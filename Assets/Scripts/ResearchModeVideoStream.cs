@@ -5,13 +5,19 @@ using System;
 using System.Runtime.InteropServices;
 
 #if ENABLE_WINMD_SUPPORT
+#if UNITY_EDITOR
+#else
 using HL2UnityPlugin;
+#endif
 #endif
 
 public class ResearchModeVideoStream : MonoBehaviour
 {
 #if ENABLE_WINMD_SUPPORT
+#if UNITY_EDITOR
+#else
     HL2ResearchMode researchMode;
+#endif
 #endif
 
     TCPClient tcpClient;
@@ -73,6 +79,8 @@ public class ResearchModeVideoStream : MonoBehaviour
         tcpClient = GetComponent<TCPClient>();
 
 #if ENABLE_WINMD_SUPPORT
+#if UNITY_EDITOR
+#else
         researchMode = new HL2ResearchMode();
         researchMode.InitializeDepthSensor();
         researchMode.InitializeLongDepthSensor();
@@ -86,12 +94,15 @@ public class ResearchModeVideoStream : MonoBehaviour
         
         researchMode.StartSpatialCamerasFrontLoop();
 #endif
+#endif
     }
 
     bool startRealtimePreview = true;
     void LateUpdate()
     {
 #if ENABLE_WINMD_SUPPORT
+#if UNITY_EDITOR
+#else
         // update depth map texture
         if (startRealtimePreview && researchMode.DepthMapTextureUpdated())
         {
@@ -207,6 +218,7 @@ public class ResearchModeVideoStream : MonoBehaviour
             }
         }
 #endif
+#endif
     }
 
 
@@ -233,7 +245,10 @@ public class ResearchModeVideoStream : MonoBehaviour
     public void StopSensorsEvent()
     {
 #if ENABLE_WINMD_SUPPORT
+#if UNITY_EDITOR
+#else
         researchMode.StopAllSensorDevice();
+#endif
 #endif
         startRealtimePreview = false;
     }
@@ -241,8 +256,11 @@ public class ResearchModeVideoStream : MonoBehaviour
     public void SaveAHATSensorDataEvent()
     {
 #if ENABLE_WINMD_SUPPORT
+#if UNITY_EDITOR
+#else
         var depthMap = researchMode.GetDepthMapBuffer();
         var AbImage = researchMode.GetShortAbImageBuffer();
+#endif
 #if WINDOWS_UWP
         tcpClient.SendUINT16Async(depthMap, AbImage);
 #endif

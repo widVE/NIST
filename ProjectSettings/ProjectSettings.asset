@@ -129,6 +129,8 @@ PlayerSettings:
     Others: 1
   bundleVersion: 0.1
   preloadedAssets:
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: -5691421039504993335, guid: 5f5776f591d9edd4c8c0ffc2a876792f, type: 2}
   - {fileID: 8880289550110572756, guid: 83d1380544b4b094d815fc57648a9999, type: 2}
   metroInputSource: 0
@@ -582,7 +584,8 @@ PlayerSettings:
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    14: ENABLE_WINMD_SUPPORT
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}
@@ -603,7 +606,7 @@ PlayerSettings:
   m_MobileRenderingPath: 1
   metroPackageName: EasyVizAR
   metroPackageVersion: 1.0.0.0
-  metroCertificatePath: D:\NIST_AR\NIST_AR\Assets\WSATestCertificate.pfx
+  metroCertificatePath: Assets/WSATestCertificate.pfx
   metroCertificatePassword: 
   metroCertificateSubject: DefaultCompany
   metroCertificateIssuer: DefaultCompany
