@@ -635,7 +635,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!64 &891683167
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -3883,8 +3883,8 @@ MonoBehaviour:
   OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
+      - m_Target: {fileID: 891080480}
+        m_TargetAssemblyTypeName: ResearchModeVideoStream, Assembly-CSharp
         m_MethodName: TogglePointCloudEvent
         m_Mode: 1
         m_Arguments:
@@ -4085,8 +4085,8 @@ MonoBehaviour:
   OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
+      - m_Target: {fileID: 891080480}
+        m_TargetAssemblyTypeName: ResearchModeVideoStream, Assembly-CSharp
         m_MethodName: StopSensorsEvent
         m_Mode: 1
         m_Arguments:
@@ -4287,8 +4287,8 @@ MonoBehaviour:
   OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
+      - m_Target: {fileID: 891080480}
+        m_TargetAssemblyTypeName: ResearchModeVideoStream, Assembly-CSharp
         m_MethodName: TogglePreviewEvent
         m_Mode: 1
         m_Arguments:

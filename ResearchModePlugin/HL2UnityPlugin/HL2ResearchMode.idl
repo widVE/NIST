@@ -1,0 +1,52 @@
+namespace HL2UnityPlugin
+{
+    runtimeclass HL2ResearchMode
+    {
+        HL2ResearchMode();
+
+        UInt16 GetCenterDepth();
+        UInt16[] GetDepthMapBuffer();
+        UInt8[] GetDepthMapTextureBuffer();
+        UInt16[] GetShortAbImageBuffer();
+        UInt8[] GetShortAbImageTextureBuffer();
+        Single[] GetPointCloudBuffer();
+
+        UInt16[] GetLongDepthMapBuffer();
+        UInt8[] GetLongDepthMapTextureBuffer();
+
+		UInt8[] GetLFCameraBuffer();
+		UInt8[] GetRFCameraBuffer();
+
+        Single[] GetCenterPoint();
+        Single[] GetDepthSensorPosition();
+        Int32 GetDepthBufferSize();
+        Int32 GetLongDepthBufferSize();
+        String PrintDepthResolution();
+        String PrintDepthExtrinsics();
+		String PrintLFResolution();
+		String PrintLFExtrinsics();
+		String PrintRFResolution();
+		String PrintRFExtrinsics();
+
+        Boolean DepthMapTextureUpdated();
+        Boolean ShortAbImageTextureUpdated();
+        Boolean PointCloudUpdated();
+        Boolean LongDepthMapTextureUpdated();
+		Boolean LFImageUpdated();
+		Boolean RFImageUpdated();
+
+        void InitializeDepthSensor();
+        void InitializeLongDepthSensor();
+        void InitializeSpatialCamerasFront();
+
+        void StartDepthSensorLoop();
+        void StartLongDepthSensorLoop();
+		void StartSpatialCamerasFrontLoop();
+
+        void StopAllSensorDevice();
+
+        void SetReferenceCoordinateSystem(Windows.Perception.Spatial.SpatialCoordinateSystem refCoord);
+        void SetPointCloudRoiInSpace(Single centerX, Single centerY, Single centerZ, Single boundX, Single boundY, Single boundZ);
+        void SetPointCloudDepthOffset(UInt16 offset);
+    }
+}

@@ -89,8 +89,8 @@ public class ResearchModeVideoStream : MonoBehaviour
         researchMode.SetPointCloudDepthOffset(0);
 
         // Depth sensor should be initialized in only one mode
-        researchMode.StartDepthSensorLoop();
-        //researchMode.StartLongDepthSensorLoop(); 
+        //researchMode.StartDepthSensorLoop();
+        researchMode.StartLongDepthSensorLoop(); 
         
         researchMode.StartSpatialCamerasFrontLoop();
 #endif
@@ -141,25 +141,26 @@ public class ResearchModeVideoStream : MonoBehaviour
                 shortAbImageMediaTexture.Apply();
             }
         }
+		
         // update long depth map texture
-        //if (researchMode.LongDepthMapTextureUpdated())
-        //{
-        //    byte[] frameTexture = researchMode.GetLongDepthMapTextureBuffer();
-        //    if (frameTexture.Length > 0)
-        //    {
-        //        if (longDepthFrameData == null)
-        //        {
-        //            longDepthFrameData = frameTexture;
-        //        }
-        //        else
-        //        {
-        //            System.Buffer.BlockCopy(frameTexture, 0, longDepthFrameData, 0, longDepthFrameData.Length);
-        //        }
+        if (startRealtimePreview && researchMode.LongDepthMapTextureUpdated())
+        {
+            byte[] frameTexture = researchMode.GetLongDepthMapTextureBuffer();
+            if (frameTexture.Length > 0)
+            {
+                if (longDepthFrameData == null)
+                {
+                    longDepthFrameData = frameTexture;
+                }
+                else
+                {
+                    System.Buffer.BlockCopy(frameTexture, 0, longDepthFrameData, 0, longDepthFrameData.Length);
+                }
 
-        //        longDepthMediaTexture.LoadRawTextureData(longDepthFrameData);
-        //        longDepthMediaTexture.Apply();
-        //    }
-        //}
+                longDepthMediaTexture.LoadRawTextureData(longDepthFrameData);
+                longDepthMediaTexture.Apply();
+            }
+        }
 
         // update LF camera texture
         if (startRealtimePreview && researchMode.LFImageUpdated())
