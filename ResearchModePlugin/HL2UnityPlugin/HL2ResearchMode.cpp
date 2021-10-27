@@ -102,12 +102,29 @@ namespace winrt::HL2UnityPlugin::implementation
                 winrt::check_hresult(m_LFCameraSensor->GetCameraExtrinsicsMatrix(&m_LFCameraPose));
                 m_LFCameraPoseInvMatrix = XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_LFCameraPose));
             }
+            
+            if (sensorDescriptor.sensorType == LEFT_LEFT)
+            {
+                winrt::check_hresult(m_pSensorDevice->GetSensor(sensorDescriptor.sensorType, &m_LFSensorSide));
+                winrt::check_hresult(m_LFSensorSide->QueryInterface(IID_PPV_ARGS(&m_LFCameraSensorSide)));
+                winrt::check_hresult(m_LFCameraSensorSide->GetCameraExtrinsicsMatrix(&m_LFCameraPoseSide));
+                m_LFCameraPoseInvMatrixSide = XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_LFCameraPoseSide));
+            }
+
             if (sensorDescriptor.sensorType == RIGHT_FRONT)
             {
                 winrt::check_hresult(m_pSensorDevice->GetSensor(sensorDescriptor.sensorType, &m_RFSensor));
                 winrt::check_hresult(m_RFSensor->QueryInterface(IID_PPV_ARGS(&m_RFCameraSensor)));
                 winrt::check_hresult(m_RFCameraSensor->GetCameraExtrinsicsMatrix(&m_RFCameraPose));
                 m_RFCameraPoseInvMatrix = XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_RFCameraPose));
+            }
+
+            if (sensorDescriptor.sensorType == RIGHT_RIGHT)
+            {
+                winrt::check_hresult(m_pSensorDevice->GetSensor(sensorDescriptor.sensorType, &m_RFSensorSide));
+                winrt::check_hresult(m_RFSensorSide->QueryInterface(IID_PPV_ARGS(&m_RFCameraSensorSide)));
+                winrt::check_hresult(m_RFCameraSensorSide->GetCameraExtrinsicsMatrix(&m_RFCameraPoseSide));
+                m_RFCameraPoseInvMatrixSide = XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_RFCameraPoseSide));
             }
         }
     }
@@ -380,6 +397,7 @@ namespace winrt::HL2UnityPlugin::implementation
                 pHL2ResearchMode->m_longDepthBufferSize = outBufferCount;
 
                 auto pDepthTexture = std::make_unique<uint8_t[]>(outBufferCount);
+                std::vector<float> pointCloud;
 
                 // get tracking transform
                 ResearchModeSensorTimestamp timestamp;
@@ -392,6 +410,27 @@ namespace winrt::HL2UnityPlugin::implementation
                     continue;
                 }
 
+                auto rot = transToWorld.Orientation();
+                /*{
+                    std::stringstream ss;
+                    ss << rot.x << "," << rot.y << "," << rot.z << "," << rot.w << "\n";
+                    std::string msg = ss.str();
+                    std::wstring widemsg = std::wstring(msg.begin(), msg.end());
+                    OutputDebugString(widemsg.c_str());
+                }*/
+                auto quatInDx = XMFLOAT4(rot.x, rot.y, rot.z, rot.w);
+                auto rotMat = XMMatrixRotationQuaternion(XMLoadFloat4(&quatInDx));
+                auto pos = transToWorld.Position();
+                auto posMat = XMMatrixTranslation(pos.x, pos.y, pos.z);
+                auto depthToWorld = pHL2ResearchMode->m_depthCameraPoseInvMatrix * rotMat * posMat;
+
+                pHL2ResearchMode->mu.lock();
+                auto roiCenterFloat = XMFLOAT3(pHL2ResearchMode->m_roiCenter[0], pHL2ResearchMode->m_roiCenter[1], pHL2ResearchMode->m_roiCenter[2]);
+                auto roiBoundFloat = XMFLOAT3(pHL2ResearchMode->m_roiBound[0], pHL2ResearchMode->m_roiBound[1], pHL2ResearchMode->m_roiBound[2]);
+                pHL2ResearchMode->mu.unlock();
+                XMVECTOR roiCenter = XMLoadFloat3(&roiCenterFloat);
+                XMVECTOR roiBound = XMLoadFloat3(&roiBoundFloat);
+
                 for (UINT i = 0; i < resolution.Height; i++)
                 {
                     for (UINT j = 0; j < resolution.Width; j++)
@@ -400,9 +439,51 @@ namespace winrt::HL2UnityPlugin::implementation
                         UINT16 depth = pDepth[idx];
                         depth = (pSigma[idx] & 0x80) ? 0 : depth - pHL2ResearchMode->m_depthOffset;
 
+                        /*auto idx = resolution.Width * i + j;
+                        UINT16 depth = pDepth[idx];
+                        depth = (depth > 4090) ? 0 : depth - pHL2ResearchMode->m_depthOffset;*/
+
+                        // back-project point cloud within Roi
+                        if (i > pHL2ResearchMode->depthCamRoi.kRowLower * resolution.Height && i < pHL2ResearchMode->depthCamRoi.kRowUpper * resolution.Height &&
+                            j > pHL2ResearchMode->depthCamRoi.kColLower * resolution.Width && j < pHL2ResearchMode->depthCamRoi.kColUpper * resolution.Width &&
+                            depth > pHL2ResearchMode->depthCamRoi.depthNearClip && depth < pHL2ResearchMode->depthCamRoi.depthFarClip)
+                        {
+                            float xy[2] = { 0, 0 };
+                            float uv[2] = { j, i };
+                            pHL2ResearchMode->m_pDepthCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
+                            auto pointOnUnitPlane = XMFLOAT3(xy[0], xy[1], 1);
+                            
+                            auto tempPoint = (float)depth / 4000 * XMVector3Normalize(XMLoadFloat3(&pointOnUnitPlane));
+                            // apply transformation
+                            auto pointInWorld = XMVector3Transform(tempPoint, depthToWorld);
+
+                            // filter point cloud based on region of interest
+                            if (!pHL2ResearchMode->m_useRoiFilter ||
+                                (pHL2ResearchMode->m_useRoiFilter && XMVector3InBounds(pointInWorld - roiCenter, roiBound)))
+                            {
+                                pointCloud.push_back(XMVectorGetX(pointInWorld));
+                                pointCloud.push_back(XMVectorGetY(pointInWorld));
+                                pointCloud.push_back(-XMVectorGetZ(pointInWorld));
+                            }
+                        }
+
                         // save as grayscale texture pixel into temp buffer
                         if (depth == 0) { pDepthTexture.get()[idx] = 0; }
                         else { pDepthTexture.get()[idx] = (uint8_t)((float)depth / 4000 * 255); }
+
+                        // save the depth of center pixel
+                        if (i == (UINT)(0.35 * resolution.Height) && j == (UINT)(0.5 * resolution.Width)
+                            && pointCloud.size() >= 3)
+                        {
+                            pHL2ResearchMode->m_centerDepth = depth;
+                            if (depth > pHL2ResearchMode->depthCamRoi.depthNearClip && depth < pHL2ResearchMode->depthCamRoi.depthFarClip)
+                            {
+                                std::lock_guard<std::mutex> l(pHL2ResearchMode->mu);
+                                pHL2ResearchMode->m_centerPoint[0] = *(pointCloud.end() - 3);
+                                pHL2ResearchMode->m_centerPoint[1] = *(pointCloud.end() - 2);
+                                pHL2ResearchMode->m_centerPoint[2] = *(pointCloud.end() - 1);
+                            }
+                        }
                     }
                 }
 
