@@ -203,6 +203,8 @@ namespace winrt::HL2UnityPlugin::implementation
                 auto pos = transToWorld.Position();
                 auto posMat = XMMatrixTranslation(pos.x, pos.y, pos.z);
                 auto depthToWorld = pHL2ResearchMode->m_depthCameraPoseInvMatrix * rotMat * posMat;
+                
+                pHL2ResearchMode->m_longDepthWorldTransform = depthToWorld;
 
                 pHL2ResearchMode->mu.lock();
                 auto roiCenterFloat = XMFLOAT3(pHL2ResearchMode->m_roiCenter[0], pHL2ResearchMode->m_roiCenter[1], pHL2ResearchMode->m_roiCenter[2]);
@@ -422,19 +424,21 @@ namespace winrt::HL2UnityPlugin::implementation
                 auto rotMat = XMMatrixRotationQuaternion(XMLoadFloat4(&quatInDx));
                 auto pos = transToWorld.Position();
                 auto posMat = XMMatrixTranslation(pos.x, pos.y, pos.z);
-                auto depthToWorld = pHL2ResearchMode->m_longDepthCameraPoseInvMatrix * rotMat * posMat;
+                auto depthToWorld = pHL2ResearchMode->m_depthCameraPoseInvMatrix * rotMat * posMat;
 
                 pHL2ResearchMode->mu.lock();
+
                 pHL2ResearchMode->m_depthSensorPosition[0] = pos.x;
                 pHL2ResearchMode->m_depthSensorPosition[1] = pos.y;
                 pHL2ResearchMode->m_depthSensorPosition[2] = pos.z;
+
                 auto roiCenterFloat = XMFLOAT3(pHL2ResearchMode->m_roiCenter[0], pHL2ResearchMode->m_roiCenter[1], pHL2ResearchMode->m_roiCenter[2]);
                 auto roiBoundFloat = XMFLOAT3(pHL2ResearchMode->m_roiBound[0], pHL2ResearchMode->m_roiBound[1], pHL2ResearchMode->m_roiBound[2]);
                 pHL2ResearchMode->mu.unlock();
                 XMVECTOR roiCenter = XMLoadFloat3(&roiCenterFloat);
                 XMVECTOR roiBound = XMLoadFloat3(&roiBoundFloat);
 
-                for (UINT i = resolution.Height-1; i >= 0; i--)
+                for (UINT i = 0; i < resolution.Height; i++)
                 {
                     for (UINT j = 0; j < resolution.Width; j++)
                     {
@@ -453,7 +457,7 @@ namespace winrt::HL2UnityPlugin::implementation
                         {
                             float xy[2] = { 0, 0 };
                             float uv[2] = { j, i };
-                            pHL2ResearchMode->m_pLongDepthCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
+                            pHL2ResearchMode->m_pDepthCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
                             auto pointOnUnitPlane = XMFLOAT3(xy[0], xy[1], 1);
                             
                             auto tempPoint = (float)depth / 4000 * XMVector3Normalize(XMLoadFloat3(&pointOnUnitPlane));
@@ -461,7 +465,7 @@ namespace winrt::HL2UnityPlugin::implementation
                             auto pointInWorld = XMVector3Transform(tempPoint, depthToWorld);
 
                             // filter point cloud based on region of interest
-                            /*if (!pHL2ResearchMode->m_useRoiFilter ||
+                           /* if (!pHL2ResearchMode->m_useRoiFilter ||
                                 (pHL2ResearchMode->m_useRoiFilter && XMVector3InBounds(pointInWorld - roiCenter, roiBound)))
                             {*/
                                 pointCloud.push_back(XMVectorGetX(pointInWorld));
@@ -774,17 +778,10 @@ namespace winrt::HL2UnityPlugin::implementation
             m_longDepthMapTexture = nullptr;
         }
 
-        if (m_pSensorDevice != nullptr)
-        {
-            m_pSensorDevice->Release();
-            m_pSensorDevice = nullptr;
-        }
-
-        if (m_pSensorDeviceConsent != nullptr)
-        {
-            m_pSensorDeviceConsent->Release();
-            m_pSensorDeviceConsent = nullptr;
-        }
+		m_pSensorDevice->Release();
+		m_pSensorDevice = nullptr;
+		m_pSensorDeviceConsent->Release();
+		m_pSensorDeviceConsent = nullptr;
     }
 
     com_array<uint16_t> HL2ResearchMode::GetDepthMapBuffer()
@@ -921,6 +918,14 @@ namespace winrt::HL2UnityPlugin::implementation
 
         return depthSensorPos;
     }
+
+  /*com_array<float> HL2ResearchMode::GetLongDepthSensorTransform()
+    {
+        std::lock_guard<std::mutex> l(mu);
+        com_array<float> depthSensorPos = com_array<float>(std::move_iterator(m_depthSensorPosition), std::move_iterator(m_depthSensorPosition + 3));
+
+        return depthSensorPos;
+    }*/
 
     // Set the reference coordinate system. Need to be set before the sensor loop starts; otherwise, default coordinate will be used.
     void HL2ResearchMode::SetReferenceCoordinateSystem(winrt::Windows::Perception::Spatial::SpatialCoordinateSystem refCoord)

@@ -1,0 +1,21 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{cb9f62f1-a470-b66d-fa3d-3aad788ec98e}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.MixedReality.QR.Editor", "Microsoft.MixedReality.QR.Editor.csproj", "{96a0b5cb-faae-940f-446e-88076d4f27e6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{cb9f62f1-a470-b66d-fa3d-3aad788ec98e}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{cb9f62f1-a470-b66d-fa3d-3aad788ec98e}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96a0b5cb-faae-940f-446e-88076d4f27e6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96a0b5cb-faae-940f-446e-88076d4f27e6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -8,6 +8,7 @@ public class TakeColorPhoto : MonoBehaviour
 {
 	private UnityEngine.Windows.WebCam.PhotoCapture photoCaptureObject = null;
 
+	bool _isCapturing = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,7 +23,11 @@ public class TakeColorPhoto : MonoBehaviour
 	
 	public void TakeAColorPhoto()
 	{
-		PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
+		if(!_isCapturing)
+		{
+			_isCapturing = true;
+			PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
+		}
 	}
 	
 	void OnPhotoCaptureCreated(UnityEngine.Windows.WebCam.PhotoCapture captureObject)
@@ -71,12 +76,14 @@ public class TakeColorPhoto : MonoBehaviour
 	{
 		if (result.success)
 		{
-			Debug.Log("Saved Photo to disk!");
+			//Debug.Log("Saved Photo to disk!");
 			photoCaptureObject.StopPhotoModeAsync(OnStoppedPhotoMode);
 		}
 		else
 		{
-			Debug.Log("Failed to save Photo to disk");
+			//Debug.Log("Failed to save Photo to disk");
 		}
+		
+		_isCapturing = false;
 	}
 }
