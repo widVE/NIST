@@ -26,7 +26,7 @@ git clone https://github.com/widVE/NIST.git
 2. **Build** this project for **Release and ARM 64** in Visual Studio 2019/2022. 
 3. Copy the DLL files that are generated in the **NIST/ResearchModePlugin/ARM64/Release/HL2UnityPlugin** folder to **NIST/Assets/Plugins/WSA/ARM64** (replace the DLL file if there already exist one).
 4. Open the NIST project in **Unity**.
-5. Switch the to **Window Universal Platform** in **File -> Building Settings** in Unity, change the **Target Device** to Hololens, change the **Architecture to ARM64**. Make sure your minimum platform version is set to **10.0.18362.0.** Note: Don’t forget to click Add Open Scenes. 
+5. Switch the to **Window Universal Platform** in **File -> Building Settings** in Unity, change the **Target Device** to Hololens, change the **Architecture to ARM64**. Note: Don’t forget to click Add Open Scenes. 
 6. Make any changes you want to the Unity project, and then do a **build for Windows Universal Platform** - I typically build it in a folder I call NIST/NISTBuild
 7. Attach the Hololens 2 via **USB** and enter the pin.
 8. Open the built file (in our example is NIST/NISTBuild/NIST_AR.sln) in Visual Studio 2019/2022 and build for **ARM64 Release**. 
