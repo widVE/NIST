@@ -428,13 +428,21 @@ namespace winrt::HL2UnityPlugin::implementation
                 pHL2ResearchMode->m_depthSensorPosition[0] = pos.x;
                 pHL2ResearchMode->m_depthSensorPosition[1] = pos.y;
                 pHL2ResearchMode->m_depthSensorPosition[2] = pos.z;
+                for (int p = 0; p < 4; ++p)
+                {
+                    for (int q = 0; q < 4; ++q)
+                    {
+                        pHL2ResearchMode->m_depthToWorld[p * 4 + q] = depthToWorld.r[p].n128_f32[q];
+                    }
+                }
+
                 auto roiCenterFloat = XMFLOAT3(pHL2ResearchMode->m_roiCenter[0], pHL2ResearchMode->m_roiCenter[1], pHL2ResearchMode->m_roiCenter[2]);
                 auto roiBoundFloat = XMFLOAT3(pHL2ResearchMode->m_roiBound[0], pHL2ResearchMode->m_roiBound[1], pHL2ResearchMode->m_roiBound[2]);
                 pHL2ResearchMode->mu.unlock();
                 XMVECTOR roiCenter = XMLoadFloat3(&roiCenterFloat);
                 XMVECTOR roiBound = XMLoadFloat3(&roiBoundFloat);
 
-                for (UINT i = resolution.Height-1; i >= 0; i--)
+                for (UINT i = 0; i < resolution.Height; i++)
                 {
                     for (UINT j = 0; j < resolution.Width; j++)
                     {
@@ -556,6 +564,8 @@ namespace winrt::HL2UnityPlugin::implementation
 
         pHL2ResearchMode->m_LFSensor->OpenStream();
         pHL2ResearchMode->m_RFSensor->OpenStream();
+        pHL2ResearchMode->m_LFSensorSide->OpenStream();
+        pHL2ResearchMode->m_RFSensorSide->OpenStream();
 
         try
         {
@@ -565,28 +575,57 @@ namespace winrt::HL2UnityPlugin::implementation
                 IResearchModeSensorFrame* pRFCameraFrame = nullptr;
                 ResearchModeSensorResolution LFResolution;
                 ResearchModeSensorResolution RFResolution;
+
+                IResearchModeSensorFrame* pLRCameraFrame = nullptr;
+                IResearchModeSensorFrame* pRRCameraFrame = nullptr;
+                ResearchModeSensorResolution LRResolution;
+                ResearchModeSensorResolution RRResolution;
+
                 pHL2ResearchMode->m_LFSensor->GetNextBuffer(&pLFCameraFrame);
 				pHL2ResearchMode->m_RFSensor->GetNextBuffer(&pRFCameraFrame);
+                pHL2ResearchMode->m_LFSensorSide->GetNextBuffer(&pLRCameraFrame);
+                pHL2ResearchMode->m_RFSensorSide->GetNextBuffer(&pRRCameraFrame);
 
                 // process sensor frame
                 pLFCameraFrame->GetResolution(&LFResolution);
                 pHL2ResearchMode->m_LFResolution = LFResolution;
                 pRFCameraFrame->GetResolution(&RFResolution);
                 pHL2ResearchMode->m_RFResolution = RFResolution;
+                
+                pLRCameraFrame->GetResolution(&LRResolution);
+                pHL2ResearchMode->m_LRResolution = LRResolution;
+                pRRCameraFrame->GetResolution(&RRResolution);
+                pHL2ResearchMode->m_RRResolution = RRResolution;
 
                 IResearchModeSensorVLCFrame* pLFFrame = nullptr;
                 winrt::check_hresult(pLFCameraFrame->QueryInterface(IID_PPV_ARGS(&pLFFrame)));
                 IResearchModeSensorVLCFrame* pRFFrame = nullptr;
                 winrt::check_hresult(pRFCameraFrame->QueryInterface(IID_PPV_ARGS(&pRFFrame)));
 
+                IResearchModeSensorVLCFrame* pLRFrame = nullptr;
+                winrt::check_hresult(pLRCameraFrame->QueryInterface(IID_PPV_ARGS(&pLRFrame)));
+                IResearchModeSensorVLCFrame* pRRFrame = nullptr;
+                winrt::check_hresult(pRRCameraFrame->QueryInterface(IID_PPV_ARGS(&pRRFrame)));
+
                 size_t LFOutBufferCount = 0;
                 const BYTE *pLFImage = nullptr;
                 pLFFrame->GetBuffer(&pLFImage, &LFOutBufferCount);
                 pHL2ResearchMode->m_LFbufferSize = LFOutBufferCount;
+
 				size_t RFOutBufferCount = 0;
 				const BYTE *pRFImage = nullptr;
 				pRFFrame->GetBuffer(&pRFImage, &RFOutBufferCount);
 				pHL2ResearchMode->m_RFbufferSize = RFOutBufferCount;
+
+                size_t LROutBufferCount = 0;
+                const BYTE* pLRImage = nullptr;
+                pLRFrame->GetBuffer(&pLRImage, &LROutBufferCount);
+                pHL2ResearchMode->m_LRbufferSize = LROutBufferCount;
+
+                size_t RROutBufferCount = 0;
+                const BYTE* pRRImage = nullptr;
+                pRRFrame->GetBuffer(&pRRImage, &RROutBufferCount);
+                pHL2ResearchMode->m_RRbufferSize = RROutBufferCount;
 
                 // get tracking transform
                 ResearchModeSensorTimestamp timestamp;
@@ -613,6 +652,10 @@ namespace winrt::HL2UnityPlugin::implementation
                 auto LfToWorld = pHL2ResearchMode->m_LFCameraPoseInvMatrix * rotMat * posMat;
 				auto RfToWorld = pHL2ResearchMode->m_RFCameraPoseInvMatrix * rotMat * posMat;
 
+                auto LrToWorld = pHL2ResearchMode->m_LFCameraPoseInvMatrixSide * rotMat * posMat;
+                auto RrToWorld = pHL2ResearchMode->m_RFCameraPoseInvMatrixSide * rotMat * posMat;
+
+
                 // save data
                 {
                     std::lock_guard<std::mutex> l(pHL2ResearchMode->mu);
@@ -631,16 +674,38 @@ namespace winrt::HL2UnityPlugin::implementation
 						pHL2ResearchMode->m_RFImage = new UINT8[RFOutBufferCount];
 					}
 					memcpy(pHL2ResearchMode->m_RFImage, pRFImage, RFOutBufferCount * sizeof(UINT8));
+
+                    if (!pHL2ResearchMode->m_LRImage)
+                    {
+                        OutputDebugString(L"Create Space for Left Side Image...\n");
+                        pHL2ResearchMode->m_LRImage = new UINT8[LROutBufferCount];
+                    }
+                    memcpy(pHL2ResearchMode->m_LRImage, pLRImage, LROutBufferCount * sizeof(UINT8));
+                   
+                    if (!pHL2ResearchMode->m_RRImage)
+                    {
+                        OutputDebugString(L"Create Space for Right Side Image...\n");
+                        pHL2ResearchMode->m_RRImage = new UINT8[RROutBufferCount];
+                    }
+                    memcpy(pHL2ResearchMode->m_RRImage, pRRImage, RROutBufferCount * sizeof(UINT8));
+
                 }
 				pHL2ResearchMode->m_LFImageUpdated = true;
 				pHL2ResearchMode->m_RFImageUpdated = true;
+                pHL2ResearchMode->m_LRImageUpdated = true;
+                pHL2ResearchMode->m_RRImageUpdated = true;
 
                 // release space
 				if (pLFFrame) pLFFrame->Release();
 				if (pRFFrame) pRFFrame->Release();
+                if (pLRFrame) pLRFrame->Release();
+                if (pRRFrame) pRRFrame->Release();
 
 				if (pLFCameraFrame) pLFCameraFrame->Release();
 				if (pRFCameraFrame) pRFCameraFrame->Release();
+
+                if (pLRCameraFrame) pLRCameraFrame->Release();
+                if (pRRCameraFrame) pRRCameraFrame->Release();
             }
         }
         catch (...) {}
@@ -651,6 +716,14 @@ namespace winrt::HL2UnityPlugin::implementation
 		pHL2ResearchMode->m_RFSensor->CloseStream();
 		pHL2ResearchMode->m_RFSensor->Release();
 		pHL2ResearchMode->m_RFSensor = nullptr;
+
+        pHL2ResearchMode->m_LFSensorSide->CloseStream();
+        pHL2ResearchMode->m_LFSensorSide->Release();
+        pHL2ResearchMode->m_LFSensorSide = nullptr;
+
+        pHL2ResearchMode->m_RFSensorSide->CloseStream();
+        pHL2ResearchMode->m_RFSensorSide->Release();
+        pHL2ResearchMode->m_RFSensorSide = nullptr;
     }
 
     void HL2ResearchMode::CamAccessOnComplete(ResearchModeSensorConsent consent)
@@ -676,6 +749,10 @@ namespace winrt::HL2UnityPlugin::implementation
 	inline bool HL2ResearchMode::LFImageUpdated() { return m_LFImageUpdated; }
 
 	inline bool HL2ResearchMode::RFImageUpdated() { return m_RFImageUpdated; }
+
+    inline bool HL2ResearchMode::LRImageUpdated() { return m_LRImageUpdated; }
+
+    inline bool HL2ResearchMode::RRImageUpdated() { return m_RRImageUpdated; }
 
     hstring HL2ResearchMode::PrintDepthResolution()
     {
@@ -877,6 +954,19 @@ namespace winrt::HL2UnityPlugin::implementation
 		return tempBuffer;
 	}
 
+    com_array<uint8_t> HL2ResearchMode::GetLRCameraBuffer()
+    {
+        std::lock_guard<std::mutex> l(mu);
+        if (!m_LRImage)
+        {
+            return com_array<UINT8>();
+        }
+        com_array<UINT8> tempBuffer = com_array<UINT8>(std::move_iterator(m_LRImage), std::move_iterator(m_LRImage + m_LRbufferSize));
+
+        m_LRImageUpdated = false;
+        return tempBuffer;
+    }
+
 	com_array<uint8_t> HL2ResearchMode::GetRFCameraBuffer()
 	{
 		std::lock_guard<std::mutex> l(mu);
@@ -890,6 +980,18 @@ namespace winrt::HL2UnityPlugin::implementation
 		return tempBuffer;
 	}
 
+    com_array<uint8_t> HL2ResearchMode::GetRRCameraBuffer()
+    {
+        std::lock_guard<std::mutex> l(mu);
+        if (!m_RRImage)
+        {
+            return com_array<UINT8>();
+        }
+        com_array<UINT8> tempBuffer = com_array<UINT8>(std::move_iterator(m_RRImage), std::move_iterator(m_RRImage + m_RRbufferSize));
+
+        m_RRImageUpdated = false;
+        return tempBuffer;
+    }
 
     // Get the buffer for point cloud in the form of float array.
     // There will be 3n elements in the array where the 3i, 3i+1, 3i+2 element correspond to x, y, z component of the i'th point. (i->[0,n-1])

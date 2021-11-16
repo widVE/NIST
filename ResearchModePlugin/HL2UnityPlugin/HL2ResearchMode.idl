@@ -16,6 +16,8 @@ namespace HL2UnityPlugin
 
 		UInt8[] GetLFCameraBuffer();
 		UInt8[] GetRFCameraBuffer();
+        UInt8[] GetLRCameraBuffer();
+        UInt8[] GetRRCameraBuffer();
 
         Single[] GetCenterPoint();
         Single[] GetDepthSensorPosition();
@@ -34,6 +36,8 @@ namespace HL2UnityPlugin
         Boolean LongDepthMapTextureUpdated();
 		Boolean LFImageUpdated();
 		Boolean RFImageUpdated();
+        Boolean LRImageUpdated();
+        Boolean RRImageUpdated();
 
         void InitializeDepthSensor();
         void InitializeLongDepthSensor();

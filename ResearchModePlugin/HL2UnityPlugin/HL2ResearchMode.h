@@ -47,6 +47,8 @@ namespace winrt::HL2UnityPlugin::implementation
         bool LongDepthMapTextureUpdated();
 		bool LFImageUpdated();
 		bool RFImageUpdated();
+        bool LRImageUpdated();
+        bool RRImageUpdated();
 
         void SetReferenceCoordinateSystem(Windows::Perception::Spatial::SpatialCoordinateSystem refCoord);
         void SetPointCloudRoiInSpace(float centerX, float centerY, float centerZ, float boundX, float boundY, float boundZ);
@@ -59,6 +61,8 @@ namespace winrt::HL2UnityPlugin::implementation
         com_array<uint8_t> GetLongDepthMapTextureBuffer();
 		com_array<uint8_t> GetLFCameraBuffer();
 		com_array<uint8_t> GetRFCameraBuffer();
+        com_array<uint8_t> GetLRCameraBuffer();
+        com_array<uint8_t> GetRRCameraBuffer();
         com_array<float> GetPointCloudBuffer();
         com_array<float> GetCenterPoint();
         com_array<float> GetDepthSensorPosition();
@@ -75,6 +79,8 @@ namespace winrt::HL2UnityPlugin::implementation
         UINT8* m_longDepthMapTexture = nullptr;
 		UINT8* m_LFImage = nullptr;
 		UINT8* m_RFImage = nullptr;
+        UINT8* m_LRImage = nullptr;
+        UINT8* m_RRImage = nullptr;
         IResearchModeSensor* m_depthSensor = nullptr;
         IResearchModeCameraSensor* m_pDepthCameraSensor = nullptr;
         IResearchModeSensor* m_longDepthSensor = nullptr;
@@ -91,6 +97,8 @@ namespace winrt::HL2UnityPlugin::implementation
         ResearchModeSensorResolution m_longDepthResolution;
         ResearchModeSensorResolution m_LFResolution;
         ResearchModeSensorResolution m_RFResolution;
+        ResearchModeSensorResolution m_LRResolution;
+        ResearchModeSensorResolution m_RRResolution;
         IResearchModeSensorDevice* m_pSensorDevice = nullptr;
         std::vector<ResearchModeSensorDescriptor> m_sensorDescriptors;
         IResearchModeSensorDeviceConsent* m_pSensorDeviceConsent = nullptr;
@@ -100,9 +108,12 @@ namespace winrt::HL2UnityPlugin::implementation
         std::atomic_int m_longDepthBufferSize = 0;
         std::atomic_int m_LFbufferSize = 0;
         std::atomic_int m_RFbufferSize = 0;
+        std::atomic_int m_LRbufferSize = 0;
+        std::atomic_int m_RRbufferSize = 0;
         std::atomic_uint16_t m_centerDepth = 0;
         float m_centerPoint[3]{ 0,0,0 };
         float m_depthSensorPosition[3]{ 0,0,0 };
+        float m_depthToWorld[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
         std::atomic_bool m_depthSensorLoopStarted = false;
         std::atomic_bool m_longDepthSensorLoopStarted = false;
         std::atomic_bool m_spatialCamerasFrontLoopStarted = false;
@@ -113,6 +124,8 @@ namespace winrt::HL2UnityPlugin::implementation
         std::atomic_bool m_useRoiFilter = false;
 		std::atomic_bool m_LFImageUpdated = false;
 		std::atomic_bool m_RFImageUpdated = false;
+        std::atomic_bool m_LRImageUpdated = false;
+        std::atomic_bool m_RRImageUpdated = false;
 
         float m_roiBound[3]{ 0,0,0 };
         float m_roiCenter[3]{ 0,0,0 };

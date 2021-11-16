@@ -4,6 +4,9 @@ using UnityEngine;
 using System;
 using System.Runtime.InteropServices;
 using System.IO;
+using UnityEngine.Windows.WebCam;
+using System.Linq;
+//using Microsoft.MixedReality.Toolkit;
 
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
@@ -20,6 +23,8 @@ public class ResearchModeVideoStream : MonoBehaviour
     HL2ResearchMode researchMode;
 #endif
 #endif
+
+	private UnityEngine.Windows.WebCam.PhotoCapture photoCaptureObject = null;
 
     TCPClient tcpClient;
 
@@ -48,16 +53,23 @@ public class ResearchModeVideoStream : MonoBehaviour
     private Texture2D RFMediaTexture = null;
     private byte[] RFFrameData = null;
 
+    public GameObject LRPreviewPlane = null;
+    private Material LRMediaMaterial = null;
+    private Texture2D LRMediaTexture = null;
+    private byte[] LRFrameData = null;
 
+    public GameObject RRPreviewPlane = null;
+    private Material RRMediaMaterial = null;
+    private Texture2D RRMediaTexture = null;
+    private byte[] RRFrameData = null;
+	
     public GameObject pointCloudRendererGo;
     public Color pointColor = Color.white;
     private PointCloudRenderer pointCloudRenderer;
 	
 	bool startRealtimePreview = true;
 	bool renderPointCloud = false;
-	
-	[SerializeField]
-	TakeColorPhoto _photoCapture;
+	bool _isCapturing = false;
 	
 	float _lastCaptureTime = 0.0f;
 	
@@ -97,6 +109,20 @@ public class ResearchModeVideoStream : MonoBehaviour
 			RFMediaTexture = new Texture2D(640, 480, TextureFormat.Alpha8, false);
 			RFMediaMaterial.mainTexture = RFMediaTexture;
 		}
+		
+		if(LRPreviewPlane != null)
+		{
+			LRMediaMaterial = LRPreviewPlane.GetComponent<MeshRenderer>().material;
+			LRMediaTexture = new Texture2D(640, 480, TextureFormat.Alpha8, false);
+			LRMediaMaterial.mainTexture = LRMediaTexture;
+		}
+		
+		if(RRPreviewPlane != null)
+		{
+			RRMediaMaterial = RRPreviewPlane.GetComponent<MeshRenderer>().material;
+			RRMediaTexture = new Texture2D(640, 480, TextureFormat.Alpha8, false);
+			RRMediaMaterial.mainTexture = RRMediaTexture;
+		}
 
 		if(pointCloudRendererGo != null)
 		{
@@ -125,7 +151,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 			researchMode.StartDepthSensorLoop();
 		}
         
-		if(LFPreviewPlane != null || RFPreviewPlane != null)
+		if(LFPreviewPlane != null || RFPreviewPlane != null || RRPreviewPlane != null || RFPreviewPlane != null)
 		{
 			researchMode.InitializeSpatialCamerasFront();
 			researchMode.StartSpatialCamerasFrontLoop();
@@ -134,7 +160,124 @@ public class ResearchModeVideoStream : MonoBehaviour
 #endif
     }
 
-    
+    public void TakeAColorPhoto()
+	{
+		if(!_isCapturing)
+		{
+			_isCapturing = true;
+			PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
+		}
+	}
+	
+	/*public void SetVisualizationOfSpatialMapping(Microsoft.MixedReality.Toolkit.SpatialAwarenessSystem.SpatialAwarenessMeshDisplayOptions option)
+	{
+		if (Microsoft.MixedReality.Toolkit.CoreServices.SpatialAwarenessSystem is IMixedRealityDataProviderAccess provider)
+		{
+			foreach (var observer in provider.GetDataProviders())
+			{
+				if (observer is IMixedRealitySpatialAwarenessMeshObserver meshObs)
+				{
+					meshObs.DisplayOption = option;
+				}
+			}
+		}
+	}*/
+	
+	void OnPhotoCaptureCreated(UnityEngine.Windows.WebCam.PhotoCapture captureObject)
+	{
+		photoCaptureObject = captureObject;
+
+		Resolution cameraResolution = PhotoCapture.SupportedResolutions.OrderByDescending((res) => res.width * res.height).First();
+		foreach (Resolution resolution in PhotoCapture.SupportedResolutions)
+        {
+            Debug.Log(resolution);
+        }
+		
+		CameraParameters c = new UnityEngine.Windows.WebCam.CameraParameters();
+		c.hologramOpacity = 0.0f;
+		c.cameraResolutionWidth = cameraResolution.width;
+		c.cameraResolutionHeight = cameraResolution.height;
+		c.pixelFormat = UnityEngine.Windows.WebCam.CapturePixelFormat.BGRA32;
+
+		captureObject.StartPhotoModeAsync(c, delegate(PhotoCapture.PhotoCaptureResult result) {
+			// Take a picture
+			string filename = string.Format(@"CapturedImage{0}_n.png", Time.time);
+			string filePath = System.IO.Path.Combine(Application.persistentDataPath, filename);
+
+			photoCaptureObject.TakePhotoAsync(filePath, PhotoCaptureFileOutputFormat.PNG, OnCapturedPhotoToDisk);
+		});
+	}
+	
+	void OnStoppedPhotoMode(PhotoCapture.PhotoCaptureResult result)
+	{
+		photoCaptureObject.Dispose();
+		photoCaptureObject = null;
+	}
+	
+	private void OnPhotoModeStarted(PhotoCapture.PhotoCaptureResult result)
+	{
+		if (result.success)
+		{
+			string filename = string.Format(@"CapturedImage{0}_n.png", Time.time);
+			string filePath = System.IO.Path.Combine(Application.persistentDataPath, filename);
+
+			photoCaptureObject.TakePhotoAsync(filePath, PhotoCaptureFileOutputFormat.PNG, OnCapturedPhotoToDisk);
+		}
+		else
+		{
+			Debug.LogError("Unable to start photo mode!");
+		}
+	}
+	
+	void OnCapturedPhotoToDisk(PhotoCapture.PhotoCaptureResult result)
+	{
+		float currTime = Time.time;
+		
+		if (result.success)
+		{
+#if UNITY_EDITOR
+#else
+			if (startRealtimePreview && researchMode.LongDepthMapTextureUpdated())
+			{
+				byte[] frameTexture = researchMode.GetLongDepthMapTextureBuffer();
+				if (frameTexture.Length > 0)
+				{
+					if (longDepthFrameData == null)
+					{
+						longDepthFrameData = frameTexture;
+					}
+					else
+					{
+						System.Buffer.BlockCopy(frameTexture, 0, longDepthFrameData, 0, longDepthFrameData.Length);
+					}
+
+					longDepthMediaTexture.LoadRawTextureData(longDepthFrameData);
+					longDepthMediaTexture.Apply();
+				
+					//write out this PNG... do this at the same time when the color photo is saved...
+					byte[] pngData = longDepthMediaTexture.EncodeToPNG();
+					string filename = string.Format(@"CapturedImageDepth{0}_n.png", currTime);
+					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), pngData);
+					
+					float[] depthPos = researchMode.GetDepthSensorPosition();
+					string depthString = depthPos[0].ToString("F4") + " " + depthPos[1].ToString("F4") + " " + depthPos[2].ToString("F4") + "\n";
+					string filenameTxt = string.Format(@"Position{0}_n.txt", currTime);
+					System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxt), depthString);
+				}
+			}
+#endif
+			//Debug.Log("Saved Photo to disk!");
+			photoCaptureObject.StopPhotoModeAsync(OnStoppedPhotoMode);
+		}
+		else
+		{
+			//Debug.Log("Failed to save Photo to disk");
+		}
+		
+		_lastCaptureTime = currTime;
+		_isCapturing = false;
+	}
+	
     void LateUpdate()
     {
 #if ENABLE_WINMD_SUPPORT
@@ -199,24 +342,18 @@ public class ResearchModeVideoStream : MonoBehaviour
 				
 				float currTime = Time.time;
 				
-				if(currTime - _lastCaptureTime > 3f)
+				if(currTime - _lastCaptureTime > 1f)
 				{
-					//write out this PNG...
-					byte[] pngData = longDepthMediaTexture.EncodeToPNG();
+					TakeAColorPhoto();
+					//write out this PNG... do this at the same time when the color photo is saved...
+					/*byte[] pngData = longDepthMediaTexture.EncodeToPNG();
 					string filename = string.Format(@"CapturedImageDepth{0}_n.png", currTime);
 					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), pngData);
-					
-					if(_photoCapture != null)
-					{
-						_photoCapture.TakeAColorPhoto();
-					}
 					
 					float[] depthPos = researchMode.GetDepthSensorPosition();
 					string depthString = depthPos[0].ToString("F4") + " " + depthPos[1].ToString("F4") + " " + depthPos[2].ToString("F4") + "\n";
 					string filenameTxt = string.Format(@"Position{0}_n.txt", currTime);
-					System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxt), depthString);
-					
-					_lastCaptureTime = currTime;
+					System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxt), depthString);*/
 				}
             }
         }
@@ -260,6 +397,44 @@ public class ResearchModeVideoStream : MonoBehaviour
             }
         }
 
+		if (startRealtimePreview && researchMode.RRImageUpdated())
+        {
+            byte[] frameTexture = researchMode.GetRRCameraBuffer();
+            if (frameTexture.Length > 0)
+            {
+                if (RRFrameData == null)
+                {
+                    RRFrameData = frameTexture;
+                }
+                else
+                {
+                    System.Buffer.BlockCopy(frameTexture, 0, RRFrameData, 0, RRFrameData.Length);
+                }
+
+                RRMediaTexture.LoadRawTextureData(RRFrameData);
+                RRMediaTexture.Apply();
+            }
+        }
+		
+		if (startRealtimePreview && researchMode.LRImageUpdated())
+        {
+            byte[] frameTexture = researchMode.GetLRCameraBuffer();
+            if (frameTexture.Length > 0)
+            {
+                if (LRFrameData == null)
+                {
+                    LRFrameData = frameTexture;
+                }
+                else
+                {
+                    System.Buffer.BlockCopy(frameTexture, 0, LRFrameData, 0, LRFrameData.Length);
+                }
+
+                LRMediaTexture.LoadRawTextureData(LRFrameData);
+                LRMediaTexture.Apply();
+            }
+        }
+		
         // Update point cloud
         if (renderPointCloud)
         {
