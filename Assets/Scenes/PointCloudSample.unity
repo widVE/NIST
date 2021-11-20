@@ -392,7 +392,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 382997460}
   m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.197, y: 0, z: 1}
+  m_LocalPosition: {x: 0.143, y: 0, z: 1}
   m_LocalScale: {x: -0.096, y: 0.128, z: 1}
   m_Children: []
   m_Father: {fileID: 1517424694}
@@ -489,7 +489,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 446940270}
   m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -0.069, y: 0, z: 1}
+  m_LocalPosition: {x: 0.02300001, y: 0, z: 1}
   m_LocalScale: {x: 0.096, y: -0.128, z: 1}
   m_Children: []
   m_Father: {fileID: 1517424694}
@@ -608,7 +608,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &463577947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -721,7 +721,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83d9acc7968244a8886f3af591305bcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activeProfile: {fileID: 11400000, guid: 31a611a779d3499e8e35f1a2018ca841, type: 2}
+  activeProfile: {fileID: 11400000, guid: 690916c2e6307764a9d89fbab3436536, type: 2}
 --- !u!4 &752144244
 Transform:
   m_ObjectHideFlags: 0
@@ -769,9 +769,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   depthPreviewPlane: {fileID: 0}
   shortAbImagePreviewPlane: {fileID: 0}
-  longDepthPreviewPlane: {fileID: 891683166}
+  longDepthPreviewPlane: {fileID: 0}
   LFPreviewPlane: {fileID: 446940270}
-  RFPreviewPlane: {fileID: 1942013569}
+  RFPreviewPlane: {fileID: 0}
   LRPreviewPlane: {fileID: 1968632944}
   RRPreviewPlane: {fileID: 382997460}
   pointCloudRendererGo: {fileID: 168399716}
@@ -834,7 +834,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &891683167
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1150,7 +1150,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &1942013570
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1320,7 +1320,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1968632944}
   m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -0.197, y: 0, z: 1}
+  m_LocalPosition: {x: -0.09099999, y: 0, z: 1}
   m_LocalScale: {x: -0.096, y: 0.128, z: 1}
   m_Children: []
   m_Father: {fileID: 1517424694}

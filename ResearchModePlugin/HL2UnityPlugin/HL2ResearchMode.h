@@ -66,6 +66,7 @@ namespace winrt::HL2UnityPlugin::implementation
         com_array<float> GetPointCloudBuffer();
         com_array<float> GetCenterPoint();
         com_array<float> GetDepthSensorPosition();
+        com_array<float> GetDepthToWorld();
         std::mutex mu;
 
     private:

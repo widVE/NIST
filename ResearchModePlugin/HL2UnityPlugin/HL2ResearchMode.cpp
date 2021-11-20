@@ -446,7 +446,7 @@ namespace winrt::HL2UnityPlugin::implementation
                 {
                     for (UINT j = 0; j < resolution.Width; j++)
                     {
-                        auto idx = resolution.Width * i + j;
+                        UINT idx = resolution.Width * ((resolution.Height - 1) - i) + j;
                         UINT16 depth = pDepth[idx];
                         depth = (pSigma[idx] & 0x80) ? 0 : depth - pHL2ResearchMode->m_depthOffset;
 
@@ -1022,6 +1022,14 @@ namespace winrt::HL2UnityPlugin::implementation
         com_array<float> depthSensorPos = com_array<float>(std::move_iterator(m_depthSensorPosition), std::move_iterator(m_depthSensorPosition + 3));
 
         return depthSensorPos;
+    }
+
+    com_array<float> HL2ResearchMode::GetDepthToWorld()
+    {
+        std::lock_guard<std::mutex> l(mu);
+        com_array<float> depthToWorld = com_array<float>(std::move_iterator(m_depthToWorld), std::move_iterator(m_depthToWorld + 16));
+
+        return depthToWorld;
     }
 
     // Set the reference coordinate system. Need to be set before the sensor loop starts; otherwise, default coordinate will be used.
