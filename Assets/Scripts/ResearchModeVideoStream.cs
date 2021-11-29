@@ -245,17 +245,31 @@ public class ResearchModeVideoStream : MonoBehaviour
 
 					longDepthMediaTexture.LoadRawTextureData(longDepthFrameData);
 					longDepthMediaTexture.Apply();
-				
+					
 					//write out this PNG... do this at the same time when the color photo is saved...
 					byte[] pngData = longDepthMediaTexture.EncodeToPNG();*/
+					
+					/*for(int j = 0; j < 320; ++j)
+					{
+						for(int i = 0; i < 288; ++i)
+						{
+							int idx = j * 288 + i;
+							int flipIdx = j * (288-1-i) + i;
+							byte b = frameTexture[idx];
+							byte flipB = frameTexture[flipIdx];
+							frameTexture[idx] = flipB;
+							frameTexture[flipIdx] = b;
+						}
+					}*/
+					
 					string filename = string.Format(@"CapturedImageDepth{0}_n.png", currTime);
 					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(frameTexture, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
 					
 					float[] depthPos = researchMode.GetDepthToWorld();
-					string depthString = depthPos[0].ToString("F4") + " " + depthPos[1].ToString("F4") + " " + depthPos[2].ToString("F4") + + depthPos[3].ToString("F4") + "\n";
-					depthString.Append(depthPos[4].ToString("F4") + " " + depthPos[5].ToString("F4") + " " + depthPos[6].ToString("F4") + + depthPos[7].ToString("F4") + "\n");
-					depthString.Append(depthPos[8].ToString("F4") + " " + depthPos[9].ToString("F4") + " " + depthPos[10].ToString("F4") + + depthPos[11].ToString("F4") + "\n");
-					depthString.Append(depthPos[12].ToString("F4") + " " + depthPos[13].ToString("F4") + " " + depthPos[14].ToString("F4") + + depthPos[15].ToString("F4") + "\n");
+					string depthString = depthPos[0].ToString("F4") + " " + depthPos[1].ToString("F4") + " " + depthPos[2].ToString("F4") + " " + depthPos[3].ToString("F4") + "\n";
+					depthString = depthString + (depthPos[4].ToString("F4") + " " + depthPos[5].ToString("F4") + " " + depthPos[6].ToString("F4") + " " + depthPos[7].ToString("F4") + "\n");
+					depthString = depthString + (depthPos[8].ToString("F4") + " " + depthPos[9].ToString("F4") + " " + depthPos[10].ToString("F4") + " " + depthPos[11].ToString("F4") + "\n");
+					depthString = depthString + (depthPos[12].ToString("F4") + " " + depthPos[13].ToString("F4") + " " + depthPos[14].ToString("F4") + " " + depthPos[15].ToString("F4") + "\n");
 					string filenameTxt = string.Format(@"Position{0}_n.txt", currTime);
 					System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxt), depthString);
 				}

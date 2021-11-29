@@ -425,6 +425,7 @@ namespace winrt::HL2UnityPlugin::implementation
                 auto depthToWorld = pHL2ResearchMode->m_longDepthCameraPoseInvMatrix * rotMat * posMat;
 
                 pHL2ResearchMode->mu.lock();
+                
                 pHL2ResearchMode->m_depthSensorPosition[0] = pos.x;
                 pHL2ResearchMode->m_depthSensorPosition[1] = pos.y;
                 pHL2ResearchMode->m_depthSensorPosition[2] = pos.z;
@@ -438,7 +439,9 @@ namespace winrt::HL2UnityPlugin::implementation
 
                 auto roiCenterFloat = XMFLOAT3(pHL2ResearchMode->m_roiCenter[0], pHL2ResearchMode->m_roiCenter[1], pHL2ResearchMode->m_roiCenter[2]);
                 auto roiBoundFloat = XMFLOAT3(pHL2ResearchMode->m_roiBound[0], pHL2ResearchMode->m_roiBound[1], pHL2ResearchMode->m_roiBound[2]);
+                
                 pHL2ResearchMode->mu.unlock();
+
                 XMVECTOR roiCenter = XMLoadFloat3(&roiCenterFloat);
                 XMVECTOR roiBound = XMLoadFloat3(&roiBoundFloat);
 
@@ -446,7 +449,7 @@ namespace winrt::HL2UnityPlugin::implementation
                 {
                     for (UINT j = 0; j < resolution.Width; j++)
                     {
-                        UINT idx = resolution.Width * ((resolution.Height - 1) - i) + j;
+                        UINT idx = resolution.Width * i + j;
                         UINT16 depth = pDepth[idx];
                         depth = (pSigma[idx] & 0x80) ? 0 : depth - pHL2ResearchMode->m_depthOffset;
 
@@ -455,9 +458,9 @@ namespace winrt::HL2UnityPlugin::implementation
                         depth = (depth > 4090) ? 0 : depth - pHL2ResearchMode->m_depthOffset;*/
 
                         // back-project point cloud within Roi
-                        if (i > pHL2ResearchMode->depthCamRoi.kRowLower * resolution.Height && i < pHL2ResearchMode->depthCamRoi.kRowUpper * resolution.Height &&
-                            j > pHL2ResearchMode->depthCamRoi.kColLower * resolution.Width && j < pHL2ResearchMode->depthCamRoi.kColUpper * resolution.Width &&
-                            depth > pHL2ResearchMode->depthCamRoi.depthNearClip && depth < pHL2ResearchMode->depthCamRoi.depthFarClip)
+                        //if (i > pHL2ResearchMode->depthCamRoi.kRowLower * resolution.Height && i < pHL2ResearchMode->depthCamRoi.kRowUpper * resolution.Height &&
+                        //    j > pHL2ResearchMode->depthCamRoi.kColLower * resolution.Width && j < pHL2ResearchMode->depthCamRoi.kColUpper * resolution.Width)// &&
+                            //depth > pHL2ResearchMode->depthCamRoi.depthNearClip && depth < pHL2ResearchMode->depthCamRoi.depthFarClip)
                         {
                             float xy[2] = { 0, 0 };
                             float uv[2] = { j, i };
@@ -467,7 +470,9 @@ namespace winrt::HL2UnityPlugin::implementation
                             auto tempPoint = (float)depth / 4000 * XMVector3Normalize(XMLoadFloat3(&pointOnUnitPlane));
                             // apply transformation
                             auto pointInWorld = XMVector3Transform(tempPoint, depthToWorld);
-
+                            //pointInWorld.n128_f32[0] /= pointInWorld.n128_f32[3];
+                            //pointInWorld.n128_f32[1] /= pointInWorld.n128_f32[3];
+                            //pointInWorld.n128_f32[2] /= pointInWorld.n128_f32[3];
                             // filter point cloud based on region of interest
                             /*if (!pHL2ResearchMode->m_useRoiFilter ||
                                 (pHL2ResearchMode->m_useRoiFilter && XMVector3InBounds(pointInWorld - roiCenter, roiBound)))
