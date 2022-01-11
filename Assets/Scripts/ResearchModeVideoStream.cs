@@ -73,6 +73,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 	
 	float _lastCaptureTime = 0.0f;
 	
+	Texture2D targetTexture = null;
+	
     void Start()
     {
 		if(depthPreviewPlane != null)
@@ -139,7 +141,7 @@ public class ResearchModeVideoStream : MonoBehaviour
         researchMode.SetPointCloudDepthOffset(0);
 
         // Depth sensor should be initialized in only one mode
-        
+        targetTexture = new Texture2D(760, 428, TextureFormat.RGBA32, false);
 		//if(longDepthPreviewPlane != null)
 		//{
 			researchMode.InitializeLongDepthSensor();
@@ -192,10 +194,11 @@ public class ResearchModeVideoStream : MonoBehaviour
 
 		captureObject.StartPhotoModeAsync(c, delegate(PhotoCapture.PhotoCaptureResult result) {
 			// Take a picture
-			string filename = string.Format(@"CapturedImage{0}_n.png", Time.time);
-			string filePath = System.IO.Path.Combine(Application.persistentDataPath, filename);
+			//string filename = string.Format(@"CapturedImage{0}_n.png", Time.time);
+			//string filePath = System.IO.Path.Combine(Application.persistentDataPath, filename);
 
-			photoCaptureObject.TakePhotoAsync(filePath, PhotoCaptureFileOutputFormat.PNG, OnCapturedPhotoToDisk);
+			//photoCaptureObject.TakePhotoAsync(filePath, PhotoCaptureFileOutputFormat.PNG, OnCapturedPhotoToDisk);
+			photoCaptureObject.TakePhotoAsync(OnCapturedPhotoToMemory);
 		});
 	}
 	
@@ -211,13 +214,123 @@ public class ResearchModeVideoStream : MonoBehaviour
 		{
 			string filename = string.Format(@"CapturedImage{0}_n.png", Time.time);
 			string filePath = System.IO.Path.Combine(Application.persistentDataPath, filename);
-
-			photoCaptureObject.TakePhotoAsync(filePath, PhotoCaptureFileOutputFormat.PNG, OnCapturedPhotoToDisk);
+			
+			photoCaptureObject.TakePhotoAsync(OnCapturedPhotoToMemory);
+			//photoCaptureObject.TakePhotoAsync(filePath, PhotoCaptureFileOutputFormat.PNG, OnCapturedPhotoToDisk);
 		}
 		else
 		{
 			Debug.LogError("Unable to start photo mode!");
 		}
+	}
+	
+	void OnCapturedPhotoToMemory(PhotoCapture.PhotoCaptureResult result, PhotoCaptureFrame photoCaptureFrame)
+	{
+		float currTime = Time.time;
+		
+		if(result.success)
+		{
+#if ENABLE_WINMD_SUPPORT
+#if UNITY_EDITOR
+#else
+			if (startRealtimePreview && researchMode.LongDepthMapTextureUpdated())
+			{
+				byte[] frameTexture = researchMode.GetLongDepthMapTextureBuffer();
+				if (frameTexture.Length > 0)
+				{
+					/*if (longDepthFrameData == null)
+					{
+						longDepthFrameData = frameTexture;
+					}
+					else
+					{
+						System.Buffer.BlockCopy(frameTexture, 0, longDepthFrameData, 0, longDepthFrameData.Length);
+					}
+
+					longDepthMediaTexture.LoadRawTextureData(longDepthFrameData);
+					longDepthMediaTexture.Apply();
+					
+					//write out this PNG... do this at the same time when the color photo is saved...
+					byte[] pngData = longDepthMediaTexture.EncodeToPNG();*/
+					
+					/*for(int j = 0; j < 320; ++j)
+					{
+						for(int i = 0; i < 288; ++i)
+						{
+							int idx = j * 288 + i;
+							int flipIdx = j * (288-1-i) + i;
+							byte b = frameTexture[idx];
+							byte flipB = frameTexture[flipIdx];
+							frameTexture[idx] = flipB;
+							frameTexture[flipIdx] = b;
+						}
+					}*/
+					
+					List<byte> imageBufferList = new List<byte>();
+					photoCaptureFrame.CopyRawImageDataIntoBuffer(imageBufferList);
+					
+					int stride = 4;
+					float denominator = 1.0f / 255.0f;
+					List<Color> colorArray = new List<Color>();
+					for (int i = imageBufferList.Count - 1; i >= 0; i -= stride)
+					{
+						float a = (int)(imageBufferList[i - 0]) * denominator;
+						float r = (int)(imageBufferList[i - 1]) * denominator;
+						float g = (int)(imageBufferList[i - 2]) * denominator;
+						float b = (int)(imageBufferList[i - 3]) * denominator;
+
+						colorArray.Add(new Color(r, g, b, a));
+					}
+
+					targetTexture.SetPixels(colorArray.ToArray());
+					targetTexture.Apply();
+					
+					string filenameC = string.Format(@"CapturedImage{0}_n.png", currTime);
+					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), targetTexture.EncodeToPNG());//ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
+					
+					if(photoCaptureFrame.hasLocationData)
+					{
+						//Matrix4x4 cameraToWorldMatrix = Matrix4x4.identity;
+						//Matrix4x4 projectionMatrix = Matrix4x4.identity;
+						
+						photoCaptureFrame.TryGetCameraToWorldMatrix(out Matrix4x4 cameraToWorldMatrix);
+
+						//Vector3 position = cameraToWorldMatrix.GetColumn(3) - cameraToWorldMatrix.GetColumn(2);
+						//Quaternion rotation = Quaternion.LookRotation(-cameraToWorldMatrix.GetColumn(2), cameraToWorldMatrix.GetColumn(1));
+
+						//photoCaptureFrame.TryGetProjectionMatrix(Camera.main.nearClipPlane, Camera.main.farClipPlane, out Matrix4x4 projectionMatrix);
+						
+						//write pv / projection matrices...
+						string colorString = cameraToWorldMatrix[0].ToString("F4") + " " + cameraToWorldMatrix[1].ToString("F4") + " " + cameraToWorldMatrix[2].ToString("F4") + " " + cameraToWorldMatrix[3].ToString("F4") + "\n";
+						colorString = colorString + (cameraToWorldMatrix[4].ToString("F4") + " " + cameraToWorldMatrix[5].ToString("F4") + " " + cameraToWorldMatrix[6].ToString("F4") + " " + cameraToWorldMatrix[7].ToString("F4") + "\n");
+						colorString = colorString + (cameraToWorldMatrix[8].ToString("F4") + " " + cameraToWorldMatrix[9].ToString("F4") + " " + cameraToWorldMatrix[10].ToString("F4") + " " + cameraToWorldMatrix[11].ToString("F4") + "\n");
+						colorString = colorString + (cameraToWorldMatrix[12].ToString("F4") + " " + cameraToWorldMatrix[13].ToString("F4") + " " + cameraToWorldMatrix[14].ToString("F4") + " " + cameraToWorldMatrix[15].ToString("F4") + "\n");
+						string filenameTxtC = string.Format(@"PV2World{0}_n.txt", currTime);
+						System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxtC), colorString);
+					}
+					
+			
+					//we probably want 16 bit here instead...
+					
+					string filename = string.Format(@"CapturedImageDepth{0}_n.png", currTime);
+					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(frameTexture, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
+					
+					float[] depthPos = researchMode.GetDepthToWorld();
+					string depthString = depthPos[0].ToString("F4") + " " + depthPos[1].ToString("F4") + " " + depthPos[2].ToString("F4") + " " + depthPos[3].ToString("F4") + "\n";
+					depthString = depthString + (depthPos[4].ToString("F4") + " " + depthPos[5].ToString("F4") + " " + depthPos[6].ToString("F4") + " " + depthPos[7].ToString("F4") + "\n");
+					depthString = depthString + (depthPos[8].ToString("F4") + " " + depthPos[9].ToString("F4") + " " + depthPos[10].ToString("F4") + " " + depthPos[11].ToString("F4") + "\n");
+					depthString = depthString + (depthPos[12].ToString("F4") + " " + depthPos[13].ToString("F4") + " " + depthPos[14].ToString("F4") + " " + depthPos[15].ToString("F4") + "\n");
+					string filenameTxt = string.Format(@"Position{0}_n.txt", currTime);
+					System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxt), depthString);
+				}
+			}
+#endif
+#endif
+			photoCaptureObject.StopPhotoModeAsync(OnStoppedPhotoMode);
+		}
+		
+		_lastCaptureTime = currTime;
+		_isCapturing = false;
 	}
 	
 	void OnCapturedPhotoToDisk(PhotoCapture.PhotoCaptureResult result)
@@ -261,6 +374,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 							frameTexture[flipIdx] = b;
 						}
 					}*/
+					
+					//we probably want 16 bit here instead...
 					
 					string filename = string.Format(@"CapturedImageDepth{0}_n.png", currTime);
 					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(frameTexture, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
