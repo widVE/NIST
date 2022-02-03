@@ -245,17 +245,17 @@ public class ResearchModeVideoStream : MonoBehaviour
 					else
 					{
 						System.Buffer.BlockCopy(frameTexture, 0, longDepthFrameData, 0, longDepthFrameData.Length);
-					}
+					}*/
 
-					longDepthMediaTexture.LoadRawTextureData(longDepthFrameData);
-					longDepthMediaTexture.Apply();
+					//longDepthMediaTexture.LoadRawTextureData(longDepthFrameData);
+					//longDepthMediaTexture.Apply();
 					
 					//write out this PNG... do this at the same time when the color photo is saved...
-					byte[] pngData = longDepthMediaTexture.EncodeToPNG();*/
+					//byte[] pngData = longDepthMediaTexture.EncodeToPNG();
 					
 					/*for(int j = 0; j < 320; ++j)
 					{
-						for(int i = 0; i < 288; ++i)
+						for(int i = 0; i < 144; ++i)
 						{
 							int idx = j * 288 + i;
 							int flipIdx = j * (288-1-i) + i;
@@ -272,12 +272,13 @@ public class ResearchModeVideoStream : MonoBehaviour
 					int stride = 4;
 					float denominator = 1.0f / 255.0f;
 					List<Color> colorArray = new List<Color>();
-					for (int i = imageBufferList.Count - 1; i >= 0; i -= stride)
+					//for (int i = imageBufferList.Count - 1; i >= 0; i -= stride)
+					for (int i = 0; i < imageBufferList.Count; i += stride)
 					{
-						float a = (int)(imageBufferList[i - 0]) * denominator;
-						float r = (int)(imageBufferList[i - 1]) * denominator;
-						float g = (int)(imageBufferList[i - 2]) * denominator;
-						float b = (int)(imageBufferList[i - 3]) * denominator;
+						float a = (int)(imageBufferList[i + 3]) * denominator;
+						float r = (int)(imageBufferList[i + 2]) * denominator;
+						float g = (int)(imageBufferList[i + 1]) * denominator;
+						float b = (int)(imageBufferList[i]) * denominator;
 
 						colorArray.Add(new Color(r, g, b, a));
 					}
@@ -298,14 +299,20 @@ public class ResearchModeVideoStream : MonoBehaviour
 						//Vector3 position = cameraToWorldMatrix.GetColumn(3) - cameraToWorldMatrix.GetColumn(2);
 						//Quaternion rotation = Quaternion.LookRotation(-cameraToWorldMatrix.GetColumn(2), cameraToWorldMatrix.GetColumn(1));
 
-						//photoCaptureFrame.TryGetProjectionMatrix(Camera.main.nearClipPlane, Camera.main.farClipPlane, out Matrix4x4 projectionMatrix);
+						photoCaptureFrame.TryGetProjectionMatrix(Camera.main.nearClipPlane, Camera.main.farClipPlane, out Matrix4x4 projectionMatrix);
 						
 						//write pv / projection matrices...
 						string colorString = cameraToWorldMatrix[0].ToString("F4") + " " + cameraToWorldMatrix[1].ToString("F4") + " " + cameraToWorldMatrix[2].ToString("F4") + " " + cameraToWorldMatrix[3].ToString("F4") + "\n";
 						colorString = colorString + (cameraToWorldMatrix[4].ToString("F4") + " " + cameraToWorldMatrix[5].ToString("F4") + " " + cameraToWorldMatrix[6].ToString("F4") + " " + cameraToWorldMatrix[7].ToString("F4") + "\n");
 						colorString = colorString + (cameraToWorldMatrix[8].ToString("F4") + " " + cameraToWorldMatrix[9].ToString("F4") + " " + cameraToWorldMatrix[10].ToString("F4") + " " + cameraToWorldMatrix[11].ToString("F4") + "\n");
 						colorString = colorString + (cameraToWorldMatrix[12].ToString("F4") + " " + cameraToWorldMatrix[13].ToString("F4") + " " + cameraToWorldMatrix[14].ToString("F4") + " " + cameraToWorldMatrix[15].ToString("F4") + "\n");
-						string filenameTxtC = string.Format(@"PV2World{0}_n.txt", currTime);
+						
+						colorString = colorString + (projectionMatrix[0].ToString("F4") + " " + projectionMatrix[1].ToString("F4") + " " + projectionMatrix[2].ToString("F4") + " " + projectionMatrix[3].ToString("F4") + "\n");
+						colorString = colorString + (projectionMatrix[4].ToString("F4") + " " + projectionMatrix[5].ToString("F4") + " " + projectionMatrix[6].ToString("F4") + " " + projectionMatrix[7].ToString("F4") + "\n");
+						colorString = colorString + (projectionMatrix[8].ToString("F4") + " " + projectionMatrix[9].ToString("F4") + " " + projectionMatrix[10].ToString("F4") + " " + projectionMatrix[11].ToString("F4") + "\n");
+						colorString = colorString + (projectionMatrix[12].ToString("F4") + " " + projectionMatrix[13].ToString("F4") + " " + projectionMatrix[14].ToString("F4") + " " + projectionMatrix[15].ToString("F4") + "\n");
+						
+						string filenameTxtC = string.Format(@"CapturedImage{0}_n.txt", currTime);
 						System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxtC), colorString);
 					}
 					
@@ -320,7 +327,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 					depthString = depthString + (depthPos[4].ToString("F4") + " " + depthPos[5].ToString("F4") + " " + depthPos[6].ToString("F4") + " " + depthPos[7].ToString("F4") + "\n");
 					depthString = depthString + (depthPos[8].ToString("F4") + " " + depthPos[9].ToString("F4") + " " + depthPos[10].ToString("F4") + " " + depthPos[11].ToString("F4") + "\n");
 					depthString = depthString + (depthPos[12].ToString("F4") + " " + depthPos[13].ToString("F4") + " " + depthPos[14].ToString("F4") + " " + depthPos[15].ToString("F4") + "\n");
-					string filenameTxt = string.Format(@"Position{0}_n.txt", currTime);
+					string filenameTxt = string.Format(@"CapturedImageDepth{0}_n.txt", currTime);
 					System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxt), depthString);
 				}
 			}
