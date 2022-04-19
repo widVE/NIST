@@ -83,7 +83,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 	
 	float _lastCaptureTime = 0.0f;
 	
-	byte[] depthTextureBytes = new byte[320*288*2];
+	byte[] depthTextureBytes = new byte[320*288];
 	
 	Texture2D targetTexture = null;
 	
@@ -106,7 +106,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 		//if(longDepthPreviewPlane != null)
 		{
 			//longDepthMediaMaterial = longDepthPreviewPlane.GetComponent<MeshRenderer>().material;
-			longDepthMediaTexture = new Texture2D(320, 288, TextureFormat.R16, false);
+			longDepthMediaTexture = new Texture2D(320, 288, TextureFormat.R8, false);
 			//longDepthMediaMaterial.mainTexture = longDepthMediaTexture;
 		}
 		
@@ -251,7 +251,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 #else
 			if (startRealtimePreview && researchMode.LongDepthMapTextureUpdated())
 			{
-				ushort[] frameTexture = researchMode.GetLongDepthMapBuffer();
+				//ushort[] frameTexture = researchMode.GetLongDepthMapBuffer();
+				byte[] frameTexture = researchMode.GetLongDepthMapTextureBuffer();
 				if (frameTexture.Length > 0)
 				{
 					/*if (longDepthFrameData == null)
@@ -263,16 +264,17 @@ public class ResearchModeVideoStream : MonoBehaviour
 						System.Buffer.BlockCopy(frameTexture, 0, longDepthFrameData, 0, longDepthFrameData.Length);
 					}*/
 					
-					for(int i = 0; i < 320; ++i)
+					for(int i = 0; i < 288; ++i)
 					{
-						for(int j = 0; j < 288; ++j)
+						for(int j = 0; j < 320; ++j)
 						{
-							int idx = (320-i-1) * 288 + (288-j-1);
-							int ourIdx = (320-i-1) * 288 + j;
-							frameTexture[idx] = (ushort)(((uint)frameTexture[idx]*(uint)4000)/(ushort)255);
-							byte[] db = System.BitConverter.GetBytes(frameTexture[idx]);
-							depthTextureBytes[ourIdx*2] = db[0];
-							depthTextureBytes[ourIdx*2+1] = db[1];
+							int idx = (288-i-1) * 320 + j;
+							int ourIdx = i * 320 + j;
+							depthTextureBytes[ourIdx] = frameTexture[idx];
+							//frameTexture[idx] = (ushort)(((uint)frameTexture[idx]*(uint)4000)/255);
+							//byte[] db = System.BitConverter.GetBytes(frameTexture[idx]);
+							//depthTextureBytes[ourIdx*2] = db[0];
+							//depthTextureBytes[ourIdx*2+1] = db[1];
 						}
 					}
 					
@@ -394,7 +396,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 					
 					//we probably want 16 bit here instead...
 					string filename = string.Format(@"CapturedImageDepth{0}_n.png", currTime);
-					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(depthTextureBytes, UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm, 320, 288));
+					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(depthTextureBytes, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
 					//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(frameTexture, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
 					//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(_ourDepth.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm, 320, 288));
 					
