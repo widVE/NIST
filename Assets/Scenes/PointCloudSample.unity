@@ -732,7 +732,11 @@ MonoBehaviour:
   LRPreviewPlane: {fileID: 1968632944}
   RRPreviewPlane: {fileID: 382997460}
   pointCloudRendererGo: {fileID: 168399716}
-  pointColor: {r: 1, g: 1, b: 1, a: 1}
+  pointColor: {r: 1, g: 0, b: 0.8657131, a: 1}
+  _colorRT: {fileID: 8400000, guid: 5a7ecc7d9f6de6843b3778389dad01ce, type: 2}
+  _depthRT: {fileID: 8400000, guid: bc4ac553eae35ae4bb3e56b8c9ab7f76, type: 2}
+  _colorCopyMaterial: {fileID: 2100000, guid: 748aaa792b540014dab1d631cface284, type: 2}
+  _depthCopyMaterial: {fileID: 2100000, guid: e2751f21b4f612748b9979193f5a11ad, type: 2}
 --- !u!4 &891080481
 Transform:
   m_ObjectHideFlags: 0
@@ -883,6 +887,7 @@ GameObject:
   - component: {fileID: 1517424692}
   - component: {fileID: 1517424695}
   - component: {fileID: 1517424697}
+  - component: {fileID: 1517424696}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -977,6 +982,29 @@ MonoBehaviour:
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
+--- !u!114 &1517424696
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1517424691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf98dd1206224111a38765365e98e207, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockCursorWhenFocusLocked: 1
+  setCursorInvisibleWhenFocusLocked: 0
+  maxGazeCollisionDistance: 10
+  raycastLayerMasks:
+  - serializedVersion: 2
+    m_Bits: 4294967291
+  stabilizer:
+    storedStabilitySamples: 60
+  gazeTransform: {fileID: 0}
+  minHeadVelocityThreshold: 0.5
+  maxHeadVelocityThreshold: 2
 --- !u!114 &1517424697
 MonoBehaviour:
   m_ObjectHideFlags: 0
