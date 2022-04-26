@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using System;
 using System.Runtime.InteropServices;
 using System.IO;
@@ -15,6 +16,22 @@ using HL2UnityPlugin;
 #endif
 #endif
 
+/*[System.Serializable]
+public class EasyVizARTransform
+{
+	public Vector3 position;
+	public Vector3 orientation;
+}*/
+
+[System.Serializable]
+public class Headset : MonoBehaviour
+{
+	public string name;
+	//public EasyVizARTransform transform;
+	public Vector3 position;
+	public Vector3 orientation;
+};
+
 public class ResearchModeVideoStream : MonoBehaviour
 {
 #if ENABLE_WINMD_SUPPORT
@@ -26,7 +43,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 
 	private UnityEngine.Windows.WebCam.PhotoCapture photoCaptureObject = null;
 
-    TCPClient tcpClient;
+    //TCPClient tcpClient;
 
     public GameObject depthPreviewPlane = null;
     private Material depthMediaMaterial = null;
@@ -74,8 +91,9 @@ public class ResearchModeVideoStream : MonoBehaviour
 	public Material _depthCopyMaterial;
 	
 	//for writing the rotated versions...
-	Texture2D _ourColor;
-	Texture2D _ourDepth;
+	Texture2D _ourColor = null;
+	//Texture2D _ourDepth = null;
+	Texture2D targetTexture = null;
 	
 	bool startRealtimePreview = true;
 	bool renderPointCloud = false;
@@ -83,9 +101,47 @@ public class ResearchModeVideoStream : MonoBehaviour
 	
 	float _lastCaptureTime = 0.0f;
 	
-	byte[] depthTextureBytes = new byte[320*288];
+	const int DEPTH_WIDTH = 320;
+	const int DEPTH_HEIGHT = 288;
 	
-	Texture2D targetTexture = null;
+	const int COLOR_WIDTH = 760;
+	const int COLOR_HEIGHT = 428;
+	
+	byte[] depthTextureBytes = new byte[DEPTH_WIDTH*DEPTH_HEIGHT];
+	
+	[SerializeField]
+	float _writeTime = 1f;
+	public float WriteTime => _writeTime;
+	
+	[SerializeField]
+	bool _performTSDFReconstruction = false;
+	public bool PerformTSDF => _performTSDFReconstruction;
+	
+	[SerializeField]
+	bool _writeImagesToDisk = false;
+	public bool WriteImagesToDisk => _writeImagesToDisk;
+	
+	[SerializeField]
+	bool _writePosToEdge = false;
+	public bool WritePosToEdge => _writePosToEdge;
+	
+	[SerializeField]
+	bool _showImagesInView = false;
+	public bool ShowImagesInView => _showImagesInView;
+	
+	bool _firstHeadsetSend = true;
+	
+	[ContextMenu("TestJSON")]
+	public void TestJSON()
+	{
+		//StartCoroutine(UploadHeadset());
+		/*Headset s = new Headset();
+		s.name = "Tester";
+		s.transform = new EasyVizARTransform();
+		s.transform.pos = new Vector3(1f, 2f, 3f);
+		s.transform.rot = new Vector3(0f, 0f, 1f);
+		Debug.Log(JsonUtility.ToJson(s, true));*/
+	}
 	
     void Start()
     {
@@ -103,11 +159,11 @@ public class ResearchModeVideoStream : MonoBehaviour
 			shortAbImageMediaMaterial.mainTexture = shortAbImageMediaTexture;
 		}
 
-		//if(longDepthPreviewPlane != null)
+		if(longDepthPreviewPlane != null)
 		{
-			//longDepthMediaMaterial = longDepthPreviewPlane.GetComponent<MeshRenderer>().material;
-			longDepthMediaTexture = new Texture2D(320, 288, TextureFormat.R8, false);
-			//longDepthMediaMaterial.mainTexture = longDepthMediaTexture;
+			longDepthMediaMaterial = longDepthPreviewPlane.GetComponent<MeshRenderer>().material;
+			longDepthMediaTexture = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.R8, false);
+			longDepthMediaMaterial.mainTexture = longDepthMediaTexture;
 		}
 		
 		if(LFPreviewPlane != null)
@@ -143,7 +199,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 			pointCloudRenderer = pointCloudRendererGo.GetComponent<PointCloudRenderer>();
 		}
 
-        tcpClient = GetComponent<TCPClient>();
+        //tcpClient = GetComponent<TCPClient>();
 
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
@@ -153,10 +209,10 @@ public class ResearchModeVideoStream : MonoBehaviour
         researchMode.SetPointCloudDepthOffset(0);
 
         // Depth sensor should be initialized in only one mode
-        targetTexture = new Texture2D(760, 428, TextureFormat.RGBA32, false);
+        targetTexture = new Texture2D(COLOR_WIDTH, COLOR_HEIGHT, TextureFormat.RGBA32, false);
 		
-		_ourColor = new Texture2D(760, 428, TextureFormat.RGBA32, false);
-		_ourDepth = new Texture2D(320, 288, TextureFormat.R16, false);
+		_ourColor = new Texture2D(COLOR_WIDTH, COLOR_HEIGHT, TextureFormat.RGBA32, false);
+		//_ourDepth = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.R8, false);
 		
 		//if(longDepthPreviewPlane != null)
 		//{
@@ -204,8 +260,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 		
 		CameraParameters c = new UnityEngine.Windows.WebCam.CameraParameters();
 		c.hologramOpacity = 0.0f;
-		c.cameraResolutionWidth = 760;//cameraResolution.width;
-		c.cameraResolutionHeight = 428;//cameraResolution.height;
+		c.cameraResolutionWidth = COLOR_WIDTH;//cameraResolution.width;
+		c.cameraResolutionHeight = COLOR_HEIGHT;//cameraResolution.height;
 		c.pixelFormat = UnityEngine.Windows.WebCam.CapturePixelFormat.BGRA32;
 
 		captureObject.StartPhotoModeAsync(c, delegate(PhotoCapture.PhotoCaptureResult result) {
@@ -240,6 +296,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 		}
 	}
 	
+	//this the function we're using for image capture (color and depth), goto memory first, so we can write additional synchronized info (transforms)
 	void OnCapturedPhotoToMemory(PhotoCapture.PhotoCaptureResult result, PhotoCaptureFrame photoCaptureFrame)
 	{
 		float currTime = Time.time;
@@ -255,48 +312,24 @@ public class ResearchModeVideoStream : MonoBehaviour
 				byte[] frameTexture = researchMode.GetLongDepthMapTextureBuffer();
 				if (frameTexture.Length > 0)
 				{
-					/*if (longDepthFrameData == null)
+					for(int i = 0; i < DEPTH_HEIGHT; ++i)
 					{
-						longDepthFrameData = frameTexture;
-					}
-					else
-					{
-						System.Buffer.BlockCopy(frameTexture, 0, longDepthFrameData, 0, longDepthFrameData.Length);
-					}*/
-					
-					for(int i = 0; i < 288; ++i)
-					{
-						for(int j = 0; j < 320; ++j)
+						for(int j = 0; j < DEPTH_WIDTH; ++j)
 						{
-							int idx = (288-i-1) * 320 + j;
-							int ourIdx = i * 320 + j;
+							int idx = (DEPTH_HEIGHT-i-1) * DEPTH_WIDTH + j;
+							int ourIdx = i * DEPTH_WIDTH + j;
 							depthTextureBytes[ourIdx] = frameTexture[idx];
-							//frameTexture[idx] = (ushort)(((uint)frameTexture[idx]*(uint)4000)/255);
-							//byte[] db = System.BitConverter.GetBytes(frameTexture[idx]);
-							//depthTextureBytes[ourIdx*2] = db[0];
-							//depthTextureBytes[ourIdx*2+1] = db[1];
 						}
 					}
 					
-					/*for(int i = 0; i < frameTexture.Length; ++i)
-					{
-						//frameTexture[i] = (ushort)(((uint)frameTexture[i]*(uint)4000)/(ushort)255);
-						byte[] db = System.BitConverter.GetBytes(frameTexture[i]);
-						depthTextureBytes[i*2] = db[0];
-						depthTextureBytes[i*2+1] = db[1];
-					}*/
-					
-					//longDepthMediaTexture.SetPixels(depthArray.ToArray());
-					longDepthMediaTexture.LoadRawTextureData(depthTextureBytes);
-					longDepthMediaTexture.Apply();
-					
+					//only if previewing the depth within our view do we need to load the depth data...
+
 					List<byte> imageBufferList = new List<byte>();
 					photoCaptureFrame.CopyRawImageDataIntoBuffer(imageBufferList);
 					
 					int stride = 4;
 					float denominator = 1.0f / 255.0f;
 					List<Color> colorArray = new List<Color>();
-					//for (int i = imageBufferList.Count - 1; i >= 0; i -= stride)
 					for (int i = 0; i < imageBufferList.Count; i += stride)
 					{
 						//int idx = imageBufferList.Count-1-i;
@@ -308,9 +341,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 						colorArray.Add(new Color(r, g, b, a));
 					}
 
-					//targetTexture.SetPixels(colorArray.ToArray());
-					//targetTexture.Apply();
-					
 					targetTexture.SetPixels(colorArray.ToArray());
 					targetTexture.Apply();
 					
@@ -338,10 +368,13 @@ public class ResearchModeVideoStream : MonoBehaviour
 						RenderTexture.active = null;
 					}
 					
-					string filenameC = string.Format(@"CapturedImage{0}_n.png", currTime);
-					//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), targetTexture.EncodeToPNG());//ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
-					//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
-					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), ImageConversion.EncodeArrayToPNG(_ourColor.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, (uint)_ourColor.width, (uint)_ourColor.height));
+					if(WriteImagesToDisk)
+					{
+						string filenameC = string.Format(@"CapturedImage{0}_n.png", currTime);
+						//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), targetTexture.EncodeToPNG());//ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
+						//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
+						File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), ImageConversion.EncodeArrayToPNG(_ourColor.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, (uint)_ourColor.width, (uint)_ourColor.height));
+					}
 					
 					if(photoCaptureFrame.hasLocationData)
 					{
@@ -366,11 +399,21 @@ public class ResearchModeVideoStream : MonoBehaviour
 						colorString = colorString + (projectionMatrix[8].ToString("F4") + " " + projectionMatrix[9].ToString("F4") + " " + projectionMatrix[10].ToString("F4") + " " + projectionMatrix[11].ToString("F4") + "\n");
 						colorString = colorString + (projectionMatrix[12].ToString("F4") + " " + projectionMatrix[13].ToString("F4") + " " + projectionMatrix[14].ToString("F4") + " " + projectionMatrix[15].ToString("F4") + "\n");
 						
-						string filenameTxtC = string.Format(@"CapturedImage{0}_n.txt", currTime);
-						System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxtC), colorString);
+						if(WriteImagesToDisk)
+						{
+							string filenameTxtC = string.Format(@"CapturedImage{0}_n.txt", currTime);
+							System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxtC), colorString);
+						}
+						
+						if(_firstHeadsetSend)
+						{
+							StartCoroutine(UploadHeadset(new Vector3(cameraToWorldMatrix[12], cameraToWorldMatrix[13], cameraToWorldMatrix[14]), new Vector3(1f,2f,3f)));
+							_firstHeadsetSend = false;
+						}
 					}
 					
-					var commandBufferDepth = new UnityEngine.Rendering.CommandBuffer();
+					
+					/*var commandBufferDepth = new UnityEngine.Rendering.CommandBuffer();
 					commandBufferDepth.name = "Depth Blit Pass";
 					
 					_depthCopyMaterial.SetTexture("_MainTex", longDepthMediaTexture);
@@ -392,13 +435,16 @@ public class ResearchModeVideoStream : MonoBehaviour
 					else
 					{
 						RenderTexture.active = null;
-					}
+					}*/
 					
-					//we probably want 16 bit here instead...
-					string filename = string.Format(@"CapturedImageDepth{0}_n.png", currTime);
-					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(depthTextureBytes, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
-					//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(frameTexture, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
-					//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(_ourDepth.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm, 320, 288));
+					//not using 16 bit depth as the raw depth buffer from the research mode plugin doesn't handle the sigma buffer within it ahead of time..
+					if(WriteImagesToDisk)
+					{
+						string filename = string.Format(@"CapturedImageDepth{0}_n.png", currTime);
+						File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(depthTextureBytes, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
+						//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(frameTexture, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
+						//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(_ourDepth.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm, 320, 288));
+					}
 					
 					float[] depthPos = researchMode.GetDepthToWorld();
 					string depthString = depthPos[0].ToString("F4") + " " + depthPos[1].ToString("F4") + " " + depthPos[2].ToString("F4") + " " + depthPos[3].ToString("F4") + "\n";
@@ -406,8 +452,11 @@ public class ResearchModeVideoStream : MonoBehaviour
 					depthString = depthString + (depthPos[8].ToString("F4") + " " + depthPos[9].ToString("F4") + " " + depthPos[10].ToString("F4") + " " + depthPos[11].ToString("F4") + "\n");
 					depthString = depthString + (depthPos[12].ToString("F4") + " " + depthPos[13].ToString("F4") + " " + depthPos[14].ToString("F4") + " " + depthPos[15].ToString("F4") + "\n");
 					
-					string filenameTxt = string.Format(@"CapturedImageDepth{0}_n.txt", currTime);
-					System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxt), depthString);
+					if(WriteImagesToDisk)
+					{
+						string filenameTxt = string.Format(@"CapturedImageDepth{0}_n.txt", currTime);
+						System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxt), depthString);
+					}
 				}
 			}
 #endif
@@ -419,6 +468,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 		_isCapturing = false;
 	}
 	
+	//4/26/2022 - Ross T - this writes the color image to disk directly, but we aren't using this one at the moment
 	void OnCapturedPhotoToDisk(PhotoCapture.PhotoCaptureResult result)
 	{
 		float currTime = Time.time;
@@ -433,35 +483,16 @@ public class ResearchModeVideoStream : MonoBehaviour
 				byte[] frameTexture = researchMode.GetLongDepthMapTextureBuffer();
 				if (frameTexture.Length > 0)
 				{
-					/*if (longDepthFrameData == null)
+					for(int i = 0; i < DEPTH_HEIGHT; ++i)
 					{
-						longDepthFrameData = frameTexture;
-					}
-					else
-					{
-						System.Buffer.BlockCopy(frameTexture, 0, longDepthFrameData, 0, longDepthFrameData.Length);
-					}
-
-					longDepthMediaTexture.LoadRawTextureData(longDepthFrameData);
-					longDepthMediaTexture.Apply();
-					
-					//write out this PNG... do this at the same time when the color photo is saved...
-					byte[] pngData = longDepthMediaTexture.EncodeToPNG();*/
-					
-					/*for(int j = 0; j < 320; ++j)
-					{
-						for(int i = 0; i < 288; ++i)
+						for(int j = 0; j < DEPTH_WIDTH; ++j)
 						{
-							int idx = j * 288 + i;
-							int flipIdx = j * (288-1-i) + i;
-							byte b = frameTexture[idx];
-							byte flipB = frameTexture[flipIdx];
-							frameTexture[idx] = flipB;
-							frameTexture[flipIdx] = b;
+							int idx = (DEPTH_HEIGHT-i-1) * DEPTH_WIDTH + j;
+							int ourIdx = i * DEPTH_WIDTH + j;
+							depthTextureBytes[ourIdx] = frameTexture[idx];
 						}
-					}*/
+					}
 					
-					//we probably want 16 bit here instead...
 					
 					string filename = string.Format(@"CapturedImageDepth{0}_n.png", currTime);
 					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(frameTexture, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
@@ -489,6 +520,246 @@ public class ResearchModeVideoStream : MonoBehaviour
 		_isCapturing = false;
 	}
 	
+	IEnumerator UploadHeadset(Vector3 pos, Vector3 orient)
+    {
+        //WWWForm form = new WWWForm();
+        //form.AddField("Content-Type", "application/json");
+		
+		Headset h = new Headset();
+		h.name = "RossTestFromHololens2";
+		h.position = pos;
+		h.orientation = orient;
+		
+        //UnityWebRequest www = UnityWebRequest.Post("http://halo05.wings.cs.wisc.edu:5000/headsets", form);
+		
+		UnityWebRequest www = new UnityWebRequest("http://halo05.wings.cs.wisc.edu:5000/headsets", "POST");
+		www.SetRequestHeader("Content-Type", "application/json");
+		
+		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(JsonUtility.ToJson(h));
+		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
+        www.downloadHandler = new DownloadHandlerBuffer();
+
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(www.error);
+        }
+        else
+        {
+            Debug.Log("Form upload complete!");
+        }
+		
+		www.Dispose();
+    }
+	
+	/*public async Task<TResultType> PostJsonString<TResultType>(string url, string json_as_string)
+    {
+        try
+        {
+            //Setting up a non static constructor version and putting the pieces together
+            using (var www = new UnityWebRequest(url, "POST"))
+            {
+                //Converting into "RAW" JSON? I think this is what that means. I can't use the
+                //static put constructor because it only takes WWWForms as an argument
+                byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(json_as_string);
+
+                //Setting up the rest of the web request
+                //Set content type to Json based on the serialization class used for JsonSerializationOption
+                www.SetRequestHeader("Content-Type", _serializationOption.ContentType);
+
+                www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
+                www.downloadHandler = new DownloadHandlerBuffer();
+
+                var operation = www.SendWebRequest();
+
+                while (!operation.isDone)
+                    await Task.Yield();
+
+                Debug.Log("www.result: " + www.downloadHandler.text);
+                stringID = www.downloadHandler.text;
+                
+
+                if (www.result != UnityWebRequest.Result.Success)
+                    Debug.LogError($"Failed: {www.error}");
+
+                return default;
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"{nameof(Get)} failed: {ex.Message}");
+            return default;
+        }
+    }*/
+	
+	void UpdateImagePreviews()
+	{
+#if ENABLE_WINMD_SUPPORT
+#if UNITY_EDITOR
+#else
+		if(depthPreviewPlane != null)
+		{
+			// update short depth map texture
+			if (startRealtimePreview && researchMode.DepthMapTextureUpdated())
+			{
+				byte[] frameTexture = researchMode.GetDepthMapTextureBuffer();
+				if (frameTexture.Length > 0)
+				{
+					if (depthFrameData == null)
+					{
+						depthFrameData = frameTexture;
+					}
+					else
+					{
+						System.Buffer.BlockCopy(frameTexture, 0, depthFrameData, 0, depthFrameData.Length);
+					}
+
+					depthMediaTexture.LoadRawTextureData(depthFrameData);
+					depthMediaTexture.Apply();
+				}
+			}
+		}
+
+		if(longDepthPreviewPlane != null)
+		{
+			if (startRealtimePreview && researchMode.LongDepthMapTextureUpdated())
+			{
+				byte[] frameTexture = researchMode.GetLongDepthMapTextureBuffer();
+				
+				if (longDepthFrameData == null)
+				{
+					longDepthFrameData = frameTexture;
+				}
+				else
+				{
+					System.Buffer.BlockCopy(frameTexture, 0, longDepthFrameData, 0, longDepthFrameData.Length);
+				}
+				
+				if (frameTexture.Length > 0)
+				{
+					longDepthMediaTexture.LoadRawTextureData(longDepthFrameData);
+					longDepthMediaTexture.Apply();
+				}
+			}
+		}
+		
+		// update short-throw AbImage texture
+        if(shortAbImagePreviewPlane != null)
+		{
+			if (startRealtimePreview && researchMode.ShortAbImageTextureUpdated())
+			{
+				byte[] frameTexture = researchMode.GetShortAbImageTextureBuffer();
+				if (frameTexture.Length > 0)
+				{
+					if (shortAbImageFrameData == null)
+					{
+						shortAbImageFrameData = frameTexture;
+					}
+					else
+					{
+						System.Buffer.BlockCopy(frameTexture, 0, shortAbImageFrameData, 0, shortAbImageFrameData.Length);
+					}
+
+					shortAbImageMediaTexture.LoadRawTextureData(shortAbImageFrameData);
+					shortAbImageMediaTexture.Apply();
+				}
+			}
+		}
+		
+		if(LFPreviewPlane != null)
+		{
+			// update LF camera texture
+			if (startRealtimePreview && researchMode.LFImageUpdated())
+			{
+				byte[] frameTexture = researchMode.GetLFCameraBuffer();
+				if (frameTexture.Length > 0)
+				{
+					if (LFFrameData == null)
+					{
+						LFFrameData = frameTexture;
+					}
+					else
+					{
+						System.Buffer.BlockCopy(frameTexture, 0, LFFrameData, 0, LFFrameData.Length);
+					}
+
+					LFMediaTexture.LoadRawTextureData(LFFrameData);
+					LFMediaTexture.Apply();
+				}
+			}
+		}
+		
+		if(RFPreviewPlane != null)
+		{
+			// update RF camera texture
+			if (startRealtimePreview && researchMode.RFImageUpdated())
+			{
+				byte[] frameTexture = researchMode.GetRFCameraBuffer();
+				if (frameTexture.Length > 0)
+				{
+					if (RFFrameData == null)
+					{
+						RFFrameData = frameTexture;
+					}
+					else
+					{
+						System.Buffer.BlockCopy(frameTexture, 0, RFFrameData, 0, RFFrameData.Length);
+					}
+
+					RFMediaTexture.LoadRawTextureData(RFFrameData);
+					RFMediaTexture.Apply();
+				}
+			}
+		}
+
+		if(RRPreviewPlane != null)
+		{
+			if (startRealtimePreview && researchMode.RRImageUpdated())
+			{
+				byte[] frameTexture = researchMode.GetRRCameraBuffer();
+				if (frameTexture.Length > 0)
+				{
+					if (RRFrameData == null)
+					{
+						RRFrameData = frameTexture;
+					}
+					else
+					{
+						System.Buffer.BlockCopy(frameTexture, 0, RRFrameData, 0, RRFrameData.Length);
+					}
+
+					RRMediaTexture.LoadRawTextureData(RRFrameData);
+					RRMediaTexture.Apply();
+				}
+			}
+		}
+		
+		if(LRPreviewPlane != null)
+		{
+			if (startRealtimePreview && researchMode.LRImageUpdated())
+			{
+				byte[] frameTexture = researchMode.GetLRCameraBuffer();
+				if (frameTexture.Length > 0)
+				{
+					if (LRFrameData == null)
+					{
+						LRFrameData = frameTexture;
+					}
+					else
+					{
+						System.Buffer.BlockCopy(frameTexture, 0, LRFrameData, 0, LRFrameData.Length);
+					}
+
+					LRMediaTexture.LoadRawTextureData(LRFrameData);
+					LRMediaTexture.Apply();
+				}
+			}
+		}
+#endif
+#endif
+	}
+	
     void LateUpdate()
     {
 		/*Resolution cameraResolution = PhotoCapture.SupportedResolutions.OrderByDescending((res) => res.width * res.height).First();
@@ -499,168 +770,32 @@ public class ResearchModeVideoStream : MonoBehaviour
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
 #else
-        // update depth map texture
-        if (startRealtimePreview && researchMode.DepthMapTextureUpdated())
-        {
-            byte[] frameTexture = researchMode.GetDepthMapTextureBuffer();
-            if (frameTexture.Length > 0)
-            {
-                if (depthFrameData == null)
-                {
-                    depthFrameData = frameTexture;
-                }
-                else
-                {
-                    System.Buffer.BlockCopy(frameTexture, 0, depthFrameData, 0, depthFrameData.Length);
-                }
-
-                depthMediaTexture.LoadRawTextureData(depthFrameData);
-                depthMediaTexture.Apply();
-            }
-        }
-        // update short-throw AbImage texture
-        if (startRealtimePreview && researchMode.ShortAbImageTextureUpdated())
-        {
-            byte[] frameTexture = researchMode.GetShortAbImageTextureBuffer();
-            if (frameTexture.Length > 0)
-            {
-                if (shortAbImageFrameData == null)
-                {
-                    shortAbImageFrameData = frameTexture;
-                }
-                else
-                {
-                    System.Buffer.BlockCopy(frameTexture, 0, shortAbImageFrameData, 0, shortAbImageFrameData.Length);
-                }
-
-                shortAbImageMediaTexture.LoadRawTextureData(shortAbImageFrameData);
-                shortAbImageMediaTexture.Apply();
-            }
-        }
+		
+		if(ShowImagesInView && startRealtimePreview)
+		{
+			UpdateImagePreviews();
+		}
 		
         // update long depth map texture
         if (startRealtimePreview && researchMode.LongDepthMapTextureUpdated())
         {
-            //byte[] frameTexture = researchMode.GetLongDepthMapTextureBuffer();
-            //if (frameTexture.Length > 0)
-            {
-                /*if (longDepthFrameData == null)
-                {
-                    longDepthFrameData = frameTexture;
-                }
-                else
-                {
-                    System.Buffer.BlockCopy(frameTexture, 0, longDepthFrameData, 0, longDepthFrameData.Length);
-                }
-
-                longDepthMediaTexture.LoadRawTextureData(longDepthFrameData);
-                longDepthMediaTexture.Apply();*/
-				
-				float currTime = Time.time;
-				
-				if(_lastCaptureTime == 0.0)
+			float currTime = Time.time;
+			
+			if(_lastCaptureTime == 0.0)
+			{
+				_lastCaptureTime = currTime;
+			}
+			
+			if(currTime - _lastCaptureTime > WriteTime)
+			{
+				if(!_isCapturing)
 				{
-					_lastCaptureTime = currTime;
+					_isCapturing = true;
+					PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
 				}
-				
-				if(currTime - _lastCaptureTime > 1f)
-				{
-					if(!_isCapturing)
-					{
-						_isCapturing = true;
-						PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
-					}
-					
-					//write out this PNG... do this at the same time when the color photo is saved...
-					/*byte[] pngData = longDepthMediaTexture.EncodeToPNG();
-					string filename = string.Format(@"CapturedImageDepth{0}_n.png", currTime);
-					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), pngData);
-					
-					float[] depthPos = researchMode.GetDepthSensorPosition();
-					string depthString = depthPos[0].ToString("F4") + " " + depthPos[1].ToString("F4") + " " + depthPos[2].ToString("F4") + "\n";
-					string filenameTxt = string.Format(@"Position{0}_n.txt", currTime);
-					System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxt), depthString);*/
-				}
-            }
+			}
         }
 
-        // update LF camera texture
-        if (startRealtimePreview && researchMode.LFImageUpdated())
-        {
-            byte[] frameTexture = researchMode.GetLFCameraBuffer();
-            if (frameTexture.Length > 0)
-            {
-                if (LFFrameData == null)
-                {
-                    LFFrameData = frameTexture;
-                }
-                else
-                {
-                    System.Buffer.BlockCopy(frameTexture, 0, LFFrameData, 0, LFFrameData.Length);
-                }
-
-                LFMediaTexture.LoadRawTextureData(LFFrameData);
-                LFMediaTexture.Apply();
-            }
-        }
-        // update RF camera texture
-        if (startRealtimePreview && researchMode.RFImageUpdated())
-        {
-            byte[] frameTexture = researchMode.GetRFCameraBuffer();
-            if (frameTexture.Length > 0)
-            {
-                if (RFFrameData == null)
-                {
-                    RFFrameData = frameTexture;
-                }
-                else
-                {
-                    System.Buffer.BlockCopy(frameTexture, 0, RFFrameData, 0, RFFrameData.Length);
-                }
-
-                RFMediaTexture.LoadRawTextureData(RFFrameData);
-                RFMediaTexture.Apply();
-            }
-        }
-
-		if (startRealtimePreview && researchMode.RRImageUpdated())
-        {
-            byte[] frameTexture = researchMode.GetRRCameraBuffer();
-            if (frameTexture.Length > 0)
-            {
-                if (RRFrameData == null)
-                {
-                    RRFrameData = frameTexture;
-                }
-                else
-                {
-                    System.Buffer.BlockCopy(frameTexture, 0, RRFrameData, 0, RRFrameData.Length);
-                }
-
-                RRMediaTexture.LoadRawTextureData(RRFrameData);
-                RRMediaTexture.Apply();
-            }
-        }
-		
-		if (startRealtimePreview && researchMode.LRImageUpdated())
-        {
-            byte[] frameTexture = researchMode.GetLRCameraBuffer();
-            if (frameTexture.Length > 0)
-            {
-                if (LRFrameData == null)
-                {
-                    LRFrameData = frameTexture;
-                }
-                else
-                {
-                    System.Buffer.BlockCopy(frameTexture, 0, LRFrameData, 0, LRFrameData.Length);
-                }
-
-                LRMediaTexture.LoadRawTextureData(LRFrameData);
-                LRMediaTexture.Apply();
-            }
-        }
-		
         // Update point cloud
         if (renderPointCloud)
         {
@@ -678,6 +813,11 @@ public class ResearchModeVideoStream : MonoBehaviour
 
             }
         }
+		
+		if (_performTSDFReconstruction)
+		{
+			
+		}
 #endif
 #endif
     }
@@ -688,7 +828,6 @@ public class ResearchModeVideoStream : MonoBehaviour
     {
         startRealtimePreview = !startRealtimePreview;
     }
-
     
     public void TogglePointCloudEvent()
     {
@@ -723,7 +862,7 @@ public class ResearchModeVideoStream : MonoBehaviour
         var AbImage = researchMode.GetShortAbImageBuffer();
 #endif
 #if WINDOWS_UWP
-        tcpClient.SendUINT16Async(depthMap, AbImage);
+        //tcpClient.SendUINT16Async(depthMap, AbImage);
 #endif
 #endif
     }
