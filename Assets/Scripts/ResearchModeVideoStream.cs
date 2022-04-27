@@ -24,13 +24,37 @@ public class EasyVizARTransform
 }*/
 
 [System.Serializable]
-public class Headset : MonoBehaviour
+public class Headset
 {
 	public string name;
-	//public EasyVizARTransform transform;
 	public Vector3 position;
 	public Vector3 orientation;
+	//using below nests the transform, but the server doesn't expect that...
+	//public EasyVizARTransform transform;
 };
+
+[System.Serializable]
+public class Hololens2PhotoPost
+{
+	public string contentType;
+	public string imagePath;
+	public string id;
+	
+	public int width;
+	public int height;
+}
+
+[System.Serializable]
+public class Hololens2PhotoPut
+{
+	public string contentType;
+	public string imagePath;
+	public string imageUrl;
+	public string id;
+	
+	public int width;
+	public int height;
+}
 
 public class ResearchModeVideoStream : MonoBehaviour
 {
@@ -117,6 +141,56 @@ public class ResearchModeVideoStream : MonoBehaviour
 	bool _performTSDFReconstruction = false;
 	public bool PerformTSDF => _performTSDFReconstruction;
 	
+	const uint NUM_GRIDS = 4096;		
+	const uint NUM_GRIDS_CPU = 4096;
+	const uint TOTAL_GRID_SIZE_X = 2048;
+	const uint TOTAL_GRID_SIZE_Y = 1024;
+	const uint TOTAL_GRID_SIZE_Z = 2048;
+
+	const uint GRID_SIZE_X = 32;
+	const uint GRID_SIZE_Y = 16;
+	const uint GRID_SIZE_Z = 32;
+	
+	const uint TOTAL_NUM_OCTANTS = (TOTAL_GRID_SIZE_X/GRID_SIZE_X) * (TOTAL_GRID_SIZE_Y/GRID_SIZE_Y) * (TOTAL_GRID_SIZE_Z/GRID_SIZE_Z);
+
+#if SINGLE_GRID
+	Vector4 volumeGridSize = new Vector4(512f, 256f, 512f, 0f);
+	const uint TOTAL_CELLS = 512 * 256 * 512;
+#else
+	Vector4 volumeGridSize = new Vector4((float)TOTAL_GRID_SIZE_X, (float)TOTAL_GRID_SIZE_Y, (float)TOTAL_GRID_SIZE_Z, 0f);
+	const uint TOTAL_CELLS = GRID_SIZE_X * GRID_SIZE_Y * GRID_SIZE_Z;
+#endif
+
+	const uint GRID_BYTE_COUNT = TOTAL_CELLS * sizeof(ushort);
+	const uint COLOR_BYTE_COUNT = TOTAL_CELLS * sizeof(uint);
+
+	//store where each possible "octant" maps to on the GPU, -1 if not on gpu.
+	int[] octantToBufferMapGPU = new int[(int)TOTAL_NUM_OCTANTS];
+
+	public ComputeShader octreeShader;
+		
+	Dictionary<uint, uint> octantToBufferMapCPU = new Dictionary<uint, uint>();
+	Dictionary<uint, uint> colorToBufferMapCPU = new Dictionary<uint, uint>();
+	Dictionary<uint, uint> octantToBufferMap = new Dictionary<uint, uint>();
+	Dictionary<uint, uint> colorToBufferMap = new Dictionary<uint, uint>();
+	
+	ComputeBuffer octantBuffer=null;
+	ComputeBuffer cellBuffer=null;
+	
+	int[] octantData = null;
+	int[] cellData = null;
+	
+	Vector4 volumeBounds = new Vector4(8f, 4f, 8f, 0f);
+	Vector4 volumeOrigin = new Vector4(0f, 0f, 0f, 0f);		
+	Vector4 cellDimensions = new Vector4(32f, 16f, 32f, 0f);
+
+	int processID = -1;
+	int processIDSingle = -1;
+	int clearID = -1;
+	int clearTextureID = -1;
+	int octantComputeID = -1;
+	int renderID = -1;
+		
 	[SerializeField]
 	bool _writeImagesToDisk = false;
 	public bool WriteImagesToDisk => _writeImagesToDisk;
@@ -131,6 +205,9 @@ public class ResearchModeVideoStream : MonoBehaviour
 	
 	bool _firstHeadsetSend = true;
 	
+	[SerializeField]
+	Texture2D _testTexture;
+	
 	[ContextMenu("TestJSON")]
 	public void TestJSON()
 	{
@@ -141,6 +218,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 		s.transform.pos = new Vector3(1f, 2f, 3f);
 		s.transform.rot = new Vector3(0f, 0f, 1f);
 		Debug.Log(JsonUtility.ToJson(s, true));*/
+		StartCoroutine(UploadImage("Assets/testSendImage.png", _testTexture));
 	}
 	
     void Start()
@@ -373,7 +451,13 @@ public class ResearchModeVideoStream : MonoBehaviour
 						string filenameC = string.Format(@"CapturedImage{0}_n.png", currTime);
 						//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), targetTexture.EncodeToPNG());//ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
 						//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
-						File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), ImageConversion.EncodeArrayToPNG(_ourColor.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, (uint)_ourColor.width, (uint)_ourColor.height));
+						string outPathColorImage = System.IO.Path.Combine(Application.persistentDataPath, filenameC);
+						File.WriteAllBytes(outPathColorImage, ImageConversion.EncodeArrayToPNG(_ourColor.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, (uint)_ourColor.width, (uint)_ourColor.height));
+						//if(_firstHeadsetSend)
+						{
+							StartCoroutine(UploadImage(outPathColorImage, _ourColor));
+							_firstHeadsetSend = false;
+						}
 					}
 					
 					if(photoCaptureFrame.hasLocationData)
@@ -405,11 +489,11 @@ public class ResearchModeVideoStream : MonoBehaviour
 							System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxtC), colorString);
 						}
 						
-						if(_firstHeadsetSend)
+						/*if(_firstHeadsetSend)
 						{
-							StartCoroutine(UploadHeadset(new Vector3(cameraToWorldMatrix[12], cameraToWorldMatrix[13], cameraToWorldMatrix[14]), new Vector3(1f,2f,3f)));
+							//StartCoroutine(UploadHeadset(new Vector3(cameraToWorldMatrix[12], cameraToWorldMatrix[13], cameraToWorldMatrix[14]), new Vector3(1f,2f,3f)));
 							_firstHeadsetSend = false;
-						}
+						}*/
 					}
 					
 					
@@ -519,79 +603,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 		_lastCaptureTime = currTime;
 		_isCapturing = false;
 	}
-	
-	IEnumerator UploadHeadset(Vector3 pos, Vector3 orient)
-    {
-        //WWWForm form = new WWWForm();
-        //form.AddField("Content-Type", "application/json");
-		
-		Headset h = new Headset();
-		h.name = "RossTestFromHololens2";
-		h.position = pos;
-		h.orientation = orient;
-		
-        //UnityWebRequest www = UnityWebRequest.Post("http://halo05.wings.cs.wisc.edu:5000/headsets", form);
-		
-		UnityWebRequest www = new UnityWebRequest("http://halo05.wings.cs.wisc.edu:5000/headsets", "POST");
-		www.SetRequestHeader("Content-Type", "application/json");
-		
-		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(JsonUtility.ToJson(h));
-		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
-        www.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return www.SendWebRequest();
-
-        if (www.result != UnityWebRequest.Result.Success)
-        {
-            Debug.Log(www.error);
-        }
-        else
-        {
-            Debug.Log("Form upload complete!");
-        }
-		
-		www.Dispose();
-    }
-	
-	/*public async Task<TResultType> PostJsonString<TResultType>(string url, string json_as_string)
-    {
-        try
-        {
-            //Setting up a non static constructor version and putting the pieces together
-            using (var www = new UnityWebRequest(url, "POST"))
-            {
-                //Converting into "RAW" JSON? I think this is what that means. I can't use the
-                //static put constructor because it only takes WWWForms as an argument
-                byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(json_as_string);
-
-                //Setting up the rest of the web request
-                //Set content type to Json based on the serialization class used for JsonSerializationOption
-                www.SetRequestHeader("Content-Type", _serializationOption.ContentType);
-
-                www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
-                www.downloadHandler = new DownloadHandlerBuffer();
-
-                var operation = www.SendWebRequest();
-
-                while (!operation.isDone)
-                    await Task.Yield();
-
-                Debug.Log("www.result: " + www.downloadHandler.text);
-                stringID = www.downloadHandler.text;
-                
-
-                if (www.result != UnityWebRequest.Result.Success)
-                    Debug.LogError($"Failed: {www.error}");
-
-                return default;
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"{nameof(Get)} failed: {ex.Message}");
-            return default;
-        }
-    }*/
 	
 	void UpdateImagePreviews()
 	{
@@ -871,4 +882,145 @@ public class ResearchModeVideoStream : MonoBehaviour
     {
         if (!focus) StopSensorsEvent();
     }
+	
+	//server communication functions...
+
+	IEnumerator UploadHeadset(Vector3 pos, Vector3 orient)
+    {
+        //WWWForm form = new WWWForm();
+        //form.AddField("Content-Type", "application/json");
+		
+		Headset h = new Headset();
+		h.name = "RossTestFromHololens2";
+		h.position = pos;
+		h.orientation = orient;
+		
+        //UnityWebRequest www = UnityWebRequest.Post("http://halo05.wings.cs.wisc.edu:5000/headsets", form);
+		
+		UnityWebRequest www = new UnityWebRequest("http://halo05.wings.cs.wisc.edu:5000/headsets", "POST");
+		www.SetRequestHeader("Content-Type", "application/json");
+		
+		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(JsonUtility.ToJson(h));
+		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
+        www.downloadHandler = new DownloadHandlerBuffer();
+
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(www.error);
+        }
+        else
+        {
+            Debug.Log("Form upload complete!");
+        }
+		
+		www.Dispose();
+    }
+	
+	IEnumerator UploadImage(string sPathToFile, Texture2D imageData)
+	{
+		Hololens2PhotoPost h = new Hololens2PhotoPost();
+		h.width = COLOR_WIDTH;
+		h.height = COLOR_HEIGHT;
+		h.contentType = "image/png";
+		//h.imagePath = h2Location;
+		//h.imageUrl = null;
+		
+		UnityWebRequest www = new UnityWebRequest("http://halo05.wings.cs.wisc.edu:5000/photos", "POST");
+		www.SetRequestHeader("Content-Type", "application/json");
+		
+		string ourJson = JsonUtility.ToJson(h);
+		Debug.Log(ourJson);
+		
+		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(ourJson);
+		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
+        www.downloadHandler = new DownloadHandlerBuffer();
+
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(www.error);
+        }
+        else
+        {
+            Debug.Log("Form upload complete!");
+        }
+		
+		string resultText = www.downloadHandler.text;
+		
+		Debug.Log(resultText);
+		
+		Hololens2PhotoPut h2 = JsonUtility.FromJson<Hololens2PhotoPut>(resultText);
+		//h2.imagePath = h2Location;
+		
+		string photoJson = JsonUtility.ToJson(h2);
+		Debug.Log(photoJson);
+		Debug.Log(h2.imageUrl);
+		
+		UnityWebRequest www2 = new UnityWebRequest("http://halo05.wings.cs.wisc.edu:5000"+h2.imageUrl, "PUT");
+		www2.SetRequestHeader("Content-Type", "image/png");
+		
+		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
+		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
+		www2.uploadHandler = new UploadHandlerFile(sPathToFile);//new UploadHandlerRaw(image_as_bytes2);//
+        www2.downloadHandler = new DownloadHandlerBuffer();
+
+		yield return www2.SendWebRequest();
+
+        if (www2.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(www2.error);
+			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOutErr.txt"), www2.error);
+        }
+        else
+        {
+            Debug.Log("Photo upload complete!");
+			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOut.txt"), "successfully sent photo");
+        }
+		
+		www.Dispose();
+		www2.Dispose();
+	}
+	
+	/*public async Task<TResultType> PostJsonString<TResultType>(string url, string json_as_string)
+    {
+        try
+        {
+            //Setting up a non static constructor version and putting the pieces together
+            using (var www = new UnityWebRequest(url, "POST"))
+            {
+                //Converting into "RAW" JSON? I think this is what that means. I can't use the
+                //static put constructor because it only takes WWWForms as an argument
+                byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(json_as_string);
+
+                //Setting up the rest of the web request
+                //Set content type to Json based on the serialization class used for JsonSerializationOption
+                www.SetRequestHeader("Content-Type", _serializationOption.ContentType);
+
+                www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
+                www.downloadHandler = new DownloadHandlerBuffer();
+
+                var operation = www.SendWebRequest();
+
+                while (!operation.isDone)
+                    await Task.Yield();
+
+                Debug.Log("www.result: " + www.downloadHandler.text);
+                stringID = www.downloadHandler.text;
+                
+
+                if (www.result != UnityWebRequest.Result.Success)
+                    Debug.LogError($"Failed: {www.error}");
+
+                return default;
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"{nameof(Get)} failed: {ex.Message}");
+            return default;
+        }
+    }*/
 }
