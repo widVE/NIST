@@ -16,46 +16,6 @@ using HL2UnityPlugin;
 #endif
 #endif
 
-/*[System.Serializable]
-public class EasyVizARTransform
-{
-	public Vector3 position;
-	public Vector3 orientation;
-}*/
-
-[System.Serializable]
-public class Headset
-{
-	public string name;
-	public Vector3 position;
-	public Vector3 orientation;
-	//using below nests the transform, but the server doesn't expect that...
-	//public EasyVizARTransform transform;
-};
-
-[System.Serializable]
-public class Hololens2PhotoPost
-{
-	public string contentType;
-	public string imagePath;
-	public string id;
-	
-	public int width;
-	public int height;
-}
-
-[System.Serializable]
-public class Hololens2PhotoPut
-{
-	public string contentType;
-	public string imagePath;
-	public string imageUrl;
-	public string id;
-	
-	public int width;
-	public int height;
-}
-
 public class ResearchModeVideoStream : MonoBehaviour
 {
 #if ENABLE_WINMD_SUPPORT
@@ -887,10 +847,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 
 	IEnumerator UploadHeadset(Vector3 pos, Vector3 orient)
     {
-        //WWWForm form = new WWWForm();
-        //form.AddField("Content-Type", "application/json");
-		
-		Headset h = new Headset();
+		EasyVizAR.Headset h = new EasyVizAR.Headset();
 		h.name = "RossTestFromHololens2";
 		h.position = pos;
 		h.orientation = orient;
@@ -920,7 +877,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 	
 	IEnumerator UploadImage(string sPathToFile, Texture2D imageData)
 	{
-		Hololens2PhotoPost h = new Hololens2PhotoPost();
+		EasyVizAR.Hololens2PhotoPost h = new EasyVizAR.Hololens2PhotoPost();
 		h.width = COLOR_WIDTH;
 		h.height = COLOR_HEIGHT;
 		h.contentType = "image/png";
@@ -931,7 +888,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 		www.SetRequestHeader("Content-Type", "application/json");
 		
 		string ourJson = JsonUtility.ToJson(h);
-		Debug.Log(ourJson);
+		//Debug.Log(ourJson);
 		
 		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(ourJson);
 		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
@@ -952,12 +909,12 @@ public class ResearchModeVideoStream : MonoBehaviour
 		
 		Debug.Log(resultText);
 		
-		Hololens2PhotoPut h2 = JsonUtility.FromJson<Hololens2PhotoPut>(resultText);
+		EasyVizAR.Hololens2PhotoPut h2 = JsonUtility.FromJson<EasyVizAR.Hololens2PhotoPut>(resultText);
 		//h2.imagePath = h2Location;
 		
 		string photoJson = JsonUtility.ToJson(h2);
-		Debug.Log(photoJson);
-		Debug.Log(h2.imageUrl);
+		//Debug.Log(photoJson);
+		//Debug.Log(h2.imageUrl);
 		
 		UnityWebRequest www2 = new UnityWebRequest("http://halo05.wings.cs.wisc.edu:5000"+h2.imageUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");
@@ -971,12 +928,12 @@ public class ResearchModeVideoStream : MonoBehaviour
 
         if (www2.result != UnityWebRequest.Result.Success)
         {
-            Debug.Log(www2.error);
+            //Debug.Log(www2.error);
 			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOutErr.txt"), www2.error);
         }
         else
         {
-            Debug.Log("Photo upload complete!");
+            //Debug.Log("Photo upload complete!");
 			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOut.txt"), "successfully sent photo");
         }
 		
