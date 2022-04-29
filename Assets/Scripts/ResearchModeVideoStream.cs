@@ -127,7 +127,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 	//store where each possible "octant" maps to on the GPU, -1 if not on gpu.
 	int[] octantToBufferMapGPU = new int[(int)TOTAL_NUM_OCTANTS];
 
-	public ComputeShader octreeShader;
+	public ComputeShader _tsdfShader;
 		
 	Dictionary<uint, uint> octantToBufferMapCPU = new Dictionary<uint, uint>();
 	Dictionary<uint, uint> colorToBufferMapCPU = new Dictionary<uint, uint>();
@@ -165,8 +165,10 @@ public class ResearchModeVideoStream : MonoBehaviour
 	
 	bool _firstHeadsetSend = true;
 	
+	//[SerializeField]
+	//Texture2D _testTexture;
 	[SerializeField]
-	Texture2D _testTexture;
+	GameObject _headsetPrefab;
 	
 	[ContextMenu("TestJSON")]
 	public void TestJSON()
@@ -178,11 +180,15 @@ public class ResearchModeVideoStream : MonoBehaviour
 		s.transform.pos = new Vector3(1f, 2f, 3f);
 		s.transform.rot = new Vector3(0f, 0f, 1f);
 		Debug.Log(JsonUtility.ToJson(s, true));*/
-		StartCoroutine(UploadImage("Assets/testSendImage.png", _testTexture));
+		
+		//StartCoroutine(UploadImage("Assets/testSendImage.png", _testTexture));
 	}
 	
     void Start()
     {
+		GameObject g = Instantiate(_headsetPrefab);
+		EasyVizARHeadset h = g.GetComponent<EasyVizARHeadset>();
+		
 		if(depthPreviewPlane != null)
 		{
 			depthMediaMaterial = depthPreviewPlane.GetComponent<MeshRenderer>().material;
@@ -406,19 +412,11 @@ public class ResearchModeVideoStream : MonoBehaviour
 						RenderTexture.active = null;
 					}
 					
-					if(WriteImagesToDisk)
-					{
-						string filenameC = string.Format(@"CapturedImage{0}_n.png", currTime);
-						//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), targetTexture.EncodeToPNG());//ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
-						//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
-						string outPathColorImage = System.IO.Path.Combine(Application.persistentDataPath, filenameC);
-						File.WriteAllBytes(outPathColorImage, ImageConversion.EncodeArrayToPNG(_ourColor.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, (uint)_ourColor.width, (uint)_ourColor.height));
-						//if(_firstHeadsetSend)
-						{
-							StartCoroutine(UploadImage(outPathColorImage, _ourColor));
-							_firstHeadsetSend = false;
-						}
-					}
+					float[] depthPos = researchMode.GetDepthToWorld();
+					string depthString = depthPos[0].ToString("F4") + " " + depthPos[1].ToString("F4") + " " + depthPos[2].ToString("F4") + " " + depthPos[3].ToString("F4") + "\n";
+					depthString = depthString + (depthPos[4].ToString("F4") + " " + depthPos[5].ToString("F4") + " " + depthPos[6].ToString("F4") + " " + depthPos[7].ToString("F4") + "\n");
+					depthString = depthString + (depthPos[8].ToString("F4") + " " + depthPos[9].ToString("F4") + " " + depthPos[10].ToString("F4") + " " + depthPos[11].ToString("F4") + "\n");
+					depthString = depthString + (depthPos[12].ToString("F4") + " " + depthPos[13].ToString("F4") + " " + depthPos[14].ToString("F4") + " " + depthPos[15].ToString("F4") + "\n");
 					
 					if(photoCaptureFrame.hasLocationData)
 					{
@@ -443,6 +441,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 						colorString = colorString + (projectionMatrix[8].ToString("F4") + " " + projectionMatrix[9].ToString("F4") + " " + projectionMatrix[10].ToString("F4") + " " + projectionMatrix[11].ToString("F4") + "\n");
 						colorString = colorString + (projectionMatrix[12].ToString("F4") + " " + projectionMatrix[13].ToString("F4") + " " + projectionMatrix[14].ToString("F4") + " " + projectionMatrix[15].ToString("F4") + "\n");
 						
+						
 						if(WriteImagesToDisk)
 						{
 							string filenameTxtC = string.Format(@"CapturedImage{0}_n.txt", currTime);
@@ -456,6 +455,20 @@ public class ResearchModeVideoStream : MonoBehaviour
 						}*/
 					}
 					
+					if(WriteImagesToDisk)
+					{
+						//TODO - use above matrices to project color onto depth, write color image that matches depth image size and that have pixels with valid depth..
+						string filenameC = string.Format(@"CapturedImage{0}_n.png", currTime);
+						//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), targetTexture.EncodeToPNG());//ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
+						//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
+						string outPathColorImage = System.IO.Path.Combine(Application.persistentDataPath, filenameC);
+						File.WriteAllBytes(outPathColorImage, ImageConversion.EncodeArrayToPNG(_ourColor.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, (uint)_ourColor.width, (uint)_ourColor.height));
+						//if(_firstHeadsetSend)
+						{
+							StartCoroutine(UploadImage(outPathColorImage, _ourColor));
+							_firstHeadsetSend = false;
+						}
+					}
 					
 					/*var commandBufferDepth = new UnityEngine.Rendering.CommandBuffer();
 					commandBufferDepth.name = "Depth Blit Pass";
@@ -489,12 +502,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 						//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(frameTexture, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
 						//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(_ourDepth.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm, 320, 288));
 					}
-					
-					float[] depthPos = researchMode.GetDepthToWorld();
-					string depthString = depthPos[0].ToString("F4") + " " + depthPos[1].ToString("F4") + " " + depthPos[2].ToString("F4") + " " + depthPos[3].ToString("F4") + "\n";
-					depthString = depthString + (depthPos[4].ToString("F4") + " " + depthPos[5].ToString("F4") + " " + depthPos[6].ToString("F4") + " " + depthPos[7].ToString("F4") + "\n");
-					depthString = depthString + (depthPos[8].ToString("F4") + " " + depthPos[9].ToString("F4") + " " + depthPos[10].ToString("F4") + " " + depthPos[11].ToString("F4") + "\n");
-					depthString = depthString + (depthPos[12].ToString("F4") + " " + depthPos[13].ToString("F4") + " " + depthPos[14].ToString("F4") + " " + depthPos[15].ToString("F4") + "\n");
 					
 					if(WriteImagesToDisk)
 					{

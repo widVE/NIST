@@ -16,6 +16,5 @@ MonoBehaviour:
   Values:
   - featureSets:
     - com.microsoft.openxr.featureset.wmr
-    - com.microsoft.openxr.featureset.playmoderemoting
   - featureSets:
     - com.microsoft.openxr.featureset.hololens

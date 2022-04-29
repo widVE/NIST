@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 921069525072559224}
   - component: {fileID: 921069525072559225}
   m_Layer: 0
-  m_Name: EasyVizarHeadset
+  m_Name: EasyVizARHeadset
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _updateFrequency: 3
-  _headsetID: ross_tester
+  _headsetName: ross_test
 --- !u!33 &921069525072559224
 MeshFilter:
   m_ObjectHideFlags: 0
