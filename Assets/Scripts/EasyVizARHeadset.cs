@@ -6,15 +6,14 @@ public class EasyVizARHeadset : MonoBehaviour
 {
 	[SerializeField]
 	float _updateFrequency;
-	float UpdateFrequency => _updateFrequency;
 	
 	[SerializeField]
 	string _headsetName;
-	string Name => _headsetName;
+	public string Name => _headsetName;
 	
 	[SerializeField]
 	bool _isLocal = true;
-	bool IsLocal => _isLocal;
+	public bool IsLocal => _isLocal;
 	
 	string _headsetID;
 	
@@ -29,16 +28,19 @@ public class EasyVizARHeadset : MonoBehaviour
     void Start()
     {
 		_lastTime = UnityEngine.Time.time;
-		
-		if(_isLocal)
-		{
-			_mainCamera = Camera.main;
-		}
-		
-		CreateHeadset();
+		Debug.Log("In start");
+		//CreateHeadset();
 		//RegisterHeadset();
     }
 
+	public void CreateLocalHeadset(string headsetName)
+	{
+		_isLocal = true;
+		_mainCamera = Camera.main;
+		_headsetName = headsetName;
+		CreateHeadset();
+	}
+	
     // Update is called once per frame
     void Update()
     {
@@ -55,12 +57,20 @@ public class EasyVizARHeadset : MonoBehaviour
 			{
 				if(_isRegisteredWithServer)
 				{
-					PostPosition();
+					//PostPosition();
 				}
 				_lastTime = t;
 			}
 		}
     }
+	
+	public void AssignValuesFromJson(EasyVizAR.Headset h)
+	{
+		transform.position = h.position;
+		transform.rotation = new Quaternion(h.orientation.x, h.orientation.y, h.orientation.z, h.orientation.w);
+		_headsetID = h.id;
+		_headsetName = h.name;
+	}
 	
 	void RegisterHeadset()
 	{
@@ -75,10 +85,7 @@ public class EasyVizARHeadset : MonoBehaviour
 			//Debug.Log(resultData);
 			EasyVizAR.Headset h = JsonUtility.FromJson<EasyVizAR.Headset>(resultData);
 			//fill in any local data here from the server...
-			transform.position = h.position;
-			transform.rotation = new Quaternion(h.orientation.x, h.orientation.y, h.orientation.z, h.orientation.w);
-			_headsetID = h.id;
-			_headsetName = h.name;
+			AssignValuesFromJson(h);
 		}
 		else
 		{
@@ -128,7 +135,7 @@ public class EasyVizARHeadset : MonoBehaviour
 	
 	void PostPositionCallback(string resultData)
 	{
-		Debug.Log(resultData);
+		//Debug.Log(resultData);
 		
 		if(resultData != "error")
 		{

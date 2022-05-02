@@ -20,15 +20,15 @@ namespace EasyVizAR
 	[System.Serializable]
 	public class Headset
 	{
+		public string[] active_in_incidents;
 		public int created;
 		public string id;
 		public string locationId;
+		public string mapId;
 		public string name;
-		public Vector3 position;
 		public Vector4 orientation;
+		public Vector3 position;
 		public int updated;
-		//using below nests the transform, but the server doesn't expect that...
-		//public EasyVizARTransform transform;
 	};
 
 	[System.Serializable]
@@ -52,6 +52,12 @@ namespace EasyVizAR
 		
 		public int width;
 		public int height;
+	}
+	
+	[System.Serializable]
+	public class HeadsetList
+	{
+		public Headset[] headsets;
 	}
 }
 
