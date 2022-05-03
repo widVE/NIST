@@ -9,6 +9,9 @@ namespace QRTracking
 {
     public class QRCodesVisualizer : MonoBehaviour
     {
+		[SerializeField]
+		EasyVizARHeadsetManager _manager;
+		
         public GameObject qrCodePrefab;
 
         private System.Collections.Generic.SortedDictionary<System.Guid, GameObject> qrCodesObjectsList;
@@ -53,6 +56,12 @@ namespace QRTracking
                 throw new System.Exception("Prefab not assigned");
             }
         }
+		
+		public GameObject GetQRCodeGameObjectForID(System.Guid id)
+		{
+			return qrCodesObjectsList[id];
+		}
+		
         private void Instance_QRCodesTrackingStateChanged(object sender, bool status)
         {
             if (!status)
@@ -104,6 +113,13 @@ namespace QRTracking
                         qrCodeObject.GetComponent<SpatialGraphCoordinateSystem>().Id = action.qrCode.SpatialGraphNodeId;
                         qrCodeObject.GetComponent<QRCode>().qrCode = action.qrCode;
                         qrCodesObjectsList.Add(action.qrCode.Id, qrCodeObject);
+						
+						if(_manager != null)
+						{
+							System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "qrCodeDetected.txt"), "Detected QRCode at " + qrCodeObject.transform.position.ToString("F4"));
+							_manager.transform.SetParent(qrCodeObject.transform.parent);
+							System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "qrCodeDetected2.txt"), "Our new tranform: " + _manager.transform.position.ToString("F4"));
+						}
                     }
                     else if (action.type == ActionData.Type.Updated)
                     {

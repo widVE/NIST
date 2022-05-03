@@ -167,9 +167,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 	
 	//[SerializeField]
 	//Texture2D _testTexture;
-	[SerializeField]
-	GameObject _headsetPrefab;
-	
+
 	[ContextMenu("TestJSON")]
 	public void TestJSON()
 	{
@@ -186,9 +184,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 	
     void Start()
     {
-		//GameObject g = Instantiate(_headsetPrefab);
-		//EasyVizARHeadset h = g.GetComponent<EasyVizARHeadset>();
-		
 		if(depthPreviewPlane != null)
 		{
 			depthMediaMaterial = depthPreviewPlane.GetComponent<MeshRenderer>().material;
@@ -911,7 +906,7 @@ public class ResearchModeVideoStream : MonoBehaviour
         if (!focus) StopSensorsEvent();
     }
 	
-	//server communication functions...
+	//server communication functions... this will be moved to EasyVizAR.cs file...
 
 	IEnumerator UploadHeadset(Vector3 pos, Vector3 orient)
     {
@@ -1009,43 +1004,121 @@ public class ResearchModeVideoStream : MonoBehaviour
 		www2.Dispose();
 	}
 	
-	/*public async Task<TResultType> PostJsonString<TResultType>(string url, string json_as_string)
-    {
-        try
-        {
-            //Setting up a non static constructor version and putting the pieces together
-            using (var www = new UnityWebRequest(url, "POST"))
-            {
-                //Converting into "RAW" JSON? I think this is what that means. I can't use the
-                //static put constructor because it only takes WWWForms as an argument
-                byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(json_as_string);
+	/*IEnumerator StartNewSubgridFind()
+	{
+		_waitingForGrids = true;
+		_updateImages = false;
+		
+		//Debug.Log("Starting new grid find");
 
-                //Setting up the rest of the web request
-                //Set content type to Json based on the serialization class used for JsonSerializationOption
-                www.SetRequestHeader("Content-Type", _serializationOption.ContentType);
+		FindSubgrids();
 
-                www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
-                www.downloadHandler = new DownloadHandlerBuffer();
+		UnityEngine.Rendering.AsyncGPUReadbackRequest currRequest = UnityEngine.Rendering.AsyncGPUReadback.Request(octantBuffer); 
 
-                var operation = www.SendWebRequest();
+		while(!currRequest.done)
+		{
+			yield return null;
+		}
 
-                while (!operation.isDone)
-                    await Task.Yield();
+		if(!currRequest.hasError)
+		{
+			Unity.Collections.NativeArray<int>.Copy(currRequest.GetData<int>(), octantData);
+		}
+		else
+		{
+			Debug.Log("Error!");
+		}
 
-                Debug.Log("www.result: " + www.downloadHandler.text);
-                stringID = www.downloadHandler.text;
-                
+		_gridsFound = true;
+	}*/
+	
+	void FindSubgrids()
+	{
+		/*var cameraParams = new XRCameraParams {
+			zNear = _arCamera.nearClipPlane,
+			zFar = _arCamera.farClipPlane,
+			screenWidth = Screen.width,//_currWidth,//
+			screenHeight = Screen.height,//_currHeight,//
+			screenOrientation = Screen.orientation
+		};
 
-                if (www.result != UnityWebRequest.Result.Success)
-                    Debug.LogError($"Failed: {www.error}");
+		//Debug.Log(lastDisplayMatrix.ToString("F4"));
 
-                return default;
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"{nameof(Get)} failed: {ex.Message}");
-            return default;
-        }
-    }*/
+		Matrix4x4 viewMatrix = Matrix4x4.identity;//_arCamera.viewMatrix;
+		Matrix4x4 projMatrix = lastProjMatrix;
+		Matrix4x4 viewInverse = Matrix4x4.identity;
+
+		if (m_CameraManager.subsystem.TryGetLatestFrame(cameraParams, out var cameraFrame)) {
+			viewMatrix = Matrix4x4.TRS(_arCamera.transform.position, _arCamera.transform.rotation, Vector3.one).inverse;
+			if (SystemInfo.usesReversedZBuffer)
+			{
+				viewMatrix.m20 = -viewMatrix.m20;
+				viewMatrix.m21 = -viewMatrix.m21;
+				viewMatrix.m22 = -viewMatrix.m22;
+				viewMatrix.m23 = -viewMatrix.m23;
+			}
+			projMatrix = cameraFrame.projectionMatrix;
+			viewInverse = viewMatrix.inverse;
+		}
+		
+		Matrix4x4 viewProjMatrix = projMatrix * viewMatrix;//Matrix4x4.TRS(_arCamera.transform.position, _arCamera.transform.rotation, Vector3.one);//_arCamera.worldToCameraMatrix;//
+		
+		if (!m_CameraManager.subsystem.TryGetIntrinsics(out XRCameraIntrinsics cameraIntrinsics))
+		{
+			SetLastValues();
+			return;
+		}
+		
+		Matrix4x4 flipYZ = new Matrix4x4();
+		flipYZ.SetRow(0, new Vector4(1f,0f,0f,0f));
+		flipYZ.SetRow(1, new Vector4(0f,1f,0f,0f));
+		flipYZ.SetRow(2, new Vector4(0f,0f,-1f,0f));
+		flipYZ.SetRow(3, new Vector4(0f,0f,0f,1f));
+
+		//the way we are making this quaternion is impacting the correctness (i.e. we need to do it eventhough the angle is zero, for things to work)
+		
+		//Debug.Log(viewMatrix.ToString("F6"));
+		
+		Matrix4x4 cTransform = GetCamTransform();
+
+#if NO_PROJECT
+		Matrix4x4 rotateToARCamera = flipYZ;
+#else
+		Matrix4x4 rotateToARCamera = flipYZ * cTransform;
+#endif
+		Matrix4x4 theMatrix = viewInverse * rotateToARCamera;
+
+		Matrix4x4 camIntrinsics = Matrix4x4.identity;
+
+		//we want to pass in the data to compute buffers and calculate that way..
+		//viewProjMatrix = projMatrix * theMatrix.inverse;
+
+		_tsdfShader.SetMatrix("localToWorld", theMatrix);
+		_tsdfShader.SetMatrix("displayMatrix", lastDisplayMatrix);
+		_tsdfShader.SetMatrix("viewProjMatrix", viewProjMatrix);
+
+		if(Screen.orientation == ScreenOrientation.Portrait || Screen.orientation == ScreenOrientation.PortraitUpsideDown)
+		{
+			//these could be set on re-orientation...
+			camIntrinsics.SetColumn(0, new Vector4(cameraIntrinsics.focalLength.x, 0f, 0f, 0f));
+			camIntrinsics.SetColumn(1, new Vector4(0f, cameraIntrinsics.focalLength.y, 0f, 0f));
+			camIntrinsics.SetColumn(2, new Vector4(cameraIntrinsics.principalPoint.y, cameraIntrinsics.principalPoint.x, 1f, 0f));
+		}
+		else
+		{
+			camIntrinsics.SetColumn(0, new Vector4(cameraIntrinsics.focalLength.x, 0f, 0f, 0f));
+			camIntrinsics.SetColumn(1, new Vector4(0f, cameraIntrinsics.focalLength.y, 0f, 0f));
+			camIntrinsics.SetColumn(2, new Vector4(cameraIntrinsics.principalPoint.x, cameraIntrinsics.principalPoint.y, 1f, 0f));
+		}
+
+		_tsdfShader.SetMatrix("camIntrinsicsInverse", camIntrinsics.inverse);
+	
+		_tsdfShader.SetBuffer(octantComputeID, "octantBuffer", octantBuffer);
+		_tsdfShader.SetTexture(octantComputeID, "depthTexture", _renderTargetDepthV);
+		_tsdfShader.SetTexture(octantComputeID, "confTexture", _renderTargetConfV);
+		_tsdfShader.Dispatch(octantComputeID, ((int)_currWidth + 31) / 32, ((int)_currHeight + 31) / 32, 1);*/
+	}
+
+	
+	
 }
