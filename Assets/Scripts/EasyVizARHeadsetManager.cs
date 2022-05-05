@@ -50,13 +50,16 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	
 	private void QRCodeDetected(object sender, QRTracking.QRCodeEventArgs<Microsoft.MixedReality.QR.QRCode> e)
 	{
-		System.Guid guid = e.Data.Id;
-		GameObject g = _qrCodes.GetQRCodeGameObjectForID(guid);
-		if(g != null)
+		if(_qrCodes != null)
 		{
-			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "qrCodeDetected.txt"), "Detected QRCode at " + g.transform.position.ToString("F4"));
-			transform.SetParent(g.transform.parent);
-			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "qrCodeDetected2.txt"), "Our new tranform: " + transform.position.ToString("F4"));
+			System.Guid guid = e.Data.Id;
+			GameObject g = _qrCodes.GetQRCodeGameObjectForID(guid);
+			if(g != null)
+			{
+				System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "qrCodeDetected.txt"), "Detected QRCode at " + g.transform.position.ToString("F4"));
+				transform.SetParent(g.transform.parent);
+				System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "qrCodeDetected2.txt"), "Our new tranform: " + transform.position.ToString("F4"));
+			}
 		}
 	}
 	

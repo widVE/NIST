@@ -781,7 +781,6 @@ MonoBehaviour:
   _writeImagesToDisk: 0
   _writePosToEdge: 0
   _showImagesInView: 0
-  _headsetPrefab: {fileID: 921069525072559227, guid: 53b7274ec7bf90643b352bf1c7589e26, type: 3}
 --- !u!4 &891080481
 Transform:
   m_ObjectHideFlags: 0
@@ -928,6 +927,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e225851d0172f184ea4336a911d50719, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1478750761 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5731539863259288648, guid: 9ceaea61be84db74ca74378863e9c03e, type: 3}
+  m_PrefabInstance: {fileID: 508021658}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c011a6cf24698544bfd05b3bb6c96da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1517424691
@@ -1495,6 +1505,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
+      propertyPath: _qrCodes
+      value: 
+      objectReference: {fileID: 1478750761}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: _localHeadsetName
       value: ross_test
