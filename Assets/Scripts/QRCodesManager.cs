@@ -49,6 +49,7 @@ namespace QRTracking
         private QRCodeWatcherAccessStatus accessStatus;
         private System.Threading.Tasks.Task<QRCodeWatcherAccessStatus> capabilityTask;
 
+		
         public System.Guid GetIdForQRCode(string qrCodeData)
         {
             lock (qrCodesList)
@@ -71,11 +72,12 @@ namespace QRTracking
                 return new List<Microsoft.MixedReality.QR.QRCode>(qrCodesList.Values);
             }
         }
+		
         protected void Awake()
         {
 
         }
-
+		
         // Use this for initialization
         async protected virtual void Start()
         {
@@ -83,6 +85,7 @@ namespace QRTracking
             capabilityTask = QRCodeWatcher.RequestAccessAsync();
             accessStatus = await capabilityTask;
             capabilityInitialized = true;
+			
         }
 
         private void SetupQRTracking()
@@ -194,15 +197,16 @@ namespace QRTracking
         {
             Debug.Log("QRCodesManager QRCodeWatcher_Added");
 
-            lock (qrCodesList)
-            {
-                qrCodesList[args.Code.Id] = args.Code;
-            }
-            var handlers = QRCodeAdded;
-            if (handlers != null)
-            {
-                handlers(this, QRCodeEventArgs.Create(args.Code));
-            }
+			lock (qrCodesList)
+			{
+				qrCodesList[args.Code.Id] = args.Code;
+			}
+			var handlers = QRCodeAdded;
+			if (handlers != null)
+			{
+				handlers(this, QRCodeEventArgs.Create(args.Code));
+			}
+		
         }
 
         private void QRCodeWatcher_EnumerationCompleted(object sender, object e)
@@ -214,6 +218,7 @@ namespace QRTracking
         {
             if (qrTracker == null && capabilityInitialized && IsSupported)
             {
+				Debug.Log(accessStatus);
                 if (accessStatus == QRCodeWatcherAccessStatus.Allowed)
                 {
                     SetupQRTracking();

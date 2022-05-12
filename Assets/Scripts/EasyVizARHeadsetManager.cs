@@ -56,9 +56,9 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 			GameObject g = _qrCodes.GetQRCodeGameObjectForID(guid);
 			if(g != null)
 			{
-				System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "qrCodeDetected.txt"), "Detected QRCode at " + g.transform.position.ToString("F4"));
-				transform.SetParent(g.transform.parent);
-				System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "qrCodeDetected2.txt"), "Our new tranform: " + transform.position.ToString("F4"));
+				//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "qrCodeDetected.txt"), "Detected QRCode at " + g.transform.position.ToString("F4"));
+				//transform.SetParent(g.transform.parent);
+				//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "qrCodeDetected2.txt"), "Our new tranform: " + transform.position.ToString("F4"));
 			}
 		}
 	}

@@ -12,11 +12,16 @@ namespace QRTracking
 		[SerializeField]
 		EasyVizARHeadsetManager _manager;
 		
+		[SerializeField]
+		GameObject _objectToChild;
+		
         public GameObject qrCodePrefab;
 
         private System.Collections.Generic.SortedDictionary<System.Guid, GameObject> qrCodesObjectsList;
         private bool clearExisting = false;
-
+		private bool SetupComplete = false;
+		private bool skipOne = true;
+		
         struct ActionData
         {
             public enum Type
@@ -55,8 +60,16 @@ namespace QRTracking
             {
                 throw new System.Exception("Prefab not assigned");
             }
+			
+			StartCoroutine(DelayStartAdd(5f));
         }
 		
+		IEnumerator DelayStartAdd(float timeToDelay)
+		{
+			yield return new WaitForSeconds(timeToDelay);
+			SetupComplete = true;
+		}
+
 		public GameObject GetQRCodeGameObjectForID(System.Guid id)
 		{
 			return qrCodesObjectsList[id];
@@ -73,11 +86,14 @@ namespace QRTracking
         private void Instance_QRCodeAdded(object sender, QRCodeEventArgs<Microsoft.MixedReality.QR.QRCode> e)
         {
             Debug.Log("QRCodesVisualizer Instance_QRCodeAdded");
-
-            lock (pendingActions)
-            {
-                pendingActions.Enqueue(new ActionData(ActionData.Type.Added, e.Data));
-            }
+			
+			//if(SetupComplete)
+			{
+				lock (pendingActions)
+				{
+					pendingActions.Enqueue(new ActionData(ActionData.Type.Added, e.Data));
+				}
+			}
         }
 
         private void Instance_QRCodeUpdated(object sender, QRCodeEventArgs<Microsoft.MixedReality.QR.QRCode> e)
@@ -109,10 +125,30 @@ namespace QRTracking
                     var action = pendingActions.Dequeue();
                     if (action.type == ActionData.Type.Added)
                     {
-                        GameObject qrCodeObject = Instantiate(qrCodePrefab, new Vector3(0, 0, 0), Quaternion.identity);
-                        qrCodeObject.GetComponent<SpatialGraphCoordinateSystem>().Id = action.qrCode.SpatialGraphNodeId;
-                        qrCodeObject.GetComponent<QRCode>().qrCode = action.qrCode;
-                        qrCodesObjectsList.Add(action.qrCode.Id, qrCodeObject);
+						Debug.Log("QR Code Added!");
+                        
+						if(skipOne)
+						{
+							skipOne = false;
+						}
+						else
+						{
+							GameObject qrCodeObject = Instantiate(qrCodePrefab, new Vector3(0, 0, 0), Quaternion.identity);
+							GameObject model = Instantiate(_objectToChild, new Vector3(0,0,0), Quaternion.identity);
+							
+							if(model != null)
+							{
+								model.transform.SetParent(qrCodeObject.transform, false);
+							}
+							
+							Microsoft.MixedReality.QR.QRCode qr = qrCodeObject.GetComponent<QRCode>().qrCode;
+							if(qr != null)
+							{
+								qrCodeObject.GetComponent<SpatialGraphCoordinateSystem>().Id = action.qrCode.SpatialGraphNodeId;
+								qrCodeObject.GetComponent<QRCode>().qrCode = action.qrCode;
+								qrCodesObjectsList.Add(action.qrCode.Id, qrCodeObject);
+							}
+						}
 						
 						/*if(_manager != null)
 						{
@@ -141,6 +177,7 @@ namespace QRTracking
                     }
                 }
             }
+			
             if (clearExisting)
             {
                 clearExisting = false;

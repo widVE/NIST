@@ -428,64 +428,66 @@ public class ResearchModeVideoStream : MonoBehaviour
 						//at this point we have the depth mvp matrix, and the color proj / view matrix.
 						//need to project world space depth value into color image that matches depth image size...
 						
-						/*float depth = (float)((float)depthData[n] / 255f) * 4000f;
-						//Debug.Log("Depth: " + depth);
-
-						int wIndex = (int)(n % numCols);
-						int hIndex = (int)numRows - (int)(n / numCols);
-						
-						//uint numRows = numPoints / numCols;
-
-						int colorWidth = (int)760;
-						int colorHeight = (int)428;
-			
-						uint idx = (uint)(hIndex * (int)numCols + wIndex);
-						//byte cData = confData[idx];
-						
-						pos.x = 0f;
-						pos.y = 0f;
-						pos.z = 0f;
-						pos.w = 1.0f;
-						
-						//if(cData >= ipadConfidence)
+						/*for(int n = 0; n < DEPTH_WIDTH*DEPTH_HEIGHT; ++n)
 						{
-							Vector3 cameraPoint = new Vector3(wIndex + 0.5f, hIndex + 0.5f, 1f);
-							cameraPoint = camIntrinsics.MultiplyVector(cameraPoint);
-							cameraPoint *= depth;
-							//cameraPoint.z = -cameraPoint.z;
-							Vector4 newCamPoint = new Vector4(cameraPoint.x, cameraPoint.y, cameraPoint.z, 1f);
-							//Debug.Log(newCamPoint.ToString("F3"));
-							
-							Vector4 projectedPoint = scanTrans * newCamPoint;
-							
-							pos.x = projectedPoint.x / projectedPoint.w;
-							pos.y = projectedPoint.y / projectedPoint.w;
-							pos.z = projectedPoint.z / projectedPoint.w;
+							float depth = (float)((float)depthTextureBytes[n] / 255f) * 4000f;
+							//Debug.Log("Depth: " + depth);
 
-						}
-						
-						//Debug.Log(pos.ToString("F4"));
-						//we now want to project pos into the color image to look up the color value for the new color image
-						//this will replace the below colorIdx calculation...
-						//need full view projection...
-						//do we have this?
-						
-						Vector4 projPos = scanTransPV * pos;
-						//projPos = camIntrinsics2 * projPos;
-						//Debug.Log(projPos.ToString("F4"));
-						projPos.x /= projPos.w;
-						projPos.y /= projPos.w;
-						projPos.z /= projPos.w;
-						projPos.x = projPos.x * 0.5f + 0.5f;
-						projPos.y = projPos.y * 0.5f + 0.5f;
-						//projPos.x = 1f - projPos.x;
-						//projPos.y = 1f - projPos.y;
+							int wIndex = (int)(n % DEPTH_WIDTH);
+							int hIndex = (int)DEPTH_HEIGHT - (int)(n / DEPTH_WIDTH);
+							
+							//uint numRows = numPoints / numCols;
 
-						//Debug.Log(projPos.x);
-						//Debug.Log(projPos.y);
-						int hIdx = (int)((float)colorHeight * projPos.y);
-						int wIdx = (int)((float)colorWidth * projPos.x);*/
-						
+							int colorWidth = (int)760;
+							int colorHeight = (int)428;
+				
+							uint idx = (uint)(hIndex * (int)DEPTH_WIDTH + wIndex);
+							//byte cData = confData[idx];
+							
+							pos.x = 0f;
+							pos.y = 0f;
+							pos.z = 0f;
+							pos.w = 1.0f;*/
+							
+							//if(cData >= ipadConfidence)
+							/*{
+								Vector3 cameraPoint = new Vector3(wIndex + 0.5f, hIndex + 0.5f, 1f);
+								cameraPoint = camIntrinsics.MultiplyVector(cameraPoint);
+								cameraPoint *= depth;
+								//cameraPoint.z = -cameraPoint.z;
+								Vector4 newCamPoint = new Vector4(cameraPoint.x, cameraPoint.y, cameraPoint.z, 1f);
+								//Debug.Log(newCamPoint.ToString("F3"));
+								
+								Vector4 projectedPoint = scanTrans * newCamPoint;
+								
+								pos.x = projectedPoint.x / projectedPoint.w;
+								pos.y = projectedPoint.y / projectedPoint.w;
+								pos.z = projectedPoint.z / projectedPoint.w;
+
+							}
+							
+							//Debug.Log(pos.ToString("F4"));
+							//we now want to project pos into the color image to look up the color value for the new color image
+							//this will replace the below colorIdx calculation...
+							//need full view projection...
+							//do we have this?
+							
+							Vector4 projPos = scanTransPV * pos;
+							//projPos = camIntrinsics2 * projPos;
+							//Debug.Log(projPos.ToString("F4"));
+							projPos.x /= projPos.w;
+							projPos.y /= projPos.w;
+							projPos.z /= projPos.w;
+							projPos.x = projPos.x * 0.5f + 0.5f;
+							projPos.y = projPos.y * 0.5f + 0.5f;
+							//projPos.x = 1f - projPos.x;
+							//projPos.y = 1f - projPos.y;
+
+							//Debug.Log(projPos.x);
+							//Debug.Log(projPos.y);
+							int hIdx = (int)((float)colorHeight * projPos.y);
+							int wIdx = (int)((float)colorWidth * projPos.x);*/
+						//}
 						//write pv / projection matrices...
 						string colorString = cameraToWorldMatrix[0].ToString("F4") + " " + cameraToWorldMatrix[1].ToString("F4") + " " + cameraToWorldMatrix[2].ToString("F4") + " " + cameraToWorldMatrix[3].ToString("F4") + "\n";
 						colorString = colorString + (cameraToWorldMatrix[4].ToString("F4") + " " + cameraToWorldMatrix[5].ToString("F4") + " " + cameraToWorldMatrix[6].ToString("F4") + " " + cameraToWorldMatrix[7].ToString("F4") + "\n");

@@ -42,6 +42,7 @@ namespace QRTracking
         // Use this for initialization
         void Start()
         {
+			
 #if WINDOWS_UWP
             if (CoordinateSystem == null)
             {
@@ -75,7 +76,8 @@ namespace QRTracking
                     
 					SpatialCoordinateSystem rootSpatialCoordinateSystem = PerceptionInterop.GetSceneCoordinateSystem(UnityEngine.Pose.identity) as SpatialCoordinateSystem;
                     //System.IntPtr rootCoordnateSystemPtr = UnityEngine.XR.WindowsMR.WindowsMREnvironment.OriginSpatialCoordinateSystem;
-                    //SpatialCoordinateSystem rootSpatialCoordinateSystem = (SpatialCoordinateSystem)System.Runtime.InteropServices.Marshal.GetObjectForIUnknown(rootCoordnateSystemPtr);
+                    //SpatialCoordinateSystem rootSpatialCoordinateSystem = Microsoft.Windows.Perception.Spatial.SpatialCoordinateSystem.FromNativePtr(rootCoordnateSystemPtr);
+					//SpatialCoordinateSystem rootSpatialCoordinateSystem = (SpatialCoordinateSystem)System.Runtime.InteropServices.Marshal.GetObjectForIUnknown(rootCoordnateSystemPtr);
 
                     // Get the relative transform from the unity origin
                     System.Numerics.Matrix4x4? relativePose = CoordinateSystem.TryGetTransformTo(rootSpatialCoordinateSystem);
@@ -106,13 +108,18 @@ namespace QRTracking
 
                         // If there is a parent to the camera that means we are using teleport and we should not apply the teleport
                         // to these objects so apply the inverse
-                        if (CameraCache.Main.transform.parent != null)
+                        //if(CameraCache.Main.transform != null)
+						//{
+						//	pose = pose.GetTransformedBy(CameraCache.Main.transform);
+						//}
+						if (CameraCache.Main.transform.parent != null)
                         {
                             pose = pose.GetTransformedBy(CameraCache.Main.transform.parent);
                         }
 
-                        gameObject.transform.SetPositionAndRotation(pose.position, pose.rotation);
-                        //Debug.Log("Id= " + id + " QRPose = " +  pose.position.ToString("F7") + " QRRot = "  +  pose.rotation.ToString("F7"));
+						MovePoseToCenter(pose);
+                        //gameObject.transform.SetPositionAndRotation(pose.position, pose.rotation);
+                        Debug.Log("Id= " + id + " QRPose = " +  pose.position.ToString("F7") + " QRRot = "  +  pose.rotation.ToString("F7"));
                     }
                     else
                     {
@@ -126,6 +133,49 @@ namespace QRTracking
 #endif
             }
         }
+		
+		protected void MovePoseToCenter(Pose pose)
+        {
+            // Rotate 90 degrees 'forward' over 'right' so 'up' is pointing straight up from the QR code
+            QRCode qrCode = gameObject.GetComponent<QRCode>();
+			if(qrCode != null)
+			{
+				//pose.rotation *= Quaternion.Euler(0, 180, 0);
+				pose.rotation *= Quaternion.Euler(90, 0, 0);
+				
+				// Move the anchor point to the *center* of the QR code
+				var deltaToCenter = qrCode.PhysicalSize * 0.5f;
+				pose.position += (pose.rotation * (deltaToCenter * Vector3.right) -
+                              pose.rotation * (deltaToCenter * Vector3.forward));
+				CheckPosition(pose);
+			}
+        }
+		
+		
+        private Pose? lastPose;
+
+        private void CheckPosition(Pose pose)
+        {
+            if (lastPose == null)
+            {
+                lastPose = pose;
+                return;
+            }
+
+            if (Mathf.Abs(Quaternion.Dot(lastPose.Value.rotation, pose.rotation)) > 0.99f &&
+                Vector3.Distance(lastPose.Value.position, pose.position) < 0.5f)
+            {
+                //locationIdSizes.Clear();
+                lastPose = null;
+                gameObject.transform.SetPositionAndRotation(pose.position, pose.rotation);
+                //PositionAcquired?.Invoke(this, pose);
+            }
+            else
+            {
+                lastPose = pose;
+            }
+        }
+		
         // Update is called once per frame
         void Update()
         {
