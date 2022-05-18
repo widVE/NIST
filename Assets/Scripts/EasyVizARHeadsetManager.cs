@@ -16,12 +16,6 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	string _localHeadsetName;
 	public string LocalHeadsetName => _localHeadsetName;
 	
-	[SerializeField]
-	QRTracking.QRCodesVisualizer _qrCodes;
-	
-	//the transform of this game object could serve as the common coordinate space for all headsets (i.e. make them as children to this object)
-	//and use QR code detection to set this object's transform.
-	
 	List<EasyVizARHeadset> _activeHeadsets = new List<EasyVizARHeadset>();
 	
     // Start is called before the first frame update
@@ -29,7 +23,6 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     {
 		//CreateLocalHeadset();
 		//CreateHeadsets();
-		//QRTracking.QRCodesManager.Instance.QRCodeAdded += QRCodeDetected;
     }
 
     // Update is called once per frame
@@ -45,22 +38,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	
 	void OnDisable()
 	{
-		//QRTracking.QRCodesManager.Instance.QRCodeAdded -= QRCodeDetected;
-	}
-	
-	private void QRCodeDetected(object sender, QRTracking.QRCodeEventArgs<Microsoft.MixedReality.QR.QRCode> e)
-	{
-		if(_qrCodes != null)
-		{
-			System.Guid guid = e.Data.Id;
-			GameObject g = _qrCodes.GetQRCodeGameObjectForID(guid);
-			if(g != null)
-			{
-				//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "qrCodeDetected.txt"), "Detected QRCode at " + g.transform.position.ToString("F4"));
-				//transform.SetParent(g.transform.parent);
-				//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "qrCodeDetected2.txt"), "Our new tranform: " + transform.position.ToString("F4"));
-			}
-		}
+		
 	}
 	
 	void CreateLocalHeadset()
