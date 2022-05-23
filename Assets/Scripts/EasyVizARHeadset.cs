@@ -15,7 +15,17 @@ public class EasyVizARHeadset : MonoBehaviour
 	bool _isLocal = true;
 	public bool IsLocal => _isLocal;
 	
+	[SerializeField]
+	bool _showPositionChanges = false;
+	public bool ShowPositionChanges => _showPositionChanges;
+	
+	[SerializeField]
+	bool _postPositionChanges = false;
+	public bool PostPositionChanges => _postPositionChanges;
+	
 	string _headsetID;
+	
+	string _locationID;
 	
 	float _lastTime;
 	
@@ -28,9 +38,10 @@ public class EasyVizARHeadset : MonoBehaviour
     void Start()
     {
 		_lastTime = UnityEngine.Time.time;
-		Debug.Log("In start");
+		//Debug.Log("In start");
 		//CreateHeadset();
 		//RegisterHeadset();
+
     }
 
 	public void CreateLocalHeadset(string headsetName)
@@ -55,9 +66,9 @@ public class EasyVizARHeadset : MonoBehaviour
 			float t = UnityEngine.Time.time;
 			if(t - _lastTime > _updateFrequency)
 			{
-				if(_isRegisteredWithServer)
+				if(_isRegisteredWithServer && _postPositionChanges)
 				{
-					//PostPosition();
+					PostPosition();
 				}
 				_lastTime = t;
 			}
@@ -77,6 +88,12 @@ public class EasyVizARHeadset : MonoBehaviour
 		transform.rotation = new Quaternion(h.orientation.x, h.orientation.y, h.orientation.z, h.orientation.w);
 		_headsetID = h.id;
 		_headsetName = h.name;
+		_locationID = h.location_id;
+		
+		if(_showPositionChanges)
+		{
+			GetPastPositions();
+		}
 	}
 	
 	void RegisterHeadset()
@@ -134,6 +151,7 @@ public class EasyVizARHeadset : MonoBehaviour
 			
 			transform.position = newPos;
 			transform.rotation = new Quaternion(h.orientation.x, h.orientation.y, h.orientation.z, h.orientation.w);
+			
 			_headsetID = h.id;
 			_headsetName = h.name;
 		}
@@ -156,6 +174,7 @@ public class EasyVizARHeadset : MonoBehaviour
 		h.orientation.z = transform.rotation[2];
 		h.orientation.w = transform.rotation[3];
 		h.name = _headsetName;
+		h.location_id = _locationID;
 		
 		EasyVizARServer.Instance.Patch("headsets/"+_headsetID, EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), PostPositionCallback);
 	}
@@ -173,5 +192,35 @@ public class EasyVizARHeadset : MonoBehaviour
 		{
 			
 		}
+	}
+	
+	void GetPastPositionsCallback(string resultData)
+	{
+		if(resultData != "error")
+		{
+			EasyVizAR.PoseChanges p = JsonUtility.FromJson<EasyVizAR.PoseChanges>("{\"poseChanges\":" + resultData + "}");
+			
+			//either make a line renderer or trail renderer, etc. with these positions / orientations
+			LineRenderer r = transform.GetChild(0).GetComponent<LineRenderer>();
+			r.positionCount = p.poseChanges.Length;
+			
+			for(int i = 0; i < p.poseChanges.Length; ++i)
+			{
+				Vector3 vPos = Vector3.zero;
+				vPos.x = p.poseChanges[i].position.x;
+				vPos.y = p.poseChanges[i].position.y;
+				vPos.z = p.poseChanges[i].position.z;
+				r.SetPosition(i, vPos);
+			}
+		}
+		else
+		{
+			Debug.Log("Received an error when obtaining past positions");
+		}
+	}
+	
+	void GetPastPositions()
+	{
+		EasyVizARServer.Instance.Get("headsets/"+_headsetID+"/pose-changes", EasyVizARServer.JSON_TYPE, GetPastPositionsCallback);
 	}
 }

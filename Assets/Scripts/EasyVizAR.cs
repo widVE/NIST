@@ -75,6 +75,20 @@ namespace EasyVizAR
 	{
 		public Headset[] headsets;
 	}
+	
+	[System.Serializable]
+	public class PoseChange
+	{
+		public Orientation orientation;
+		public Position position;
+		public float time;
+	}
+	
+	[System.Serializable]
+	public class PoseChanges
+	{
+		public PoseChange[] poseChanges;
+	}
 }
 
 public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>

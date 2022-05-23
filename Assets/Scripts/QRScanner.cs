@@ -110,6 +110,10 @@ public class QRScanner : MonoBehaviour
 				
 				_qrPrefab.transform.SetPositionAndRotation(d.pose.position, d.pose.rotation);
 				
+				int cc = _qrPrefab.transform.childCount;
+				
+				_qrPrefab.transform.GetChild(cc-1).GetComponent<EasyVizARHeadsetManager>().CreateAllHeadsets();
+				
 				//Matrix4x4 m = Matrix4x4.TRS(d.pose.position, d.pose.rotation, Vector3.one);
 				//Matrix4x4 mInv = m.inverse;
 				//_qrPrefab.transform.SetPositionAndRotation(mInv.GetPosition(), mInv.rotation);

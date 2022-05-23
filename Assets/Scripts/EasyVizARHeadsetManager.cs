@@ -18,11 +18,12 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	
 	List<EasyVizARHeadset> _activeHeadsets = new List<EasyVizARHeadset>();
 	
+	bool _headsetsCreated = false;
+	
     // Start is called before the first frame update
     void Start()
     {
-		CreateLocalHeadset();
-		CreateHeadsets();
+		CreateAllHeadsets();
     }
 
     // Update is called once per frame
@@ -39,6 +40,17 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	void OnDisable()
 	{
 		
+	}
+	
+	public void CreateAllHeadsets()
+	{
+		if(!_headsetsCreated)
+		{
+			CreateLocalHeadset();
+			CreateHeadsets();
+			
+			_headsetsCreated = true;
+		}
 	}
 	
 	void CreateLocalHeadset()
@@ -62,7 +74,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 			EasyVizAR.HeadsetList h = JsonUtility.FromJson<EasyVizAR.HeadsetList>("{\"headsets\":" + resultData + "}");
 			for(int i = 0; i < h.headsets.Length; ++i)
 			{
-				GameObject s = Instantiate(_headsetPrefab);
+				GameObject s = Instantiate(_headsetPrefab, transform);
 				EasyVizARHeadset hs = s.GetComponent<EasyVizARHeadset>();
 				if(hs != null)
 				{
