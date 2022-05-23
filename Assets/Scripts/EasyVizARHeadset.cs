@@ -66,7 +66,14 @@ public class EasyVizARHeadset : MonoBehaviour
 	
 	public void AssignValuesFromJson(EasyVizAR.Headset h)
 	{
-		transform.position = h.position;
+		Vector3 newPos = Vector3.zero;
+
+		newPos.x = h.position.x;
+		newPos.y = h.position.y;
+		newPos.z = h.position.z;	
+		
+		transform.position = newPos;
+		
 		transform.rotation = new Quaternion(h.orientation.x, h.orientation.y, h.orientation.z, h.orientation.w);
 		_headsetID = h.id;
 		_headsetName = h.name;
@@ -97,8 +104,16 @@ public class EasyVizARHeadset : MonoBehaviour
 	void CreateHeadset()
 	{
 		EasyVizAR.Headset h = new EasyVizAR.Headset();
-		h.position = transform.position;
-		h.orientation = new Vector4(transform.rotation[0], transform.rotation[1], transform.rotation[2], transform.rotation[3]);
+		h.position = new EasyVizAR.Position();
+		h.position.x = transform.position.x;
+		h.position.y = transform.position.y;
+		h.position.z = transform.position.z;
+		h.orientation = new EasyVizAR.Orientation();
+		h.orientation.x = transform.rotation[0];
+		h.orientation.y = transform.rotation[1];
+		h.orientation.z = transform.rotation[2];
+		h.orientation.w = transform.rotation[3];
+		
 		h.name = _headsetName;
 		
 		EasyVizARServer.Instance.Post("headsets", EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), CreateCallback);
@@ -111,7 +126,13 @@ public class EasyVizARHeadset : MonoBehaviour
 			_isRegisteredWithServer = true;
 			Debug.Log("Successfully connected headset");
 			EasyVizAR.Headset h = JsonUtility.FromJson<EasyVizAR.Headset>(resultData);
-			transform.position = h.position;
+			Vector3 newPos = Vector3.zero;
+
+			newPos.x = h.position.x;
+			newPos.y = h.position.y;
+			newPos.z = h.position.z;	
+			
+			transform.position = newPos;
 			transform.rotation = new Quaternion(h.orientation.x, h.orientation.y, h.orientation.z, h.orientation.w);
 			_headsetID = h.id;
 			_headsetName = h.name;
@@ -125,8 +146,15 @@ public class EasyVizARHeadset : MonoBehaviour
 	void PostPosition()
 	{
 		EasyVizAR.Headset h = new EasyVizAR.Headset();
-		h.position = transform.position;
-		h.orientation = new Vector4(transform.rotation[0], transform.rotation[1], transform.rotation[2], transform.rotation[3]);
+		h.position = new EasyVizAR.Position();
+		h.position.x = transform.position.x;
+		h.position.y = transform.position.y;
+		h.position.z = transform.position.z;
+		h.orientation = new EasyVizAR.Orientation();
+		h.orientation.x = transform.rotation[0];
+		h.orientation.y = transform.rotation[1];
+		h.orientation.z = transform.rotation[2];
+		h.orientation.w = transform.rotation[3];
 		h.name = _headsetName;
 		
 		EasyVizARServer.Instance.Patch("headsets/"+_headsetID, EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), PostPositionCallback);

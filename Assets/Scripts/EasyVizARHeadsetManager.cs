@@ -21,8 +21,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-		//CreateLocalHeadset();
-		//CreateHeadsets();
+		CreateLocalHeadset();
+		CreateHeadsets();
     }
 
     // Update is called once per frame
@@ -58,7 +58,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		if(resultData != "error" && resultData.Length > 2)
 		{
 			//parse list of headsets for this location and create...
-			EasyVizAR.HeadsetList h = JsonUtility.FromJson<EasyVizAR.HeadsetList>(resultData);
+			//the key to parsing the array - the text we add here has to match the name of the variable in the array wrapper class (headsets).
+			EasyVizAR.HeadsetList h = JsonUtility.FromJson<EasyVizAR.HeadsetList>("{\"headsets\":" + resultData + "}");
 			for(int i = 0; i < h.headsets.Length; ++i)
 			{
 				GameObject s = Instantiate(_headsetPrefab);

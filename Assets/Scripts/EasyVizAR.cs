@@ -18,16 +18,32 @@ namespace EasyVizAR
 	}*/
 	
 	[System.Serializable]
+	public class Orientation
+	{
+		public float w;
+		public float x;
+		public float y;
+		public float z;
+	}
+	
+	[System.Serializable]
+	public class Position
+	{
+		public float x;
+		public float y;
+		public float z;
+	}
+	
+	[System.Serializable]
 	public class Headset
 	{
-		public string[] active_in_incidents;
 		public int created;
 		public string id;
-		public string locationId;
+		public string location_id;
 		public string mapId;
 		public string name;
-		public Vector4 orientation;
-		public Vector3 position;
+		public Orientation orientation;
+		public Position position;
 		public int updated;
 	};
 

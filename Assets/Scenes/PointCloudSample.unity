@@ -1757,6 +1757,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
+      propertyPath: _locationId
+      value: 66a4e9f2-e978-4405-988e-e168a9429030
+      objectReference: {fileID: 0}
+    - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: _localHeadsetName
       value: ross_test
       objectReference: {fileID: 0}

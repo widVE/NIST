@@ -914,8 +914,8 @@ public class ResearchModeVideoStream : MonoBehaviour
     {
 		EasyVizAR.Headset h = new EasyVizAR.Headset();
 		h.name = "RossTestFromHololens2";
-		h.position = pos;
-		h.orientation = orient;
+		//h.position = pos;
+		//h.orientation = orient;
 		
         //UnityWebRequest www = UnityWebRequest.Post("http://halo05.wings.cs.wisc.edu:5000/headsets", form);
 		
