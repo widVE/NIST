@@ -12,8 +12,12 @@ public class EasyVizARHeadset : MonoBehaviour
 	public string Name => _headsetName;
 	
 	[SerializeField]
-	bool _isLocal = true;
-	public bool IsLocal => _isLocal;
+	bool _isLocal = false;
+	public bool IsLocal
+	{
+		get { return _isLocal; }
+		set { _isLocal = value; }
+	}
 	
 	[SerializeField]
 	bool _showPositionChanges = false;
@@ -26,6 +30,12 @@ public class EasyVizARHeadset : MonoBehaviour
 	string _headsetID;
 	
 	string _locationID;
+	
+	public string LocationID
+	{
+		get { return _locationID; }
+		set { _locationID = value; }
+	}
 	
 	float _lastTime;
 	
@@ -44,12 +54,20 @@ public class EasyVizARHeadset : MonoBehaviour
 
     }
 
-	public void CreateLocalHeadset(string headsetName)
+	public void CreateLocalHeadset(string headsetName, string location, bool postChanges)
 	{
 		_isLocal = true;
 		_mainCamera = Camera.main;
 		_headsetName = headsetName;
-		CreateHeadset();
+		_locationID = location;
+		
+		if(postChanges)
+		{
+			//create a new headset if not visualizing old local version..
+			CreateHeadset();
+		}
+		
+		_postPositionChanges = postChanges;
 	}
 	
     // Update is called once per frame
@@ -57,7 +75,7 @@ public class EasyVizARHeadset : MonoBehaviour
     {
 		if(_isLocal)
 		{
-			if(_mainCamera)
+			if(_mainCamera && _postPositionChanges)
 			{
 				transform.position = _mainCamera.transform.position;
 				transform.rotation = _mainCamera.transform.rotation;
@@ -132,6 +150,7 @@ public class EasyVizARHeadset : MonoBehaviour
 		h.orientation.w = transform.rotation[3];
 		
 		h.name = _headsetName;
+		h.location_id = _locationID;
 		
 		EasyVizARServer.Instance.Post("headsets", EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), CreateCallback);
 	}
@@ -141,7 +160,7 @@ public class EasyVizARHeadset : MonoBehaviour
 		if(resultData != "error")
 		{
 			_isRegisteredWithServer = true;
-			Debug.Log("Successfully connected headset");
+			
 			EasyVizAR.Headset h = JsonUtility.FromJson<EasyVizAR.Headset>(resultData);
 			Vector3 newPos = Vector3.zero;
 
@@ -154,6 +173,9 @@ public class EasyVizARHeadset : MonoBehaviour
 			
 			_headsetID = h.id;
 			_headsetName = h.name;
+			_locationID = h.location_id;
+			
+			Debug.Log("Successfully connected headset: " + h.name);
 		}
 		else
 		{
@@ -165,9 +187,9 @@ public class EasyVizARHeadset : MonoBehaviour
 	{
 		EasyVizAR.Headset h = new EasyVizAR.Headset();
 		h.position = new EasyVizAR.Position();
-		h.position.x = transform.position.x;
-		h.position.y = transform.position.y;
-		h.position.z = transform.position.z;
+		h.position.x = transform.localPosition.x;
+		h.position.y = transform.localPosition.y;
+		h.position.z = transform.localPosition.z;
 		h.orientation = new EasyVizAR.Orientation();
 		h.orientation.x = transform.rotation[0];
 		h.orientation.y = transform.rotation[1];

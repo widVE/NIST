@@ -20,10 +20,16 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	
 	bool _headsetsCreated = false;
 	
+	[SerializeField]
+	Material _localMaterial;
+	
+	[SerializeField]
+	bool _visualizePreviousLocal = false;
+	
     // Start is called before the first frame update
     void Start()
     {
-		CreateAllHeadsets();
+		//CreateAllHeadsets();
     }
 
     // Update is called once per frame
@@ -55,11 +61,19 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	
 	void CreateLocalHeadset()
 	{
-		GameObject localHeadset = Instantiate(_headsetPrefab, transform);
-		if(localHeadset != null)
+		if(!_visualizePreviousLocal)
 		{
-			EasyVizARHeadset h = localHeadset.GetComponent<EasyVizARHeadset>();
-			h.CreateLocalHeadset(_localHeadsetName);
+			GameObject localHeadset = Instantiate(_headsetPrefab, transform);
+			if(localHeadset != null)
+			{
+				EasyVizARHeadset h = localHeadset.GetComponent<EasyVizARHeadset>();
+				if(_localMaterial != null)
+				{
+					localHeadset.GetComponent<MeshRenderer>().material = _localMaterial;
+				}
+				
+				h.CreateLocalHeadset(_localHeadsetName, _locationId, !_visualizePreviousLocal);
+			}
 		}
 	}
 	
@@ -74,12 +88,33 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 			EasyVizAR.HeadsetList h = JsonUtility.FromJson<EasyVizAR.HeadsetList>("{\"headsets\":" + resultData + "}");
 			for(int i = 0; i < h.headsets.Length; ++i)
 			{
-				GameObject s = Instantiate(_headsetPrefab, transform);
-				EasyVizARHeadset hs = s.GetComponent<EasyVizARHeadset>();
-				if(hs != null)
+				if(h.headsets[i].name != _localHeadsetName || _visualizePreviousLocal)
 				{
-					hs.AssignValuesFromJson(h.headsets[i]);
-					_activeHeadsets.Add(hs);
+					GameObject s = Instantiate(_headsetPrefab, transform);
+					EasyVizARHeadset hs = s.GetComponent<EasyVizARHeadset>();
+					if(hs != null)
+					{
+						s.name = h.headsets[i].name;
+						hs.AssignValuesFromJson(h.headsets[i]);
+						_activeHeadsets.Add(hs);
+					}
+				}
+				else if(h.headsets[i].name == _localHeadsetName && _visualizePreviousLocal)
+				{
+					GameObject s = Instantiate(_headsetPrefab, transform);
+					EasyVizARHeadset hs = s.GetComponent<EasyVizARHeadset>();
+					if(hs != null)
+					{
+						s.name = h.headsets[i].name;
+						if(_localMaterial != null)
+						{
+							s.GetComponent<MeshRenderer>().material = _localMaterial;
+						}
+						hs.AssignValuesFromJson(h.headsets[i]);
+						hs.IsLocal = true;
+						hs.LocationID = h.headsets[i].location_id;
+						_activeHeadsets.Add(hs);
+					}
 				}
 			}
 		}

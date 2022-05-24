@@ -335,6 +335,18 @@ public class ResearchModeVideoStream : MonoBehaviour
 		}
 	}
 	
+	void UpdateCallback(string resultData)
+	{
+		if(resultData != "error")
+		{
+			
+		}
+		else
+		{
+			
+		}
+	}
+	
 	//this the function we're using for image capture (color and depth), goto memory first, so we can write additional synchronized info (transforms)
 	void OnCapturedPhotoToMemory(PhotoCapture.PhotoCaptureResult result, PhotoCaptureFrame photoCaptureFrame)
 	{
@@ -506,11 +518,22 @@ public class ResearchModeVideoStream : MonoBehaviour
 							System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxtC), colorString);
 						}
 						
-						/*if(_firstHeadsetSend)
+						if(_writePosToEdge)
 						{
-							//StartCoroutine(UploadHeadset(new Vector3(cameraToWorldMatrix[12], cameraToWorldMatrix[13], cameraToWorldMatrix[14]), new Vector3(1f,2f,3f)));
-							_firstHeadsetSend = false;
-						}*/
+							//update local headset with this new transform...
+							
+							
+							//EasyVizAR.Headset h = new EasyVizAR.Headset();
+							//h.position = new EasyVizAR.Position();
+							//h.position.x = cameraToWorldMatrix[12];
+							//h.position.y = cameraToWorldMatrix[13];
+							//h.position.z = cameraToWorldMatrix[14];
+							//h.orientation = new EasyVizAR.Orientation();
+							
+							//EasyVizARServer.Instance.Patch("headsets/"+_headsetID, EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), UpdateCallback);
+							//StartCoroutine(UploadHeadset(new Vector3(cameraToWorldMatrix[12], cameraToWorldMatrix[13], cameraToWorldMatrix[14]), new Vector4(1f,2f,3f)));
+							//_firstHeadsetSend = false;
+						}
 					}
 					
 					if(WriteImagesToDisk)
@@ -910,7 +933,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 	
 	//server communication functions... this will be moved to EasyVizAR.cs file...
 
-	IEnumerator UploadHeadset(Vector3 pos, Vector3 orient)
+	IEnumerator UploadHeadset(Vector3 pos, Vector4 orient)
     {
 		EasyVizAR.Headset h = new EasyVizAR.Headset();
 		h.name = "RossTestFromHololens2";
