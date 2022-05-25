@@ -893,11 +893,17 @@ public class ResearchModeVideoStream : MonoBehaviour
         renderPointCloud = !renderPointCloud;
         if (renderPointCloud)
         {
-            pointCloudRendererGo.SetActive(true);
+			if(pointCloudRendererGo != null)
+			{
+            	pointCloudRendererGo.SetActive(true);
+			}
         }
         else
         {
-            pointCloudRendererGo.SetActive(false);
+			if(pointCloudRendererGo != null)
+			{
+            	pointCloudRendererGo.SetActive(false);
+			}
         }
     }
 

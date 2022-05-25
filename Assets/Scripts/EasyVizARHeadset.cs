@@ -102,8 +102,8 @@ public class EasyVizARHeadset : MonoBehaviour
 		newPos.z = h.position.z;	
 		
 		transform.position = newPos;
-		
 		transform.rotation = new Quaternion(h.orientation.x, h.orientation.y, h.orientation.z, h.orientation.w);
+
 		_headsetID = h.id;
 		_headsetName = h.name;
 		_locationID = h.location_id;
@@ -187,9 +187,9 @@ public class EasyVizARHeadset : MonoBehaviour
 	{
 		EasyVizAR.Headset h = new EasyVizAR.Headset();
 		h.position = new EasyVizAR.Position();
-		h.position.x = transform.localPosition.x;
-		h.position.y = transform.localPosition.y;
-		h.position.z = transform.localPosition.z;
+		h.position.x = transform.position.x;
+		h.position.y = transform.position.y;
+		h.position.z = transform.position.z;
 		h.orientation = new EasyVizAR.Orientation();
 		h.orientation.x = transform.rotation[0];
 		h.orientation.y = transform.rotation[1];

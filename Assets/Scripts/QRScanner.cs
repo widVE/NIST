@@ -52,6 +52,9 @@ public class QRScanner : MonoBehaviour
 	
 	[SerializeField]
 	GameObject _qrPrefab;
+
+	[SerializeField]
+	GameObject _qrPrefabParent;
 	
 	/// Initialization is just a matter of asking for permission, and then
 	/// hooking up to the `QRCodeWatcher`'s events. `QRCodeWatcher.RequestAccessAsync`
@@ -104,21 +107,22 @@ public class QRScanner : MonoBehaviour
 	{
 		foreach(QRData d in poses.Values)
 		{ 
-			if(_qrPrefab != null)
+			if(_qrPrefab != null && _qrPrefabParent != null)
 			{
+				_qrPrefabParent.SetActive(true);
 				_qrPrefab.SetActive(true);
 				
-				_qrPrefab.transform.SetPositionAndRotation(d.pose.position, d.pose.rotation);
+				Matrix4x4 m = Matrix4x4.TRS(d.pose.position, d.pose.rotation, Vector3.one);
+				Matrix4x4 mInv = m.inverse;
+				_qrPrefabParent.transform.SetPositionAndRotation(mInv.GetPosition(), mInv.rotation);
 				
+				_qrPrefab.transform.localPosition = d.pose.position;
+				_qrPrefab.transform.localRotation = d.pose.rotation;
+
 				int cc = _qrPrefab.transform.childCount;
 				
 				_qrPrefab.transform.GetChild(cc-1).GetComponent<EasyVizARHeadsetManager>().CreateAllHeadsets();
-				
-				//Matrix4x4 m = Matrix4x4.TRS(d.pose.position, d.pose.rotation, Vector3.one);
-				//Matrix4x4 mInv = m.inverse;
-				//_qrPrefab.transform.SetPositionAndRotation(mInv.GetPosition(), mInv.rotation);
 			}
 		}
 	}
-
 }
