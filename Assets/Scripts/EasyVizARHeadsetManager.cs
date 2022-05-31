@@ -7,7 +7,11 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 {
 	[SerializeField]
 	string _locationId = "none";
-	public string LocationID => _locationId;
+	public string LocationID 
+	{
+		get { return _locationId; }
+		set { _locationId = value; }
+	}
 	
 	[SerializeField]
 	GameObject _headsetPrefab;	//prefab for loading other headsets...
@@ -25,6 +29,9 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	
 	[SerializeField]
 	bool _visualizePreviousLocal = false;
+	
+	[SerializeField]
+	bool _makeUniqueLocalHeadset = false;
 	
     // Start is called before the first frame update
     void Start()
@@ -72,7 +79,16 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 					localHeadset.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
 				}
 				
-				h.CreateLocalHeadset(_localHeadsetName, _locationId, !_visualizePreviousLocal);
+				if(_makeUniqueLocalHeadset)
+				{
+					string s = System.DateTime.Now.ToString();
+					
+					h.CreateLocalHeadset(_localHeadsetName+"_"+s, _locationId, !_visualizePreviousLocal);
+				}
+				else
+				{
+					h.CreateLocalHeadset(_localHeadsetName, _locationId, !_visualizePreviousLocal);
+				}
 			}
 		}
 	}

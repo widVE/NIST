@@ -93,7 +93,7 @@ namespace EasyVizAR
 
 public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 {
-	const string _baseURL = "http://halo05.wings.cs.wisc.edu:5000/";
+	public string _baseURL = "http://halo05.wings.cs.wisc.edu:5000/";
 	
 	public const string JSON_TYPE = "application/json";
 	public const string JPEG_TYPE = "image/jpeg";

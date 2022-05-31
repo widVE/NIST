@@ -24,6 +24,10 @@ public class EasyVizARHeadset : MonoBehaviour
 	public bool ShowPositionChanges => _showPositionChanges;
 	
 	[SerializeField]
+	bool _realTimeChanges = false;
+	public bool RealTimeChanges => _realTimeChanges;
+	
+	[SerializeField]
 	bool _postPositionChanges = false;
 	public bool PostPositionChanges => _postPositionChanges;
 	
@@ -63,6 +67,7 @@ public class EasyVizARHeadset : MonoBehaviour
 		
 		if(postChanges)
 		{
+			_realTimeChanges = true;
 			//create a new headset if not visualizing old local version..
 			CreateHeadset();
 		}
@@ -89,6 +94,11 @@ public class EasyVizARHeadset : MonoBehaviour
 					PostPosition();
 				}
 				_lastTime = t;
+				
+				if(_realTimeChanges && _showPositionChanges)
+				{
+					GetPastPositions();
+				}
 			}
 		}
     }

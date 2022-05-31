@@ -41,6 +41,7 @@ public class QRScanner : MonoBehaviour
 			
 			result.size = qr.PhysicalSideLength;
 			result.text = qr.Data == null ? "" : qr.Data;
+			Debug.Log(result.text);
 			return result;
 		}
 	}
@@ -55,6 +56,8 @@ public class QRScanner : MonoBehaviour
 
 	[SerializeField]
 	GameObject _qrPrefabParent;
+	
+	bool _updatedServerFromQR = false;
 	
 	/// Initialization is just a matter of asking for permission, and then
 	/// hooking up to the `QRCodeWatcher`'s events. `QRCodeWatcher.RequestAccessAsync`
@@ -80,6 +83,12 @@ public class QRScanner : MonoBehaviour
 			// so we often want to filter those out.
 			if (qr.Code.LastDetectedTime > watcherStart) 
 			{
+				AudioSource aSource = GetComponent<AudioSource>();
+				if(aSource != null)
+				{
+					aSource.Play();
+				}
+				Debug.Log("QR Code: " + qr.Code.Data.ToString());
 				Debug.Log("Adding QR Code: " + qr.Code.Id.ToString());
 				poses.Add(qr.Code.Id, QRData.FromCode(qr.Code)); 
 			}
@@ -107,6 +116,30 @@ public class QRScanner : MonoBehaviour
 	{
 		foreach(QRData d in poses.Values)
 		{ 
+			if(!_updatedServerFromQR)
+			{
+				//parse server and location from here...
+				/*int p = d.text.LastIndexOf("/");
+				if(p != -1)
+				{
+					int l = d.text.Length;
+					string serverString = d.text.Substring(0, p);
+					int p2 = serverString.LastIndexOf("/");
+					string url = serverString.Substring(0, p2+1);
+					EasyVizARServer.Instance._baseURL = url;
+					Debug.Log(EasyVizARServer.Instance._baseURL);
+					string loc = d.text.Substring(p+1, l-p-1);
+					Debug.Log(loc);
+					if(_qrPrefab != null)
+					{
+						int cc = _qrPrefab.transform.childCount;
+						_qrPrefab.transform.GetChild(cc-1).GetComponent<EasyVizARHeadsetManager>().LocationID = loc;
+					}
+					
+				}*/
+				_updatedServerFromQR = true;
+			}
+			
 			if(_qrPrefab != null && _qrPrefabParent != null)
 			{
 				_qrPrefabParent.SetActive(true);

@@ -50,7 +50,7 @@ MonoBehaviour:
   _headsetName: ross_test
   _isLocal: 0
   _showPositionChanges: 1
-  _postPositionChanges: 0
+  _postPositionChanges: 1
 --- !u!1 &8231832368714168251
 GameObject:
   m_ObjectHideFlags: 0
