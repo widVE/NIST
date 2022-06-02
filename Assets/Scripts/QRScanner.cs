@@ -29,7 +29,7 @@ public class QRScanner : MonoBehaviour
                     result.pose = result.pose.GetTransformedBy(CameraCache.Main.transform.parent);
                 }*/
 				
-				result.pose.rotation *= Quaternion.Euler(90, 0, 0);
+				result.pose.rotation *= Quaternion.Euler(180, 0, 0);
 
 				// Move the anchor point to the *center* of the QR code
 				var deltaToCenter = qr.PhysicalSideLength * 0.5f;
@@ -119,13 +119,14 @@ public class QRScanner : MonoBehaviour
 			if(!_updatedServerFromQR)
 			{
 				//parse server and location from here...
-				/*int p = d.text.LastIndexOf("/");
+				int p = d.text.LastIndexOf("/");
 				if(p != -1)
 				{
 					int l = d.text.Length;
 					string serverString = d.text.Substring(0, p);
 					int p2 = serverString.LastIndexOf("/");
 					string url = serverString.Substring(0, p2+1);
+					url = url.Replace("vizar", "http");
 					EasyVizARServer.Instance._baseURL = url;
 					Debug.Log(EasyVizARServer.Instance._baseURL);
 					string loc = d.text.Substring(p+1, l-p-1);
@@ -134,9 +135,8 @@ public class QRScanner : MonoBehaviour
 					{
 						int cc = _qrPrefab.transform.childCount;
 						_qrPrefab.transform.GetChild(cc-1).GetComponent<EasyVizARHeadsetManager>().LocationID = loc;
-					}
-					
-				}*/
+					}	
+				}
 				_updatedServerFromQR = true;
 			}
 			
