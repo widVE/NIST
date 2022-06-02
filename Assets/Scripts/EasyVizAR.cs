@@ -115,6 +115,11 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		StartCoroutine(DoPATCH(_baseURL+url, contentType, jsonData, callBack));
 	}
 	
+	public void Texture(string url, string contentType, string width, System.Action<Texture> callBack)
+	{
+		StartCoroutine(GetTexture(_baseURL+url, contentType, width, callBack));
+	}
+	
 	public void Put(string url, string contentType, string jsonData, System.Action<string> callBack)
 	{
 		
@@ -203,44 +208,46 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		callBack(result);
 	}
 	
-	
-    public void DisplayLayer(string location_id) {
+	IEnumerator GetTexture(string url, string contentType, string width, System.Action<Texture> callBack)
+	{
+		UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
 
-        StartCoroutine(GetTexture());
+		www.SetRequestHeader("Accept", contentType);
+		www.SetRequestHeader("Width", width);
+		//Debug.Log(www);
+		yield return www.SendWebRequest();
+		
+		//Debug.Log(www.result);
+		
+		if (www.result != UnityWebRequest.Result.Success)
+		{
+			Debug.Log(www.error);
+		}
+		else
+		{
+			
+			//Using the Texture download handler we get the content from the Unity Web Request object
+			Texture my_text = DownloadHandlerTexture.GetContent(www);
+			callBack(my_text);
+			
+			//www.Dispose();
+			
+			//Map_lines is a list of different map display layers. The texture is assigned to the lines layer
+			//of the map_layout instances. Those objects can modify the display of color and other properties of the lines
+			//this may also be useful for multi layer mapping in the future.
+			/*foreach (var map_layout in map_lines) 
+			{
+				map_layout.GetComponent<Renderer>().material.mainTexture = my_text;
+			}*/
 
-        IEnumerator GetTexture()
-        {
-            UnityWebRequest www = UnityWebRequestTexture.GetTexture(_baseURL + "locations/" + location_id + "/layers/1/image");
+			//Code from eariler attempts, review and delete
+			//Texture myTexture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+			//Debug.Log(myTexture == null);
 
-            www.SetRequestHeader("Accept", "image/png");
-            www.SetRequestHeader("Width", "1200");
-            //Debug.Log(www);
-            yield return www.SendWebRequest();
-
-            if (www.result != UnityWebRequest.Result.Success)
-            {
-                Debug.Log(www.error);
-            }
-            else
-            {
-                
-                //Using the Texture download handler we get the content from the Unity Web Request object
-                Texture my_text = DownloadHandlerTexture.GetContent(www);
-
-                //Map_lines is a list of different map display layers. The texture is assigned to the lines layer
-                //of the map_layout instances. Those objects can modify the display of color and other properties of the lines
-                //this may also be useful for multi layer mapping in the future.
-                //foreach (var map_layout in map_lines) map_layout.GetComponent<Renderer>().material.mainTexture = my_text;
-
-                //Code from eariler attempts, review and delete
-                //Texture myTexture = ((DownloadHandlerTexture)www.downloadHandler).texture;
-                //Debug.Log(myTexture == null);
-
-                //Material material = new Material(shader);
-                //material.mainTexture = myTexture;
-                //current_layer_prefab.GetComponent<Renderer>().material.mainTexture = myTexture;
-                //current_layer_prefab.GetComponent<Renderer>().material.SetTexture("_BaseMap", my_text);
-            }
-        }
-    }
+			//Material material = new Material(shader);
+			//material.mainTexture = myTexture;
+			//current_layer_prefab.GetComponent<Renderer>().material.mainTexture = myTexture;
+			//current_layer_prefab.GetComponent<Renderer>().material.SetTexture("_BaseMap", my_text);
+		}
+	}
 }

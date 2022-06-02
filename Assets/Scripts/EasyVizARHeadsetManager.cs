@@ -33,6 +33,9 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	[SerializeField]
 	bool _makeUniqueLocalHeadset = false;
 	
+	[SerializeField]
+	List<GameObject> _mapObjects = new List<GameObject>();
+	
     // Start is called before the first frame update
     void Start()
     {
@@ -64,6 +67,20 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 			
 			_headsetsCreated = true;
 		}
+	}
+	
+	public void DisplayMapCallback(Texture resultTexture)
+	{
+		//Debug.Log("In map callback");
+		foreach (var map_layout in _mapObjects) 
+		{
+			map_layout.GetComponent<Renderer>().material.mainTexture = resultTexture;
+		}
+	}
+	
+	public void DisplayHandMap()
+	{
+		EasyVizARServer.Instance.Texture("locations/" + _locationId + "/layers/1/image", "image/png", "1200", DisplayMapCallback); 
 	}
 	
 	void CreateLocalHeadset()
