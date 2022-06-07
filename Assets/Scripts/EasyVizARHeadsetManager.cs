@@ -91,10 +91,29 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		EasyVizARServer.Instance.Texture("locations/" + _locationId + "/layers/1/image", "image/png", "1200", DisplayMapCallback); 
 	}
 
+
+
+	public void ToggleBreadcrumbs()
+	{
+		//For every headset in the active list set the line renderer to the opposite state
+		foreach (EasyVizARHeadset headset_user in _activeHeadsets)
+		{
+			//Turns out it's not the line renderer that needs to be disabled to hide the line, it's the entire object
+			//holding the lines
+			//--LineRenderer line_trail = headset_user.gameObject.transform.GetChild(0).GetComponent<LineRenderer>();
+			GameObject line_trail = headset_user.gameObject.transform.GetChild(0).gameObject;
+
+			//This only works for componenets
+			//--line_trail.enabled = !line_trail.enabled;			
+
+			//To de/activate game objects use
+			line_trail.SetActive(!line_trail.activeSelf);
+		}
+	}
+
 	//These don't work correctly. The funcitons are being called all the time while the user interacts with the slider
 	//This is causing an error due to rounding I think. The funcitons are getting the position of the current trail
 	//renderer and keeping one component of it, this is causing drift on the values taht are supposed to stay the same
-
 	public void BreadcrumbsOffsetVertical()
 	{
 		//Getting the data from the pinch sliders as a value to offset.
