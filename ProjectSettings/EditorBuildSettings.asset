@@ -5,9 +5,12 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/PointCloudSample.unity
     guid: b2ea44247999fe846983588a46fa8ad7
+  - enabled: 1
+    path: Assets/Scenes/v1.3 Marker Placement and Breadcrumb Offset.unity
+    guid: fe70eeffe64470f44a0cf8022ffca4ff
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 24efe516db1dbf446a155a698a288aae, type: 2}
     Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: 8ff3c7c77ccd00441a88cebd82b4144c, type: 2}

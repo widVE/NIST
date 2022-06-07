@@ -226,6 +226,15 @@ public class EasyVizARHeadset : MonoBehaviour
 		}
 	}
 	
+/*
+	Line Renderer Method and Post parsing?
+
+	What is a callback for here? Is this part of the visualization or is this related to the parsing infomation
+	The line/trail rederer doesn't move the lines once they've been made, even if the root is offset. They need
+	to be redrawn from the path. We may want to seperate the parsing of the positions from the visulaization 
+	because the only way we've figured out how to update the whole trail is by replaying the past position with the
+	new offset included.
+ */
 	void GetPastPositionsCallback(string resultData)
 	{
 		if(resultData != "error")
@@ -238,6 +247,7 @@ public class EasyVizARHeadset : MonoBehaviour
 			
 			for(int i = 0; i < p.poseChanges.Length; ++i)
 			{
+				// X is negated here to offset the coordinate mismatch between the server and Unity
 				Vector3 vPos = Vector3.zero;
 				vPos.x = -p.poseChanges[i].position.x;
 				vPos.y = p.poseChanges[i].position.y;
