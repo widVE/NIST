@@ -69,11 +69,23 @@ public class QRScanner : MonoBehaviour
 	/// before the session began. We don't need that, so we're ignoring those.
 	void Start()
 	{
+#if UNITY_EDITOR
+
+		if(!UnityEditor.SessionState.GetBool("FirstInitDone", false))
+		{
+			var status = QRCodeWatcher.RequestAccessAsync().Result;
+			if (status != QRCodeWatcherAccessStatus.Allowed)
+				return;
+			
+			UnityEditor.SessionState.SetBool("FirstInitDone", true);
+		}
+#else
 		// Ask for permission to use the QR code tracking system
 		var status = QRCodeWatcher.RequestAccessAsync().Result;
 		if (status != QRCodeWatcherAccessStatus.Allowed)
 			return;
-
+#endif
+		
 		// Set up the watcher, and listen for QR code events.
 		watcherStart = DateTime.Now;
 		watcher      = new QRCodeWatcher();
