@@ -11,8 +11,8 @@ public class HandTracking : MonoBehaviour
 
     public GameObject leftTextMarker;
     public GameObject rightTextMarker;
-    GameObject left_wrist;
-    GameObject right_wrist;
+    GameObject left_wrist_label;
+    GameObject right_wrist_label;
 
     MixedRealityPose pose;
 
@@ -20,32 +20,63 @@ public class HandTracking : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        left_wrist = Instantiate(leftTextMarker, this.transform);
-        right_wrist = Instantiate(rightTextMarker, this.transform);
-
+        left_wrist_label = Instantiate(leftTextMarker, this.transform);
+        right_wrist_label = Instantiate(rightTextMarker, this.transform);
     }
 
     // Update is called once per frame
     void Update()
     {
-        // originally set to false, check if find the correct pose, then change to true
-        left_wrist.GetComponent<Renderer>().enabled = false;
-        right_wrist.GetComponent<Renderer>().enabled = false;
+        // originally set to false, check if find the correct pose, then change to trueX
+        //left_wrist.GetComponent<Renderer>().enabled = false;
+        //right_wrist.GetComponent<Renderer>().enabled = false;
 
         if (HandJointUtils.TryGetJointPose(TrackedHandJoint.Wrist, Handedness.Left, out pose))
         {
-            left_wrist.GetComponent<Renderer>().enabled = true;
-            left_wrist.transform.position = pose.Position;
-
+            //left_wrist.GetComponent<Renderer>().enabled = true;
+            left_wrist_label.transform.position = pose.Position;
+        }
+        else
+        {
+            left_wrist_label.GetComponent<Renderer>().enabled = false;
         }
 
         if (HandJointUtils.TryGetJointPose(TrackedHandJoint.Wrist, Handedness.Right, out pose))
         {
-            right_wrist.GetComponent<Renderer>().enabled = true;
-            right_wrist.transform.position = pose.Position;
-
+            //right_wrist.GetComponent<Renderer>().enabled = true;
+            right_wrist_label.transform.position = pose.Position;
+        }
+        else
+        {
+            right_wrist_label.GetComponent<Renderer>().enabled = false;
         }
 
+    }
+
+    public void PalmAwayRightAlways()
+    {
+        Debug.Log("Hand see");
+        right_wrist_label.GetComponent<Renderer>().enabled = true;
+    }
+
+    public void PalmAwayRight()
+    {
+        right_wrist_label.GetComponent<Renderer>().enabled = true;
+    }
+
+    public void PalmTowardsRight()
+    {
+        right_wrist_label.GetComponent<Renderer>().enabled = false;
+    }
+
+    public void PalmAwayLeft()
+    {
+        left_wrist_label.GetComponent<Renderer>().enabled = true;
+    }
+
+    public void PalmTowardsLeft()
+    {
+        left_wrist_label.GetComponent<Renderer>().enabled = false;
     }
 }
 
