@@ -16,6 +16,9 @@ public class HandTracking : MonoBehaviour
 
     MixedRealityPose pose;
 
+    bool left_hand_seen = false;
+    bool right_hand_seen = false;
+
 
     // Start is called before the first frame update
     void Start()
@@ -33,7 +36,11 @@ public class HandTracking : MonoBehaviour
 
         if (HandJointUtils.TryGetJointPose(TrackedHandJoint.Wrist, Handedness.Left, out pose))
         {
-            //left_wrist.GetComponent<Renderer>().enabled = true;
+            if (!left_hand_seen)
+            {
+                left_wrist_label.GetComponent<Renderer>().enabled = true;
+                left_hand_seen = true;
+            }
             left_wrist_label.transform.position = pose.Position;
         }
         else
@@ -43,7 +50,11 @@ public class HandTracking : MonoBehaviour
 
         if (HandJointUtils.TryGetJointPose(TrackedHandJoint.Wrist, Handedness.Right, out pose))
         {
-            //right_wrist.GetComponent<Renderer>().enabled = true;
+            if (!right_hand_seen)
+            {
+                right_wrist_label.GetComponent<Renderer>().enabled = true;
+                right_hand_seen = true;
+            }
             right_wrist_label.transform.position = pose.Position;
         }
         else
@@ -51,12 +62,6 @@ public class HandTracking : MonoBehaviour
             right_wrist_label.GetComponent<Renderer>().enabled = false;
         }
 
-    }
-
-    public void PalmAwayRightAlways()
-    {
-        Debug.Log("Hand see");
-        right_wrist_label.GetComponent<Renderer>().enabled = true;
     }
 
     public void PalmAwayRight()
