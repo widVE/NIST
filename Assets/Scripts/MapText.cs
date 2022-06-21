@@ -8,10 +8,13 @@ using UnityEngine.Networking;
 public class MapText : MonoBehaviour
 {
     public string baseURL = "http://halo05.wings.cs.wisc.edu:5000/";
-    public string location_id = "66a4e9f2-e978-4405-988e-e168a9429030";
+
+    [SerializeField]
+    public string location_id = "";
 
     [SerializeField] 
     public TextMeshPro map_text;
+
 
     [System.Serializable]
     public class MapField
@@ -20,30 +23,39 @@ public class MapText : MonoBehaviour
         public string name;
 
     }
+
+    [System.Serializable]
+    public class LocationItem 
+    {
+        public string id;
+        public string name;
+    }
+
+    [System.Serializable]
+    public class Location
+    {
+        public LocationItem[] loc;
+    }
     // Start is called before the first frame update
     void Start()
     {
         map_text = GetComponent<TextMeshPro>();
         map_text.color = new Color32(191, 131, 6, 255);
         // TODO: ask about how to fix the hard code problem
-        string location_id = "66a4e9f2-e978-4405-988e-e168a9429030";
-        string url = baseURL + "locations/" + location_id + "/layers/1/image";
-        StartCoroutine(GetMapName(url));
-        
-    }
+        StartCoroutine(GetLocationID(baseURL + "locations"));
+        Debug.Log("This is the location ID: " + location_id);
+        string url = baseURL + "locations/" + location_id;
 
-    // Update is called once per frame
-    void Update()
-    {
+        StartCoroutine(GetMapName(url));
         
     }
 
     IEnumerator GetMapName(string url)
     {
         //first get the texture of the image file
-        UnityWebRequest www = UnityWebRequest.Get("http://halo05.wings.cs.wisc.edu:5000/locations/66a4e9f2-e978-4405-988e-e168a9429030");
+        UnityWebRequest www = UnityWebRequest.Get(url);
 
-       // www.SetRequestHeader("name", "CS Building"); // TODO: ask Lance to name the image file [need to fix]
+        // www.SetRequestHeader("name", "CS Building"); // TODO: ask Lance to name the image file [need to fix]
         yield return www.SendWebRequest();
 
 
@@ -63,4 +75,33 @@ public class MapText : MonoBehaviour
 
 
     }
+
+    IEnumerator GetLocationID(string url)
+    {
+        //first get the texture of the image file
+        UnityWebRequest www = UnityWebRequest.Get(url);
+
+        yield return www.SendWebRequest();
+
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(www.error);
+        }
+        else
+        {
+            Debug.Log("Successfully done a UnityWebRequest");
+
+            var txt = www.downloadHandler.text;
+            Location myLocation = new Location();
+            myLocation = JsonUtility.FromJson<Location>("{\"loc\":" + txt + "}");
+
+            this.location_id = myLocation.loc[0].id; //TODO: will have to fix this after (ask Ross about how he is setting up location id) 
+            
+            Debug.Log(map_text.text);
+        }
+
+
+    }
+
 }
