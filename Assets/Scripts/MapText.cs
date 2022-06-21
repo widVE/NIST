@@ -12,6 +12,14 @@ public class MapText : MonoBehaviour
 
     [SerializeField] 
     public TextMeshPro map_text;
+
+    [System.Serializable]
+    public class MapField
+    {
+        public string id;
+        public string name;
+
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -33,9 +41,9 @@ public class MapText : MonoBehaviour
     IEnumerator GetMapName(string url)
     {
         //first get the texture of the image file
-        UnityWebRequest www = UnityWebRequestTexture.GetTexture("http://halo05.wings.cs.wisc.edu:5000/locations/66a4e9f2-e978-4405-988e-e168a9429030/layers/1/image");
+        UnityWebRequest www = UnityWebRequest.Get("http://halo05.wings.cs.wisc.edu:5000/locations/66a4e9f2-e978-4405-988e-e168a9429030");
 
-        www.SetRequestHeader("Accept", "CS Building"); // TODO: ask Lance to name the image file [need to fix]
+       // www.SetRequestHeader("name", "CS Building"); // TODO: ask Lance to name the image file [need to fix]
         yield return www.SendWebRequest();
 
 
@@ -45,7 +53,11 @@ public class MapText : MonoBehaviour
         }
         else
         {
-            map_text.text = www.GetRequestHeader("Accept");
+            Debug.Log("Successfully done a UnityWebRequest");
+
+            var txt = www.downloadHandler.text;
+            MapField mapField = JsonUtility.FromJson<MapField>(txt);
+            map_text.text = mapField.name;
             Debug.Log(map_text.text);
         }
 
