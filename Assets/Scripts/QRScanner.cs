@@ -29,7 +29,7 @@ public class QRScanner : MonoBehaviour
                     result.pose = result.pose.GetTransformedBy(CameraCache.Main.transform.parent);
                 }*/
 				
-				result.pose.rotation *= Quaternion.Euler(180, 0, 0);
+				result.pose.rotation *= Quaternion.Euler(90, 0, 0);
 
 				// Move the anchor point to the *center* of the QR code
 				var deltaToCenter = qr.PhysicalSideLength * 0.5f;
