@@ -81,6 +81,13 @@ public class QRScanner : MonoBehaviour
 		}
 #else
 		// Ask for permission to use the QR code tracking system
+		
+		//THE CRASH STARTS HERE, When this block is commented out you can
+		//reuse play mode witout crash. I just ended up disabling the entire
+		//QR watcher game object and that also fixes it. But this is what
+		//I tracked it down to. I couldn't get the watcher to stop with
+		//on application end, but if we shut down this async request there 
+		//that might do it.
 		var status = QRCodeWatcher.RequestAccessAsync().Result;
 		if (status != QRCodeWatcherAccessStatus.Allowed)
 			return;
@@ -90,6 +97,8 @@ public class QRScanner : MonoBehaviour
 		watcherStart = DateTime.Now;
 		watcher      = new QRCodeWatcher();
 
+
+		// What does this mean? += (o, qr) =>
 		watcher.Added   += (o, qr) => {
 			// QRCodeWatcher will provide QR codes from before session start,
 			// so we often want to filter those out.
@@ -121,6 +130,7 @@ public class QRScanner : MonoBehaviour
 	void DestroyObject()
 	{
 		Debug.Log("Stopping QR Watcher");
+		// Why is there a question mark here?
 		watcher?.Stop();
 	}
 
@@ -169,5 +179,13 @@ public class QRScanner : MonoBehaviour
 				_qrPrefab.transform.GetChild(cc-1).GetComponent<EasyVizARHeadsetManager>().CreateAllHeadsets();
 			}
 		}
+	}
+
+	//This is getting called on play mode exit, but it doesn't seem to be enough to stop the crashes
+	void OnApplicationQuit()
+	{
+		Debug.Log("Stopping QR Watcher");
+		watcher.Stop();
+		Debug.Log("Application ending after " + Time.time + " seconds");
 	}
 }
