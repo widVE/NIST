@@ -26,6 +26,8 @@ public class SpawnListIndex : MonoBehaviour
         //visualize in the editor
 
         Instantiate(maker_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
+        
+
     }
 
 }
