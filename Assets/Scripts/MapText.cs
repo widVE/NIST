@@ -11,7 +11,7 @@ public class MapText : MonoBehaviour
     public string baseURL = "http://halo05.wings.cs.wisc.edu:5000/";
     public string location_id = "";
 
-    [SerializeField] 
+    [SerializeField]
     public TextMeshPro map_text;
     // Start is called before the first frame update
 
@@ -33,11 +33,11 @@ public class MapText : MonoBehaviour
         // TODO: ask about how to fix the hard code problem
         StartCoroutine(GetLocationInfo(baseURL + "/locations/"));
         //StartCoroutine(GetMapName("http://halo05.wings.cs.wisc.edu:5000/locations/66a4e9f2-e978-4405-988e-e168a9429030/"));
-       // StartCoroutine(GetMapName(baseURL + "/locations/" + location_id + "/"));
+        // StartCoroutine(GetMapName(baseURL + "/locations/" + location_id + "/"));
 
 
     }
-    
+
     IEnumerator GetLocationInfo(string url)
     {
         UnityWebRequest www = UnityWebRequest.Get(url);
@@ -60,5 +60,5 @@ public class MapText : MonoBehaviour
             Debug.Log("the location id at GetLocationID: " + location_id);
         }
     }
-    
+
 }
