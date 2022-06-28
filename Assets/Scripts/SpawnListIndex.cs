@@ -19,6 +19,19 @@ public class SpawnListIndex : MonoBehaviour
         public string name;
         public Vector3 position;
     }
+
+     void GetLocation(string result)
+    {
+        if (result != "error")
+        {
+            //Debug.Log(resultData);
+        }
+        else
+        {
+        }
+
+    }
+
     public void spawnObjectAtIndex(int index)
     {
         GameObject maker_to_spawn = spawn_list[index];
@@ -34,8 +47,13 @@ public class SpawnListIndex : MonoBehaviour
 
         Instantiate(maker_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
 
+        PositionInfo marker_pos = new PositionInfo();
+        marker_pos.name = "hazard";
+        marker_pos.position = new Vector3(maker_to_spawn.GetComponent<PositionInfo>().position.x, maker_to_spawn.GetComponent<PositionInfo>().position.y, maker_to_spawn.GetComponent<PositionInfo>().position.z);
+        var data = JsonUtility.ToJson(marker_pos);
+
         //for sending stuff to the server 
-        EasyVizARServer.Instance.Post("locations/" + EasyVizARHeadset._locationID + "/features", EasyVizARServer.JSON_TYPE, GetPastPositionsCallback);
+        EasyVizARServer.Instance.Post("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE,data,  GetLocation);
 
     }
 
