@@ -17,7 +17,6 @@ public class SpawnListIndex : MonoBehaviour
     public class PositionInfo
     {
         public string name;
-        public string type;
         public Vector3 position;
     }
     public void spawnObjectAtIndex(int index)
@@ -36,7 +35,7 @@ public class SpawnListIndex : MonoBehaviour
         Instantiate(maker_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
 
         //for sending stuff to the server 
-        //EasyVizARServer.Instance.Post("locations/" + curr_headset._locationID + "/features", EasyVizARServer.JSON_TYPE, GetPastPositionsCallback);
+        EasyVizARServer.Instance.Post("locations/" + EasyVizARHeadset._locationID + "/features", EasyVizARServer.JSON_TYPE, GetPastPositionsCallback);
 
     }
 

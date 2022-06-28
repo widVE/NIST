@@ -33,7 +33,7 @@ public class EasyVizARHeadset : MonoBehaviour
 	
 	string _headsetID;
 	
-	string _locationID;// will change this back to just string w/o public
+	public string _locationID;// will change this back to just string w/o public
 	
 	public string LocationID
 	{
