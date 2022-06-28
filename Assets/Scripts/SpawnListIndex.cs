@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class SpawnListIndex : MonoBehaviour
 {
     public EasyVizARHeadsetManager manager;
@@ -47,10 +48,24 @@ public class SpawnListIndex : MonoBehaviour
 
         Instantiate(maker_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
 
-        PositionInfo marker_pos = new PositionInfo();
-        marker_pos.name = "hazard";
-        marker_pos.position = maker_to_spawn.transform.position;
-        var data = JsonUtility.ToJson(marker_pos);
+        //Create our feature to be sent via JSON
+
+        EasyVizAR.Feature feature_to_post = new EasyVizAR.Feature();
+
+        feature_to_post.created = System.DateTime.Now;
+        //placeholder name of creator
+        feature_to_post.createdBy = "Test Marker";
+        //is the ID assigned by the server? we don't know
+        feature_to_post.id = 1;
+        feature_to_post.name = "Hallway Fire";
+        feature_to_post.position = maker_to_spawn.transform.position;
+        feature_to_post.type "hazard";
+        //This isn't correct right now. We need to have an update
+        //call when the obejct in manipulated.
+        feature_to_post.updated = System.DateTime.Now;
+
+        //Serialize the feature into JSON
+        var data = JsonUtility.ToJson(feature_to_post);
 
         //for sending stuff to the server 
         EasyVizARServer.Instance.Post("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE,data,  GetLocation);

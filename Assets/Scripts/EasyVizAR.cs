@@ -94,12 +94,12 @@ namespace EasyVizAR
 	public class Feature
 	{
 		public string color;
-		public float number;
-		public createdBy string;
+		public float created;
+		public string createdBy;
 		public int id;
 		public string name;
 		//Are we using the predefined Vect3f or using our custom class
-		public Position position;
+		public Vector3 position;
 		//public sytle;
 		public string type;
 		public float updated;
