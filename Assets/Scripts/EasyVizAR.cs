@@ -89,6 +89,21 @@ namespace EasyVizAR
 	{
 		public PoseChange[] poseChanges;
 	}
+
+	[System.Serializable]
+	public class Feature
+	{
+		public string color;
+		public float number;
+		public createdBy string;
+		public int id;
+		public string name;
+		//Are we using the predefined Vect3f or using our custom class
+		public Position position;
+		//public sytle;
+		public string type;
+		public float updated;
+	}
 }
 
 public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
