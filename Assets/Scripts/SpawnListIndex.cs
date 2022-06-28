@@ -49,7 +49,7 @@ public class SpawnListIndex : MonoBehaviour
 
         PositionInfo marker_pos = new PositionInfo();
         marker_pos.name = "hazard";
-        marker_pos.position = new Vector3(maker_to_spawn.GetComponent<PositionInfo>().position.x, maker_to_spawn.GetComponent<PositionInfo>().position.y, maker_to_spawn.GetComponent<PositionInfo>().position.z);
+        marker_pos.position = maker_to_spawn.transform.position;
         var data = JsonUtility.ToJson(marker_pos);
 
         //for sending stuff to the server 
