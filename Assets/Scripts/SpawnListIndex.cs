@@ -10,8 +10,16 @@ public class SpawnListIndex : MonoBehaviour
     public List<GameObject> spawn_list = null;
     public GameObject spawn_root;
     public GameObject spawn_parent;
+    public GameObject curr_headset;
     public float offset_distance_z = 1;
 
+    [System.Serializable]
+    public class PositionInfo
+    {
+        public string name;
+        public string type;
+        public Vector3 position;
+    }
     public void spawnObjectAtIndex(int index)
     {
         GameObject maker_to_spawn = spawn_list[index];
@@ -26,7 +34,9 @@ public class SpawnListIndex : MonoBehaviour
         //visualize in the editor
 
         Instantiate(maker_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
-        
+
+        //for sending stuff to the server 
+        //EasyVizARServer.Instance.Post("locations/" + curr_headset._locationID + "/features", EasyVizARServer.JSON_TYPE, GetPastPositionsCallback);
 
     }
 
