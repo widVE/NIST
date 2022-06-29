@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.endel.nativewebsocket": {
+      "version": "file:../NativeWebSocket-1.1.4/Assets",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.microsoft.mixedreality.openxr": {
       "version": "file:MixedReality/com.microsoft.mixedreality.openxr-1.4.0.tgz",
       "depth": 0,
