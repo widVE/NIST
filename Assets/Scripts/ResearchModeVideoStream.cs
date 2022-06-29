@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿#define INCLUDE_TSDF
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -74,9 +76,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 	public Material _colorCopyMaterial;
 	public Material _depthCopyMaterial;
 	
-	//for writing the rotated versions...
 	Texture2D _ourColor = null;
-	//Texture2D _ourDepth = null;
+	Texture2D _ourDepth = null;
 	Texture2D targetTexture = null;
 	
 	bool startRealtimePreview = true;
@@ -96,16 +97,17 @@ public class ResearchModeVideoStream : MonoBehaviour
 	[SerializeField]
 	float _writeTime = 1f;
 	public float WriteTime => _writeTime;
-	
+
+#if INCLUDE_TSDF
 	[SerializeField]
 	bool _performTSDFReconstruction = false;
 	public bool PerformTSDF => _performTSDFReconstruction;
 	
 	const uint NUM_GRIDS = 4096;		
 	const uint NUM_GRIDS_CPU = 4096;
-	const uint TOTAL_GRID_SIZE_X = 2048;
-	const uint TOTAL_GRID_SIZE_Y = 1024;
-	const uint TOTAL_GRID_SIZE_Z = 2048;
+	const uint TOTAL_GRID_SIZE_X = 1024;
+	const uint TOTAL_GRID_SIZE_Y = 512;
+	const uint TOTAL_GRID_SIZE_Z = 1024;
 
 	const uint GRID_SIZE_X = 32;
 	const uint GRID_SIZE_Y = 16;
@@ -140,24 +142,62 @@ public class ResearchModeVideoStream : MonoBehaviour
 	int[] octantData = null;
 	int[] cellData = null;
 	
-	Vector4 volumeBounds = new Vector4(8f, 4f, 8f, 0f);
+	Vector4 volumeBounds = new Vector4(16f, 8f, 16f, 0f);
 	Vector4 volumeOrigin = new Vector4(0f, 0f, 0f, 0f);		
 	Vector4 cellDimensions = new Vector4(32f, 16f, 32f, 0f);
 
 	int processID = -1;
-	int processIDSingle = -1;
 	int clearID = -1;
 	int clearTextureID = -1;
+	int clearBufferID = -1;
 	int octantComputeID = -1;
 	int renderID = -1;
-		
+	int textureID = -1;
+	int renderIDAll = -1;
+
+	uint _totalRes = 0;
+	uint _currWidth = 0;
+	uint _currHeight = 0;
+
+	byte[] bigVolumeData = new byte[NUM_GRIDS*TOTAL_CELLS * sizeof(ushort)];
+	byte[] bigColorData = new byte[NUM_GRIDS*TOTAL_CELLS * sizeof(uint)];
+	byte[] bigVolumeCPUData;// = new byte[NUM_GRIDS_CPU * TOTAL_CELLS * sizeof(ushort)];
+	byte[] bigColorCPUData;// = new byte[NUM_GRIDS_CPU * TOTAL_CELLS * sizeof(uint)];
+
+	int[] octantLookupData = new int[NUM_GRIDS];
+	int[] volumeLookupData = new int[NUM_GRIDS];
+
+	ComputeBuffer octantLookup = null;
+	ComputeBuffer volumeLookup = null;
+
+	ComputeBuffer bigVolumeBuffer=null;
+	ComputeBuffer bigColorBuffer=null;
+
+	int _lastCopyCount = 0;
+
+	Queue<uint> _gpuIndices = new Queue<uint>((int)NUM_GRIDS);
+	Queue<uint> _gpuColorIndices = new Queue<uint>((int)NUM_GRIDS);
+	Queue<uint> _cpuIndices = new Queue<uint>((int)NUM_GRIDS_CPU);
+	Queue<uint> _cpuColorIndices = new Queue<uint>((int)NUM_GRIDS_CPU);
+	
+	bool _updateImages = true;
+	bool _waitingForGrids = false;
+	bool _gridsFound = false;
+	
+	const float SCREEN_MULTIPLIER = 1.0f;
+
+	public RenderTexture _pointRenderTexture;
+	public ComputeBuffer _pointRenderBuffer;
+
+	Matrix4x4 _lastProjMatrix = Matrix4x4.identity;
+	Matrix4x4 _camIntrinsicsInv = Matrix4x4.identity;
+
+	Camera _arCamera;
+#endif
+
 	[SerializeField]
 	bool _writeImagesToDisk = false;
 	public bool WriteImagesToDisk => _writeImagesToDisk;
-	
-	[SerializeField]
-	bool _writePosToEdge = false;
-	public bool WritePosToEdge => _writePosToEdge;
 	
 	[SerializeField]
 	bool _showImagesInView = false;
@@ -171,7 +211,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 	[ContextMenu("TestJSON")]
 	public void TestJSON()
 	{
-		//StartCoroutine(UploadHeadset());
 		/*Headset s = new Headset();
 		s.name = "Tester";
 		s.transform = new EasyVizARTransform();
@@ -184,6 +223,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 	
     void Start()
     {
+		_arCamera = Camera.main;
+
 		if(depthPreviewPlane != null)
 		{
 			depthMediaMaterial = depthPreviewPlane.GetComponent<MeshRenderer>().material;
@@ -251,7 +292,7 @@ public class ResearchModeVideoStream : MonoBehaviour
         targetTexture = new Texture2D(COLOR_WIDTH, COLOR_HEIGHT, TextureFormat.RGBA32, false);
 		
 		_ourColor = new Texture2D(COLOR_WIDTH, COLOR_HEIGHT, TextureFormat.RGBA32, false);
-		//_ourDepth = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.R8, false);
+		_ourDepth = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.R8, false);
 		
 		//if(longDepthPreviewPlane != null)
 		//{
@@ -271,7 +312,515 @@ public class ResearchModeVideoStream : MonoBehaviour
 		}
 #endif
 #endif
+
+#if INCLUDE_TSDF
+		InitializeTSDF();
+#endif
     }
+
+#if INCLUDE_TSDF
+	void InitializeTSDF()
+	{
+		if(_tsdfShader != null)
+		{
+			if(processID == -1)
+			{
+				processID = _tsdfShader.FindKernel("CSTsdfGrid");
+				if(processID != -1)
+				{
+					Debug.Log("Found Processing shader");
+				}
+			}
+
+			if(renderID == -1)
+			{
+				renderID = _tsdfShader.FindKernel("CSRender");
+				if(renderID != -1)
+				{
+					Debug.Log("Found render shader");
+				}
+			}
+
+			if(renderIDAll == -1)
+			{
+				renderIDAll = _tsdfShader.FindKernel("CSRenderAll");
+				if(renderIDAll != -1)
+				{
+					Debug.Log("Found render all shader");
+				}
+			}
+
+			if(clearID == -1)
+			{
+				clearID = _tsdfShader.FindKernel("CSClear");
+				if(clearID != -1)
+				{
+					Debug.Log("Found clear shader");
+				}
+			}
+
+			if(clearTextureID == -1)
+			{
+				clearTextureID = _tsdfShader.FindKernel("CSClearTexture");
+				if(clearTextureID != -1)
+				{
+					Debug.Log("Found clear texture");
+				}
+			}
+			
+			if(clearBufferID == -1)
+			{
+				clearBufferID = _tsdfShader.FindKernel("CSClearBuffer");
+				if(clearBufferID != -1)
+				{
+					Debug.Log("Found clear texture");
+				}
+			}
+
+			if(octantComputeID == -1)
+			{
+				octantComputeID = _tsdfShader.FindKernel("CSOctant");
+				if(octantComputeID != -1)
+				{
+					Debug.Log("Found CSOctant shader");
+				}
+			}
+
+			if(textureID == -1)
+			{
+				textureID = _tsdfShader.FindKernel("CSTexture");
+				if(textureID != -1)
+				{
+					Debug.Log("Found CSTexture shader");
+				}
+			}
+
+			/*if(depthRangeID == -1)
+			{
+				depthRangeID = _tsdfShader.FindKernel("CSDepthRange");
+				if(depthRangeID != -1)
+				{
+					Debug.Log("Found CSDepthRange shader");
+				}
+			}*/
+		}
+
+		if(octantBuffer == null)
+		{
+			octantBuffer = new ComputeBuffer(_depthRT.width * _depthRT.height, sizeof(int));
+			octantData = new int[_depthRT.width * _depthRT.height];
+			//Debug.Log("Image depth: " + imageDepth.width + " " + imageDepth.height);
+			for(int i = 0; i < _depthRT.width * _depthRT.height; ++i)
+			{
+				octantData[i] = -1;
+			}
+		}
+
+		octantBuffer.SetData(octantData);
+
+		if(cellBuffer == null)
+		{
+			cellBuffer = new ComputeBuffer(_depthRT.width * _depthRT.height, sizeof(int), ComputeBufferType.Default, ComputeBufferMode.SubUpdates);
+			cellData = new int[_depthRT.width * _depthRT.height];
+			for(int i = 0; i < _depthRT.width * _depthRT.height; ++i)
+			{
+				cellData[i] = -1;
+			}
+		}
+
+		cellBuffer.SetData(cellData);
+		ushort posOne = UnityEngine.Mathf.FloatToHalf(1.0f);
+		byte[] posOneBytes = System.BitConverter.GetBytes(posOne);
+
+		uint totalGPUMem = NUM_GRIDS * TOTAL_CELLS * sizeof(ushort);
+		for(uint i = 0; i < totalGPUMem; i+=2)
+		{
+			System.Buffer.BlockCopy(posOneBytes, 0, bigVolumeData, (int)i, sizeof(ushort));
+		}
+
+		uint totalGPUColorMem = NUM_GRIDS * TOTAL_CELLS * sizeof(uint);
+		for(uint i = 0; i < totalGPUColorMem; ++i)
+		{
+			bigColorData[i] = 0;
+		}
+
+		for(uint i = 0; i < NUM_GRIDS_CPU; ++i)
+		{
+			_cpuIndices.Enqueue(i * TOTAL_CELLS * sizeof(ushort));
+			_cpuColorIndices.Enqueue(i * TOTAL_CELLS * sizeof(uint));
+		}
+
+		for(uint i = 0; i < NUM_GRIDS; ++i)
+		{
+			_gpuIndices.Enqueue(i * TOTAL_CELLS * sizeof(ushort));
+			_gpuColorIndices.Enqueue(i * TOTAL_CELLS * sizeof(uint));
+		}
+
+		int screenWidthMult = (int)((float)Screen.width * SCREEN_MULTIPLIER);
+		int screenHeightMult = (int)((float)Screen.height * SCREEN_MULTIPLIER);
+
+		_pointRenderTexture = new RenderTexture(screenWidthMult, screenHeightMult, 0);
+		_pointRenderTexture.name = name + "_Color";
+
+		_pointRenderTexture.enableRandomWrite = true;
+		_pointRenderTexture.filterMode = FilterMode.Point;
+		_pointRenderTexture.format = RenderTextureFormat.ARGB32;
+		_pointRenderTexture.useMipMap = false;
+		_pointRenderTexture.autoGenerateMips = false;
+		_pointRenderTexture.Create();
+
+		_pointRenderBuffer = new ComputeBuffer(screenWidthMult*screenHeightMult*4, sizeof(uint));
+		
+		octantLookup = new ComputeBuffer((int)NUM_GRIDS, sizeof(int), ComputeBufferType.Default, ComputeBufferMode.SubUpdates);
+		volumeLookup = new ComputeBuffer((int)NUM_GRIDS, sizeof(int), ComputeBufferType.Default, ComputeBufferMode.SubUpdates);
+		for(int i = 0; i < NUM_GRIDS; ++i)
+		{
+			octantLookupData[i] = -1;
+			volumeLookupData[i] = -1;
+		}
+
+		octantLookup.SetData(octantLookupData);
+		volumeLookup.SetData(volumeLookupData);
+
+		_totalRes = (uint)_depthRT.width * (uint)_depthRT.height;
+
+		_currWidth = (uint)_depthRT.width;
+		_currHeight = (uint)_depthRT.height;
+
+		for(int i = 0; i < TOTAL_NUM_OCTANTS; ++i)
+		{
+			octantToBufferMapGPU[i] = -1;
+		}
+		//Debug.Log(_currWidth + " " +_currHeight);
+
+		/*if(_allOctantBuffer == null)
+		{
+			_allOctantBuffer = new ComputeBuffer((int)TOTAL_NUM_OCTANTS, sizeof(int));
+			_allOctantBuffer.SetData(octantToBufferMapGPU);
+		}*/
+
+		if(bigVolumeBuffer == null)
+		{
+			bigVolumeBuffer = new ComputeBuffer((int)NUM_GRIDS*(int)TOTAL_CELLS/2, sizeof(uint));
+			bigVolumeBuffer.SetData(bigVolumeData);
+		}
+
+		if(bigColorBuffer == null)
+		{
+			bigColorBuffer = new ComputeBuffer((int)NUM_GRIDS*(int)TOTAL_CELLS, sizeof(uint));
+			bigColorBuffer.SetData(bigColorData);
+		}
+
+
+		_tsdfShader.SetBuffer(clearID, "volumeBuffer", bigVolumeBuffer);
+		_tsdfShader.SetBuffer(clearID, "volumeColorBuffer", bigColorBuffer);
+		
+
+		_tsdfShader.SetInt("numVolumes", (int)NUM_GRIDS);
+		if((NUM_GRIDS*TOTAL_CELLS+1023)/1024 > 65535)
+		{
+			int numCalls = (int)(NUM_GRIDS*TOTAL_CELLS / (1024*65535)) + 1;
+			int totalCount = 0;
+			int singleCallMax = (65535 * 1024);
+			for(int j = 0; j < numCalls; ++j)
+			{
+				_tsdfShader.SetInt("volumeOffset", j * singleCallMax);
+				if((j+1) * singleCallMax > NUM_GRIDS*TOTAL_CELLS)
+				{
+					_tsdfShader.Dispatch(clearID, (int)((NUM_GRIDS*TOTAL_CELLS-totalCount) + 1023) / 1024, 1, 1);
+				}
+				else
+				{
+					_tsdfShader.Dispatch(clearID, singleCallMax / 1024, 1, 1);
+				}
+				totalCount += singleCallMax;
+			}
+		}
+		else
+		{
+			_tsdfShader.Dispatch(clearID, ((int)NUM_GRIDS*(int)TOTAL_CELLS + 1023) / 1024, 1, 1);
+		}
+
+		bigColorBuffer.GetData(bigColorData);
+		bigVolumeBuffer.GetData(bigVolumeData);
+
+		float gridSizeDiag = (float)(volumeBounds.magnitude / volumeGridSize.magnitude) * (float)1.05f;
+		//float gridSizeDiag = volumeBounds.x / volumeGridSize.x;
+
+		_tsdfShader.SetFloat("gridSizeDiag", gridSizeDiag);
+		_tsdfShader.SetVector("volumeBounds", volumeBounds);
+		_tsdfShader.SetVector("volumeOrigin", volumeOrigin);
+		_tsdfShader.SetVector("volumeGridSize", volumeGridSize);
+		_tsdfShader.SetVector("volumeGridSizeWorld", new Vector4(volumeBounds.x / volumeGridSize.x, volumeBounds.y / volumeGridSize.y, volumeBounds.z / volumeGridSize.z, 1f));
+		_tsdfShader.SetVector("octantDimensions", new Vector4(volumeGridSize.x / cellDimensions.x, volumeGridSize.y / cellDimensions.y, volumeGridSize.z / cellDimensions.z, 1f));
+		_tsdfShader.SetVector("octantWorldLength", new Vector4(volumeBounds.x / (volumeGridSize.x / cellDimensions.x), volumeBounds.y / (volumeGridSize.y / cellDimensions.y), volumeBounds.z / (volumeGridSize.z / cellDimensions.z), 1.0f));
+		_tsdfShader.SetVector("volumeMin", volumeOrigin - volumeBounds * 0.5f);
+		_tsdfShader.SetVector("cellDimensions", cellDimensions);
+		_tsdfShader.SetFloat("depthWidth", (float)_currWidth);
+		_tsdfShader.SetFloat("depthHeight", (float)_currHeight);
+		_tsdfShader.SetFloat("depthResolution", _totalRes);
+		_tsdfShader.SetInt("orientation", (int)Screen.orientation);
+		_tsdfShader.SetInt("screenWidth", screenWidthMult);
+		_tsdfShader.SetInt("screenHeight", screenHeightMult);
+		_tsdfShader.SetInt("volumeOffset", 0);
+		_tsdfShader.SetInt("totalCells", (int)TOTAL_CELLS);
+		_tsdfShader.SetInt("computeMaxEdgeSize", 256);
+
+		_tsdfShader.SetBuffer(clearBufferID, "renderBuffer", _pointRenderBuffer);
+		
+		_tsdfShader.SetBuffer(octantComputeID, "octantBuffer", octantBuffer);
+		_tsdfShader.SetTexture(octantComputeID, "depthTexture", _depthRT);
+		//_tsdfShader.SetTexture(octantComputeID, "confTexture", _renderTargetConfV);
+
+		_tsdfShader.SetTexture(processID, "depthTexture", _depthRT);
+		//_tsdfShader.SetTexture(processID, "confTexture", _renderTargetConfV);
+		_tsdfShader.SetTexture(processID, "colorTexture", _colorRT);
+
+		_tsdfShader.SetBuffer(processID, "volumeBuffer", bigVolumeBuffer);
+		_tsdfShader.SetBuffer(processID, "volumeColorBuffer", bigColorBuffer);
+		_tsdfShader.SetBuffer(processID, "cellBuffer", cellBuffer);
+		_tsdfShader.SetBuffer(processID, "octantBuffer", octantBuffer);
+
+		_tsdfShader.SetTexture(clearTextureID, "renderTexture", _pointRenderTexture);
+
+		_tsdfShader.SetTexture(textureID, "renderTexture", _pointRenderTexture);
+		_tsdfShader.SetBuffer(textureID, "renderBuffer", _pointRenderBuffer);
+		
+		_tsdfShader.SetBuffer(renderID, "volumeBuffer", bigVolumeBuffer);
+		_tsdfShader.SetBuffer(renderID, "volumeColorBuffer", bigColorBuffer);
+		_tsdfShader.SetBuffer(renderID, "octantLookup", octantLookup);
+		_tsdfShader.SetBuffer(renderID, "volumeLookup", volumeLookup);
+		_tsdfShader.SetBuffer(renderID, "renderBuffer", _pointRenderBuffer);
+		
+		_camIntrinsicsInv[0] = 200.0f;//587.189f/2.375f;//(float)int.Parse(camIntrinsicData[0]); // 7.5f;
+		_camIntrinsicsInv[5] = 200.0f;//585.766f/1.4861f;//(float)int.Parse(camIntrinsicData[1]); // 7.5f;
+		_camIntrinsicsInv[8] = 160.0f;//373.018f/2.375f;//(float)int.Parse(camIntrinsicData[2]); // 7.5f;
+		_camIntrinsicsInv[9] = 144.0f;//200.805f/1.4861f;//(float)int.Parse(camIntrinsicData[3]); // 7.5f;
+		_camIntrinsicsInv = _camIntrinsicsInv.inverse;
+
+		_tsdfShader.SetMatrix("camIntrinsicsInverse", _camIntrinsicsInv);
+
+	}
+
+	/*void UpdateCameraParams()
+	{
+		var cameraParams = new XRCameraParams {
+			zNear = _arCamera.nearClipPlane,
+			zFar = _arCamera.farClipPlane,
+			screenWidth = Screen.width,//_currWidth,//
+			screenHeight = Screen.height,//_currHeight,//
+			screenOrientation = Screen.orientation
+		};
+
+		//Debug.Log(lastDisplayMatrix.ToString("F4"));
+
+		Matrix4x4 viewMatrix = Matrix4x4.identity;//_arCamera.viewMatrix;
+		Matrix4x4 projMatrix = _lastProjMatrix;
+		Matrix4x4 viewInverse = Matrix4x4.identity;
+
+		if (m_CameraManager.subsystem.TryGetLatestFrame(cameraParams, out var cameraFrame)) {
+			viewMatrix = Matrix4x4.TRS(_arCamera.transform.position, _arCamera.transform.rotation, Vector3.one).inverse;
+			if (SystemInfo.usesReversedZBuffer)
+			{
+				viewMatrix.m20 = -viewMatrix.m20;
+				viewMatrix.m21 = -viewMatrix.m21;
+				viewMatrix.m22 = -viewMatrix.m22;
+				viewMatrix.m23 = -viewMatrix.m23;
+			}
+			projMatrix = cameraFrame.projectionMatrix;
+			viewInverse = viewMatrix.inverse;
+		}
+		
+		
+		Matrix4x4 viewProjMatrix = projMatrix * viewMatrix;//Matrix4x4.TRS(_arCamera.transform.position, _arCamera.transform.rotation, Vector3.one);//_arCamera.worldToCameraMatrix;//
+		//Debug.Log(viewProjMatrix.ToString());
+		
+		if (!m_CameraManager.subsystem.TryGetIntrinsics(out XRCameraIntrinsics cameraIntrinsics))
+		{
+			SetLastValues();
+			return;
+		}
+		
+		Matrix4x4 flipYZ = new Matrix4x4();
+		flipYZ.SetRow(0, new Vector4(1f,0f,0f,0f));
+		flipYZ.SetRow(1, new Vector4(0f,1f,0f,0f));
+		flipYZ.SetRow(2, new Vector4(0f,0f,-1f,0f));
+		flipYZ.SetRow(3, new Vector4(0f,0f,0f,1f));
+
+		//the way we are making this quaternion is impacting the correctness (i.e. we need to do it eventhough the angle is zero, for things to work)
+		
+		//Debug.Log(viewMatrix.ToString("F6"));
+		
+		//Matrix4x4 cTransform = GetCamTransform();
+
+		Matrix4x4 rotateToARCamera = flipYZ;
+
+		Matrix4x4 theMatrix = viewInverse * rotateToARCamera;
+
+		Matrix4x4 camIntrinsics = Matrix4x4.identity;
+
+		//we want to pass in the data to compute buffers and calculate that way..
+		//viewProjMatrix = projMatrix * theMatrix.inverse;
+
+		_tsdfShader.SetMatrix("localToWorld", theMatrix);
+		//octreeShader.SetMatrix("displayMatrix", _lastDisplayMatrix);
+		_tsdfShader.SetMatrix("viewProjMatrix", viewProjMatrix);
+
+		//Debug.Log(cameraIntrinsics.focalLength.x + " " + cameraIntrinsics.focalLength.y + " " + cameraIntrinsics.principalPoint.x + " " + cameraIntrinsics.principalPoint.y);
+		//these could be set on re-orientation...
+		//focal length values are equal
+		camIntrinsics.SetColumn(0, new Vector4(cameraIntrinsics.focalLength.y, 0f, 0f, 0f));
+		camIntrinsics.SetColumn(1, new Vector4(0f, cameraIntrinsics.focalLength.x, 0f, 0f));
+		camIntrinsics.SetColumn(2, new Vector4(cameraIntrinsics.principalPoint.y, cameraIntrinsics.principalPoint.x, 1f, 0f));
+
+		Matrix4x4 camInv = camIntrinsics.inverse;
+		_tsdfShader.SetMatrix("camIntrinsicsInverse", camInv);
+		_arCamera.GetComponent<ARCameraBackground>().customMaterial.SetMatrix("_camIntrinsicsInverse", camInv);
+	}*/
+
+	int ManageMemory()
+	{
+		int copyCount = 0;
+
+		//UnityEngine.Profiling.Profiler.BeginSample("ManageMemory");
+		
+		uint numNew = 0;
+
+		Dictionary<int, int> pixelToOctant = new Dictionary<int, int>();
+
+		for(int k = 0; k < _totalRes; ++k)
+		{
+			//if(copyCount < NUM_GRIDS)
+			{
+				//Debug.Log(k + " " + octantData[k]);
+				//for each pixel from the depth map, check which octant it hit...
+				if(octantData[k] != -1)
+				{
+					//can we remember what was present last frame?  and re-use without copying?
+					//i.e. don't clear octantData?
+					uint gpuIndex = 0;
+					if(octantToBufferMapGPU[octantData[k]] == -1)
+					{
+						if(_gpuIndices.Count > 0)
+						{
+							numNew++;
+							gpuIndex = _gpuIndices.Dequeue();
+							octantToBufferMapGPU[octantData[k]] = (int)gpuIndex;
+
+							uint octID = (uint)octantData[k];
+							octantToBufferMap.Add(octID, gpuIndex);
+							colorToBufferMap.Add(octID, _gpuColorIndices.Dequeue());
+						
+							if(!octantToBufferMapCPU.ContainsKey(octID))
+							{
+								octantToBufferMapCPU.Add(octID, _cpuIndices.Dequeue());
+								colorToBufferMapCPU.Add(octID, _cpuColorIndices.Dequeue());
+							}
+
+							//if(pixelToOctant[octantData[k]] == -1)
+							//{
+							//copy to big buffer...
+							/*if(!_firstFrame)
+							{
+								System.Buffer.BlockCopy(bigVolumeCPUData, (int)octantToBufferMapCPU[octID], bigVolumeData, (int)gpuIndex, (int)GRID_BYTE_COUNT);
+								System.Buffer.BlockCopy(bigColorCPUData, (int)colorToBufferMapCPU[octID], bigColorData, (int)colorToBufferMap[octID], (int)COLOR_BYTE_COUNT);
+							}*/
+
+							//this stores GPU index...
+							//pixelToOctant[octantData[k]] = copyCount;
+							//newCount++;
+							//copy octantID to cell buffer...
+							cellData[k] = (int)(gpuIndex/GRID_BYTE_COUNT);
+							octantLookupData[copyCount] = (int)octID;
+							volumeLookupData[copyCount] = cellData[k];
+
+							copyCount++;
+						}
+						else
+						{
+							Debug.Log("NO MORE INDICES!");
+						}
+					}
+					else
+					{
+						cellData[k] = (int)(octantToBufferMapGPU[octantData[k]]/GRID_BYTE_COUNT);
+
+						int outTest = 0;
+						if(!pixelToOctant.TryGetValue(octantData[k], out outTest))
+						{
+							pixelToOctant.Add(octantData[k], -1);
+							octantLookupData[copyCount] = octantData[k];
+							volumeLookupData[copyCount] = cellData[k];
+							copyCount++;
+						}
+					}
+				}
+				else
+				{
+					cellData[k] = -1;
+				}
+			}
+		}
+
+		for(int i = copyCount; i < NUM_GRIDS; ++i)
+		{
+			octantLookupData[i] = -1;
+			volumeLookupData[i] = -1;
+		}
+
+		Unity.Collections.NativeArray<int> cellBuffData = cellBuffer.BeginWrite<int>(0, (int)_totalRes);
+
+		Unity.Collections.NativeArray<int>.Copy(cellData, cellBuffData);
+
+		cellBuffer.EndWrite<int>((int)_totalRes);
+
+		Unity.Collections.NativeArray<int> octantLookupBuffData = octantLookup.BeginWrite<int>(0, (int)NUM_GRIDS);
+
+		Unity.Collections.NativeArray<int>.Copy(octantLookupData, octantLookupBuffData);
+		
+		octantLookup.EndWrite<int>((int)NUM_GRIDS);
+
+		Unity.Collections.NativeArray<int> volumeLookupBuffData = volumeLookup.BeginWrite<int>(0, (int)NUM_GRIDS);
+
+		Unity.Collections.NativeArray<int>.Copy(volumeLookupData, volumeLookupBuffData);
+		
+		volumeLookup.EndWrite<int>((int)NUM_GRIDS);
+
+		/*if(numNew > 0)
+		{
+			//Debug.Log("New count: " + numNew);
+			//this call is over-writing previous scan data on the GPU...
+			//unless we read it back first
+			bigVolumeBuffer.SetData(bigVolumeData);
+			bigColorBuffer.SetData(bigColorData);
+		}*/
+
+		//cellBuffer.SetData(cellData);
+		//UnityEngine.Profiling.Profiler.EndSample();
+
+		//_firstFrame = false;
+
+		return copyCount;
+	}
+
+	void FindSuboctants()
+	{
+		//this doesn't use a co-routine + AsyncGPUReadback, so the GetData call is slow
+		_waitingForGrids = true;
+		_updateImages = false;
+		
+		//UpdateCameraParams();
+
+		//octreeShader.SetBuffer(octantComputeID, "octantBuffer", octantBuffer);
+		//octreeShader.SetTexture(octantComputeID, "depthTexture", _depthRT);
+		//octreeShader.SetTexture(octantComputeID, "confTexture", _renderTargetConfV);
+		_tsdfShader.Dispatch(octantComputeID, ((int)_currWidth + 31) / 32, ((int)_currHeight + 31) / 32, 1);
+
+		octantBuffer.GetData(octantData);
+
+		_gridsFound = true;
+	}
+#endif
 
 	/*public void SetVisualizationOfSpatialMapping(Microsoft.MixedReality.Toolkit.SpatialAwarenessSystem.SpatialAwarenessMeshDisplayOptions option)
 	{
@@ -335,18 +884,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 		}
 	}
 	
-	void UpdateCallback(string resultData)
-	{
-		if(resultData != "error")
-		{
-			
-		}
-		else
-		{
-			
-		}
-	}
-	
 	//this the function we're using for image capture (color and depth), goto memory first, so we can write additional synchronized info (transforms)
 	void OnCapturedPhotoToMemory(PhotoCapture.PhotoCaptureResult result, PhotoCaptureFrame photoCaptureFrame)
 	{
@@ -363,6 +900,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 				byte[] frameTexture = researchMode.GetLongDepthMapTextureBuffer();
 				if (frameTexture.Length > 0)
 				{
+
+					
 					for(int i = 0; i < DEPTH_HEIGHT; ++i)
 					{
 						for(int j = 0; j < DEPTH_WIDTH; ++j)
@@ -394,36 +933,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 
 					targetTexture.SetPixels(colorArray.ToArray());
 					targetTexture.Apply();
-					
-					var commandBuffer = new UnityEngine.Rendering.CommandBuffer();
-					commandBuffer.name = "Color Blit Pass";
-					
-					_colorCopyMaterial.SetTexture("_MainTex", targetTexture);
-					
-					RenderTexture currentActiveRT = RenderTexture.active;
-					
-					Graphics.SetRenderTarget(_colorRT.colorBuffer,_colorRT.depthBuffer);
-					//commandBuffer.ClearRenderTarget(false, true, Color.black);
-					commandBuffer.Blit(targetTexture, UnityEngine.Rendering.BuiltinRenderTextureType.CurrentActive, _colorCopyMaterial);
-					Graphics.ExecuteCommandBuffer(commandBuffer);
-					
-					_ourColor.ReadPixels(new Rect(0, 0, _ourColor.width, _ourColor.height), 0, 0, false);
-					_ourColor.Apply();
-					
-					if(currentActiveRT != null)
-					{
-						Graphics.SetRenderTarget(currentActiveRT.colorBuffer, currentActiveRT.depthBuffer);
-					}
-					else
-					{
-						RenderTexture.active = null;
-					}
-					
+
 					float[] depthPos = researchMode.GetDepthToWorld();
-					string depthString = depthPos[0].ToString("F4") + " " + depthPos[1].ToString("F4") + " " + depthPos[2].ToString("F4") + " " + depthPos[3].ToString("F4") + "\n";
-					depthString = depthString + (depthPos[4].ToString("F4") + " " + depthPos[5].ToString("F4") + " " + depthPos[6].ToString("F4") + " " + depthPos[7].ToString("F4") + "\n");
-					depthString = depthString + (depthPos[8].ToString("F4") + " " + depthPos[9].ToString("F4") + " " + depthPos[10].ToString("F4") + " " + depthPos[11].ToString("F4") + "\n");
-					depthString = depthString + (depthPos[12].ToString("F4") + " " + depthPos[13].ToString("F4") + " " + depthPos[14].ToString("F4") + " " + depthPos[15].ToString("F4") + "\n");
 					
 					if(photoCaptureFrame.hasLocationData)
 					{
@@ -432,14 +943,58 @@ public class ResearchModeVideoStream : MonoBehaviour
 						
 						photoCaptureFrame.TryGetCameraToWorldMatrix(out Matrix4x4 cameraToWorldMatrix);
 
+						//in the manual processing, the cameraToWorldMatrix here corresponds to the color camera's extrinsic matrix
+						//its 3rd column is negated, and we take the transpose of it
+						Matrix4x4 scanTransPV = cameraToWorldMatrix;
+						Matrix4x4 zScale2 = Matrix4x4.identity;
+						Vector4 col3 = zScale2.GetColumn(2);
+						col3 = -col3;
+						zScale2.SetColumn(2, col3);
+						scanTransPV = zScale2 * scanTransPV;
+						scanTransPV = scanTransPV.transpose;
+						
 						//Vector3 position = cameraToWorldMatrix.GetColumn(3) - cameraToWorldMatrix.GetColumn(2);
 						//Quaternion rotation = Quaternion.LookRotation(-cameraToWorldMatrix.GetColumn(2), cameraToWorldMatrix.GetColumn(1));
 
 						photoCaptureFrame.TryGetProjectionMatrix(Camera.main.nearClipPlane, Camera.main.farClipPlane, out Matrix4x4 projectionMatrix);
 						
+						scanTransPV = projectionMatrix * scanTransPV;
+						//scanTransPV is now the MVP matrix of the color camera, this is used to project back unprojected depth image data to the color image
+						//to look up what corresponding color matches the depth, if any
+
+						Matrix scanTrans = Matrix4x4.identity;
+						for(int i = 0; i < 16; ++i)
+						{
+							scanTrans[i] = depthPos[i];
+						}
+
+						var commandBuffer = new UnityEngine.Rendering.CommandBuffer();
+						commandBuffer.name = "Color Blit Pass";
+						
+						_colorCopyMaterial.SetTexture("_MainTex", targetTexture);
+						
+						RenderTexture currentActiveRT = RenderTexture.active;
+						
+						Graphics.SetRenderTarget(_colorRT.colorBuffer,_colorRT.depthBuffer);
+						//commandBuffer.ClearRenderTarget(false, true, Color.black);
+						commandBuffer.Blit(targetTexture, UnityEngine.Rendering.BuiltinRenderTextureType.CurrentActive, _colorCopyMaterial);
+						Graphics.ExecuteCommandBuffer(commandBuffer);
+						
+						_ourColor.ReadPixels(new Rect(0, 0, _ourColor.width, _ourColor.height), 0, 0, false);
+						_ourColor.Apply();
+						
+						if(currentActiveRT != null)
+						{
+							Graphics.SetRenderTarget(currentActiveRT.colorBuffer, currentActiveRT.depthBuffer);
+						}
+						else
+						{
+							RenderTexture.active = null;
+						}
 						//at this point we have the depth mvp matrix, and the color proj / view matrix.
 						//need to project world space depth value into color image that matches depth image size...
 						
+						//this should happen in the BLIT shader above...
 						/*for(int n = 0; n < DEPTH_WIDTH*DEPTH_HEIGHT; ++n)
 						{
 							float depth = (float)((float)depthTextureBytes[n] / 255f) * 4000f;
@@ -464,7 +1019,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 							//if(cData >= ipadConfidence)
 							/*{
 								Vector3 cameraPoint = new Vector3(wIndex + 0.5f, hIndex + 0.5f, 1f);
-								cameraPoint = camIntrinsics.MultiplyVector(cameraPoint);
+								cameraPoint = _camIntrinsicsInv.MultiplyVector(cameraPoint);
 								cameraPoint *= depth;
 								//cameraPoint.z = -cameraPoint.z;
 								Vector4 newCamPoint = new Vector4(cameraPoint.x, cameraPoint.y, cameraPoint.z, 1f);
@@ -500,40 +1055,47 @@ public class ResearchModeVideoStream : MonoBehaviour
 							int hIdx = (int)((float)colorHeight * projPos.y);
 							int wIdx = (int)((float)colorWidth * projPos.x);*/
 						//}
+
+						if(_gpuIndices.Count > 0)
+						{
+							if(!_waitingForGrids)
+							{
+								FindSuboctants();
+								//StartCoroutine(StartNewSubgridFind());
+							}
+
+							if(_gridsFound)
+							{	
+								_lastCopyCount = ManageMemory();
+							
+								UnprojectPoints(_lastCopyCount);
+
+								_updateImages = true;
+								_gridsFound = false;
+								_waitingForGrids = false;
+							}
+						}
+
+						//RenderPoints(_lastCopyCount);
+
 						//write pv / projection matrices...
-						string colorString = cameraToWorldMatrix[0].ToString("F4") + " " + cameraToWorldMatrix[1].ToString("F4") + " " + cameraToWorldMatrix[2].ToString("F4") + " " + cameraToWorldMatrix[3].ToString("F4") + "\n";
-						colorString = colorString + (cameraToWorldMatrix[4].ToString("F4") + " " + cameraToWorldMatrix[5].ToString("F4") + " " + cameraToWorldMatrix[6].ToString("F4") + " " + cameraToWorldMatrix[7].ToString("F4") + "\n");
-						colorString = colorString + (cameraToWorldMatrix[8].ToString("F4") + " " + cameraToWorldMatrix[9].ToString("F4") + " " + cameraToWorldMatrix[10].ToString("F4") + " " + cameraToWorldMatrix[11].ToString("F4") + "\n");
-						colorString = colorString + (cameraToWorldMatrix[12].ToString("F4") + " " + cameraToWorldMatrix[13].ToString("F4") + " " + cameraToWorldMatrix[14].ToString("F4") + " " + cameraToWorldMatrix[15].ToString("F4") + "\n");
-						
-						colorString = colorString + (projectionMatrix[0].ToString("F4") + " " + projectionMatrix[1].ToString("F4") + " " + projectionMatrix[2].ToString("F4") + " " + projectionMatrix[3].ToString("F4") + "\n");
-						colorString = colorString + (projectionMatrix[4].ToString("F4") + " " + projectionMatrix[5].ToString("F4") + " " + projectionMatrix[6].ToString("F4") + " " + projectionMatrix[7].ToString("F4") + "\n");
-						colorString = colorString + (projectionMatrix[8].ToString("F4") + " " + projectionMatrix[9].ToString("F4") + " " + projectionMatrix[10].ToString("F4") + " " + projectionMatrix[11].ToString("F4") + "\n");
-						colorString = colorString + (projectionMatrix[12].ToString("F4") + " " + projectionMatrix[13].ToString("F4") + " " + projectionMatrix[14].ToString("F4") + " " + projectionMatrix[15].ToString("F4") + "\n");
-						
-						
 						if(WriteImagesToDisk)
 						{
+							string colorString = cameraToWorldMatrix[0].ToString("F4") + " " + cameraToWorldMatrix[1].ToString("F4") + " " + cameraToWorldMatrix[2].ToString("F4") + " " + cameraToWorldMatrix[3].ToString("F4") + "\n";
+							colorString = colorString + (cameraToWorldMatrix[4].ToString("F4") + " " + cameraToWorldMatrix[5].ToString("F4") + " " + cameraToWorldMatrix[6].ToString("F4") + " " + cameraToWorldMatrix[7].ToString("F4") + "\n");
+							colorString = colorString + (cameraToWorldMatrix[8].ToString("F4") + " " + cameraToWorldMatrix[9].ToString("F4") + " " + cameraToWorldMatrix[10].ToString("F4") + " " + cameraToWorldMatrix[11].ToString("F4") + "\n");
+							colorString = colorString + (cameraToWorldMatrix[12].ToString("F4") + " " + cameraToWorldMatrix[13].ToString("F4") + " " + cameraToWorldMatrix[14].ToString("F4") + " " + cameraToWorldMatrix[15].ToString("F4") + "\n");
+							
+							colorString = colorString + (projectionMatrix[0].ToString("F4") + " " + projectionMatrix[1].ToString("F4") + " " + projectionMatrix[2].ToString("F4") + " " + projectionMatrix[3].ToString("F4") + "\n");
+							colorString = colorString + (projectionMatrix[4].ToString("F4") + " " + projectionMatrix[5].ToString("F4") + " " + projectionMatrix[6].ToString("F4") + " " + projectionMatrix[7].ToString("F4") + "\n");
+							colorString = colorString + (projectionMatrix[8].ToString("F4") + " " + projectionMatrix[9].ToString("F4") + " " + projectionMatrix[10].ToString("F4") + " " + projectionMatrix[11].ToString("F4") + "\n");
+							colorString = colorString + (projectionMatrix[12].ToString("F4") + " " + projectionMatrix[13].ToString("F4") + " " + projectionMatrix[14].ToString("F4") + " " + projectionMatrix[15].ToString("F4") + "\n");
+							
+							
 							string filenameTxtC = string.Format(@"CapturedImage{0}_n.txt", currTime);
 							System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxtC), colorString);
 						}
 						
-						if(_writePosToEdge)
-						{
-							//update local headset with this new transform...
-							
-							
-							//EasyVizAR.Headset h = new EasyVizAR.Headset();
-							//h.position = new EasyVizAR.Position();
-							//h.position.x = cameraToWorldMatrix[12];
-							//h.position.y = cameraToWorldMatrix[13];
-							//h.position.z = cameraToWorldMatrix[14];
-							//h.orientation = new EasyVizAR.Orientation();
-							
-							//EasyVizARServer.Instance.Patch("headsets/"+_headsetID, EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), UpdateCallback);
-							//StartCoroutine(UploadHeadset(new Vector3(cameraToWorldMatrix[12], cameraToWorldMatrix[13], cameraToWorldMatrix[14]), new Vector4(1f,2f,3f)));
-							//_firstHeadsetSend = false;
-						}
 					}
 					
 					if(WriteImagesToDisk)
@@ -546,8 +1108,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 						File.WriteAllBytes(outPathColorImage, ImageConversion.EncodeArrayToPNG(_ourColor.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, (uint)_ourColor.width, (uint)_ourColor.height));
 						//if(_firstHeadsetSend)
 						{
-							StartCoroutine(UploadImage(outPathColorImage, _ourColor));
-							_firstHeadsetSend = false;
+						//	StartCoroutine(UploadImage(outPathColorImage, _ourColor));
+						//	_firstHeadsetSend = false;
 						}
 					}
 					
@@ -586,6 +1148,11 @@ public class ResearchModeVideoStream : MonoBehaviour
 					
 					if(WriteImagesToDisk)
 					{
+						string depthString = depthPos[0].ToString("F4") + " " + depthPos[1].ToString("F4") + " " + depthPos[2].ToString("F4") + " " + depthPos[3].ToString("F4") + "\n";
+						depthString = depthString + (depthPos[4].ToString("F4") + " " + depthPos[5].ToString("F4") + " " + depthPos[6].ToString("F4") + " " + depthPos[7].ToString("F4") + "\n");
+						depthString = depthString + (depthPos[8].ToString("F4") + " " + depthPos[9].ToString("F4") + " " + depthPos[10].ToString("F4") + " " + depthPos[11].ToString("F4") + "\n");
+						depthString = depthString + (depthPos[12].ToString("F4") + " " + depthPos[13].ToString("F4") + " " + depthPos[14].ToString("F4") + " " + depthPos[15].ToString("F4") + "\n");
+						
 						string filenameTxt = string.Format(@"CapturedImageDepth{0}_n.txt", currTime);
 						System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxt), depthString);
 					}
@@ -855,7 +1422,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 			}
         }
 
-        // Update point cloud
+        // Update point cloud - not currently used...
         if (renderPointCloud)
         {
             float[] pointCloud = researchMode.GetPointCloudBuffer();
@@ -872,11 +1439,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 
             }
         }
-		
-		if (_performTSDFReconstruction)
-		{
-			
-		}
 #endif
 #endif
     }
@@ -937,38 +1499,7 @@ public class ResearchModeVideoStream : MonoBehaviour
         if (!focus) StopSensorsEvent();
     }
 	
-	//server communication functions... this will be moved to EasyVizAR.cs file...
-
-	IEnumerator UploadHeadset(Vector3 pos, Vector4 orient)
-    {
-		EasyVizAR.Headset h = new EasyVizAR.Headset();
-		h.name = "RossTestFromHololens2";
-		//h.position = pos;
-		//h.orientation = orient;
-		
-        //UnityWebRequest www = UnityWebRequest.Post("http://halo05.wings.cs.wisc.edu:5000/headsets", form);
-		
-		UnityWebRequest www = new UnityWebRequest("http://halo05.wings.cs.wisc.edu:5000/headsets", "POST");
-		www.SetRequestHeader("Content-Type", "application/json");
-		
-		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(JsonUtility.ToJson(h));
-		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
-        www.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return www.SendWebRequest();
-
-        if (www.result != UnityWebRequest.Result.Success)
-        {
-            Debug.Log(www.error);
-        }
-        else
-        {
-            Debug.Log("Form upload complete!");
-        }
-		
-		www.Dispose();
-    }
-	
+	//proof of concept of uploading an image to the easyvizar server
 	IEnumerator UploadImage(string sPathToFile, Texture2D imageData)
 	{
 		EasyVizAR.Hololens2PhotoPost h = new EasyVizAR.Hololens2PhotoPost();
@@ -1035,7 +1566,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 		www2.Dispose();
 	}
 	
-	/*IEnumerator StartNewSubgridFind()
+	IEnumerator StartNewSubgridFind()
 	{
 		_waitingForGrids = true;
 		_updateImages = false;
@@ -1061,95 +1592,15 @@ public class ResearchModeVideoStream : MonoBehaviour
 		}
 
 		_gridsFound = true;
-	}*/
+	}
 	
 	void FindSubgrids()
 	{
-		/*var cameraParams = new XRCameraParams {
-			zNear = _arCamera.nearClipPlane,
-			zFar = _arCamera.farClipPlane,
-			screenWidth = Screen.width,//_currWidth,//
-			screenHeight = Screen.height,//_currHeight,//
-			screenOrientation = Screen.orientation
-		};
+		//UpdateCameraParams();
 
-		//Debug.Log(lastDisplayMatrix.ToString("F4"));
-
-		Matrix4x4 viewMatrix = Matrix4x4.identity;//_arCamera.viewMatrix;
-		Matrix4x4 projMatrix = lastProjMatrix;
-		Matrix4x4 viewInverse = Matrix4x4.identity;
-
-		if (m_CameraManager.subsystem.TryGetLatestFrame(cameraParams, out var cameraFrame)) {
-			viewMatrix = Matrix4x4.TRS(_arCamera.transform.position, _arCamera.transform.rotation, Vector3.one).inverse;
-			if (SystemInfo.usesReversedZBuffer)
-			{
-				viewMatrix.m20 = -viewMatrix.m20;
-				viewMatrix.m21 = -viewMatrix.m21;
-				viewMatrix.m22 = -viewMatrix.m22;
-				viewMatrix.m23 = -viewMatrix.m23;
-			}
-			projMatrix = cameraFrame.projectionMatrix;
-			viewInverse = viewMatrix.inverse;
-		}
-		
-		Matrix4x4 viewProjMatrix = projMatrix * viewMatrix;//Matrix4x4.TRS(_arCamera.transform.position, _arCamera.transform.rotation, Vector3.one);//_arCamera.worldToCameraMatrix;//
-		
-		if (!m_CameraManager.subsystem.TryGetIntrinsics(out XRCameraIntrinsics cameraIntrinsics))
-		{
-			SetLastValues();
-			return;
-		}
-		
-		Matrix4x4 flipYZ = new Matrix4x4();
-		flipYZ.SetRow(0, new Vector4(1f,0f,0f,0f));
-		flipYZ.SetRow(1, new Vector4(0f,1f,0f,0f));
-		flipYZ.SetRow(2, new Vector4(0f,0f,-1f,0f));
-		flipYZ.SetRow(3, new Vector4(0f,0f,0f,1f));
-
-		//the way we are making this quaternion is impacting the correctness (i.e. we need to do it eventhough the angle is zero, for things to work)
-		
-		//Debug.Log(viewMatrix.ToString("F6"));
-		
-		Matrix4x4 cTransform = GetCamTransform();
-
-#if NO_PROJECT
-		Matrix4x4 rotateToARCamera = flipYZ;
-#else
-		Matrix4x4 rotateToARCamera = flipYZ * cTransform;
-#endif
-		Matrix4x4 theMatrix = viewInverse * rotateToARCamera;
-
-		Matrix4x4 camIntrinsics = Matrix4x4.identity;
-
-		//we want to pass in the data to compute buffers and calculate that way..
-		//viewProjMatrix = projMatrix * theMatrix.inverse;
-
-		_tsdfShader.SetMatrix("localToWorld", theMatrix);
-		_tsdfShader.SetMatrix("displayMatrix", lastDisplayMatrix);
-		_tsdfShader.SetMatrix("viewProjMatrix", viewProjMatrix);
-
-		if(Screen.orientation == ScreenOrientation.Portrait || Screen.orientation == ScreenOrientation.PortraitUpsideDown)
-		{
-			//these could be set on re-orientation...
-			camIntrinsics.SetColumn(0, new Vector4(cameraIntrinsics.focalLength.x, 0f, 0f, 0f));
-			camIntrinsics.SetColumn(1, new Vector4(0f, cameraIntrinsics.focalLength.y, 0f, 0f));
-			camIntrinsics.SetColumn(2, new Vector4(cameraIntrinsics.principalPoint.y, cameraIntrinsics.principalPoint.x, 1f, 0f));
-		}
-		else
-		{
-			camIntrinsics.SetColumn(0, new Vector4(cameraIntrinsics.focalLength.x, 0f, 0f, 0f));
-			camIntrinsics.SetColumn(1, new Vector4(0f, cameraIntrinsics.focalLength.y, 0f, 0f));
-			camIntrinsics.SetColumn(2, new Vector4(cameraIntrinsics.principalPoint.x, cameraIntrinsics.principalPoint.y, 1f, 0f));
-		}
-
-		_tsdfShader.SetMatrix("camIntrinsicsInverse", camIntrinsics.inverse);
-	
-		_tsdfShader.SetBuffer(octantComputeID, "octantBuffer", octantBuffer);
-		_tsdfShader.SetTexture(octantComputeID, "depthTexture", _renderTargetDepthV);
-		_tsdfShader.SetTexture(octantComputeID, "confTexture", _renderTargetConfV);
-		_tsdfShader.Dispatch(octantComputeID, ((int)_currWidth + 31) / 32, ((int)_currHeight + 31) / 32, 1);*/
+		//octreeShader.SetBuffer(octantComputeID, "octantBuffer", octantBuffer);
+		//octreeShader.SetTexture(octantComputeID, "depthTexture", _depthRT);
+		//octreeShader.SetTexture(octantComputeID, "confTexture", _renderTargetConfV);
+		_tsdfShader.Dispatch(octantComputeID, ((int)_currWidth + 31) / 32, ((int)_currHeight + 31) / 32, 1);
 	}
-
-	
-	
 }

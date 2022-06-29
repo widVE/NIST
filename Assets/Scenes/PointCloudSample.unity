@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
+  m_IndirectSpecularColor: {r: 0.37099704, g: 0.37852412, b: 0.35739636, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1194,8 +1194,8 @@ MonoBehaviour:
   _writeTime: 3
   _performTSDFReconstruction: 0
   _tsdfShader: {fileID: 0}
+  _pointRenderTexture: {fileID: 0}
   _writeImagesToDisk: 0
-  _writePosToEdge: 0
   _showImagesInView: 0
 --- !u!4 &891080481
 Transform:
