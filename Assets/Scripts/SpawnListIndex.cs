@@ -7,11 +7,10 @@ public class SpawnListIndex : MonoBehaviour
 {
     public EasyVizARHeadsetManager manager;
 
-
     public List<GameObject> spawn_list = null;
     public GameObject spawn_root;
     public GameObject spawn_parent;
-    public GameObject curr_headset;
+    //public GameObject curr_headset;
     public float offset_distance_z = 1;
 
     [System.Serializable]
@@ -21,11 +20,11 @@ public class SpawnListIndex : MonoBehaviour
         public Vector3 position;
     }
 
-     void GetLocation(string result)
+    void GetLocation(string result)
     {
         if (result != "error")
         {
-            //Debug.Log(resultData);
+            Debug.Log(result);
         }
         else
         {
@@ -46,30 +45,37 @@ public class SpawnListIndex : MonoBehaviour
         //Using a empty offset connected to the main camera as our spawn target works well and is easy to 
         //visualize in the editor
 
-        Instantiate(maker_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
+        GameObject cloned_marker = Instantiate(maker_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
 
         //Create our feature to be sent via JSON
 
         EasyVizAR.Feature feature_to_post = new EasyVizAR.Feature();
 
-        feature_to_post.created = System.DateTime.Now;
+        feature_to_post.created = ((float)System.DateTime.Now.Hour + ((float)System.DateTime.Now.Minute*0.01f));
         //placeholder name of creator
         feature_to_post.createdBy = "Test Marker";
         //is the ID assigned by the server? we don't know
         feature_to_post.id = 1;
         feature_to_post.name = "Hallway Fire";
-        feature_to_post.position = maker_to_spawn.transform.position;
-        feature_to_post.type "hazard";
+        feature_to_post.position = cloned_marker.transform.position;
+        
+        //This doesn't work but why? The transform should be set, but it's realitve
+        //feature_to_post.position = maker_to_spawn.transform.position;
+        //We figured it out!! it's becase the marker to spawn is the template and not the actual game object
+        //that gets made via instantiate. We now have a reference to it via the cloned_marker and so we can
+        //access the correct transformation yey
+        
+        
+        feature_to_post.type = "hazard";
         //This isn't correct right now. We need to have an update
         //call when the obejct in manipulated.
-        feature_to_post.updated = System.DateTime.Now;
+        feature_to_post.updated = ((float)System.DateTime.Now.Hour + ((float)System.DateTime.Now.Minute * 0.01f));
 
         //Serialize the feature into JSON
         var data = JsonUtility.ToJson(feature_to_post);
 
         //for sending stuff to the server 
-        EasyVizARServer.Instance.Post("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE,data,  GetLocation);
-
+        EasyVizARServer.Instance.Post("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, data, GetLocation);
     }
 
 }
