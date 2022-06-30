@@ -358,7 +358,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 561901448}
-  feature_id: -1
+  feature_list:
+    features: []
+  featureID: 34
 --- !u!1 &349520856
 GameObject:
   m_ObjectHideFlags: 0
