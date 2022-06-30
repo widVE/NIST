@@ -1193,10 +1193,10 @@ MonoBehaviour:
   _depthCopyMaterial: {fileID: 2100000, guid: e2751f21b4f612748b9979193f5a11ad, type: 2}
   _writeTime: 3
   _performTSDFReconstruction: 0
-  _tsdfShader: {fileID: 0}
-  _writeImagesToDisk: 0
-  _writePosToEdge: 0
-  _showImagesInView: 0
+  _tsdfShader: {fileID: 7200000, guid: 2940ca67a277a8c4998cf58e1466cf16, type: 3}
+  _pointRenderTexture: {fileID: 0}
+  _writeImagesToDisk: 1
+  _showImagesInView: 1
 --- !u!4 &891080481
 Transform:
   m_ObjectHideFlags: 0
@@ -1426,7 +1426,6 @@ GameObject:
   - component: {fileID: 1517424692}
   - component: {fileID: 1517424695}
   - component: {fileID: 1517424697}
-  - component: {fileID: 1517424698}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1538,29 +1537,6 @@ MonoBehaviour:
   m_InputActionsPerSecond: 10
   m_RepeatDelay: 0.5
   m_ForceModuleActive: 0
---- !u!114 &1517424698
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1517424691}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf98dd1206224111a38765365e98e207, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lockCursorWhenFocusLocked: 1
-  setCursorInvisibleWhenFocusLocked: 0
-  maxGazeCollisionDistance: 10
-  raycastLayerMasks:
-  - serializedVersion: 2
-    m_Bits: 4294967291
-  stabilizer:
-    storedStabilitySamples: 60
-  gazeTransform: {fileID: 0}
-  minHeadVelocityThreshold: 0.5
-  maxHeadVelocityThreshold: 2
 --- !u!1001 &1539913614
 PrefabInstance:
   m_ObjectHideFlags: 0
