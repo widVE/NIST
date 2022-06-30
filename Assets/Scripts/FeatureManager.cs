@@ -11,7 +11,7 @@ public class FeatureManager : MonoBehaviour
     public Dictionary<int, GameObject> feature_dictionary = new Dictionary<int, GameObject>();
     public EasyVizAR.FeatureList feature_list = new EasyVizAR.FeatureList();
     private GameObject markerHolder = null;
-
+    public int featureID = 32;
 
     // Start is called before the first frame update
     void Start()
@@ -45,6 +45,7 @@ public class FeatureManager : MonoBehaviour
 
     void GetFeatureCallBack(string result)
     {
+        var resultJSON = JsonUtility.FromJson<EasyVizAR.Feature>(result);
 
         if (result != "error")
         {
@@ -101,10 +102,10 @@ public class FeatureManager : MonoBehaviour
         //append to list 
         
     }
-
-    public void GetFeature(int id)
+    [ContextMenu("GetFeature")]
+    public void GetFeature()
     {
-
+       var id = featureID;
         EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features/" + id, EasyVizARServer.JSON_TYPE, GetFeatureCallBack);
 
 
