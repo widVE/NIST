@@ -8,8 +8,8 @@ public class FeatureManager : MonoBehaviour
     public EasyVizARHeadsetManager manager;
 
     // key as id, value as the GameObject (the marker placed)
-    public Dictionary<int, GameObject> marker_list = new Dictionary<int, GameObject>();
-    private int feature_id = -1;
+    public Dictionary<int, GameObject> feature_dictionary = new Dictionary<int, GameObject>();
+    public List<EasyVizAR.Feature> feature_list = new List<EasyVizAR.Feature>();
     private GameObject markerHolder = null;
 
 
@@ -39,11 +39,23 @@ public class FeatureManager : MonoBehaviour
         {
             Debug.Log("ERROR: " + result);
         }
-        marker_list.Add(resultJSON.id, markerHolder);
+        feature_dictionary.Add(resultJSON.id, markerHolder);
+       
     }
 
-    void GetFeature(string result)
+    void GetFeatureCallBack(string result)
     {
+
+        if (result != "error")
+        {
+            Debug.Log("SUCCESS: " + result);
+
+        }
+        else
+        {
+            Debug.Log("ERROR: " + result);
+        }
+
 
     }
 
@@ -93,12 +105,29 @@ public class FeatureManager : MonoBehaviour
     public void GetFeature(int id)
     {
 
-        //EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features" + , EasyVizARServer.JSON_TYPE, data, GetLocation);
-
+        EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features/" + id, EasyVizARServer.JSON_TYPE, GetFeatureCallBack);
 
 
     }
 
+    public void ListFeatures()
+    {
+        EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
+    }
+
+    void ListFeatureCallBack(string result) {
+        if (result != "error")
+        {
+            Debug.Log("SUCCESS: " + result);
+            feature_list = JsonUtility.FromJson<List<EasyVizAR.Feature>>(result);
+
+        }
+        else
+        {
+            Debug.Log("ERROR: " + result);
+        }
+
+    }
 
 
     // might need this in the future, but just left it here for now
