@@ -73,11 +73,13 @@ public class QRScanner : MonoBehaviour
 
 		if(!UnityEditor.SessionState.GetBool("FirstInitDone", false))
 		{
+			Debug.Log("Request Async Editor");
+			UnityEditor.SessionState.SetBool("FirstInitDone", true);
+			
 			var status = QRCodeWatcher.RequestAccessAsync().Result;
+			
 			if (status != QRCodeWatcherAccessStatus.Allowed)
 				return;
-			
-			UnityEditor.SessionState.SetBool("FirstInitDone", true);
 		}
 #else
 		// Ask for permission to use the QR code tracking system
@@ -127,7 +129,7 @@ public class QRScanner : MonoBehaviour
 	}
 
 	// For shutdown, we just need to stop the watcher
-	void DestroyObject()
+	void OnDestroy()
 	{
 		Debug.Log("Stopping QR Watcher");
 		// Why is there a question mark here?
