@@ -9,7 +9,8 @@ public class FeatureManager : MonoBehaviour
 
     // key as id, value as the GameObject (the marker placed)
     public Dictionary<int, GameObject> marker_list = new Dictionary<int, GameObject>();
-    public int feature_id = -1; 
+    private int feature_id = -1;
+    private GameObject markerHolder = null;
 
 
     // Start is called before the first frame update
@@ -25,16 +26,20 @@ public class FeatureManager : MonoBehaviour
     }
 
     // a callback function
-    void GetLocation(string result)
+    void PostFeature(string result)
     {
+        var resultJSON = JsonUtility.FromJson<EasyVizAR.Feature>(result);
+        
         if (result != "error")
-        {
-            Debug.Log(result);
+        { 
+            Debug.Log("SUCCESS: " + result);
+           
         }
         else
         {
+            Debug.Log("ERROR: " + result);
         }
-
+        marker_list.Add(resultJSON.id, markerHolder);
     }
 
     // POST 
@@ -68,16 +73,24 @@ public class FeatureManager : MonoBehaviour
         
         //Serialize the feature into JSON
         var data = JsonUtility.ToJson(feature_to_post);
-
+        Debug.Log("Json utility: " + feature_to_post.id);
+        Debug.Log("locations/" + manager.LocationID + "/features");
         //for sending stuff to the server 
-        EasyVizARServer.Instance.Post("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, data, GetLocation);
+        
+        EasyVizARServer.Instance.Post("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, data, PostFeature);
+       
+        
+        markerHolder = marker;
         //append to list 
         
-        //marker_list.Add(feature_id, marker); // TODO: ask about the feature_id 
     }
 
     public void GetFeature(int id)
     {
+
+       // EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features" + , EasyVizARServer.JSON_TYPE, data, GetLocation);
+
+
 
     }
 

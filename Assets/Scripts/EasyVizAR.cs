@@ -134,7 +134,12 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	{
 		StartCoroutine(DoPOST(_baseURL+url, contentType, jsonData, callBack));
 	}
-	
+	public void Feature_Post(string url, string contentType, string jsonData, System.Action<object> callBack)
+	{
+		StartCoroutine(DoFeaturePOST(_baseURL + url, contentType, jsonData, callBack));
+	}
+
+
 	public void Patch(string url, string contentType, string jsonData, System.Action<string> callBack)
 	{
 		StartCoroutine(DoPATCH(_baseURL+url, contentType, jsonData, callBack));
@@ -204,6 +209,34 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		
 		www.Dispose();
 		callBack(result);
+	}
+
+	IEnumerator DoFeaturePOST(string url, string contentType, string jsonData, System.Action<object> callBack)
+	{
+		UnityWebRequest www = new UnityWebRequest(url, "POST");
+		www.SetRequestHeader("Content-Type", contentType);
+
+		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(jsonData);
+		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
+		www.downloadHandler = new DownloadHandlerBuffer();
+
+		yield return www.SendWebRequest();
+
+		string result = "";
+		if (www.result != UnityWebRequest.Result.Success)
+		{
+			result = "error";
+			//Debug.Log(www.error);
+		}
+		else
+		{
+			result = www.downloadHandler.text;
+			//Debug.Log("Form upload complete!");
+		}
+
+		
+		callBack(www.downloadHandler);
+		www.Dispose();
 	}
 
 	IEnumerator DoPATCH(string url, string contentType, string jsonData, System.Action<string> callBack)

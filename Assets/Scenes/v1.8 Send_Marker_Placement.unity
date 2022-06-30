@@ -298,6 +298,7 @@ GameObject:
   m_Component:
   - component: {fileID: 303111020}
   - component: {fileID: 303111021}
+  - component: {fileID: 303111022}
   m_Layer: 0
   m_Name: Marker Spawning
   m_TagString: Untagged
@@ -336,7 +337,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 561901448}
-  feature_manager: {fileID: 4050414068657230388, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
+  feature_manager: {fileID: 303111022}
   spawn_list:
   - {fileID: 5318789042369293505, guid: 407ca288127f083438f60ed7cf8ef487, type: 3}
   - {fileID: 5318789042369293505, guid: 87f7d5c97f1905d41b8ba2e58de72e21, type: 3}
@@ -344,6 +345,20 @@ MonoBehaviour:
   spawn_root: {fileID: 1208393620}
   spawn_parent: {fileID: 1968206798}
   offset_distance_z: 1
+--- !u!114 &303111022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 303111019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1016ef682c6729c47b1a27ae83049812, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  manager: {fileID: 561901448}
+  feature_id: -1
 --- !u!1 &349520856
 GameObject:
   m_ObjectHideFlags: 0
