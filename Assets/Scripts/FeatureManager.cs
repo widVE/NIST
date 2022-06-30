@@ -42,6 +42,11 @@ public class FeatureManager : MonoBehaviour
         marker_list.Add(resultJSON.id, markerHolder);
     }
 
+    void GetFeature(string result)
+    {
+
+    }
+
     // POST 
     public void CreateNewFeature(int index, GameObject marker)
     {
@@ -88,7 +93,7 @@ public class FeatureManager : MonoBehaviour
     public void GetFeature(int id)
     {
 
-       // EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features" + , EasyVizARServer.JSON_TYPE, data, GetLocation);
+        //EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features" + , EasyVizARServer.JSON_TYPE, data, GetLocation);
 
 
 
