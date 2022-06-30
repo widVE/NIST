@@ -91,6 +91,12 @@ namespace EasyVizAR
 	}
 
 	[System.Serializable]
+	public class FeatureList
+	{
+		public Feature[] features;
+	}
+
+	[System.Serializable]
 	public class Feature
 	{
 		public string color;

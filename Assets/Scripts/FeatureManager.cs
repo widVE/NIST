@@ -9,7 +9,7 @@ public class FeatureManager : MonoBehaviour
 
     // key as id, value as the GameObject (the marker placed)
     public Dictionary<int, GameObject> feature_dictionary = new Dictionary<int, GameObject>();
-    public List<EasyVizAR.Feature> feature_list = new List<EasyVizAR.Feature>();
+    public EasyVizAR.FeatureList feature_list = new EasyVizAR.FeatureList();
     private GameObject markerHolder = null;
 
 
@@ -109,7 +109,7 @@ public class FeatureManager : MonoBehaviour
 
 
     }
-
+    [ContextMenu("ListFeatures")]
     public void ListFeatures()
     {
         EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
@@ -119,7 +119,8 @@ public class FeatureManager : MonoBehaviour
         if (result != "error")
         {
             Debug.Log("SUCCESS: " + result);
-            feature_list = JsonUtility.FromJson<List<EasyVizAR.Feature>>(result);
+            feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList> ("{\"features\":" + result + "}"); 
+
 
         }
         else
