@@ -6,6 +6,7 @@ using UnityEngine;
 public class SpawnListIndex : MonoBehaviour
 {
     public EasyVizARHeadsetManager manager;
+    public FeatureManager feature_manager;
 
     public List<GameObject> spawn_list = null;
     public GameObject spawn_root;
@@ -51,11 +52,11 @@ public class SpawnListIndex : MonoBehaviour
 
         EasyVizAR.Feature feature_to_post = new EasyVizAR.Feature();
 
-        feature_to_post.created = ((float)System.DateTime.Now.Hour + ((float)System.DateTime.Now.Minute*0.01f));
+      //feature_to_post.created = ((float)System.DateTime.Now.Hour + ((float)System.DateTime.Now.Minute*0.01f));
         //placeholder name of creator
         feature_to_post.createdBy = "Test Marker";
         //is the ID assigned by the server? we don't know
-        feature_to_post.id = 1;
+      // feature_to_post.id = 1;
         feature_to_post.name = "Hallway Fire";
         feature_to_post.position = cloned_marker.transform.position;
         
@@ -69,7 +70,8 @@ public class SpawnListIndex : MonoBehaviour
         feature_to_post.type = "hazard";
         //This isn't correct right now. We need to have an update
         //call when the obejct in manipulated.
-        feature_to_post.updated = ((float)System.DateTime.Now.Hour + ((float)System.DateTime.Now.Minute * 0.01f));
+        
+     //   feature_to_post.updated = ((float)System.DateTime.Now.Hour + ((float)System.DateTime.Now.Minute * 0.01f));
 
         //Serialize the feature into JSON
         var data = JsonUtility.ToJson(feature_to_post);

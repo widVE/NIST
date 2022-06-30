@@ -104,6 +104,16 @@ namespace EasyVizAR
 		public string type;
 		public float updated;
 	}
+
+    [System.Serializable]
+	public class FeatureDisplayStyle
+	{
+		public int leftOffset;
+		public string placement;
+		public int radius;
+		public int topOffset;
+
+    }
 }
 
 public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
