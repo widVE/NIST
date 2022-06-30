@@ -336,6 +336,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 561901448}
+  feature_manager: {fileID: 4050414068657230388, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
   spawn_list:
   - {fileID: 5318789042369293505, guid: 407ca288127f083438f60ed7cf8ef487, type: 3}
   - {fileID: 5318789042369293505, guid: 87f7d5c97f1905d41b8ba2e58de72e21, type: 3}
