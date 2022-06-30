@@ -1193,10 +1193,10 @@ MonoBehaviour:
   _depthCopyMaterial: {fileID: 2100000, guid: e2751f21b4f612748b9979193f5a11ad, type: 2}
   _writeTime: 3
   _performTSDFReconstruction: 0
-  _tsdfShader: {fileID: 0}
+  _tsdfShader: {fileID: 7200000, guid: 2940ca67a277a8c4998cf58e1466cf16, type: 3}
   _pointRenderTexture: {fileID: 0}
   _writeImagesToDisk: 0
-  _showImagesInView: 0
+  _showImagesInView: 1
 --- !u!4 &891080481
 Transform:
   m_ObjectHideFlags: 0
