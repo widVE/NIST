@@ -321,6 +321,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 #if INCLUDE_TSDF
 	void InitializeTSDF()
 	{
+		Debug.Log("Initializing TSDF");
+		
 		if(_tsdfShader != null)
 		{
 			if(processID == -1)
@@ -962,7 +964,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 						//scanTransPV is now the MVP matrix of the color camera, this is used to project back unprojected depth image data to the color image
 						//to look up what corresponding color matches the depth, if any
 
-						Matrix scanTrans = Matrix4x4.identity;
+						Matrix4x4 scanTrans = Matrix4x4.identity;
 						for(int i = 0; i < 16; ++i)
 						{
 							scanTrans[i] = depthPos[i];
@@ -1167,6 +1169,162 @@ public class ResearchModeVideoStream : MonoBehaviour
 		_isCapturing = false;
 	}
 	
+	void UnprojectPoints(int copyCount)
+	{
+		_tsdfShader.SetInt("numVolumes", copyCount);
+		_tsdfShader.Dispatch(processID, ((int)_currWidth + 31) / 32, ((int)_currHeight + 31) / 32, 1);
+	}
+
+	void WriteXYZ()
+	{
+		
+		string debugOut = Path.Combine(Application.persistentDataPath, DateTime.Now.ToString("M_dd_yyyy_hh_mm_ss")+".txt");
+		Debug.Log("Writing data to: " + debugOut);
+		
+		StreamWriter s = new StreamWriter(File.Open(debugOut, FileMode.Create));
+		if(s != null)
+		{
+			float gridSizeDiag = (float)1.1f * (float)(volumeBounds.magnitude / volumeGridSize.magnitude);
+			
+			Vector3Int octantDim = new Vector3Int((int)(volumeGridSize.x / cellDimensions.x), (int)(volumeGridSize.y / cellDimensions.y), (int)(volumeGridSize.z / cellDimensions.z));
+   
+			Vector3 octantLength = new Vector3((volumeBounds.x / volumeGridSize.x) * cellDimensions.x, (volumeBounds.y / volumeGridSize.y) * cellDimensions.y, (volumeBounds.z / volumeGridSize.z) * cellDimensions.z);
+			
+			Vector3 gridCellSize = new Vector3((volumeBounds.x / volumeGridSize.x), (volumeBounds.y / volumeGridSize.y), (volumeBounds.z / volumeGridSize.z));
+			
+			uint gridXY = (uint)(octantDim.x * octantDim.y);
+			uint gridYZ = (uint)(octantDim.y * octantDim.z);
+
+			if(gridXY == 0)
+			{
+				gridXY = 1;
+			}
+			
+			uint gridX = (uint)octantDim.x;
+			uint gridZ = (uint)octantDim.z;
+			
+			if(gridX == 0)
+			{
+				gridX = 1;
+			}
+
+			bigVolumeBuffer.GetData(bigVolumeData);
+			bigColorBuffer.GetData(bigColorData);
+
+			uint totalOs = 0;
+			for(uint i = 0; i < TOTAL_NUM_OCTANTS; ++i)
+			{
+				if(octantToBufferMapGPU[i] != -1)
+				{
+					totalOs++;
+				}
+			}
+			
+			ushort posOne = UnityEngine.Mathf.FloatToHalf(1.0f);
+			byte[] posOneBytes = System.BitConverter.GetBytes(posOne);
+
+			byte[] bigVolumeCPUData2 = new byte[totalOs * TOTAL_CELLS * sizeof(ushort)];
+			byte[] bigColorCPUData2 = new byte[totalOs * TOTAL_CELLS * sizeof(uint)];
+
+			uint totalCPUMem = totalOs * TOTAL_CELLS * sizeof(ushort);
+			for(uint i = 0; i < totalCPUMem; i+=2)
+			{
+				System.Buffer.BlockCopy(posOneBytes, 0, bigVolumeCPUData2, (int)i, sizeof(ushort));
+			}
+
+			uint totalCPUColorMem = totalOs * TOTAL_CELLS * sizeof(uint);
+			for(uint i = 0; i < totalCPUColorMem; ++i)
+			{
+				bigColorCPUData2[i] = 0;
+			}
+
+			totalOs = 0;
+			//List<uint> keysGPU = new List<uint>(octantToBufferMap.Keys);
+			for(uint i = 0; i < TOTAL_NUM_OCTANTS; ++i)
+			//for(int k = 0; k < keysGPU.Count; ++k)
+			{			
+				if(octantToBufferMapGPU[i] != -1)
+				{
+					//System.Buffer.BlockCopy(bigVolumeData, (int)octantToBufferMapGPU[i], bigVolumeCPUData, (int)octantToBufferMapCPU[i], (int)GRID_BYTE_COUNT);
+					//System.Buffer.BlockCopy(bigColorData, (int)colorToBufferMap[i], bigColorCPUData, (int)colorToBufferMapCPU[i], (int)COLOR_BYTE_COUNT);
+
+					System.Buffer.BlockCopy(bigVolumeData, (int)octantToBufferMapGPU[i], bigVolumeCPUData2, (int)totalOs * (int)GRID_BYTE_COUNT, (int)GRID_BYTE_COUNT);
+					System.Buffer.BlockCopy(bigColorData, (int)colorToBufferMap[i], bigColorCPUData2, (int)totalOs * (int)COLOR_BYTE_COUNT, (int)COLOR_BYTE_COUNT);
+
+					totalOs++;
+				}
+			}
+			//List<uint> keys = new List<uint>(octantToBufferMapCPU.Keys);
+			//for(int i = 0; i < keys.Count; ++i)
+			totalOs = 0;
+			for(int i = 0; i < TOTAL_NUM_OCTANTS; ++i)
+			{
+				if(octantToBufferMapGPU[i] != -1)
+				{
+					//uint z = (uint)keys[i] / gridXY;
+					//uint val = (uint)keys[i] - (z * gridXY);
+					uint z = (uint)i / gridXY;
+					uint val = (uint)i - (z * gridXY);
+					uint y = val / gridX;
+					uint x = val - (y * gridX);
+					
+					Vector3 vXYZ = new Vector3((float)x, (float)y, (float)z);
+					Vector3 offset = Vector3.zero;
+					offset.x = volumeOrigin.x - (volumeBounds.x * 0.5f) + vXYZ.x * octantLength.x;
+					offset.y = volumeOrigin.y - (volumeBounds.y * 0.5f) + vXYZ.y * octantLength.y;
+					offset.z = volumeOrigin.z - (volumeBounds.z * 0.5f) + vXYZ.z * octantLength.z;
+
+					int cdX = (int)cellDimensions.x;
+					int cdY = (int)cellDimensions.y;
+					int cdZ = (int)cellDimensions.z;
+					int cellSizeXY = cdX * cdY;
+					for(int j = 0; j < cdZ; ++j)
+					{
+						for(int k = 0; k < cdY; ++k)
+						{
+							for(int m = 0; m < cdX; ++m)
+							{
+								int bufIdx = m + k * cdX + j * cellSizeXY;
+
+								ushort halfUShort = System.BitConverter.ToUInt16(bigVolumeCPUData2, (int)totalOs * (int)GRID_BYTE_COUNT+bufIdx*2);
+								//ushort halfUShort = System.BitConverter.ToUInt16(bigVolumeCPUData, (int)octantToBufferMapCPU[keys[i]]+bufIdx*2);
+								float tsdf = UnityEngine.Mathf.HalfToFloat(halfUShort);
+								//s.Write(octantToBufferMapCPU[keys[i]]+bufIdx + " : " + tsdf + "\n");
+								//if(tsdf != 1.0)
+								if(tsdf >= -gridSizeDiag && tsdf <= gridSizeDiag)
+								{
+									byte wCount = bigColorCPUData2[totalOs * (int)COLOR_BYTE_COUNT+bufIdx*4+3];
+
+									if(wCount > 10)
+									{
+										float xPos = offset.x + (float)m * gridCellSize.x + 0.5f * gridCellSize.x;
+										float yPos = offset.y + (float)k * gridCellSize.y + 0.5f * gridCellSize.y;
+										float zPos = offset.z + (float)j * gridCellSize.z + 0.5f * gridCellSize.z;
+
+										s.Write(xPos.ToString("F4") + " " + yPos.ToString("F4") + " " + (-zPos).ToString("F4") + " ");
+
+										//float red = (float)bigColorCPUData[colorToBufferMapCPU[keys[i]]+bufIdx*4] / 255.0f;
+										//float green = (float)bigColorCPUData[colorToBufferMapCPU[keys[i]]+bufIdx*4+1] / 255.0f;
+										//float blue = (float)bigColorCPUData[colorToBufferMapCPU[keys[i]]+bufIdx*4+2] / 255.0f;
+										
+										float red = (float)bigColorCPUData2[totalOs * (int)COLOR_BYTE_COUNT+bufIdx*4] / 255.0f;
+										float green = (float)bigColorCPUData2[totalOs * (int)COLOR_BYTE_COUNT+bufIdx*4+1] / 255.0f;
+										float blue = (float)bigColorCPUData2[totalOs * (int)COLOR_BYTE_COUNT+bufIdx*4+2] / 255.0f;
+										
+										s.Write(red.ToString() + " " + green.ToString() + " " + blue.ToString() + "\n");
+									}
+								}
+							}
+						}
+					}
+
+					totalOs++;
+				}
+			}
+			s.Close();
+		}
+	}
+
 	//4/26/2022 - Ross T - this writes the color image to disk directly, but we aren't using this one at the moment
 	void OnCapturedPhotoToDisk(PhotoCapture.PhotoCaptureResult result)
 	{
