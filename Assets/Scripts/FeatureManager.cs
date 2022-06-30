@@ -38,7 +38,7 @@ public class FeatureManager : MonoBehaviour
     }
 
     // POST 
-    public void CreateNewFeature(GameObject marker)
+    public void CreateNewFeature(int index, GameObject marker)
     {
 
         EasyVizAR.Feature feature_to_post = new EasyVizAR.Feature();
@@ -48,7 +48,18 @@ public class FeatureManager : MonoBehaviour
       // feature_to_post.id = 1;
         feature_to_post.name = "Hallway Fire";
         feature_to_post.position = marker.transform.position;
-        feature_to_post.type = "hazard";
+        if (index == 0)
+        {
+            feature_to_post.type = "Hazard";
+        }
+        else if (index == 1)
+        {
+            feature_to_post.type = "Waypoint";
+        }
+        else
+        {
+            feature_to_post.type = "Injury";
+        }
 
         //   feature_to_post.updated = ((float)System.DateTime.Now.Hour + ((float)System.DateTime.Now.Minute * 0.01f));
         EasyVizAR.FeatureDisplayStyle style = new EasyVizAR.FeatureDisplayStyle();

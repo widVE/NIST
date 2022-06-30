@@ -45,7 +45,7 @@ public class SpawnListIndex : MonoBehaviour
         if (!feature_manager.marker_list.ContainsValue(cloned_marker))
         {
 
-            feature_manager.CreateNewFeature(cloned_marker);
+            feature_manager.CreateNewFeature(index, cloned_marker);
             // feature_manager.marker_list.Add();
         }
 
