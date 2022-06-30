@@ -100,7 +100,7 @@ namespace EasyVizAR
 		public string name;
 		//Are we using the predefined Vect3f or using our custom class
 		public Vector3 position;
-		//public sytle;
+		public FeatureDisplayStyle style;
 		public string type;
 		public float updated;
 	}
@@ -108,10 +108,10 @@ namespace EasyVizAR
     [System.Serializable]
 	public class FeatureDisplayStyle
 	{
-		public int leftOffset;
+		public float leftOffset;
 		public string placement;
-		public int radius;
-		public int topOffset;
+		public float radius;
+		public float topOffset;
 
     }
 }
