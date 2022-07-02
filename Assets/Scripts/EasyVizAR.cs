@@ -91,6 +91,13 @@ namespace EasyVizAR
 	}
 
 	[System.Serializable]
+	public class MapField
+	{
+		public string id;
+		public string name;
+	}
+
+	[System.Serializable]
 	public class FeatureList
 	{
 		public Feature[] features;
