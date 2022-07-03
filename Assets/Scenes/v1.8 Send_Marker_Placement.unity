@@ -207,6 +207,20 @@ MonoBehaviour:
   pointSize: 0.005
   pointCloudElem: {fileID: 7258565985952825044, guid: 0e103885be9aa884ebc9d16411d8b804, type: 3}
   pointCloudMaterial: {fileID: 2100000, guid: 410bd770d3b6d8943be1474daa7e822c, type: 2}
+--- !u!115 &236468377
+MonoScript:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  serializedVersion: 5
+  m_Script: 
+  m_DefaultReferences: {}
+  m_Icon: {fileID: 0}
+  m_ExecutionOrder: 0
+  m_ClassName: EasyVizARServer
+  m_Namespace: 
 --- !u!1 &278560614
 GameObject:
   m_ObjectHideFlags: 0
@@ -359,8 +373,569 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 561901448}
   feature_list:
-    features: []
-  featureID: 34
+    features:
+    - color: '#000000'
+      created: 18.55
+      createdBy: Test Marker
+      id: 10
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: warning
+      updated: 1.6566243e+9
+    - color: 
+      created: 19.13
+      createdBy: Test Marker
+      id: 28
+      name: Hallway Fire
+      position: {x: -0.6095938, y: 2.5301893, z: -3.1638284}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564616e+9
+    - color: 
+      created: 19.16
+      createdBy: Test Marker
+      id: 30
+      name: Hallway Fire
+      position: {x: 0.38175792, y: 0, z: -2.4073608}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564618e+9
+    - color: 
+      created: 0
+      createdBy: Test Marker
+      id: 41
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 1}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: Waypoint
+      updated: 1.656626e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 24
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 13.24
+      createdBy: Test Marker
+      id: 31
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 1}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6566135e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 7
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 4
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 3
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 20
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 0
+      createdBy: Test Marker
+      id: 34
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 1}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: Waypoint
+      updated: 1.6566227e+9
+    - color: 
+      created: 0
+      createdBy: Test Marker
+      id: 39
+      name: Hallway Fire
+      position: {x: 0.57347727, y: 0.023329316, z: 0.8188892}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: Waypoint
+      updated: 1.6566255e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 12
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 13.25
+      createdBy: Test Marker
+      id: 32
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 1}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6566135e+9
+    - color: 
+      created: 19.16
+      createdBy: Test Marker
+      id: 29
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 1}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564618e+9
+    - color: 
+      created: 0
+      createdBy: Test Marker
+      id: 33
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 1}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: Waypoint
+      updated: 1.6566223e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 19
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 21
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 5
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 19.1
+      createdBy: Test Marker
+      id: 26
+      name: Hallway Fire
+      position: {x: -3.3348267, y: -2.1814637, z: -3.3656266}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564614e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 17
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 8
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 16
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 9
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 0
+      createdBy: Test Marker
+      id: 42
+      name: Hallway Fire
+      position: {x: 0.58945715, y: 0.28147268, z: 0.7571746}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: Waypoint
+      updated: 1.6566263e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 14
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 19.13
+      createdBy: Test Marker
+      id: 27
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 1}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564616e+9
+    - color: '#cc6677'
+      created: 1.6536608e+9
+      createdBy: 
+      id: 1
+      name: Fire-2
+      position: {x: -7.5521793, y: 0, z: -5.8460803}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: fire
+      updated: 1.6564506e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 23
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 13
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 0
+      createdBy: Test Marker
+      id: 36
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 1}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: Waypoint
+      updated: 1.656625e+9
+    - color: 
+      created: 0
+      createdBy: Test Marker
+      id: 35
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 1}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: Waypoint
+      updated: 1.656624e+9
+    - color: 
+      created: 0
+      createdBy: Test Marker
+      id: 43
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 1}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: Waypoint
+      updated: 1.6566276e+9
+    - color: 
+      created: 0
+      createdBy: Test Marker
+      id: 40
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 1}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: Waypoint
+      updated: 1.6566258e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 15
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 0
+      createdBy: Test Marker
+      id: 38
+      name: Hallway Fire
+      position: {x: -0.9160358, y: -0.38377064, z: 0.11661291}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: Injury
+      updated: 1.6566253e+9
+    - color: 
+      created: 0
+      createdBy: Test Marker
+      id: 37
+      name: Hallway Fire
+      position: {x: -0.13143359, y: 0.036332227, z: 0.99065894}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: Waypoint
+      updated: 1.6566252e+9
+    - color: 
+      created: 19.1
+      createdBy: Test Marker
+      id: 25
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: -1.6880589}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564614e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 11
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 6
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 22
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+    - color: 
+      created: 18.55
+      createdBy: Test Marker
+      id: 18
+      name: Hallway Fire
+      position: {x: 0, y: 0, z: 0}
+      style:
+        leftOffset: 0
+        placement: point
+        radius: 0
+        topOffset: 0
+      type: hazard
+      updated: 1.6564605e+9
+  featureHolder:
+    color: 
+    created: 0
+    createdBy: 
+    id: 0
+    name: 
+    position: {x: 0, y: 0, z: 0}
+    style:
+      leftOffset: 0
+      placement: 
+      radius: 0
+      topOffset: 0
+    type: 
+    updated: 0
+  markerHolder: {fileID: 0}
+  featureID: 44
 --- !u!1 &349520856
 GameObject:
   m_ObjectHideFlags: 0
@@ -1291,6 +1866,51 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1517424694}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1368765917
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1368765919}
+  - component: {fileID: 1368765918}
+  m_Layer: 0
+  m_Name: EasyVizARServer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1368765918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1368765917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 236468377}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _baseURL: http://halo05.wings.cs.wisc.edu:5000/
+--- !u!4 &1368765919
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1368765917}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1414733494
 GameObject:

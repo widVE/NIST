@@ -43,10 +43,12 @@ public class SpawnListIndex : MonoBehaviour
 
         GameObject cloned_marker = Instantiate(maker_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
         Debug.Log("feature manager" + feature_manager);
-        if (!feature_manager.feature_dictionary.ContainsValue(cloned_marker))
+        if (!feature_manager.marker_dictionary.ContainsValue(cloned_marker))
         {
 
             feature_manager.CreateNewFeature(index, cloned_marker);
+            //for testing
+           // feature_manager.UpateFeature(32, cloned_marker);
             // feature_manager.marker_list.Add();
         }
 
