@@ -145,8 +145,8 @@ public class FeatureManager : MonoBehaviour
         Debug.Log("contain id?: " + feature_dictionary.ContainsKey(featureID));
 
 
-        var id = featureID;
-        var new_feature = markerHolder;
+        var id = featureID; // parameter 
+        var new_feature = markerHolder; // parameter
         if (feature_dictionary.ContainsKey(id))
         {
             
@@ -193,9 +193,47 @@ public class FeatureManager : MonoBehaviour
 
 
 
-    // might need this in the future, but just left it here for now
-    public void DeleteAllFeature()
+    [ContextMenu("DeleteFeature")]
+    public void DeleteFeature()
     {
+        var id = featureID; //parameter 
+
+        if (feature_dictionary.ContainsKey(id))
+        {
+            EasyVizAR.Feature delete_feature = feature_dictionary[id];
+            var data = JsonUtility.ToJson(delete_feature);
+            EasyVizARServer.Instance.Delete("locations/" + manager.LocationID + "/features/" + id, EasyVizARServer.JSON_TYPE, data, DeleteFeatureCallBack);
+
+        }
+
+        /*
+         foreach (EasyVizAR.Feature feature in feature_list)
+         {
+             if (feature.id == id)
+             {
+                 feature_list.Remove(feature);
+                 break;
+             }
+         }
+        */
+
+    }
+
+    void DeleteFeatureCallBack(string result)
+    {
+        if (result != "error")
+        {
+            Debug.Log("SUCCESS: " + result);
+            // update the respective dictionaries
+            feature_dictionary.Remove(featureID);
+            marker_dictionary.Remove(featureID);
+           
+
+        }
+        else
+        {
+            Debug.Log("ERROR: " + result);
+        }
 
     }
 }
