@@ -10,6 +10,7 @@ public class FeatureManager : MonoBehaviour
     // key as id, value as the GameObject (the marker placed)
     public Dictionary<int, EasyVizAR.Feature> feature_dictionary = new Dictionary<int, EasyVizAR.Feature>();
     public Dictionary<int, GameObject> feature_gameobj_dictionary = new Dictionary<int, GameObject>(); // a seperate dictionary for keeping track of Gameobject in the scene
+    public Dictionary<int, string> feature_type_dictionary = new Dictionary<int, string>();
     public EasyVizAR.FeatureList feature_list = new EasyVizAR.FeatureList();
     public EasyVizAR.Feature featureHolder = null;
     public GameObject markerHolder = null;
@@ -29,6 +30,36 @@ public class FeatureManager : MonoBehaviour
     {
         
     }
+
+    /*
+    public void GetFeatureType()
+    {
+        EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features/" + id, EasyVizARServer.JSON_TYPE, GetFeatureTypeCallback); // change path later
+
+    }
+
+    void GetFeatureTypeCallback()
+    {
+        var resultJSON = JsonUtility.FromJson<List<string>>(result);
+
+        if (result != "error")
+        {
+            Debug.Log("SUCCESS: " + result);
+            for (int i = 0; i < resultJSON.Count; i++)
+            {
+                feature_type_dictionary.Add(i, resultJSON[i]);
+
+            }
+
+
+        }
+        else
+        {
+            Debug.Log("ERROR: " + result);
+        }
+
+    }
+    */
 
     // a callback function
     void PostFeature(string result)
