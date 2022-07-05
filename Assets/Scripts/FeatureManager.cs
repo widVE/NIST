@@ -9,11 +9,14 @@ public class FeatureManager : MonoBehaviour
 
     // key as id, value as the GameObject (the marker placed)
     public Dictionary<int, EasyVizAR.Feature> feature_dictionary = new Dictionary<int, EasyVizAR.Feature>();
-    public Dictionary<int, GameObject> marker_dictionary = new Dictionary<int, GameObject>(); // a seperate dictionary for keeping track of Gameobject in the scene
+    public Dictionary<int, GameObject> feature_gameobj_dictionary = new Dictionary<int, GameObject>(); // a seperate dictionary for keeping track of Gameobject in the scene
     public EasyVizAR.FeatureList feature_list = new EasyVizAR.FeatureList();
     public EasyVizAR.Feature featureHolder = null;
     public GameObject markerHolder = null;
     public int featureID = 32; // also a temporary holder
+    public string color = "";
+    public string name = "";
+  
 
     // Start is called before the first frame update
     void Start()
@@ -43,7 +46,7 @@ public class FeatureManager : MonoBehaviour
         }
         Debug.Log("new ID added: " + resultJSON.id);
         feature_dictionary.Add(resultJSON.id, featureHolder);
-        marker_dictionary.Add(resultJSON.id, markerHolder);
+        feature_gameobj_dictionary.Add(resultJSON.id, markerHolder);
         Debug.Log("post contain id?: " + feature_dictionary.ContainsKey(resultJSON.id));
 
 
@@ -67,28 +70,92 @@ public class FeatureManager : MonoBehaviour
     }
 
     // POST 
-    public void CreateNewFeature(int index, GameObject marker)
+    public void CreateNewFeature(int feature_type, GameObject marker)
     {
 
         EasyVizAR.Feature feature_to_post = new EasyVizAR.Feature();
 
-      //feature_to_post.created = ((float)System.DateTime.Now.Hour + ((float)System.DateTime.Now.Minute*0.01f));
-        feature_to_post.createdBy = "Test Marker";
-      // feature_to_post.id = 1;
-        feature_to_post.name = "Hallway Fire";
+      
+        feature_to_post.createdBy = manager.LocationID;
+       
+        
         feature_to_post.position = marker.transform.position;
-        if (index == 0)
-        {
-            feature_to_post.type = "Hazard";
+        switch (feature_type) {
+            case 0: 
+                {
+                    feature_to_post.type = "ambulance";
+                    feature_to_post.name = "ambulance";
+                    break;
+                };
+            case 1:
+                {
+                    feature_to_post.type = "door";
+                    feature_to_post.name = "door";
+                    break;
+                };
+            case 2:
+                {
+                    feature_to_post.type = "elevator";
+                    feature_to_post.name = "elevator";
+                    break;
+                };
+            case 3:
+                {
+                    feature_to_post.type = "extinguisher";
+                    feature_to_post.name = "extinguisher";
+                    break;
+                };
+            case 4:
+                {
+                    feature_to_post.type = "fire";
+                    feature_to_post.name = "fire";
+                    break;
+                };
+            case 5:
+                {
+                    feature_to_post.type = "headset";
+                    feature_to_post.name = "headset";
+                    break;
+                };
+            case 6:
+                {
+                    feature_to_post.type = "injury";
+                    feature_to_post.name = "injury";
+                    break;
+                };
+            case 7:
+                {
+                    feature_to_post.type = "message";
+                    feature_to_post.name = "message";
+                    break;
+                };
+            case 8:
+                {
+                    feature_to_post.type = "object";
+                    feature_to_post.name = "object";
+                    break;
+                };
+            case 9:
+                {
+                    feature_to_post.type = "stairs";
+                    feature_to_post.name = "stairs";
+                    break;
+                };
+            case 10:
+                {
+                    feature_to_post.type = "user";
+                    feature_to_post.name = "user";
+                    break;
+                };
+            case 11:
+                {
+                    feature_to_post.type = "warning";
+                    feature_to_post.name = "warning";
+                    break;
+                };
         }
-        else if (index == 1)
-        {
-            feature_to_post.type = "Waypoint";
-        }
-        else
-        {
-            feature_to_post.type = "Injury";
-        }
+
+       
 
         //   feature_to_post.updated = ((float)System.DateTime.Now.Hour + ((float)System.DateTime.Now.Minute * 0.01f));
         EasyVizAR.FeatureDisplayStyle style = new EasyVizAR.FeatureDisplayStyle();
@@ -129,7 +196,6 @@ public class FeatureManager : MonoBehaviour
             Debug.Log("SUCCESS: " + result);
             feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList> ("{\"features\":" + result + "}"); 
 
-
         }
         else
         {
@@ -147,13 +213,27 @@ public class FeatureManager : MonoBehaviour
 
         var id = featureID; // parameter 
         var new_feature = markerHolder; // parameter
+        // the following feature will be specified by user
+        
         if (feature_dictionary.ContainsKey(id))
         {
-            
             //creating new feature
             EasyVizAR.Feature feature_to_patch = feature_dictionary[id];
+            if (color.Length != 0)
+            {
+                feature_to_patch.color = color;
+            }
+
+            if (name.Length != 0)
+            {
+                feature_to_patch.name = name;
+                feature_to_patch.type = name;
+            }
+
+
+
             Debug.Log("feature name: " + feature_to_patch.name);
-            feature_to_patch.name = "Updated name";
+           //eature_to_patch.name = "Updated name: ";
             // Main: updating the position
             feature_to_patch.position = new_feature.transform.position;
 
@@ -192,6 +272,18 @@ public class FeatureManager : MonoBehaviour
     }
 
 
+    // implement later
+    public void ReplaceFeature()
+    {
+
+    }
+
+    void ReplaceFeatureCallback()
+    {
+
+    }
+
+
 
     [ContextMenu("DeleteFeature")]
     public void DeleteFeature()
@@ -226,7 +318,7 @@ public class FeatureManager : MonoBehaviour
             Debug.Log("SUCCESS: " + result);
             // update the respective dictionaries
             feature_dictionary.Remove(featureID);
-            marker_dictionary.Remove(featureID);
+            feature_gameobj_dictionary.Remove(featureID);
            
 
         }

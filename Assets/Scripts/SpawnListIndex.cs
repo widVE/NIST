@@ -30,7 +30,7 @@ public class SpawnListIndex : MonoBehaviour
 
     public void spawnObjectAtIndex(int index)
     {
-        GameObject maker_to_spawn = spawn_list[index];
+        GameObject feature_to_spawn = spawn_list[index];
         
         //Wow, this turns out to be really tricky wehn doing it via script. this was giving really weird
         //results because of the local vs world coordniate spaces I was thinking in. This code does
@@ -41,12 +41,12 @@ public class SpawnListIndex : MonoBehaviour
         //Using a empty offset connected to the main camera as our spawn target works well and is easy to 
         //visualize in the editor
 
-        GameObject cloned_marker = Instantiate(maker_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
+        GameObject cloned_feature = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
         Debug.Log("feature manager" + feature_manager);
-        if (!feature_manager.marker_dictionary.ContainsValue(cloned_marker))
+        if (!feature_manager.feature_gameobj_dictionary.ContainsValue(cloned_feature))
         {
 
-            feature_manager.CreateNewFeature(index, cloned_marker);
+            feature_manager.CreateNewFeature(index, cloned_feature);
             //for testing
            // feature_manager.UpateFeature(32, cloned_marker);
             // feature_manager.marker_list.Add();
