@@ -89,6 +89,44 @@ namespace EasyVizAR
 	{
 		public PoseChange[] poseChanges;
 	}
+
+	[System.Serializable]
+	public class MapField
+	{
+		public string id;
+		public string name;
+	}
+
+	[System.Serializable]
+	public class FeatureList
+	{
+		public Feature[] features;
+	}
+
+	[System.Serializable]
+	public class Feature
+	{
+		public string color;
+		public float created;
+		public string createdBy;
+		public int id;
+		public string name;
+		//Are we using the predefined Vect3f or using our custom class
+		public Vector3 position;
+		public FeatureDisplayStyle style;
+		public string type;
+		public float updated;
+	}
+
+    [System.Serializable]
+	public class FeatureDisplayStyle
+	{
+		public float leftOffset;
+		public string placement;
+		public float radius;
+		public float topOffset;
+
+    }
 }
 
 public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
@@ -109,12 +147,18 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	{
 		StartCoroutine(DoPOST(_baseURL+url, contentType, jsonData, callBack));
 	}
-	
+
 	public void Patch(string url, string contentType, string jsonData, System.Action<string> callBack)
 	{
 		StartCoroutine(DoPATCH(_baseURL+url, contentType, jsonData, callBack));
 	}
-	
+
+	public void Delete (string url, string contentType, string jsonData, System.Action<string> callBack)
+	{
+		StartCoroutine(DoDELETE(_baseURL + url, contentType, jsonData, callBack));
+	}
+
+
 	public void Texture(string url, string contentType, string width, System.Action<Texture> callBack)
 	{
 		StartCoroutine(GetTexture(_baseURL+url, contentType, width, callBack));
@@ -207,7 +251,35 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		www.Dispose();
 		callBack(result);
 	}
-	
+
+	IEnumerator DoDELETE(string url, string contentType, string jsonData, System.Action<string> callBack)
+	{
+		UnityWebRequest www = new UnityWebRequest(url, "DELETE");
+		www.SetRequestHeader("Content-Type", contentType);
+
+		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(jsonData);
+		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
+		www.downloadHandler = new DownloadHandlerBuffer();
+
+		yield return www.SendWebRequest();
+
+		string result = "";
+		if (www.result != UnityWebRequest.Result.Success)
+		{
+			result = "error";
+			//Debug.Log(www.error);
+		}
+		else
+		{
+			result = www.downloadHandler.text;
+			//Debug.Log("Form upload complete!");
+		}
+
+		www.Dispose();
+		callBack(result);
+	}
+
+
 	IEnumerator GetTexture(string url, string contentType, string width, System.Action<Texture> callBack)
 	{
 		UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
@@ -250,4 +322,5 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			//current_layer_prefab.GetComponent<Renderer>().material.SetTexture("_BaseMap", my_text);
 		}
 	}
+
 }
