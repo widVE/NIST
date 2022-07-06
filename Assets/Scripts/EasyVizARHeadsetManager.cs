@@ -317,7 +317,53 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 			}
 		}
 	}
-	
+
+    public void CreateRemoteHeadset(EasyVizAR.Headset remoteHeadset)
+    {
+        GameObject s = Instantiate(_headsetPrefab, transform);
+        EasyVizARHeadset hs = s.GetComponent<EasyVizARHeadset>();
+        if(hs != null)
+        {
+            s.name = remoteHeadset.name;
+            hs.AssignValuesFromJson(remoteHeadset);
+            _activeHeadsets.Add(hs);
+        }
+    }
+
+    public void UpdateRemoteHeadset(string previousName, EasyVizAR.Headset remoteHeadset)
+    {
+        foreach(var hs in _activeHeadsets)
+        {
+            // We should be matching on headset ID because names can change and
+            // are also not guaranteed to be unique, though they should be.
+            if(hs.Name == previousName)
+            {
+                hs.AssignValuesFromJson(remoteHeadset);
+                return;
+            }
+        }
+
+        // The updated headset was not in our list, so make a new one.
+        CreateRemoteHeadset(remoteHeadset);
+    }
+
+    public void DeleteRemoteHeadset(string name)
+    {
+        int i = 0;
+        foreach(var hs in _activeHeadsets)
+        {
+            // Definitely should be matching on ID rather than name.
+            if(hs.Name == name)
+            {
+                Destroy(hs.gameObject);
+                _activeHeadsets.RemoveAt(i);
+                break;
+            }
+
+            i++;
+        }
+    }
+
 	void CreateHeadsetsCallback(string resultData)
 	{
 		Debug.Log(resultData);
@@ -350,14 +396,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 					}
 					else
 					{
-						GameObject s = Instantiate(_headsetPrefab, transform);
-						EasyVizARHeadset hs = s.GetComponent<EasyVizARHeadset>();
-						if(hs != null)
-						{
-							s.name = h.headsets[i].name;
-							hs.AssignValuesFromJson(h.headsets[i]);
-							_activeHeadsets.Add(hs);
-						}
+                        CreateRemoteHeadset(h.headsets[i]);
 					}
 				}
 			}
