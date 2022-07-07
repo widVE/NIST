@@ -8,8 +8,11 @@ public class FeatureManager : MonoBehaviour
     public EasyVizARHeadsetManager manager;
 
     // key as id, value as the GameObject (the marker placed)
-    public Dictionary<int, EasyVizAR.Feature> feature_dictionary = new Dictionary<int, EasyVizAR.Feature>();
+    public Dictionary<int, EasyVizAR.Feature> feature_dictionary = new Dictionary<int, EasyVizAR.Feature>(); // TODO: can delete this later after more integration
+
+    // Each GameObject now contains a field call obj_feature (in the script MarkerObject.cs) so that feature is now one of the fields of the GameObject 
     public Dictionary<int, GameObject> feature_gameobj_dictionary = new Dictionary<int, GameObject>(); // a seperate dictionary for keeping track of Gameobject in the scene
+
     public Dictionary<int, string> feature_type_dictionary = new Dictionary<int, string>();
     public EasyVizAR.FeatureList feature_list = new EasyVizAR.FeatureList();
     public EasyVizAR.Feature featureHolder = null;
@@ -77,8 +80,14 @@ public class FeatureManager : MonoBehaviour
         }
         Debug.Log("new ID added: " + resultJSON.id);
         feature_dictionary.Add(resultJSON.id, featureHolder);
+
+
+        // the line below will be kept, the ones above might get deleted in the future based on new implementation
+        markerHolder.AddComponent<MarkerObject>().feature = featureHolder; // TODO: test if this exist    
         feature_gameobj_dictionary.Add(resultJSON.id, markerHolder);
+        Debug.Log("added key?: " + feature_gameobj_dictionary.ContainsKey(resultJSON.id));
         Debug.Log("post contain id?: " + feature_dictionary.ContainsKey(resultJSON.id));
+
 
 
     }
@@ -192,6 +201,7 @@ public class FeatureManager : MonoBehaviour
         EasyVizAR.FeatureDisplayStyle style = new EasyVizAR.FeatureDisplayStyle();
         style.placement = "point";
         feature_to_post.style = style;
+
         
         //Serialize the feature into JSON
         var data = JsonUtility.ToJson(feature_to_post);
@@ -215,12 +225,14 @@ public class FeatureManager : MonoBehaviour
 
 
     }
+
+
     [ContextMenu("ListFeatures")]
-    public void ListFeatures()
+    public void ListFeatures() 
     {
         EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
     }
-
+    
     void ListFeatureCallBack(string result) {
         if (result != "error")
         {
@@ -234,6 +246,8 @@ public class FeatureManager : MonoBehaviour
         }
 
     }
+
+    
 
     [ContextMenu("UpateFeature")]
     public void UpateFeature() //    public void UpateFeature(int id, GameObject new_feature)
@@ -359,4 +373,7 @@ public class FeatureManager : MonoBehaviour
         }
 
     }
+
+
+
 }
