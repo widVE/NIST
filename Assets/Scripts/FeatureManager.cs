@@ -13,7 +13,8 @@ public class FeatureManager : MonoBehaviour
     // Each GameObject now contains a field call obj_feature (in the script MarkerObject.cs) so that feature is now one of the fields of the GameObject 
     public Dictionary<int, GameObject> feature_gameobj_dictionary = new Dictionary<int, GameObject>(); // a seperate dictionary for keeping track of Gameobject in the scene
 
-    public Dictionary<int, string> feature_type_dictionary = new Dictionary<int, string>();
+    public Dictionary<string, GameObject> feature_type_dictionary = new Dictionary<string, GameObject>(); // contains all possible marker objects
+    
     public EasyVizAR.FeatureList feature_list = new EasyVizAR.FeatureList();
     public EasyVizAR.Feature featureHolder = null;
     public GameObject markerHolder = null;
@@ -65,30 +66,48 @@ public class FeatureManager : MonoBehaviour
     */
 
     // a callback function
-    void PostFeature(string result)
+     void PostFeature(string result)
     {
         var resultJSON = JsonUtility.FromJson<EasyVizAR.Feature>(result);
-        
         if (result != "error")
         { 
             Debug.Log("SUCCESS: " + result);
+            ListFeatures();
+            Debug.Log("number of element for features: " + feature_list.features.Length);
+            int found = 0;
+            foreach (EasyVizAR.Feature feature in feature_list.features)
+            {
+                if (feature.id == resultJSON.id)
+                {
+                    found = 1; 
+                } 
+            }
+            if (found == 1)
+            {
+                Debug.Log("new ID added: " + resultJSON.id);
+                feature_dictionary.Add(resultJSON.id, featureHolder);
+
+
+                // the line below will be kept, the ones above might get deleted in the future based on new implementation
+                markerHolder.AddComponent<MarkerObject>().feature = featureHolder; // TODO: test if this exist    
+                feature_gameobj_dictionary.Add(resultJSON.id, markerHolder);
+                Debug.Log("added key?: " + feature_gameobj_dictionary.ContainsKey(resultJSON.id));
+                Debug.Log("Contains id 61?: " + feature_gameobj_dictionary.ContainsKey(61));
+                Debug.Log("post contain id?: " + feature_dictionary.ContainsKey(resultJSON.id));
+                Debug.Log("Post: number of elements in dictionary right now: " + feature_gameobj_dictionary.Count);
+                found = 0;
+            }
+            else
+            {
+                Debug.Log("error in adding things to dictionary");
+            }
+
 
         }
         else
         {
             Debug.Log("ERROR: " + result);
         }
-        Debug.Log("new ID added: " + resultJSON.id);
-        feature_dictionary.Add(resultJSON.id, featureHolder);
-
-
-        // the line below will be kept, the ones above might get deleted in the future based on new implementation
-        markerHolder.AddComponent<MarkerObject>().feature = featureHolder; // TODO: test if this exist    
-        feature_gameobj_dictionary.Add(resultJSON.id, markerHolder);
-        Debug.Log("added key?: " + feature_gameobj_dictionary.ContainsKey(resultJSON.id));
-        Debug.Log("post contain id?: " + feature_dictionary.ContainsKey(resultJSON.id));
-
-
 
     }
 
@@ -117,9 +136,12 @@ public class FeatureManager : MonoBehaviour
 
       
         feature_to_post.createdBy = manager.LocationID;
-       
-        
-        feature_to_post.position = marker.transform.position;
+
+        EasyVizAR.Position position = new EasyVizAR.Position();
+        position.x = (float)marker.transform.position.x;
+        position.y = (float)marker.transform.position.y;
+        position.z = (float)marker.transform.position.z;
+        feature_to_post.position = position;
         switch (feature_type) {
             case 0: 
                 {
@@ -237,8 +259,8 @@ public class FeatureManager : MonoBehaviour
         if (result != "error")
         {
             Debug.Log("SUCCESS: " + result);
-            feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList> ("{\"features\":" + result + "}"); 
-
+            this.feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList> ("{\"features\":" + result + "}");
+            Debug.Log("feature_list length: " + feature_list.features.Length);
         }
         else
         {
@@ -278,9 +300,14 @@ public class FeatureManager : MonoBehaviour
 
 
             Debug.Log("feature name: " + feature_to_patch.name);
-           //eature_to_patch.name = "Updated name: ";
+            //eature_to_patch.name = "Updated name: ";
             // Main: updating the position
-            feature_to_patch.position = new_feature.transform.position;
+            EasyVizAR.Position new_position = new EasyVizAR.Position();
+            new_position.x = (float)new_feature.transform.position.x;
+            new_position.y = (float)new_feature.transform.position.y;
+            new_position.z = (float)new_feature.transform.position.z;
+
+            feature_to_patch.position = new_position;
 
 
             // TODO: might want to modify the style?
@@ -317,7 +344,7 @@ public class FeatureManager : MonoBehaviour
     }
 
 
-    // implement later
+    // implement later but might not need it 
     public void ReplaceFeature()
     {
 

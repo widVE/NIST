@@ -6,8 +6,8 @@ using UnityEngine;
 public class SpawnListIndex : MonoBehaviour
 {
     public EasyVizARHeadsetManager manager;
-    public FeatureManager feature_manager = new FeatureManager(); // added
-    
+    public FeatureManager feature_manager;// = new FeatureManager(); // added
+
 
     public List<GameObject> spawn_list = null;
     public GameObject spawn_root;
@@ -43,11 +43,11 @@ public class SpawnListIndex : MonoBehaviour
 
         GameObject cloned_feature = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
         cloned_feature.AddComponent<MarkerObject>().index = index; // this might be useful for future if we want to change the object index
-        Debug.Log("feature manager" + feature_manager);
-        if (!feature_manager.feature_gameobj_dictionary.ContainsValue(cloned_feature))
+        Debug.Log("feature manager" + this.feature_manager);
+        if (!this.feature_manager.feature_gameobj_dictionary.ContainsValue(cloned_feature))
         {
 
-            feature_manager.CreateNewFeature(index, cloned_feature);
+            this.feature_manager.CreateNewFeature(index, cloned_feature);
             //for testing
            // feature_manager.UpateFeature(32, cloned_marker);
             // feature_manager.marker_list.Add();
@@ -59,13 +59,15 @@ public class SpawnListIndex : MonoBehaviour
     [ContextMenu("DisplayAllMarkers")]
     public void DisplayAllMarkers()
     {
-        feature_manager.ListFeatures(); // populating the feature_list 
-        
-        foreach (EasyVizAR.Feature feature in feature_manager.feature_list.features)
+        this.feature_manager.ListFeatures(); // populating the feature_list 
+        Debug.Log("contain 64?: " + this.feature_manager.feature_gameobj_dictionary.ContainsKey(64));
+        Debug.Log("number of elements in dictionary: " + this.feature_manager.feature_gameobj_dictionary.Count);
+
+        foreach (EasyVizAR.Feature feature in this.feature_manager.feature_list.features)
         {
             
-                GameObject marker_to_display = feature_manager.feature_gameobj_dictionary[feature.id];
-                Instantiate(marker_to_display, feature.position, marker_to_display.transform.rotation, spawn_parent.transform);
+                GameObject marker_to_display = this.feature_manager.feature_gameobj_dictionary[feature.id];
+                //Instantiate(marker_to_display, feature.position, marker_to_display.transform.rotation, spawn_parent.transform);
 
             
         }
