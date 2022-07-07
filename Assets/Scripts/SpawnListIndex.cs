@@ -56,8 +56,8 @@ public class SpawnListIndex : MonoBehaviour
     }
 
     // Displaying all the features for all Hololens 
-    [ContextMenu("DisplayAllMarkers")]
-    public void DisplayAllMarkers()
+    [ContextMenu("DisplayAllFeatureGameObjects")]
+    public void DisplayAllFeatureGameObjects()
     {
         this.feature_manager.ListFeatures(); // populating the feature_list 
         Debug.Log("contain 64?: " + this.feature_manager.feature_gameobj_dictionary.ContainsKey(64));

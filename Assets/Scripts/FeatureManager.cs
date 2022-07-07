@@ -26,7 +26,8 @@ public class FeatureManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        ListFeatures();
+            Debug.Log("number of element for features: " + feature_list.features.Length);
     }
 
     // Update is called once per frame
@@ -72,9 +73,11 @@ public class FeatureManager : MonoBehaviour
         if (result != "error")
         { 
             Debug.Log("SUCCESS: " + result);
-            ListFeatures();
-            Debug.Log("number of element for features: " + feature_list.features.Length);
+            
+            /*
             int found = 0;
+            Debug.Log("resultJsonid : -->>" + resultJSON.id);
+            
             foreach (EasyVizAR.Feature feature in feature_list.features)
             {
                 if (feature.id == resultJSON.id)
@@ -82,6 +85,7 @@ public class FeatureManager : MonoBehaviour
                     found = 1; 
                 } 
             }
+
             if (found == 1)
             {
                 Debug.Log("new ID added: " + resultJSON.id);
@@ -97,10 +101,15 @@ public class FeatureManager : MonoBehaviour
                 Debug.Log("Post: number of elements in dictionary right now: " + feature_gameobj_dictionary.Count);
                 found = 0;
             }
+            
             else
             {
                 Debug.Log("error in adding things to dictionary");
             }
+            */
+
+
+
 
 
         }
@@ -108,6 +117,25 @@ public class FeatureManager : MonoBehaviour
         {
             Debug.Log("ERROR: " + result);
         }
+
+        Debug.Log("new ID added: " + resultJSON.id);
+        feature_dictionary.Add(resultJSON.id, featureHolder);
+
+
+        // the line below will be kept, the ones above might get deleted in the future based on new implementation
+        markerHolder.AddComponent<MarkerObject>().feature = featureHolder; // TODO: test if this exist    
+        feature_gameobj_dictionary.Add(resultJSON.id, markerHolder);
+        Debug.Log("added key?: " + feature_gameobj_dictionary.ContainsKey(resultJSON.id));
+        Debug.Log("Contains id 61?: " + feature_gameobj_dictionary.ContainsKey(61));
+        Debug.Log("post contain id?: " + feature_dictionary.ContainsKey(resultJSON.id));
+        Debug.Log("Post: number of elements in dictionary right now: " + feature_gameobj_dictionary.Count);
+
+        // syncing features
+       //istFeatures();
+
+
+
+
 
     }
 
