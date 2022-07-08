@@ -8,12 +8,12 @@ public class FeatureManager : MonoBehaviour
     public EasyVizARHeadsetManager manager;
 
     // key as id, value as the GameObject (the marker placed)
-    public Dictionary<int, EasyVizAR.Feature> feature_dictionary = new Dictionary<int, EasyVizAR.Feature>(); // TODO: can delete this later after more integration
+   // public Dictionary<int, EasyVizAR.Feature> feature_dictionary = new Dictionary<int, EasyVizAR.Feature>(); // TODO: can delete this later after more integration
 
     // Each GameObject now contains a field call obj_feature (in the script MarkerObject.cs) so that feature is now one of the fields of the GameObject 
     public Dictionary<int, GameObject> feature_gameobj_dictionary = new Dictionary<int, GameObject>(); // a seperate dictionary for keeping track of Gameobject in the scene
 
-    public Dictionary<string, GameObject> feature_type_dictionary = new Dictionary<string, GameObject>(); // contains all possible marker objects
+    //public Dictionary<string, GameObject> feature_type_dictionary = new Dictionary<string, GameObject>(); // contains all possible marker objects
     
     public EasyVizAR.FeatureList feature_list = new EasyVizAR.FeatureList();
     public EasyVizAR.Feature featureHolder = null;
@@ -21,13 +21,13 @@ public class FeatureManager : MonoBehaviour
     public int featureID = 32; // also a temporary holder
     public string color = "";
     public string name = "";
-  
+
+
 
     // Start is called before the first frame update
     void Start()
     {
-        ListFeatures();
-            Debug.Log("number of element for features: " + feature_list.features.Length);
+
     }
 
     // Update is called once per frame
@@ -36,35 +36,6 @@ public class FeatureManager : MonoBehaviour
         
     }
 
-    /*
-    public void GetFeatureType()
-    {
-        EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features/" + id, EasyVizARServer.JSON_TYPE, GetFeatureTypeCallback); // change path later
-
-    }
-
-    void GetFeatureTypeCallback()
-    {
-        var resultJSON = JsonUtility.FromJson<List<string>>(result);
-
-        if (result != "error")
-        {
-            Debug.Log("SUCCESS: " + result);
-            for (int i = 0; i < resultJSON.Count; i++)
-            {
-                feature_type_dictionary.Add(i, resultJSON[i]);
-
-            }
-
-
-        }
-        else
-        {
-            Debug.Log("ERROR: " + result);
-        }
-
-    }
-    */
 
     // a callback function
      void PostFeature(string result)
@@ -73,44 +44,6 @@ public class FeatureManager : MonoBehaviour
         if (result != "error")
         { 
             Debug.Log("SUCCESS: " + result);
-            
-            /*
-            int found = 0;
-            Debug.Log("resultJsonid : -->>" + resultJSON.id);
-            
-            foreach (EasyVizAR.Feature feature in feature_list.features)
-            {
-                if (feature.id == resultJSON.id)
-                {
-                    found = 1; 
-                } 
-            }
-
-            if (found == 1)
-            {
-                Debug.Log("new ID added: " + resultJSON.id);
-                feature_dictionary.Add(resultJSON.id, featureHolder);
-
-
-                // the line below will be kept, the ones above might get deleted in the future based on new implementation
-                markerHolder.AddComponent<MarkerObject>().feature = featureHolder; // TODO: test if this exist    
-                feature_gameobj_dictionary.Add(resultJSON.id, markerHolder);
-                Debug.Log("added key?: " + feature_gameobj_dictionary.ContainsKey(resultJSON.id));
-                Debug.Log("Contains id 61?: " + feature_gameobj_dictionary.ContainsKey(61));
-                Debug.Log("post contain id?: " + feature_dictionary.ContainsKey(resultJSON.id));
-                Debug.Log("Post: number of elements in dictionary right now: " + feature_gameobj_dictionary.Count);
-                found = 0;
-            }
-            
-            else
-            {
-                Debug.Log("error in adding things to dictionary");
-            }
-            */
-
-
-
-
 
         }
         else
@@ -119,7 +52,7 @@ public class FeatureManager : MonoBehaviour
         }
 
         Debug.Log("new ID added: " + resultJSON.id);
-        feature_dictionary.Add(resultJSON.id, featureHolder);
+        //feature_dictionary.Add(resultJSON.id, featureHolder);
 
 
         // the line below will be kept, the ones above might get deleted in the future based on new implementation
@@ -127,14 +60,10 @@ public class FeatureManager : MonoBehaviour
         feature_gameobj_dictionary.Add(resultJSON.id, markerHolder);
         Debug.Log("added key?: " + feature_gameobj_dictionary.ContainsKey(resultJSON.id));
         Debug.Log("Contains id 61?: " + feature_gameobj_dictionary.ContainsKey(61));
-        Debug.Log("post contain id?: " + feature_dictionary.ContainsKey(resultJSON.id));
+        //Debug.Log("post contain id?: " + feature_dictionary.ContainsKey(resultJSON.id));
         Debug.Log("Post: number of elements in dictionary right now: " + feature_gameobj_dictionary.Count);
 
         // syncing features
-       //istFeatures();
-
-
-
 
 
     }
@@ -157,7 +86,7 @@ public class FeatureManager : MonoBehaviour
     }
 
     // POST 
-    public void CreateNewFeature(int feature_type, GameObject marker)
+    public void CreateNewFeature(string feature_type, GameObject marker) //TODO: change the feature_type from int to string
     {
 
         EasyVizAR.Feature feature_to_post = new EasyVizAR.Feature();
@@ -170,6 +99,300 @@ public class FeatureManager : MonoBehaviour
         position.y = (float)marker.transform.position.y;
         position.z = (float)marker.transform.position.z;
         feature_to_post.position = position;
+
+        feature_to_post.type = feature_type;
+
+        EasyVizAR.FeatureDisplayStyle style = new EasyVizAR.FeatureDisplayStyle();
+        style.placement = "point";
+        feature_to_post.style = style;
+
+        
+        //Serialize the feature into JSON
+        var data = JsonUtility.ToJson(feature_to_post);
+        Debug.Log("Json utility: " + feature_to_post.id);
+        Debug.Log("locations/" + manager.LocationID + "/features");
+        //for sending stuff to the server 
+        
+        EasyVizARServer.Instance.Post("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, data, PostFeature);
+       
+        
+        featureHolder = feature_to_post;
+        markerHolder = marker;
+        
+    }
+
+    [ContextMenu("GetFeature")]
+    public void GetFeature() //takes in id as parameter, for some reason Unity doesn't accept that convention
+    {
+       var id = featureID;
+        EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features/" + id, EasyVizARServer.JSON_TYPE, GetFeatureCallBack);
+
+
+    }
+
+
+    [ContextMenu("ListFeatures")]
+    public void ListFeatures() 
+    {
+        EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
+    }
+    
+    void ListFeatureCallBack(string result) {
+        if (result != "error")
+        {
+            Debug.Log("SUCCESS: " + result);
+            this.feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList> ("{\"features\":" + result + "}");
+            Debug.Log("feature_list length: " + feature_list.features.Length);
+        }
+        else
+        {
+            Debug.Log("ERROR: " + result);
+        }
+
+    }
+
+    
+
+    [ContextMenu("UpateFeature")]
+    public void UpateFeature() //    public void UpateFeature(int id, GameObject new_feature)
+    {
+        Debug.Log("reached update method");
+        Debug.Log("contain id?: " + feature_gameobj_dictionary.ContainsKey(featureID));
+
+
+        var id = featureID; // parameter 
+        var new_feature = markerHolder; // parameter
+        // the following feature will be specified by user
+        
+        if (feature_gameobj_dictionary.ContainsKey(id))
+        {
+            //creating new feature
+            EasyVizAR.Feature feature_to_patch = feature_gameobj_dictionary[id].GetComponent<MarkerObject>().feature;
+            if (color.Length != 0)
+            {
+                feature_to_patch.color = color;
+            }
+
+            if (name.Length != 0)
+            {
+                feature_to_patch.name = name;
+                feature_to_patch.type = name;
+            }
+
+
+
+            Debug.Log("feature name: " + feature_to_patch.name);
+            //eature_to_patch.name = "Updated name: ";
+            // Main: updating the position
+            EasyVizAR.Position new_position = new EasyVizAR.Position();
+            new_position.x = (float)new_feature.transform.position.x;
+            new_position.y = (float)new_feature.transform.position.y;
+            new_position.z = (float)new_feature.transform.position.z;
+
+            feature_to_patch.position = new_position;
+
+
+            // TODO: might want to modify the style?
+            //feature_to_patch.style.placement = "point";
+
+            //Serialize the feature into JSON
+            var data = JsonUtility.ToJson(feature_to_patch);
+
+
+            // updates the dictionary
+            featureHolder = feature_to_patch;
+            featureID = id;
+            EasyVizARServer.Instance.Patch("locations/" + manager.LocationID + "/features/" + id, EasyVizARServer.JSON_TYPE, data, UpdateFeatureCallback);
+
+        }
+
+    }
+
+    void UpdateFeatureCallback(string result)
+    {
+        Debug.Log("reached update callback method");
+        if (result != "error")
+        {
+            Debug.Log("SUCCESS: " + result);
+            // updates the dictionary
+            Destroy(feature_gameobj_dictionary[featureID].GetComponent<MarkerObject>());
+            feature_gameobj_dictionary[featureID].AddComponent<MarkerObject>().feature = featureHolder;
+
+        }
+        else
+        {
+            Debug.Log("ERROR: " + result);
+        }
+
+    }
+
+
+    // implement later but might not need it 
+    public void ReplaceFeature()
+    {
+
+    }
+
+    void ReplaceFeatureCallback()
+    {
+
+    }
+    [ContextMenu("DeleteFeature")]
+    public void DeleteFeature()
+    {
+        var id = featureID; //parameter 
+
+        if (feature_gameobj_dictionary.ContainsKey(id))
+        {
+            EasyVizAR.Feature delete_feature = feature_gameobj_dictionary[id].GetComponent<MarkerObject>().feature;
+            var data = JsonUtility.ToJson(delete_feature);
+            EasyVizARServer.Instance.Delete("locations/" + manager.LocationID + "/features/" + id, EasyVizARServer.JSON_TYPE, data, DeleteFeatureCallBack);
+
+        }
+    }
+
+    void DeleteFeatureCallBack(string result)
+    {
+        if (result != "error")
+        {
+            Debug.Log("SUCCESS: " + result);
+            // update the respective dictionaries
+            feature_gameobj_dictionary.Remove(featureID);
+
+
+        }
+        else
+        {
+            Debug.Log("ERROR: " + result);
+        }
+
+    }
+
+
+    /*
+    [ContextMenu("DeleteFeature")]
+    public void DeleteFeature()
+    {
+        var id = featureID; //parameter 
+
+        if (feature_dictionary.ContainsKey(id))
+        {
+            EasyVizAR.Feature delete_feature = feature_dictionary[id];
+            var data = JsonUtility.ToJson(delete_feature);
+            EasyVizARServer.Instance.Delete("locations/" + manager.LocationID + "/features/" + id, EasyVizARServer.JSON_TYPE, data, DeleteFeatureCallBack);
+
+        }
+    }
+
+    void DeleteFeatureCallBack(string result)
+    {
+        if (result != "error")
+        {
+            Debug.Log("SUCCESS: " + result);
+            // update the respective dictionaries
+            feature_dictionary.Remove(featureID);
+            feature_gameobj_dictionary.Remove(featureID);
+           
+
+        }
+        else
+        {
+            Debug.Log("ERROR: " + result);
+        }
+
+    }
+    */
+    /*
+    [ContextMenu("UpateFeature")]
+    public void UpateFeature() //    public void UpateFeature(int id, GameObject new_feature)
+    {
+        Debug.Log("reached update method");
+        Debug.Log("contain id?: " + feature_dictionary.ContainsKey(featureID));
+
+
+        var id = featureID; // parameter 
+        var new_feature = markerHolder; // parameter
+                                        // the following feature will be specified by user
+
+        if (feature_gameobj_dictionary.ContainsKey(id))
+        {
+            //creating new feature
+            EasyVizAR.Feature feature_to_patch = feature_gameobj_dictionary[id].GetComponent<MarkerObject>().feature;
+            if (color.Length != 0)
+            {
+                feature_to_patch.color = color;
+            }
+
+            if (name.Length != 0)
+            {
+                feature_to_patch.name = name;
+                feature_to_patch.type = name;
+            }
+
+
+
+            Debug.Log("feature name: " + feature_to_patch.name);
+            //eature_to_patch.name = "Updated name: ";
+            // Main: updating the position
+            EasyVizAR.Position new_position = new EasyVizAR.Position();
+            new_position.x = (float)new_feature.transform.position.x;
+            new_position.y = (float)new_feature.transform.position.y;
+            new_position.z = (float)new_feature.transform.position.z;
+
+            feature_to_patch.position = new_position;
+
+
+            // TODO: might want to modify the style?
+            //feature_to_patch.style.placement = "point";
+
+            //Serialize the feature into JSON
+            var data = JsonUtility.ToJson(feature_to_patch);
+
+
+            // updates the dictionary
+            featureHolder = feature_to_patch;
+            featureID = id;
+            EasyVizARServer.Instance.Patch("locations/" + manager.LocationID + "/features/" + id, EasyVizARServer.JSON_TYPE, data, UpdateFeatureCallback);
+
+        }
+
+    }
+    */
+    /*
+    void UpdateFeatureCallback(string result)
+    {
+        Debug.Log("reached update callback method");
+        if (result != "error")
+        {
+            Debug.Log("SUCCESS: " + result);
+            // updates the dictionary
+            feature_dictionary[featureID] = featureHolder;
+
+        }
+        else
+        {
+            Debug.Log("ERROR: " + result);
+        }
+
+    }
+    */
+
+    /*
+    // ORIGINAL POST 
+    public void CreateNewFeature(int feature_type, GameObject marker) //TODO: change the feature_type from int to string
+    {
+
+        EasyVizAR.Feature feature_to_post = new EasyVizAR.Feature();
+
+
+        feature_to_post.createdBy = manager.LocationID;
+
+        EasyVizAR.Position position = new EasyVizAR.Position();
+        position.x = (float)marker.transform.position.x;
+        position.y = (float)marker.transform.position.y;
+        position.z = (float)marker.transform.position.z;
+        feature_to_post.position = position;
+        
         switch (feature_type) {
             case 0: 
                 {
@@ -244,124 +467,77 @@ public class FeatureManager : MonoBehaviour
                     break;
                 };
         }
+        
 
-       
+
 
         //   feature_to_post.updated = ((float)System.DateTime.Now.Hour + ((float)System.DateTime.Now.Minute * 0.01f));
         EasyVizAR.FeatureDisplayStyle style = new EasyVizAR.FeatureDisplayStyle();
         style.placement = "point";
         feature_to_post.style = style;
 
-        
+
         //Serialize the feature into JSON
         var data = JsonUtility.ToJson(feature_to_post);
         Debug.Log("Json utility: " + feature_to_post.id);
         Debug.Log("locations/" + manager.LocationID + "/features");
         //for sending stuff to the server 
-        
+
         EasyVizARServer.Instance.Post("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, data, PostFeature);
-       
-        
+
+
         featureHolder = feature_to_post;
         markerHolder = marker;
         //append to list 
-        
+
     }
-    [ContextMenu("GetFeature")]
-    public void GetFeature() //takes in id as parameter, for some reason Unity doesn't accept that convention
+    */
+
+
+
+    //Original Implementation
+    /*
+    // a callback function
+    void PostFeature(string result)
     {
-       var id = featureID;
-        EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features/" + id, EasyVizARServer.JSON_TYPE, GetFeatureCallBack);
-
-
-    }
-
-
-    [ContextMenu("ListFeatures")]
-    public void ListFeatures() 
-    {
-        EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
-    }
-    
-    void ListFeatureCallBack(string result) {
+        var resultJSON = JsonUtility.FromJson<EasyVizAR.Feature>(result);
         if (result != "error")
         {
             Debug.Log("SUCCESS: " + result);
-            this.feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList> ("{\"features\":" + result + "}");
-            Debug.Log("feature_list length: " + feature_list.features.Length);
-        }
-        else
-        {
-            Debug.Log("ERROR: " + result);
-        }
 
-    }
-
-    
-
-    [ContextMenu("UpateFeature")]
-    public void UpateFeature() //    public void UpateFeature(int id, GameObject new_feature)
-    {
-        Debug.Log("reached update method");
-        Debug.Log("contain id?: " + feature_dictionary.ContainsKey(featureID));
-
-
-        var id = featureID; // parameter 
-        var new_feature = markerHolder; // parameter
-        // the following feature will be specified by user
-        
-        if (feature_dictionary.ContainsKey(id))
-        {
-            //creating new feature
-            EasyVizAR.Feature feature_to_patch = feature_dictionary[id];
-            if (color.Length != 0)
+            
+            int found = 0;
+            Debug.Log("resultJsonid : -->>" + resultJSON.id);
+            
+            foreach (EasyVizAR.Feature feature in feature_list.features)
             {
-                feature_to_patch.color = color;
+                if (feature.id == resultJSON.id)
+                {
+                    found = 1; 
+                } 
             }
 
-            if (name.Length != 0)
+            if (found == 1)
             {
-                feature_to_patch.name = name;
-                feature_to_patch.type = name;
+                Debug.Log("new ID added: " + resultJSON.id);
+                feature_dictionary.Add(resultJSON.id, featureHolder);
+
+
+                // the line below will be kept, the ones above might get deleted in the future based on new implementation
+                markerHolder.AddComponent<MarkerObject>().feature = featureHolder; // TODO: test if this exist    
+                feature_gameobj_dictionary.Add(resultJSON.id, markerHolder);
+                Debug.Log("added key?: " + feature_gameobj_dictionary.ContainsKey(resultJSON.id));
+                Debug.Log("Contains id 61?: " + feature_gameobj_dictionary.ContainsKey(61));
+                Debug.Log("post contain id?: " + feature_dictionary.ContainsKey(resultJSON.id));
+                Debug.Log("Post: number of elements in dictionary right now: " + feature_gameobj_dictionary.Count);
+                found = 0;
             }
-
-
-
-            Debug.Log("feature name: " + feature_to_patch.name);
-            //eature_to_patch.name = "Updated name: ";
-            // Main: updating the position
-            EasyVizAR.Position new_position = new EasyVizAR.Position();
-            new_position.x = (float)new_feature.transform.position.x;
-            new_position.y = (float)new_feature.transform.position.y;
-            new_position.z = (float)new_feature.transform.position.z;
-
-            feature_to_patch.position = new_position;
-
-
-            // TODO: might want to modify the style?
-            //feature_to_patch.style.placement = "point";
-
-            //Serialize the feature into JSON
-            var data = JsonUtility.ToJson(feature_to_patch);
-
-
-            // updates the dictionary
-            featureHolder = feature_to_patch;
-            featureID = id;
-            EasyVizARServer.Instance.Patch("locations/" + manager.LocationID + "/features/" + id, EasyVizARServer.JSON_TYPE, data, UpdateFeatureCallback);
-
-        }
-
-    }
-
-    void UpdateFeatureCallback(string result)
-    {
-        Debug.Log("reached update callback method");
-        if (result != "error")
-        {
-            Debug.Log("SUCCESS: " + result);
-            // updates the dictionary
-            feature_dictionary[featureID] = featureHolder;
+            
+            else
+            {
+                Debug.Log("error in adding things to dictionary");
+            }
+            
 
         }
         else
@@ -370,64 +546,8 @@ public class FeatureManager : MonoBehaviour
         }
 
     }
+    */
 
-
-    // implement later but might not need it 
-    public void ReplaceFeature()
-    {
-
-    }
-
-    void ReplaceFeatureCallback()
-    {
-
-    }
-
-
-
-    [ContextMenu("DeleteFeature")]
-    public void DeleteFeature()
-    {
-        var id = featureID; //parameter 
-
-        if (feature_dictionary.ContainsKey(id))
-        {
-            EasyVizAR.Feature delete_feature = feature_dictionary[id];
-            var data = JsonUtility.ToJson(delete_feature);
-            EasyVizARServer.Instance.Delete("locations/" + manager.LocationID + "/features/" + id, EasyVizARServer.JSON_TYPE, data, DeleteFeatureCallBack);
-
-        }
-
-        /*
-         foreach (EasyVizAR.Feature feature in feature_list)
-         {
-             if (feature.id == id)
-             {
-                 feature_list.Remove(feature);
-                 break;
-             }
-         }
-        */
-
-    }
-
-    void DeleteFeatureCallBack(string result)
-    {
-        if (result != "error")
-        {
-            Debug.Log("SUCCESS: " + result);
-            // update the respective dictionaries
-            feature_dictionary.Remove(featureID);
-            feature_gameobj_dictionary.Remove(featureID);
-           
-
-        }
-        else
-        {
-            Debug.Log("ERROR: " + result);
-        }
-
-    }
 
 
 
