@@ -60,6 +60,8 @@ public class SpawnListIndex : MonoBehaviour
         feature_type_dictionary.Add("user", user_icon);
         feature_type_dictionary.Add("warning", warning_icon);
 
+        feature_manager.ListFeatures();
+
     }
 
     public void spawnObjectAtIndex(string feature_type)
@@ -78,13 +80,13 @@ public class SpawnListIndex : MonoBehaviour
         GameObject cloned_feature = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
         //cloned_feature.AddComponent<MarkerObject>().index = index; // this might be useful for future if we want to change the object index
         Debug.Log("feature manager" + this.feature_manager);
-        if (!this.feature_manager.feature_gameobj_dictionary.ContainsValue(cloned_feature))
-        {
-            this.feature_manager.CreateNewFeature(feature_type, cloned_feature);
+        
+        
+        this.feature_manager.CreateNewFeature(feature_type, cloned_feature);
             //for testing
             // feature_manager.UpateFeature(32, cloned_marker);
             // feature_manager.marker_list.Add();
-        }
+        
 
     }
 
