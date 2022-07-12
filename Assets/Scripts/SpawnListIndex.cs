@@ -38,7 +38,7 @@ public class SpawnListIndex : MonoBehaviour
     public GameObject warning_icon;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         //populating the feature types dictionary
         feature_type_dictionary.Add("ambulance", ambulance_icon);
