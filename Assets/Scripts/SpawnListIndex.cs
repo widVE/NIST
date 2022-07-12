@@ -41,24 +41,24 @@ public class SpawnListIndex : MonoBehaviour
     void Awake()
     {
         //populating the feature types dictionary
-        feature_type_dictionary.Add("ambulance", ambulance_icon);
-        feature_type_dictionary.Add("audio", audio_icon);
-        feature_type_dictionary.Add("bad-person", bad_person_icon);
-        feature_type_dictionary.Add("biohazard", biohazard_icon);
-        feature_type_dictionary.Add("door", door_icon);
-        feature_type_dictionary.Add("elevator", elevator_icon);
-        feature_type_dictionary.Add("exit", exit_icon);
-        feature_type_dictionary.Add("extinguisher", extinguisher_icon);
-        feature_type_dictionary.Add("fire", fire_icon);
-        feature_type_dictionary.Add("headset", headset_icon);
-        feature_type_dictionary.Add("injury", injury_icon);
-        feature_type_dictionary.Add("message", message_icon);
-        feature_type_dictionary.Add("object", object_icon);
-        feature_type_dictionary.Add("person", person_icon);
-        feature_type_dictionary.Add("radiation", radiation_icon);
-        feature_type_dictionary.Add("stairs", stairs_icon);
-        feature_type_dictionary.Add("user", user_icon);
-        feature_type_dictionary.Add("warning", warning_icon);
+        feature_type_dictionary.Add("Ambulance", ambulance_icon);
+        feature_type_dictionary.Add("Audio", audio_icon);
+        feature_type_dictionary.Add("Bad-person", bad_person_icon);
+        feature_type_dictionary.Add("Biohazard", biohazard_icon);
+        feature_type_dictionary.Add("Door", door_icon);
+        feature_type_dictionary.Add("Elevator", elevator_icon);
+        feature_type_dictionary.Add("Exit", exit_icon);
+        feature_type_dictionary.Add("Extinguisher", extinguisher_icon);
+        feature_type_dictionary.Add("Fire", fire_icon);
+        feature_type_dictionary.Add("Headset", headset_icon);
+        feature_type_dictionary.Add("Injury", injury_icon);
+        feature_type_dictionary.Add("Message", message_icon);
+        feature_type_dictionary.Add("Object", object_icon);
+        feature_type_dictionary.Add("Person", person_icon);
+        feature_type_dictionary.Add("Radiation", radiation_icon);
+        feature_type_dictionary.Add("Stairs", stairs_icon);
+        feature_type_dictionary.Add("User", user_icon);
+        feature_type_dictionary.Add("Warning", warning_icon);
 
         feature_manager.ListFeatures();
 
@@ -104,6 +104,7 @@ public class SpawnListIndex : MonoBehaviour
         foreach (EasyVizAR.Feature feature in this.feature_manager.feature_list.features)
         {
             if (feature_manager.feature_dictionary.ContainsKey(feature.id)) continue;
+            // display only the feature from the server that is not currently in your scene. 
             GameObject feature_object = feature_type_dictionary[feature.type];
                 //GameObject marker_to_display = this.feature_manager.feature_gameobj_dictionary[feature.id];
             Instantiate(feature_object, new Vector3(feature.position.x, feature.position.y, feature.position.z), feature_object.transform.rotation, spawn_parent.transform);
