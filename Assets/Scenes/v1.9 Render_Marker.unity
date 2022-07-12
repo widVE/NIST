@@ -616,24 +616,24 @@ MonoBehaviour:
   spawn_root: {fileID: 1208393620}
   spawn_parent: {fileID: 1968206798}
   offset_distance_z: 1
-  ambulance_icon: {fileID: 0}
-  audio_icon: {fileID: 0}
-  bad_person_icon: {fileID: 0}
-  biohazard_icon: {fileID: 0}
-  door_icon: {fileID: 0}
-  elevator_icon: {fileID: 0}
-  exit_icon: {fileID: 0}
-  extinguisher_icon: {fileID: 0}
-  fire_icon: {fileID: 0}
-  headset_icon: {fileID: 0}
-  injury_icon: {fileID: 0}
-  message_icon: {fileID: 0}
-  object_icon: {fileID: 0}
-  person_icon: {fileID: 0}
-  radiation_icon: {fileID: 0}
-  stairs_icon: {fileID: 0}
-  user_icon: {fileID: 0}
-  warning_icon: {fileID: 0}
+  ambulance_icon: {fileID: 5318789042369293505, guid: 37a86163c230e41469810596b56b6f2d, type: 3}
+  audio_icon: {fileID: 5318789042369293505, guid: 407ca288127f083438f60ed7cf8ef487, type: 3}
+  bad_person_icon: {fileID: 5318789042369293505, guid: 87f7d5c97f1905d41b8ba2e58de72e21, type: 3}
+  biohazard_icon: {fileID: 5318789042369293505, guid: 37a86163c230e41469810596b56b6f2d, type: 3}
+  door_icon: {fileID: 5318789042369293505, guid: 407ca288127f083438f60ed7cf8ef487, type: 3}
+  elevator_icon: {fileID: 5318789042369293505, guid: 87f7d5c97f1905d41b8ba2e58de72e21, type: 3}
+  exit_icon: {fileID: 5318789042369293505, guid: 37a86163c230e41469810596b56b6f2d, type: 3}
+  extinguisher_icon: {fileID: 5318789042369293505, guid: 407ca288127f083438f60ed7cf8ef487, type: 3}
+  fire_icon: {fileID: 5318789042369293505, guid: 87f7d5c97f1905d41b8ba2e58de72e21, type: 3}
+  headset_icon: {fileID: 5318789042369293505, guid: 37a86163c230e41469810596b56b6f2d, type: 3}
+  injury_icon: {fileID: 5318789042369293505, guid: 407ca288127f083438f60ed7cf8ef487, type: 3}
+  message_icon: {fileID: 5318789042369293505, guid: 87f7d5c97f1905d41b8ba2e58de72e21, type: 3}
+  object_icon: {fileID: 5318789042369293505, guid: 37a86163c230e41469810596b56b6f2d, type: 3}
+  person_icon: {fileID: 5318789042369293505, guid: 37a86163c230e41469810596b56b6f2d, type: 3}
+  radiation_icon: {fileID: 5318789042369293505, guid: 87f7d5c97f1905d41b8ba2e58de72e21, type: 3}
+  stairs_icon: {fileID: 5318789042369293505, guid: 37a86163c230e41469810596b56b6f2d, type: 3}
+  user_icon: {fileID: 5318789042369293505, guid: 407ca288127f083438f60ed7cf8ef487, type: 3}
+  warning_icon: {fileID: 5318789042369293505, guid: 87f7d5c97f1905d41b8ba2e58de72e21, type: 3}
 --- !u!114 &303111022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -647,7 +647,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 561901448}
-  obj_spawn: {fileID: 303111021}
   feature_list:
     features: []
   featureHolder:
