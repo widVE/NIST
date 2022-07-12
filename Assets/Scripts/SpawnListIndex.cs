@@ -64,6 +64,9 @@ public class SpawnListIndex : MonoBehaviour
 
     }
 
+
+    
+
     public void spawnObjectAtIndex(string feature_type)
     {
         GameObject feature_to_spawn = feature_type_dictionary[feature_type];
@@ -100,6 +103,7 @@ public class SpawnListIndex : MonoBehaviour
 
         foreach (EasyVizAR.Feature feature in this.feature_manager.feature_list.features)
         {
+            if (feature_manager.feature_dictionary.ContainsKey(feature.id)) continue;
             GameObject feature_object = feature_type_dictionary[feature.type];
                 //GameObject marker_to_display = this.feature_manager.feature_gameobj_dictionary[feature.id];
             Instantiate(feature_object, new Vector3(feature.position.x, feature.position.y, feature.position.z), feature_object.transform.rotation, spawn_parent.transform);

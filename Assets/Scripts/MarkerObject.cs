@@ -5,6 +5,6 @@ using UnityEngine;
 public class MarkerObject : MonoBehaviour
 {
     public EasyVizAR.Feature feature;
-
+    public GameObject marker;
 
 }

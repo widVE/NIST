@@ -616,6 +616,24 @@ MonoBehaviour:
   spawn_root: {fileID: 1208393620}
   spawn_parent: {fileID: 1968206798}
   offset_distance_z: 1
+  ambulance_icon: {fileID: 0}
+  audio_icon: {fileID: 0}
+  bad_person_icon: {fileID: 0}
+  biohazard_icon: {fileID: 0}
+  door_icon: {fileID: 0}
+  elevator_icon: {fileID: 0}
+  exit_icon: {fileID: 0}
+  extinguisher_icon: {fileID: 0}
+  fire_icon: {fileID: 0}
+  headset_icon: {fileID: 0}
+  injury_icon: {fileID: 0}
+  message_icon: {fileID: 0}
+  object_icon: {fileID: 0}
+  person_icon: {fileID: 0}
+  radiation_icon: {fileID: 0}
+  stairs_icon: {fileID: 0}
+  user_icon: {fileID: 0}
+  warning_icon: {fileID: 0}
 --- !u!114 &303111022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -629,6 +647,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 561901448}
+  obj_spawn: {fileID: 303111021}
   feature_list:
     features: []
   featureHolder:
@@ -652,6 +671,10 @@ MonoBehaviour:
   featureID: 55
   color: Green
   name: 
+  new_position:
+    x: 0
+    y: 0
+    z: 0
 --- !u!1 &349520856
 GameObject:
   m_ObjectHideFlags: 0
@@ -1431,7 +1454,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4692823068669223862, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4692823068669223862, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
       propertyPath: m_LocalPosition.x

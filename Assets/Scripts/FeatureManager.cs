@@ -6,12 +6,13 @@ public class FeatureManager : MonoBehaviour
 {
 
     public EasyVizARHeadsetManager manager;
-
+   // public SpawnListIndex obj_spawn;
     // key as id, value as the GameObject (the marker placed)
     public Dictionary<int, EasyVizAR.Feature> feature_dictionary = new Dictionary<int, EasyVizAR.Feature>(); // TODO: can delete this later after more integration
 
     // Each GameObject now contains a field call obj_feature (in the script MarkerObject.cs) so that feature is now one of the fields of the GameObject 
     public Dictionary<int, GameObject> feature_gameobj_dictionary = new Dictionary<int, GameObject>(); // a seperate dictionary for keeping track of Gameobject in the scene
+    
     
     public EasyVizAR.FeatureList feature_list = new EasyVizAR.FeatureList();
     public EasyVizAR.Feature featureHolder = null;
@@ -25,6 +26,7 @@ public class FeatureManager : MonoBehaviour
 
 
     // Start is called before the first frame update
+    [ContextMenu("Start")]
     void Start()
     {
         // initializing the feature_list and the feature_gameobj_dictinoary
@@ -34,6 +36,8 @@ public class FeatureManager : MonoBehaviour
         foreach (EasyVizAR.Feature feature in feature_list.features)
         {
             feature_dictionary.Add(feature.id, feature);
+           // feature_gameobj_dictionary.Add(feature.id, obj_spawn.feature_type_dictionary[feature.name]);
+           // Debug.Log("contain feature in gameobj dictionary?: " + feature_gameobj_dictionary.ContainsKey(feature.id));
         }
 
     }
