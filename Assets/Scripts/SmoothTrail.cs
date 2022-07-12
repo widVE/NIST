@@ -15,9 +15,11 @@ public class SmoothTrail : MonoBehaviour
     {
        
         feet = new GameObject("feet");
-        Vector3 headsetPos = current_headset_prefab.GetComponent<Transform>().position;
+        //Vector3 temp = new Vector3(0.0f, height, 0.0f);
+        //current_headset_prefab.GetComponent<Transform>().position += temp;
+        Vector3 headsetPos = current_headset_prefab.GetComponent<Transform>().position ;
         initYPos = headsetPos.y;
-        feet.GetComponent<Transform>().position = new Vector3(headsetPos.x, Mathf.Abs(headsetPos.y - height), headsetPos.z);
+        feet.GetComponent<Transform>().position = new Vector3(headsetPos.x,headsetPos.y - height, headsetPos.z);
         line_breadcrumbs.transform.parent = feet.transform;
         line_breadcrumbs.startWidth = 0.3f;
         line_breadcrumbs.endWidth = 0.3f;
