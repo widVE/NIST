@@ -291,7 +291,7 @@ public class ResearchModeVideoStream : MonoBehaviour
         // Depth sensor should be initialized in only one mode
         targetTexture = new Texture2D(COLOR_WIDTH, COLOR_HEIGHT, TextureFormat.RGBA32, false);
 		
-		_ourColor = new Texture2D(COLOR_WIDTH, COLOR_HEIGHT, TextureFormat.RGBA32, false);
+		_ourColor = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RGBA32, false);
 		_ourDepth = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.R8, false);
 		
 		//if(longDepthPreviewPlane != null)
@@ -947,7 +947,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 
 						//in the manual processing, the cameraToWorldMatrix here corresponds to the color camera's extrinsic matrix
 						//its 3rd column is negated, and we take the transpose of it
-						Matrix4x4 scanTransPV = cameraToWorldMatrix;
+						Matrix4x4 scanTransPV = cameraToWorldMatrix;//.transpose;
 						Matrix4x4 zScale2 = Matrix4x4.identity;
 						Vector4 col3 = zScale2.GetColumn(2);
 						col3 = -col3;
@@ -961,6 +961,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 						photoCaptureFrame.TryGetProjectionMatrix(Camera.main.nearClipPlane, Camera.main.farClipPlane, out Matrix4x4 projectionMatrix);
 						
 						scanTransPV = projectionMatrix * scanTransPV;
+						
 						//scanTransPV is now the MVP matrix of the color camera, this is used to project back unprojected depth image data to the color image
 						//to look up what corresponding color matches the depth, if any
 
@@ -969,16 +970,24 @@ public class ResearchModeVideoStream : MonoBehaviour
 						{
 							scanTrans[i] = depthPos[i];
 						}
+						
+						//scanTrans = scanTrans.transpose;
 
 						var commandBuffer = new UnityEngine.Rendering.CommandBuffer();
 						commandBuffer.name = "Color Blit Pass";
 						
 						_colorCopyMaterial.SetTexture("_MainTex", targetTexture);
+						_colorCopyMaterial.SetTexture("_DepthTex", longDepthMediaTexture);
+						_colorCopyMaterial.SetFloat("_depthWidth", (float)DEPTH_WIDTH);
+						_colorCopyMaterial.SetFloat("_depthHeight", (float)DEPTH_HEIGHT);
+						_colorCopyMaterial.SetMatrix("_camIntrinsicsInv", _camIntrinsicsInv);
+						_colorCopyMaterial.SetMatrix("_mvpColor", scanTransPV);
+						_colorCopyMaterial.SetMatrix("_depthToWorld", scanTrans);
 						
 						RenderTexture currentActiveRT = RenderTexture.active;
 						
 						Graphics.SetRenderTarget(_colorRT.colorBuffer,_colorRT.depthBuffer);
-						//commandBuffer.ClearRenderTarget(false, true, Color.black);
+						commandBuffer.ClearRenderTarget(false, true, Color.black);
 						commandBuffer.Blit(targetTexture, UnityEngine.Rendering.BuiltinRenderTextureType.CurrentActive, _colorCopyMaterial);
 						Graphics.ExecuteCommandBuffer(commandBuffer);
 						
@@ -993,6 +1002,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 						{
 							RenderTexture.active = null;
 						}
+						
 						//at this point we have the depth mvp matrix, and the color proj / view matrix.
 						//need to project world space depth value into color image that matches depth image size...
 						

@@ -14,9 +14,15 @@ Shader "Unlit/CopyColorShader" {
             #include "UnityCG.cginc"
 
             UNITY_DECLARE_SCREENSPACE_TEXTURE(_MainTex);
+			UNITY_DECLARE_SCREENSPACE_TEXTURE(_DepthTex);
             uniform float4 _MainTex_ST;
             uniform float4 _Color;
+			uniform float _depthWidth;
+			uniform float _depthHeight;
             uniform int _Orientation;
+			uniform float4x4 _camIntrinsicsInv;
+			uniform float4x4 _mvpColor;
+			uniform float4x4 _depthToWorld;
             
 
             struct appdata_t {
@@ -54,8 +60,35 @@ Shader "Unlit/CopyColorShader" {
             fixed4 frag (v2f i) : SV_Target
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
-                return UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, i.texcoord); 
-                //return UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, i.texcoord) * _Color;
+				
+				//do lookups etc here...
+
+				float d = (UNITY_SAMPLE_SCREENSPACE_TEXTURE(_DepthTex, i.texcoord) /* 255.0*/) * 4000.0;
+				if(d > 0)
+				{
+					float wIndex = (i.texcoord.x * _depthWidth);
+					float hIndex = _depthHeight - (i.texcoord.y * _depthHeight);
+					float4 cameraPoint = float4(wIndex + 0.5, hIndex + 0.5, 1.0, 0.0);
+					if(cameraPoint.x >= 0 && cameraPoint.x < _depthWidth && cameraPoint.y >= 0 && cameraPoint.y < _depthHeight)
+					{
+						cameraPoint = mul(_camIntrinsicsInv, cameraPoint);
+						cameraPoint *= d;
+						float4 newCameraPoint = float4(cameraPoint.x, cameraPoint.y, cameraPoint.z, 1.0);
+						newCameraPoint = mul(_depthToWorld, newCameraPoint);
+						newCameraPoint.xyz /= newCameraPoint.w;
+						newCameraPoint.w = 1.0;
+						float4 projPos = mul(_mvpColor, newCameraPoint);
+						projPos.xyz /= projPos.w;
+						projPos.xy = projPos.xy * 0.5 + 0.5;
+						if(projPos.x >= 0 && projPos.x < 1.0 && projPos.y >= 0 && projPos.y < 1.0)
+						{
+							return UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, projPos.xy); 
+						}
+					}
+					//return UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, i.texcoord) * _Color;
+				}
+				
+				return fixed4(0,0,0,0);
             }
             ENDCG
 
