@@ -6,7 +6,7 @@ using UnityEngine;
 public class SpawnListIndex : MonoBehaviour
 {
     public EasyVizARHeadsetManager manager;
-    public FeatureManager feature_manager;// = new FeatureManager(); // added
+    public FeatureManager feature_manager = new FeatureManager(); // added
 
 
     public List<GameObject> spawn_list = null;
