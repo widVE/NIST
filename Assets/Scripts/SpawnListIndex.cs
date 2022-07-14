@@ -6,7 +6,7 @@ using UnityEngine;
 public class SpawnListIndex : MonoBehaviour
 {
     public EasyVizARHeadsetManager manager;
-    public FeatureManager feature_manager = new FeatureManager(); // added
+    public FeatureManager feature_manager; // added
 
 
     public List<GameObject> spawn_list = null;
@@ -38,7 +38,7 @@ public class SpawnListIndex : MonoBehaviour
     public GameObject warning_icon;
 
     // Start is called before the first frame update
-    void Awake()
+    void Start()
     {
         //populating the feature types dictionary //TODO: change to lowercase
         feature_type_dictionary.Add("Ambulance", ambulance_icon);
@@ -59,8 +59,8 @@ public class SpawnListIndex : MonoBehaviour
         feature_type_dictionary.Add("Stairs", stairs_icon);
         feature_type_dictionary.Add("User", user_icon);
         feature_type_dictionary.Add("Warning", warning_icon);
-
         feature_manager.ListFeatures();
+
 
     }
 
@@ -98,14 +98,16 @@ public class SpawnListIndex : MonoBehaviour
     [ContextMenu("DisplayAllFeatureGameObjects")]
     public void DisplayAllFeatureGameObjects()
     {
-        this.feature_manager.ListFeatures(); // populating the feature_list 
-        Debug.Log("number of elements in dictionary: " + this.feature_manager.feature_dictionary.Count);
+        
+        
+        Debug.Log("1number of elements in dictionary: " + feature_manager.feature_dictionary.Count);
 
         foreach (EasyVizAR.Feature feature in this.feature_manager.feature_list.features)
         {
             // if (feature_manager.feature_dictionary.ContainsKey(feature.id)) continue;
             // display only the feature from the server that is not currently in your scene. 
             GameObject feature_object = feature_type_dictionary[feature.name];
+            Debug.Log("1");
                 //GameObject marker_to_display = this.feature_manager.feature_gameobj_dictionary[feature.id];
             Instantiate(feature_object, new Vector3(feature.position.x, feature.position.y, feature.position.z), feature_object.transform.rotation, spawn_parent.transform);
 

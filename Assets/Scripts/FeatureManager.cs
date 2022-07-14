@@ -26,11 +26,11 @@ public class FeatureManager : MonoBehaviour
 
 
     // Start is called before the first frame update
-    [ContextMenu("Start")]
+    
     void Start()
     {
         // initializing the feature_list and the feature_gameobj_dictinoary
-        ListFeatures();
+       
 
     }
 
@@ -133,6 +133,7 @@ public class FeatureManager : MonoBehaviour
     public void ListFeatures() 
     {
         EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
+        Debug.Log("ListFeatures Called");
     }
     
     void ListFeatureCallBack(string result) {

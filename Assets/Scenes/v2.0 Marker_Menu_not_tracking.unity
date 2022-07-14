@@ -2143,6 +2143,51 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3f1f46cbecbe08e46a303ccfdb5b498a, type: 3}
+--- !u!1 &734827754 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3439373402471772018, guid: 2a81227bab684c8499d2dcc03a5dd478, type: 3}
+  m_PrefabInstance: {fileID: 1402857988}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &734827763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 734827754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1016ef682c6729c47b1a27ae83049812, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  manager: {fileID: 561901448}
+  feature_list:
+    features: []
+  featureHolder:
+    color: 
+    created: 0
+    createdBy: 
+    id: 0
+    name: 
+    position:
+      x: 0
+      y: 0
+      z: 0
+    style:
+      leftOffset: 0
+      placement: 
+      radius: 0
+      topOffset: 0
+    type: 
+    updated: 0
+  markerHolder: {fileID: 0}
+  featureID: 32
+  color: 
+  name: 
+  new_position:
+    x: 0
+    y: 0
+    z: 0
 --- !u!1 &752144242
 GameObject:
   m_ObjectHideFlags: 0
@@ -3149,7 +3194,7 @@ PrefabInstance:
     - target: {fileID: 3748618262783521682, guid: 2a81227bab684c8499d2dcc03a5dd478, type: 3}
       propertyPath: feature_manager
       value: 
-      objectReference: {fileID: 545259744}
+      objectReference: {fileID: 734827763}
     - target: {fileID: 4014015331783299943, guid: 2a81227bab684c8499d2dcc03a5dd478, type: 3}
       propertyPath: m_Mesh
       value: 
