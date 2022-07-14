@@ -107,7 +107,6 @@ public class SpawnListIndex : MonoBehaviour
             // if (feature_manager.feature_dictionary.ContainsKey(feature.id)) continue;
             // display only the feature from the server that is not currently in your scene. 
             GameObject feature_object = feature_type_dictionary[feature.name];
-            Debug.Log("1");
                 //GameObject marker_to_display = this.feature_manager.feature_gameobj_dictionary[feature.id];
             Instantiate(feature_object, new Vector3(feature.position.x, feature.position.y, feature.position.z), feature_object.transform.rotation, spawn_parent.transform);
 

@@ -82,9 +82,9 @@ public class FeatureManager : MonoBehaviour
         {
             Debug.Log("SUCCESS: " + result);
             ListFeatures();
-            Debug.Log("new ID added: " + resultJSON.id);
+            //Debug.Log("new ID added: " + resultJSON.id);
             feature_dictionary.Add(resultJSON.id, featureHolder);
-            Debug.Log("Post: number of elements in dictionary right now: " + feature_dictionary.Count);
+            //Debug.Log("Post: number of elements in dictionary right now: " + feature_dictionary.Count);
 
         }
         else
@@ -141,13 +141,13 @@ public class FeatureManager : MonoBehaviour
         {
             Debug.Log("SUCCESS: " + result);
             this.feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList> ("{\"features\":" + result + "}");
-            Debug.Log("feature_list length: " + feature_list.features.Length);
+            //Debug.Log("feature_list length: " + feature_list.features.Length);
             foreach (EasyVizAR.Feature feature in feature_list.features)
             {
                 if (!this.feature_dictionary.ContainsKey(feature.id))
                 {
                     this.feature_dictionary.Add(feature.id, feature);
-                    Debug.Log("added id: " + feature.id + " to the feature_dictionary");
+                    //Debug.Log("added id: " + feature.id + " to the feature_dictionary");
                 }
             }
         }
@@ -165,11 +165,10 @@ public class FeatureManager : MonoBehaviour
     [ContextMenu("UpateFeature")]
     public void UpateFeature() //    public void UpateFeature(int id, GameObject new_feature)
     {
-        Debug.Log("reached update method");
         ListFeatures();
         
-        Debug.Log("contain id?: " + feature_dictionary.ContainsKey(featureID));
-        Debug.Log("length of feature_list: " + this.feature_list.features.Length);
+        //Debug.Log("contain id?: " + feature_dictionary.ContainsKey(featureID));
+        //Debug.Log("length of feature_list: " + this.feature_list.features.Length);
 
 
         var id = featureID; // parameter 
@@ -223,7 +222,6 @@ public class FeatureManager : MonoBehaviour
 
     void UpdateFeatureCallback(string result)
     {
-        Debug.Log("reached update callback method");
         if (result != "error")
         {
             Debug.Log("SUCCESS: " + result);
