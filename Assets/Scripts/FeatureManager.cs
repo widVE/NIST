@@ -52,8 +52,8 @@ public class FeatureManager : MonoBehaviour
         position.y = (float)marker.transform.position.y;
         position.z = (float)marker.transform.position.z;
         feature_to_post.position = position;
-        feature_to_post.name = feature_type;
-        feature_to_post.type = feature_type;
+        feature_to_post.name = feature_type.ToLower();
+        feature_to_post.type = feature_type.ToLower();
 
         EasyVizAR.FeatureDisplayStyle style = new EasyVizAR.FeatureDisplayStyle();
         style.placement = "point";
@@ -85,7 +85,6 @@ public class FeatureManager : MonoBehaviour
             Debug.Log("new ID added: " + resultJSON.id);
             feature_dictionary.Add(resultJSON.id, featureHolder);
             Debug.Log("Post: number of elements in dictionary right now: " + feature_dictionary.Count);
-
 
         }
         else

@@ -40,7 +40,7 @@ public class SpawnListIndex : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        //populating the feature types dictionary
+        //populating the feature types dictionary //TODO: change to lowercase
         feature_type_dictionary.Add("Ambulance", ambulance_icon);
         feature_type_dictionary.Add("Audio", audio_icon);
         feature_type_dictionary.Add("Bad-person", bad_person_icon);
