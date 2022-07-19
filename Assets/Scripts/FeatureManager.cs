@@ -53,7 +53,8 @@ public class FeatureManager : MonoBehaviour
         position.z = (float)marker.transform.position.z;
         feature_to_post.position = position;
         feature_to_post.name = feature_type;
-        feature_to_post.type = feature_type.ToLower();
+        // feature_to_post.type = feature_type.ToLower();
+        feature_to_post.type = feature_type;
 
         EasyVizAR.FeatureDisplayStyle style = new EasyVizAR.FeatureDisplayStyle();
         style.placement = "point";
