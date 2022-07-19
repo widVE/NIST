@@ -190,10 +190,11 @@ public class ResearchModeVideoStream : MonoBehaviour
 	public ComputeBuffer _pointRenderBuffer;
 
 	Matrix4x4 _lastProjMatrix = Matrix4x4.identity;
-	Matrix4x4 _camIntrinsicsInv = Matrix4x4.identity;
 
 	Camera _arCamera;
 #endif
+
+	Matrix4x4 _camIntrinsicsInv = Matrix4x4.identity;
 
 	[SerializeField]
 	bool _writeImagesToDisk = false;
@@ -204,6 +205,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 	public bool ShowImagesInView => _showImagesInView;
 	
 	bool _firstHeadsetSend = true;
+	
+	float _writeTimer = 0f;
 	
 	//[SerializeField]
 	//Texture2D _testTexture;
@@ -312,6 +315,11 @@ public class ResearchModeVideoStream : MonoBehaviour
 		}
 #endif
 #endif
+		_camIntrinsicsInv[0] = 200.0f;//587.189f/2.375f;//(float)int.Parse(camIntrinsicData[0]); // 7.5f;
+		_camIntrinsicsInv[5] = 200.0f;//585.766f/1.4861f;//(float)int.Parse(camIntrinsicData[1]); // 7.5f;
+		_camIntrinsicsInv[8] = 160.0f;//373.018f/2.375f;//(float)int.Parse(camIntrinsicData[2]); // 7.5f;
+		_camIntrinsicsInv[9] = 144.0f;//200.805f/1.4861f;//(float)int.Parse(camIntrinsicData[3]); // 7.5f;
+		_camIntrinsicsInv = _camIntrinsicsInv.inverse;
 
 #if INCLUDE_TSDF
 		InitializeTSDF();
@@ -594,12 +602,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 		_tsdfShader.SetBuffer(renderID, "volumeLookup", volumeLookup);
 		_tsdfShader.SetBuffer(renderID, "renderBuffer", _pointRenderBuffer);
 		
-		_camIntrinsicsInv[0] = 200.0f;//587.189f/2.375f;//(float)int.Parse(camIntrinsicData[0]); // 7.5f;
-		_camIntrinsicsInv[5] = 200.0f;//585.766f/1.4861f;//(float)int.Parse(camIntrinsicData[1]); // 7.5f;
-		_camIntrinsicsInv[8] = 160.0f;//373.018f/2.375f;//(float)int.Parse(camIntrinsicData[2]); // 7.5f;
-		_camIntrinsicsInv[9] = 144.0f;//200.805f/1.4861f;//(float)int.Parse(camIntrinsicData[3]); // 7.5f;
-		_camIntrinsicsInv = _camIntrinsicsInv.inverse;
-
 		_tsdfShader.SetMatrix("camIntrinsicsInverse", _camIntrinsicsInv);
 
 	}
@@ -1564,6 +1566,13 @@ public class ResearchModeVideoStream : MonoBehaviour
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
 #else
+		
+		_writeTimer += Time.deltaTime;
+		if(_writeTimer > 20f)
+		{
+			WriteXYZ();
+			_writeTimer = 0f;
+		}
 		
 		if(ShowImagesInView && startRealtimePreview)
 		{

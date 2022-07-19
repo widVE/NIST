@@ -43,7 +43,7 @@ Shader "Unlit/CopyColorShader" {
                 UNITY_SETUP_INSTANCE_ID(v);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.texcoord = float2(v.texcoord.x, 1.0 - v.texcoord.y);
+                o.texcoord = float2(v.texcoord.x, v.texcoord.y);
            
                 /*if (_Orientation == 1) {
                     // Portrait
@@ -62,8 +62,9 @@ Shader "Unlit/CopyColorShader" {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 				
 				//do lookups etc here...
-
-				float d = (UNITY_SAMPLE_SCREENSPACE_TEXTURE(_DepthTex, i.texcoord) /* 255.0*/) * 4000.0;
+				float2 tc = i.texcoord;
+				//tc.y = 1.0 - tc.y;
+				float d = (UNITY_SAMPLE_SCREENSPACE_TEXTURE(_DepthTex, tc) * 255.0) * 4000.0;
 				if(d > 0)
 				{
 					float wIndex = (i.texcoord.x * _depthWidth);
@@ -80,6 +81,7 @@ Shader "Unlit/CopyColorShader" {
 						float4 projPos = mul(_mvpColor, newCameraPoint);
 						projPos.xyz /= projPos.w;
 						projPos.xy = projPos.xy * 0.5 + 0.5;
+						projPos.y = 1.0 - projPos.y;
 						if(projPos.x >= 0 && projPos.x < 1.0 && projPos.y >= 0 && projPos.y < 1.0)
 						{
 							return UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, projPos.xy); 
