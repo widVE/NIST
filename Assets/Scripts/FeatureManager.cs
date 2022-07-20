@@ -335,6 +335,8 @@ public class FeatureManager : MonoBehaviour
             // update the respective dictionaries
             feature_gameobj_dictionary.Remove(featureID);
             feature_dictionary.Remove(featureID);
+            // trigger update
+            isChanged = true;
 
         }
         else
