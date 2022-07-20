@@ -111,8 +111,8 @@ public class FeatureManager : MonoBehaviour
         
         //Serialize the feature into JSON
         var data = JsonUtility.ToJson(feature_to_post);
-        Debug.Log("Json utility: " + feature_to_post.id);
-        Debug.Log("locations/" + manager.LocationID + "/features");
+       // Debug.Log("Json utility: " + feature_to_post.id);
+       // Debug.Log("locations/" + manager.LocationID + "/features");
         //for sending stuff to the server 
         
         EasyVizARServer.Instance.Post("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, data, PostFeature);
