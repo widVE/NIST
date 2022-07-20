@@ -6,7 +6,6 @@ public class FeatureManager : MonoBehaviour
 {
 
     public EasyVizARHeadsetManager manager;
-   // public SpawnListIndex obj_spawn;
     // key as id, value as the GameObject (the marker placed)
     public Dictionary<int, EasyVizAR.Feature> feature_dictionary = new Dictionary<int, EasyVizAR.Feature>(); // TODO: can delete this later after more integration
 
@@ -24,19 +23,68 @@ public class FeatureManager : MonoBehaviour
     public EasyVizAR.Position new_position;
 
 
+    //Added from SpawnListIndex
+    public GameObject spawn_root;
+    public GameObject spawn_parent;
+    public Dictionary<string, GameObject> feature_type_dictionary = new Dictionary<string, GameObject>(); // contains all possible marker objects
+    public bool isChanged = true;
+    // Feature objects
+    public GameObject ambulance_icon;
+    public GameObject audio_icon;
+    public GameObject bad_person_icon;
+    public GameObject biohazard_icon;
+    public GameObject door_icon;
+    public GameObject elevator_icon;
+    public GameObject exit_icon;
+    public GameObject extinguisher_icon;
+    public GameObject fire_icon;
+    public GameObject headset_icon;
+    public GameObject injury_icon;
+    public GameObject message_icon;
+    public GameObject object_icon;
+    public GameObject person_icon;
+    public GameObject radiation_icon;
+    public GameObject stairs_icon;
+    public GameObject user_icon;
+    public GameObject warning_icon;
+
+
 
     // Start is called before the first frame update
-    
+
     void Start()
     {
-        // initializing the feature_list and the feature_gameobj_dictinoary
-       
-
+        //Added from SpawnListIndex
+        //populating the feature types dictionary 
+        feature_type_dictionary.Add("ambulance", ambulance_icon);
+        feature_type_dictionary.Add("audio", audio_icon);
+        feature_type_dictionary.Add("bad-person", bad_person_icon);
+        feature_type_dictionary.Add("biohazard", biohazard_icon);
+        feature_type_dictionary.Add("door", door_icon);
+        feature_type_dictionary.Add("elevator", elevator_icon);
+        feature_type_dictionary.Add("exit", exit_icon);
+        feature_type_dictionary.Add("extinguisher", extinguisher_icon);
+        feature_type_dictionary.Add("fire", fire_icon);
+        feature_type_dictionary.Add("headset", headset_icon);
+        feature_type_dictionary.Add("injury", injury_icon);
+        feature_type_dictionary.Add("message", message_icon);
+        feature_type_dictionary.Add("object", object_icon);
+        feature_type_dictionary.Add("person", person_icon);
+        feature_type_dictionary.Add("radiation", radiation_icon);
+        feature_type_dictionary.Add("stairs", stairs_icon);
+        feature_type_dictionary.Add("user", user_icon);
+        feature_type_dictionary.Add("warning", warning_icon);
+        ListFeatures(); // this populates all the features listed on the server currently 
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (isChanged)
+        {
+            Debug.Log("reached Update()");
+            ListFeatures();
+        }
         
     }
 
@@ -82,10 +130,13 @@ public class FeatureManager : MonoBehaviour
         if (result != "error")
         {
             Debug.Log("SUCCESS: " + result);
-            ListFeatures();
+            //ListFeatures();
             //Debug.Log("new ID added: " + resultJSON.id);
             feature_dictionary.Add(resultJSON.id, featureHolder);
             //Debug.Log("Post: number of elements in dictionary right now: " + feature_dictionary.Count);
+
+            // enabling the Update() 
+            isChanged = true;
 
         }
         else
@@ -129,7 +180,7 @@ public class FeatureManager : MonoBehaviour
         }
     }
 
-
+    //NOTE: this function is now also displaying all the features listed on the server.
     [ContextMenu("ListFeatures")]
     public void ListFeatures() 
     {
@@ -147,10 +198,18 @@ public class FeatureManager : MonoBehaviour
             {
                 if (!this.feature_dictionary.ContainsKey(feature.id))
                 {
+                    //Added from SpawnListIndex 
+                    GameObject feature_object = feature_type_dictionary[feature.type];
+                    Instantiate(feature_object, new Vector3(feature.position.x, feature.position.y, feature.position.z), feature_object.transform.rotation, spawn_parent.transform);
+
+
                     this.feature_dictionary.Add(feature.id, feature);
                     //Debug.Log("added id: " + feature.id + " to the feature_dictionary");
                 }
             }
+
+            //disabling the Update()
+            isChanged = false;
         }
         else
         {
@@ -252,10 +311,10 @@ public class FeatureManager : MonoBehaviour
 
     }
 
-    [ContextMenu("DeleteFeature")]
-    public void DeleteFeature()
+    //[ContextMenu("DeleteFeature")]
+    public void DeleteFeature(int id)
     {
-        var id = featureID; //parameter 
+       // var id = featureID; //parameter 
 
         
         if (feature_dictionary.ContainsKey(id))
@@ -272,10 +331,10 @@ public class FeatureManager : MonoBehaviour
         if (result != "error")
         {
             Debug.Log("SUCCESS: " + result);
+            
             // update the respective dictionaries
             feature_gameobj_dictionary.Remove(featureID);
             feature_dictionary.Remove(featureID);
-
 
         }
         else
@@ -285,4 +344,25 @@ public class FeatureManager : MonoBehaviour
 
     }
 
-}
+    //Added from SpawnListIndex
+    public void spawnObjectAtIndex(string feature_type)
+    {
+        GameObject feature_to_spawn = feature_type_dictionary[feature_type];
+        GameObject cloned_feature = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
+        CreateNewFeature(feature_type, cloned_feature);
+
+    }
+
+    // this is simply for convenience used if you want all the markers in the scene to disappear 
+    [ContextMenu("DeleteAll")]
+    void DeleteAll()
+    {
+        foreach (EasyVizAR.Feature feature in feature_list.features)
+        {
+            DeleteFeature(feature.id);
+            feature_dictionary.Remove(feature.id);
+        }
+    }
+
+
+    }
