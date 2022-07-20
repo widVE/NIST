@@ -6,32 +6,78 @@ using UnityEngine;
 public class SpawnListIndex : MonoBehaviour
 {
     public EasyVizARHeadsetManager manager;
-    public FeatureManager feature_manager = new FeatureManager(); // added
-    
+    public FeatureManager feature_manager; // added
+
 
     public List<GameObject> spawn_list = null;
     public GameObject spawn_root;
     public GameObject spawn_parent;
     public float offset_distance_z = 1;
 
-    /*
-    void GetLocation(string result)
+    public Dictionary<string, GameObject> feature_type_dictionary = new Dictionary<string, GameObject>(); // contains all possible marker objects
+
+
+    //For feature type 
+    public GameObject ambulance_icon;
+    public GameObject audio_icon;
+    public GameObject bad_person_icon;
+    public GameObject biohazard_icon;
+    public GameObject door_icon;
+    public GameObject elevator_icon;
+    public GameObject exit_icon;
+    public GameObject extinguisher_icon;
+    public GameObject fire_icon;
+    public GameObject headset_icon;
+    public GameObject injury_icon;
+    public GameObject message_icon;
+    public GameObject object_icon;
+    public GameObject person_icon;
+    public GameObject radiation_icon;
+    public GameObject stairs_icon;
+    public GameObject user_icon;
+    public GameObject warning_icon;
+
+
+    // Start is called before the first frame update
+    void Start()
     {
-        if (result != "error")
-        {
-            Debug.Log(result);
-        }
-        else
-        {
-        }
+        //populating the feature types dictionary //TODO: change to lowercase
+        feature_type_dictionary.Add("ambulance", ambulance_icon);
+        feature_type_dictionary.Add("audio", audio_icon);
+        feature_type_dictionary.Add("bad-person", bad_person_icon);
+        feature_type_dictionary.Add("biohazard", biohazard_icon);
+        feature_type_dictionary.Add("door", door_icon);
+        feature_type_dictionary.Add("elevator", elevator_icon);
+        feature_type_dictionary.Add("exit", exit_icon);
+        feature_type_dictionary.Add("extinguisher", extinguisher_icon);
+        feature_type_dictionary.Add("fire", fire_icon);
+        feature_type_dictionary.Add("headset", headset_icon);
+        feature_type_dictionary.Add("injury", injury_icon);
+        feature_type_dictionary.Add("message", message_icon);
+        feature_type_dictionary.Add("object", object_icon);
+        feature_type_dictionary.Add("person", person_icon);
+        feature_type_dictionary.Add("radiation", radiation_icon);
+        feature_type_dictionary.Add("stairs", stairs_icon);
+        feature_type_dictionary.Add("user", user_icon);
+        feature_type_dictionary.Add("warning", warning_icon);
+        feature_manager.ListFeatures();
+        //DisplayAllFeatureGameObjects();
+
 
     }
-    */
 
-    public void spawnObjectAtIndex(int index)
+    void Update()
     {
-        GameObject feature_to_spawn = spawn_list[index];
-        
+        DisplayAllFeatureGameObjects();
+    }
+
+
+    
+
+    public void spawnObjectAtIndex(string feature_type)
+    {
+        GameObject feature_to_spawn = feature_type_dictionary[feature_type];
+
         //Wow, this turns out to be really tricky wehn doing it via script. this was giving really weird
         //results because of the local vs world coordniate spaces I was thinking in. This code does
         //more to achive a shifted translation, that while relative to the camera, is always offset
@@ -42,49 +88,40 @@ public class SpawnListIndex : MonoBehaviour
         //visualize in the editor
 
         GameObject cloned_feature = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
-        Debug.Log("feature manager" + feature_manager);
-        if (!feature_manager.feature_gameobj_dictionary.ContainsValue(cloned_feature))
-        {
-
-            feature_manager.CreateNewFeature(index, cloned_feature);
+        //cloned_feature.AddComponent<MarkerObject>().index = index; // this might be useful for future if we want to change the object index
+        Debug.Log("feature manager" + this.feature_manager);
+        
+        
+        this.feature_manager.CreateNewFeature(feature_type, cloned_feature);
             //for testing
-           // feature_manager.UpateFeature(32, cloned_marker);
+            // feature_manager.UpateFeature(32, cloned_marker);
             // feature_manager.marker_list.Add();
-        }
-
-        /*
-        //Create our feature to be sent via JSON
-
-        EasyVizAR.Feature feature_to_post = new EasyVizAR.Feature();
-
-      //feature_to_post.created = ((float)System.DateTime.Now.Hour + ((float)System.DateTime.Now.Minute*0.01f));
-        //placeholder name of creator
-        feature_to_post.createdBy = "Test Marker";
-        //is the ID assigned by the server? we don't know
-      // feature_to_post.id = 1;
-        feature_to_post.name = "Hallway Fire";
-        feature_to_post.position = cloned_marker.transform.position;
         
-        //This doesn't work but why? The transform should be set, but it's realitve
-        //feature_to_post.position = maker_to_spawn.transform.position;
-        //We figured it out!! it's becase the marker to spawn is the template and not the actual game object
-        //that gets made via instantiate. We now have a reference to it via the cloned_marker and so we can
-        //access the correct transformation yey
-        
-        
-        feature_to_post.type = "hazard";
-        //This isn't correct right now. We need to have an update
-        //call when the obejct in manipulated.
-        
-     //   feature_to_post.updated = ((float)System.DateTime.Now.Hour + ((float)System.DateTime.Now.Minute * 0.01f));
-
-        //Serialize the feature into JSON
-        var data = JsonUtility.ToJson(feature_to_post);
-
-        //for sending stuff to the server 
-        EasyVizARServer.Instance.Post("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, data, GetLocation);
-        */
 
     }
+
+
+    // Displaying all the features for all Hololens 
+    [ContextMenu("DisplayAllFeatureGameObjects")]
+    public void DisplayAllFeatureGameObjects()
+    {
+        
+        
+        Debug.Log("number of elements in dictionary: " + feature_manager.feature_dictionary.Count);
+
+        foreach (EasyVizAR.Feature feature in this.feature_manager.feature_list.features)
+        {
+            // if (feature_manager.feature_dictionary.ContainsKey(feature.id)) continue;
+            // display only the feature from the server that is not currently in your scene. 
+            GameObject feature_object = feature_type_dictionary[feature.type];
+                //GameObject marker_to_display = this.feature_manager.feature_gameobj_dictionary[feature.id];
+            Instantiate(feature_object, new Vector3(feature.position.x, feature.position.y, feature.position.z), feature_object.transform.rotation, spawn_parent.transform);
+
+            
+        }
+        
+    }
+
+
 
 }

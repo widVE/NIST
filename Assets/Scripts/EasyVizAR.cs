@@ -112,7 +112,7 @@ namespace EasyVizAR
 		public int id;
 		public string name;
 		//Are we using the predefined Vect3f or using our custom class
-		public Vector3 position;
+		public Position position;
 		public FeatureDisplayStyle style;
 		public string type;
 		public float updated;
