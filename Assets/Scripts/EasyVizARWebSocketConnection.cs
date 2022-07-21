@@ -28,6 +28,14 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
         set { _webSocketURL = value; }
     }
 
+    [SerializeField]
+    string _locationId = "66a4e9f2-e978-4405-988e-e168a9429030";
+    public string LocationID
+    {
+        get { return _locationId; }
+        set { _locationId = value; }
+    }
+
     public GameObject featureManager = null;
     public GameObject headsetManager = null;
 
@@ -38,7 +46,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     {
         if (!featureManager)
         {
-            featureManager = GameObject.Find("FeatureManager");
+            featureManager = GameObject.Find("HandMenu_Large_AutoWorldLock_On_HandDrop_Marker_Array");
         }
         
         if (!headsetManager)
@@ -69,9 +77,9 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
                 Debug.Log("Subscribed to headset events.");
             }
             if (featureManager) {
-                await _ws.SendText("subscribe features:created");
-                await _ws.SendText("subscribe features:updated");
-                await _ws.SendText("subscribe features:deleted");
+                await _ws.SendText(string.Format("subscribe features:created /locations/{0}/*", _locationId));
+                await _ws.SendText(string.Format("subscribe features:updated /locations/{0}/*", _locationId));
+                await _ws.SendText(string.Format("subscribe features:deleted /locations/{0}/*", _locationId));
                 Debug.Log("Subscribed to feature events.");
             }
         };
@@ -81,59 +89,11 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
             Debug.Log("WS Error: " + error);
         };
 
-        _ws.OnMessage += (data) =>
+        _ws.OnMessage += this.onMessage;
+ /*       _ws.OnMessage += (data) =>
         {
-            // Message is in json-with-header format.
-            // <event description> <URI> <JSON body>
-            // Example:
-            // headsets:updated /headsets/123 {"current": {...}, "previous": {...}}
-            var message = System.Text.Encoding.UTF8.GetString(data);
-            var parts = message.Split(" ", 3);
 
-            switch(parts[0]) {
-                case "headsets:created":
-                    {
-                        HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(parts[2]);
-                        headsetManager.GetComponent<EasyVizARHeadsetManager>().CreateRemoteHeadset(ev.current);
-                        break;
-                    }
-                case "headsets:updated":
-                    {
-                        HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(parts[2]);
-                        headsetManager.GetComponent<EasyVizARHeadsetManager>().UpdateRemoteHeadset(ev.previous.name, ev.current);
-                        break;
-                    }
-                case "headsets:deleted":
-                    {
-                        HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(parts[2]);
-                        headsetManager.GetComponent<EasyVizARHeadsetManager>().DeleteRemoteHeadset(ev.previous.name);
-                        break;
-                    }
-                case "features:created":
-                    {
-                        FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(parts[2]);
-                        featureManager.GetComponent<FeatureManager>().AddFeatureFromServer(ev.current);
-                        break;
-                    }
-                case "features:updated":
-                    {
-                        FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(parts[2]);
-                        featureManager.GetComponent<FeatureManager>().UpdateFeatureFromServer(ev.current);
-                        break;
-                    }
-                case "features:deleted":
-                    {
-                        FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(parts[2]);
-                        featureManager.GetComponent<FeatureManager>().DeleteFeatureFromServer(ev.previous.id);
-                        break;
-                    }
-                default:
-                    {
-                        Debug.Log("Event: " + parts[0] + " " + parts[1]);
-                        break;
-                    }
-            }
-        };
+        };*/
 
         await _ws.Connect();
     }
@@ -148,6 +108,73 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
     private async void OnApplicationQuit()
     {
-        await _ws.Close();
+        if (_ws != null)
+        {
+            await _ws.Close();
+        }
+    }
+
+    private void onMessage(byte[] data)
+    {
+        // Message is in json-with-header format.
+        // <event description> <URI> <JSON body>
+        // Example:
+        // headsets:updated /headsets/123 {"current": {...}, "previous": {...}}
+        var message = System.Text.Encoding.UTF8.GetString(data);
+        var parts = message.Split(" ", 3);
+        if (parts.Length < 3)
+        {
+            Debug.Log("Warning: received malformed websocket message from server");
+            return;
+        }
+
+        string event_type = parts[0];
+        string event_uri = parts[1];
+        string event_body = parts[2];
+
+        switch (event_type)
+        {
+            case "headsets:created":
+                {
+                    HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
+                    headsetManager.GetComponent<EasyVizARHeadsetManager>().CreateRemoteHeadset(ev.current);
+                    break;
+                }
+            case "headsets:updated":
+                {
+                    HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
+                    headsetManager.GetComponent<EasyVizARHeadsetManager>().UpdateRemoteHeadset(ev.previous.name, ev.current);
+                    break;
+                }
+            case "headsets:deleted":
+                {
+                    HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
+                    headsetManager.GetComponent<EasyVizARHeadsetManager>().DeleteRemoteHeadset(ev.previous.name);
+                    break;
+                }
+            case "features:created":
+                {
+                    FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(event_body);
+                    featureManager.GetComponent<FeatureManager>().AddFeatureFromServer(ev.current);
+                    break;
+                }
+            case "features:updated":
+                {
+                    FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(event_body);
+                    featureManager.GetComponent<FeatureManager>().UpdateFeatureFromServer(ev.current);
+                    break;
+                }
+            case "features:deleted":
+                {
+                    FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(event_body);
+                    featureManager.GetComponent<FeatureManager>().DeleteFeatureFromServer(ev.previous.id);
+                    break;
+                }
+            default:
+                {
+                    Debug.Log("Event: " + event_type + " " + event_uri);
+                    break;
+                }
+        }
     }
 }

@@ -74,13 +74,16 @@ public class FeatureManager : MonoBehaviour
         feature_type_dictionary.Add("stairs", stairs_icon);
         feature_type_dictionary.Add("user", user_icon);
         feature_type_dictionary.Add("warning", warning_icon);
-        ListFeatures(); // this populates all the features listed on the server currently 
+
+        ListFeatures(); // this populates all the features listed on the server currently
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isChanged)
+        // We should only need to call ListFeatures once on entering a new location.
+        // After that, we can update the existing feature list from websocket events.
+        if (false && isChanged)
         {
             Debug.Log("reached Update()");
             ListFeatures();
@@ -196,7 +199,7 @@ public class FeatureManager : MonoBehaviour
             //Debug.Log("feature_list length: " + feature_list.features.Length);
             foreach (EasyVizAR.Feature feature in feature_list.features)
             {
-                if (!this.feature_dictionary.ContainsKey(feature.id))
+                if (!this.feature_dictionary.ContainsKey(feature.id) && feature_type_dictionary.ContainsKey(feature.type))
                 {
                     //Added from SpawnListIndex 
                     GameObject feature_object = feature_type_dictionary[feature.type];
@@ -322,7 +325,6 @@ public class FeatureManager : MonoBehaviour
             EasyVizAR.Feature delete_feature = feature_dictionary[id];
             var data = JsonUtility.ToJson(delete_feature);
             EasyVizARServer.Instance.Delete("locations/" + manager.LocationID + "/features/" + id, EasyVizARServer.JSON_TYPE, data, DeleteFeatureCallBack);
-
         }
     }
 
@@ -372,8 +374,13 @@ public class FeatureManager : MonoBehaviour
 
         if (feature_type_dictionary.ContainsKey(feature.type))
         {
+            Vector3 pos = Vector3.zero;
+            pos.x = feature.position.x;
+            pos.y = feature.position.y;
+            pos.z = feature.position.z;
+
             GameObject feature_to_spawn = feature_type_dictionary[feature.type];
-            GameObject marker = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
+            GameObject marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
 
             marker.AddComponent<MarkerObject>().feature = feature;
             feature_gameobj_dictionary.Add(feature.id, marker);
@@ -386,32 +393,23 @@ public class FeatureManager : MonoBehaviour
 
     public void UpdateFeatureFromServer(EasyVizAR.Feature feature)
     {
-        if (feature_dictionary.ContainsKey(feature.id))
-        {
-            var existing_feature = feature_dictionary[feature.id];
-            existing_feature.position = feature.position;
-            existing_feature.name = feature.name;
-
-            Vector3 newPos = Vector3.zero;
-            newPos.x = feature.position.x;
-            newPos.y = feature.position.y;
-            newPos.z = feature.position.z;
-
-            var existing_gameobj = feature_gameobj_dictionary[feature.id];
-            existing_gameobj.transform.position = newPos;
-        }
-        else
-        {
-            AddFeatureFromServer(feature);
-        }
+        // It is easiest to delete and recreate the feature, because
+        // its display settings such as the feature type may have changed.
+        DeleteFeatureFromServer(feature.id);
+        AddFeatureFromServer(feature);
     }
 
     public void DeleteFeatureFromServer(int id)
     {
         if (feature_dictionary.ContainsKey(id))
         {
-            feature_gameobj_dictionary.Remove(featureID);
             feature_dictionary.Remove(id);
+        }
+
+        if (feature_gameobj_dictionary.ContainsKey(id))
+        {
+            Destroy(feature_gameobj_dictionary[id]);
+            feature_gameobj_dictionary.Remove(id);
         }
     }
 
