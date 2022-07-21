@@ -5,6 +5,13 @@ using UnityEngine;
 using NativeWebSocket;
 
 [System.Serializable]
+public class FeaturesEvent
+{
+    public EasyVizAR.Feature previous;
+    public EasyVizAR.Feature current;
+}
+
+[System.Serializable]
 public class HeadsetsEvent
 {
     public EasyVizAR.Headset previous;
@@ -21,16 +28,23 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
         set { _webSocketURL = value; }
     }
 
-    private WebSocket _ws = null;
+    public GameObject featureManager = null;
+    public GameObject headsetManager = null;
 
-    private GameObject featureManager = null;
-    private GameObject headsetManager = null;
+    private WebSocket _ws = null;
 
     // Start is called before the first frame update
     async void Start()
     {
-        featureManager = GameObject.Find("FeatureManager");
-        headsetManager = GameObject.Find("EasyVizARHeadsetManager");
+        if (!featureManager)
+        {
+            featureManager = GameObject.Find("FeatureManager");
+        }
+        
+        if (!headsetManager)
+        {
+            headsetManager = GameObject.Find("EasyVizARHeadsetManager");
+        }
 
         // This is just a placeholder. We may need to set authorization headers later on.
         var headers = new Dictionary<string, string>
@@ -93,6 +107,24 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
                     {
                         HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(parts[2]);
                         headsetManager.GetComponent<EasyVizARHeadsetManager>().DeleteRemoteHeadset(ev.previous.name);
+                        break;
+                    }
+                case "features:created":
+                    {
+                        FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(parts[2]);
+                        featureManager.GetComponent<FeatureManager>().AddFeatureFromServer(ev.current);
+                        break;
+                    }
+                case "features:updated":
+                    {
+                        FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(parts[2]);
+                        featureManager.GetComponent<FeatureManager>().UpdateFeatureFromServer(ev.current);
+                        break;
+                    }
+                case "features:deleted":
+                    {
+                        FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(parts[2]);
+                        featureManager.GetComponent<FeatureManager>().DeleteFeatureFromServer(ev.previous.id);
                         break;
                     }
                 default:

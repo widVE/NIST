@@ -366,5 +366,53 @@ public class FeatureManager : MonoBehaviour
         }
     }
 
+    public void AddFeatureFromServer(EasyVizAR.Feature feature)
+    {
+        feature_dictionary.Add(feature.id, feature);
 
+        if (feature_type_dictionary.ContainsKey(feature.type))
+        {
+            GameObject feature_to_spawn = feature_type_dictionary[feature.type];
+            GameObject marker = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
+
+            marker.AddComponent<MarkerObject>().feature = feature;
+            feature_gameobj_dictionary.Add(feature.id, marker);
+        } 
+        else
+        {
+            Debug.Log("Feature type dictionary does not contain " + feature.type);
+        }
     }
+
+    public void UpdateFeatureFromServer(EasyVizAR.Feature feature)
+    {
+        if (feature_dictionary.ContainsKey(feature.id))
+        {
+            var existing_feature = feature_dictionary[feature.id];
+            existing_feature.position = feature.position;
+            existing_feature.name = feature.name;
+
+            Vector3 newPos = Vector3.zero;
+            newPos.x = feature.position.x;
+            newPos.y = feature.position.y;
+            newPos.z = feature.position.z;
+
+            var existing_gameobj = feature_gameobj_dictionary[feature.id];
+            existing_gameobj.transform.position = newPos;
+        }
+        else
+        {
+            AddFeatureFromServer(feature);
+        }
+    }
+
+    public void DeleteFeatureFromServer(int id)
+    {
+        if (feature_dictionary.ContainsKey(id))
+        {
+            feature_gameobj_dictionary.Remove(featureID);
+            feature_dictionary.Remove(id);
+        }
+    }
+
+}
