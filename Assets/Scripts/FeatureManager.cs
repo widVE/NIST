@@ -10,7 +10,7 @@ public class FeatureManager : MonoBehaviour
     public Dictionary<int, EasyVizAR.Feature> feature_dictionary = new Dictionary<int, EasyVizAR.Feature>(); // TODO: can delete this later after more integration
 
     // Each GameObject now contains a field call obj_feature (in the script MarkerObject.cs) so that feature is now one of the fields of the GameObject 
-    public Dictionary<int, GameObject> feature_gameobj_dictionary = new Dictionary<int, GameObject>(); // a seperate dictionary for keeping track of Gameobject in the scene
+    //public Dictionary<int, GameObject> feature_gameobj_dictionary = new Dictionary<int, GameObject>(); // a seperate dictionary for keeping track of Gameobject in the scene
     
     
     public EasyVizAR.FeatureList feature_list = new EasyVizAR.FeatureList();
@@ -28,6 +28,7 @@ public class FeatureManager : MonoBehaviour
     public GameObject spawn_parent;
     public Dictionary<string, GameObject> feature_type_dictionary = new Dictionary<string, GameObject>(); // contains all possible marker objects
     public bool isChanged = true;
+    public int curr_list_size = 0;
     // Feature objects
     public GameObject ambulance_icon;
     public GameObject audio_icon;
@@ -80,11 +81,14 @@ public class FeatureManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         if (isChanged)
         {
             Debug.Log("reached Update()");
             ListFeatures();
         }
+        
+        //ListFeatures();
         
     }
 
@@ -148,7 +152,7 @@ public class FeatureManager : MonoBehaviour
 
         // the line below will be kept, the ones above might get deleted in the future based on new implementation
         markerHolder.AddComponent<MarkerObject>().feature = featureHolder; // TODO: test if this exist    
-        feature_gameobj_dictionary.Add(resultJSON.id, markerHolder);
+        //feature_gameobj_dictionary.Add(resultJSON.id, markerHolder);
         //Debug.Log("added key?: " + feature_gameobj_dictionary.ContainsKey(resultJSON.id));
         //Debug.Log("post contain id?: " + feature_dictionary.ContainsKey(resultJSON.id));
 
@@ -193,7 +197,9 @@ public class FeatureManager : MonoBehaviour
         {
             Debug.Log("SUCCESS: " + result);
             this.feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList> ("{\"features\":" + result + "}");
+            
             //Debug.Log("feature_list length: " + feature_list.features.Length);
+            
             foreach (EasyVizAR.Feature feature in feature_list.features)
             {
                 if (!this.feature_dictionary.ContainsKey(feature.id))
@@ -207,9 +213,11 @@ public class FeatureManager : MonoBehaviour
                     //Debug.Log("added id: " + feature.id + " to the feature_dictionary");
                 }
             }
+            
 
             //disabling the Update()
             isChanged = false;
+           
         }
         else
         {
@@ -225,7 +233,7 @@ public class FeatureManager : MonoBehaviour
     [ContextMenu("UpateFeature")]
     public void UpateFeature() //    public void UpateFeature(int id, GameObject new_feature)
     {
-        ListFeatures();
+       // ListFeatures();
         
         //Debug.Log("contain id?: " + feature_dictionary.ContainsKey(featureID));
         //Debug.Log("length of feature_list: " + this.feature_list.features.Length);
@@ -314,7 +322,7 @@ public class FeatureManager : MonoBehaviour
     //[ContextMenu("DeleteFeature")]
     public void DeleteFeature(int id)
     {
-       // var id = featureID; //parameter 
+       //var id = featureID; //parameter 
 
         
         if (feature_dictionary.ContainsKey(id))
@@ -331,10 +339,17 @@ public class FeatureManager : MonoBehaviour
         if (result != "error")
         {
             Debug.Log("SUCCESS: " + result);
-            
+
             // update the respective dictionaries
-            feature_gameobj_dictionary.Remove(featureID);
-            feature_dictionary.Remove(featureID);
+            //feature_gameobj_dictionary.Remove(featureID);
+
+
+            //feature_dictionary.Remove(featureID);
+            feature_dictionary.Clear();
+            foreach (Transform child in spawn_parent.transform)
+            {
+                Destroy(child.gameObject);
+            }
             // trigger update
             isChanged = true;
 
@@ -367,4 +382,53 @@ public class FeatureManager : MonoBehaviour
     }
 
 
+    // This is alternative version for list feature --> not working though
+    /*
+    void ListFeatureCallBack(string result)
+    {
+        if (result != "error")
+        {
+            Debug.Log("SUCCESS: " + result);
+            this.feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList>("{\"features\":" + result + "}");
+
+            //Debug.Log("feature_list length: " + feature_list.features.Length);
+            
+            if (curr_list_size == 0 || curr_list_size != feature_list.features.Length)
+            {
+                curr_list_size = feature_list.features.Length;
+                foreach (EasyVizAR.Feature feature in feature_list.features)
+                {
+                    if (!this.feature_dictionary.ContainsKey(feature.id))
+                    {
+                        //Added from SpawnListIndex 
+                        GameObject feature_object = feature_type_dictionary[feature.type];
+                        Instantiate(feature_object, new Vector3(feature.position.x, feature.position.y, feature.position.z), feature_object.transform.rotation, spawn_parent.transform);
+
+
+                        this.feature_dictionary.Add(feature.id, feature);
+                        //Debug.Log("added id: " + feature.id + " to the feature_dictionary");
+                    }
+                }
+            }
+            else
+            {
+                //DO NOTHING SINCE THERE IS NO CHANGE TO THE # OF FEATURES
+            }
+            
+
+            //disabling the Update()
+            isChanged = false;
+
+        }
+        else
+        {
+            Debug.Log("ERROR: " + result);
+        }
+
     }
+    */
+
+
+
+
+}
