@@ -165,24 +165,24 @@ void CSOctant(uint3 gid : SV_DispatchThreadID)
     octantBuffer[id] = -1;
 
     float d = depthTexture[tCoords];
-    if(d < 0.0 || d > 8.0)
+    /*if(d < 0.0 || d > 8.0)
     {
         return;
-    }
+    }*/
 
     const float DEPTH_THRESH = 0.04;
 
     const float2 ONE_O_WH = float2(1.0, 1.0) / float2(depthWidth, depthHeight);
-    float c = confTexture.SampleLevel(samplerconfTexture, tCoords * ONE_O_WH, 0);
+    //float c = confTexture.SampleLevel(samplerconfTexture, tCoords * ONE_O_WH, 0);
     //uint fourMult = id % 4;
     //uint conf = ((c >> (fourMult*8)) & 0x000000FF);
-    if(c < CONFIDENCE_THRESH)
-    {
-        return;
-    }
+    //if(c < CONFIDENCE_THRESH)
+    //{
+    //    return;
+    //}
 
     int oneConfBad = 0;
-    int range = 2;
+    /*int range = 2;
     for(int i = -range; i <= range && !oneConfBad; ++i)
     {
         for(int j = -range; j <= range && !oneConfBad; ++j)
@@ -199,7 +199,7 @@ void CSOctant(uint3 gid : SV_DispatchThreadID)
                 }
             }
         }
-    }
+    }*/
 
     if(oneConfBad == 1)
     {
@@ -273,25 +273,25 @@ void CSTsdfGrid (uint3 gid : SV_DispatchThreadID)
     }
 
     float d = depthTexture[tCoords];
-    if(d < 0.0 || d > 8.0)
+    /*if(d < 0.0 || d > 8.0)
     {
         return;
-    }
+    }*/
 
     const float CONFIDENCE_THRESH = 2.0/255.0;
     const float2 ONE_O_WH = float2(1.0, 1.0) / float2(depthWidth, depthHeight);
-    float c = confTexture.SampleLevel(samplerconfTexture, tCoords * ONE_O_WH, 0);//[tCoords * 0.125];
+    /*float c = confTexture.SampleLevel(samplerconfTexture, tCoords * ONE_O_WH, 0);//[tCoords * 0.125];
     //uint fourMult = id % 4;
     //uint conf = ((c >> (fourMult*8)) & 0x000000FF);
     if(c < CONFIDENCE_THRESH)
     {
         return;
-    }
+    }*/
 
     const float DEPTH_THRESH = 0.04;
 
     int oneConfBad = 0;
-    int range = 2;
+    /*int range = 2;
     //or if any neighbors confidence is < 2, exit...
     for(int i = -range; i <= range && !oneConfBad; ++i)
     {
@@ -309,7 +309,7 @@ void CSTsdfGrid (uint3 gid : SV_DispatchThreadID)
                 }
             }
         }
-    }
+    }*/
     
     if(oneConfBad == 1)
     {

@@ -54,6 +54,7 @@ namespace winrt::HL2UnityPlugin::implementation
         void SetPointCloudRoiInSpace(float centerX, float centerY, float centerZ, float boundX, float boundY, float boundZ);
         void SetPointCloudDepthOffset(uint16_t offset);
         com_array<uint16_t> GetDepthMapBuffer();
+        com_array<uint16_t> GetDepthMapBufferFiltered();
         com_array<uint8_t> GetDepthMapTextureBuffer();
         com_array<uint16_t> GetShortAbImageBuffer();
         com_array<uint8_t> GetShortAbImageTextureBuffer();
@@ -72,6 +73,7 @@ namespace winrt::HL2UnityPlugin::implementation
     private:
         float* m_pointCloud = nullptr;
         int m_pointcloudLength = 0;
+        UINT16* m_depthMapFiltered = nullptr;
         UINT16* m_depthMap = nullptr;
         UINT8* m_depthMapTexture = nullptr;
         UINT16* m_shortAbImage = nullptr;

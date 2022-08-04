@@ -390,13 +390,15 @@ namespace winrt::HL2UnityPlugin::implementation
 
                 size_t outBufferCount = 0;
                 const UINT16* pDepth = nullptr;
-
+                
                 const BYTE* pSigma = nullptr;
                 pDepthFrame->GetSigmaBuffer(&pSigma, &outBufferCount);
                 pDepthFrame->GetBuffer(&pDepth, &outBufferCount);
                 pHL2ResearchMode->m_longDepthBufferSize = outBufferCount;
 
                 auto pDepthTexture = std::make_unique<uint8_t[]>(outBufferCount);
+                auto pDepthTextureFiltered = std::make_unique<uint16_t[]>(outBufferCount);
+
                 std::vector<float> pointCloud;
 
                 // get tracking transform
@@ -484,8 +486,15 @@ namespace winrt::HL2UnityPlugin::implementation
                         }
 
                         // save as grayscale texture pixel into temp buffer
-                        if (depth == 0) { pDepthTexture.get()[idx] = 0; }
-                        else { pDepthTexture.get()[idx] = (uint8_t)((float)depth / 4000 * 255); }
+                        if (depth == 0) { 
+							pDepthTexture.get()[idx] = 0;
+                            pDepthTextureFiltered.get()[idx] = 0;
+						}
+						
+                        else { 
+                            pDepthTexture.get()[idx] = (uint8_t)((float)depth / 4000 * 255);
+                            pDepthTextureFiltered.get()[idx] = depth;
+                        }
 
                         // save the depth of center pixel
                         if (i == (UINT)(0.35 * resolution.Height) && j == (UINT)(0.5 * resolution.Width)
@@ -514,6 +523,14 @@ namespace winrt::HL2UnityPlugin::implementation
                         pHL2ResearchMode->m_longDepthMap = new UINT16[outBufferCount];
                     }
                     memcpy(pHL2ResearchMode->m_longDepthMap, pDepth, outBufferCount * sizeof(UINT16));
+                    
+                    if (!pHL2ResearchMode->m_depthMapFiltered)
+                    {
+                        OutputDebugString(L"Create Space for depth map...\n");
+                        pHL2ResearchMode->m_depthMapFiltered = new UINT16[outBufferCount];
+                    }
+
+                    memcpy(pHL2ResearchMode->m_depthMapFiltered, pDepthTextureFiltered.get(), outBufferCount * sizeof(UINT16));
 
                     // save pre-processed depth map texture (for visualization)
                     if (!pHL2ResearchMode->m_longDepthMapTexture)
@@ -527,6 +544,8 @@ namespace winrt::HL2UnityPlugin::implementation
                 pHL2ResearchMode->m_longDepthMapTextureUpdated = true;
 
                 pDepthTexture.reset();
+
+                pDepthTextureFiltered.reset();
 
                 // release space
                 if (pDepthFrame) {
@@ -832,6 +851,13 @@ namespace winrt::HL2UnityPlugin::implementation
             delete[] m_depthMap;
             m_depthMap = nullptr;
         }
+
+        if (m_depthMapFiltered)
+        {
+            delete[] m_depthMapFiltered;
+            m_depthMapFiltered = nullptr;
+        }
+
         if (m_depthMapTexture) 
         {
             delete[] m_depthMapTexture;
@@ -932,7 +958,19 @@ namespace winrt::HL2UnityPlugin::implementation
 
         return tempBuffer;
     }
+	
+    com_array<uint16_t> HL2ResearchMode::GetDepthMapBufferFiltered()
+    {
+        std::lock_guard<std::mutex> l(mu);
+        if (!m_depthMapFiltered)
+        {
+            return com_array<uint16_t>();
+        }
+        com_array<UINT16> tempBuffer = com_array<UINT16>(m_depthMapFiltered, m_depthMapFiltered + m_longDepthBufferSize);
 
+        return tempBuffer;
+    }
+	
     com_array<uint8_t> HL2ResearchMode::GetLongDepthMapTextureBuffer()
     {
         std::lock_guard<std::mutex> l(mu);

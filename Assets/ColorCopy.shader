@@ -14,7 +14,7 @@ Shader "Unlit/CopyColorShader" {
             #include "UnityCG.cginc"
 
             UNITY_DECLARE_SCREENSPACE_TEXTURE(_MainTex);
-			UNITY_DECLARE_SCREENSPACE_TEXTURE(_DepthTex);
+			sampler2D_float _DepthTex;
             uniform float4 _MainTex_ST;
             uniform float4 _Color;
 			uniform float _depthWidth;
@@ -64,12 +64,13 @@ Shader "Unlit/CopyColorShader" {
 				//do lookups etc here...
 				float2 tc = i.texcoord;
 				//tc.y = 1.0 - tc.y;
-				float d = (UNITY_SAMPLE_SCREENSPACE_TEXTURE(_DepthTex, tc) * 255.0) * 4000.0;
+				float d = tex2D(_DepthTex, tc);
+				//also does sample screenspace texture return 0->1 or 0->255?
 				if(d > 0)
 				{
 					float wIndex = (i.texcoord.x * _depthWidth);
 					float hIndex = _depthHeight - (i.texcoord.y * _depthHeight);
-					float4 cameraPoint = float4(wIndex + 0.5, hIndex + 0.5, 1.0, 0.0);
+					float4 cameraPoint = float4(wIndex, hIndex, 1.0, 0.0);
 					if(cameraPoint.x >= 0 && cameraPoint.x < _depthWidth && cameraPoint.y >= 0 && cameraPoint.y < _depthHeight)
 					{
 						cameraPoint = mul(_camIntrinsicsInv, cameraPoint);
@@ -80,17 +81,22 @@ Shader "Unlit/CopyColorShader" {
 						newCameraPoint.w = 1.0;
 						float4 projPos = mul(_mvpColor, newCameraPoint);
 						projPos.xyz /= projPos.w;
-						projPos.xy = projPos.xy * 0.5 + 0.5;
-						projPos.y = 1.0 - projPos.y;
-						if(projPos.x >= 0 && projPos.x < 1.0 && projPos.y >= 0 && projPos.y < 1.0)
+						projPos.xyz = projPos.xyz * 0.5 + 0.5;
+						if(projPos.x >= 0 && projPos.x < 1.0 && projPos.y >= 0 && projPos.y < 1.0)// && projPos.z >= 0 && projPos.z < 1.0)
 						{
+							projPos.y = 1.0 - projPos.y;
 							return UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, projPos.xy); 
+						}
+						else
+						{
+							return fixed4(0,0,1,1);
 						}
 					}
 					//return UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, i.texcoord) * _Color;
+					return fixed4(0,1,0,1);
 				}
 				
-				return fixed4(0,0,0,0);
+				return fixed4(1,0,0,1);
             }
             ENDCG
 

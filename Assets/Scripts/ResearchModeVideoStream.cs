@@ -46,6 +46,8 @@ public class ResearchModeVideoStream : MonoBehaviour
     private Texture2D longDepthMediaTexture = null;
     private byte[] longDepthFrameData = null;
 
+	private Texture2D _depthTexFromHololens = null;
+	
     public GameObject LFPreviewPlane = null;
     private Material LFMediaMaterial = null;
     private Texture2D LFMediaTexture = null;
@@ -89,10 +91,14 @@ public class ResearchModeVideoStream : MonoBehaviour
 	const int DEPTH_WIDTH = 320;
 	const int DEPTH_HEIGHT = 288;
 	
+	//3904 x 2196...
+	//1952 x 1100...
 	const int COLOR_WIDTH = 760;
 	const int COLOR_HEIGHT = 428;
 	
 	byte[] depthTextureBytes = new byte[DEPTH_WIDTH*DEPTH_HEIGHT];
+	byte[] depthTextureFilteredBytes = new byte[DEPTH_WIDTH*DEPTH_HEIGHT*2];
+	byte[] floatDepthTextureBytes = new byte[DEPTH_WIDTH*DEPTH_HEIGHT*4];
 	
 	[SerializeField]
 	float _writeTime = 1f;
@@ -195,6 +201,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 #endif
 
 	Matrix4x4 _camIntrinsicsInv = Matrix4x4.identity;
+	
+	Matrix4x4 _pvIntrinsicsInv = Matrix4x4.identity;
 
 	[SerializeField]
 	bool _writeImagesToDisk = false;
@@ -207,6 +215,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 	bool _firstHeadsetSend = true;
 	
 	float _writeTimer = 0f;
+	
+	int _fileOutNumber = 0;
 	
 	//[SerializeField]
 	//Texture2D _testTexture;
@@ -284,6 +294,12 @@ public class ResearchModeVideoStream : MonoBehaviour
 
         //tcpClient = GetComponent<TCPClient>();
 
+		// Depth sensor should be initialized in only one mode
+        targetTexture = new Texture2D(COLOR_WIDTH, COLOR_HEIGHT, TextureFormat.RGBA32, false);
+		
+		_ourColor = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RGBA32, false);
+		_ourDepth = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.R8, false);
+		
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
 #else
@@ -291,12 +307,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 	
         researchMode.SetPointCloudDepthOffset(0);
 
-        // Depth sensor should be initialized in only one mode
-        targetTexture = new Texture2D(COLOR_WIDTH, COLOR_HEIGHT, TextureFormat.RGBA32, false);
-		
-		_ourColor = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RGBA32, false);
-		_ourDepth = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.R8, false);
-		
+
 		//if(longDepthPreviewPlane != null)
 		//{
 			researchMode.InitializeLongDepthSensor();
@@ -320,7 +331,14 @@ public class ResearchModeVideoStream : MonoBehaviour
 		_camIntrinsicsInv[8] = 160.0f;//373.018f/2.375f;//(float)int.Parse(camIntrinsicData[2]); // 7.5f;
 		_camIntrinsicsInv[9] = 144.0f;//200.805f/1.4861f;//(float)int.Parse(camIntrinsicData[3]); // 7.5f;
 		_camIntrinsicsInv = _camIntrinsicsInv.inverse;
-
+		
+		_pvIntrinsicsInv[0] = 587.189f;
+		_pvIntrinsicsInv[5] = 585.766f;
+		_pvIntrinsicsInv[8] = 373.018f;
+		_pvIntrinsicsInv[9] = 200.805f;
+		
+		_pvIntrinsicsInv = _pvIntrinsicsInv.inverse;
+		
 #if INCLUDE_TSDF
 		InitializeTSDF();
 #endif
@@ -330,6 +348,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 	void InitializeTSDF()
 	{
 		Debug.Log("Initializing TSDF");
+		
+		_depthTexFromHololens = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RFloat, false);
 		
 		if(_tsdfShader != null)
 		{
@@ -900,21 +920,34 @@ public class ResearchModeVideoStream : MonoBehaviour
 #else
 			if (startRealtimePreview && researchMode.LongDepthMapTextureUpdated())
 			{
-				//ushort[] frameTexture = researchMode.GetLongDepthMapBuffer();
+				ushort[] frameTextureFiltered = researchMode.GetDepthMapBufferFiltered();
 				byte[] frameTexture = researchMode.GetLongDepthMapTextureBuffer();
 				if (frameTexture.Length > 0)
 				{
-
-					
 					for(int i = 0; i < DEPTH_HEIGHT; ++i)
 					{
+						int b2Row = i * 2 * DEPTH_WIDTH;
+						int b4Row = i * 4 * DEPTH_WIDTH;
 						for(int j = 0; j < DEPTH_WIDTH; ++j)
 						{
 							int idx = (DEPTH_HEIGHT-i-1) * DEPTH_WIDTH + j;
 							int ourIdx = i * DEPTH_WIDTH + j;
 							depthTextureBytes[ourIdx] = frameTexture[idx];
+							byte[] bd = BitConverter.GetBytes(frameTextureFiltered[idx]);
+							depthTextureFilteredBytes[b2Row + j * 2] = bd[0];
+							depthTextureFilteredBytes[b2Row + j * 2 + 1] = bd[1];
+							float fD = (float)frameTextureFiltered[idx] / 1000f;	//values are in millimeters..., so divide by 1000 to get meters...
+							byte[] b = BitConverter.GetBytes(fD);
+							
+							floatDepthTextureBytes[b4Row + j * 4] = b[0];
+							floatDepthTextureBytes[b4Row + j * 4 + 1] = b[1];
+							floatDepthTextureBytes[b4Row + j * 4 + 2] = b[2];
+							floatDepthTextureBytes[b4Row + j * 4 + 3] = b[3];
 						}
 					}
+					
+					_depthTexFromHololens.LoadRawTextureData(floatDepthTextureBytes);
+					_depthTexFromHololens.Apply();
 					
 					//only if previewing the depth within our view do we need to load the depth data...
 
@@ -949,20 +982,23 @@ public class ResearchModeVideoStream : MonoBehaviour
 
 						//in the manual processing, the cameraToWorldMatrix here corresponds to the color camera's extrinsic matrix
 						//its 3rd column is negated, and we take the transpose of it
-						Matrix4x4 scanTransPV = cameraToWorldMatrix;//.transpose;
+						Matrix4x4 scanTransPV = cameraToWorldMatrix;
+						//Matrix4x4 scanTransPV = cameraToWorldMatrix;//.transpose;
 						Matrix4x4 zScale2 = Matrix4x4.identity;
 						Vector4 col3 = zScale2.GetColumn(2);
 						col3 = -col3;
 						zScale2.SetColumn(2, col3);
 						scanTransPV = zScale2 * scanTransPV;
-						scanTransPV = scanTransPV.transpose;
+						scanTransPV = scanTransPV.inverse;
 						
 						//Vector3 position = cameraToWorldMatrix.GetColumn(3) - cameraToWorldMatrix.GetColumn(2);
 						//Quaternion rotation = Quaternion.LookRotation(-cameraToWorldMatrix.GetColumn(2), cameraToWorldMatrix.GetColumn(1));
 
-						photoCaptureFrame.TryGetProjectionMatrix(Camera.main.nearClipPlane, Camera.main.farClipPlane, out Matrix4x4 projectionMatrix);
+						photoCaptureFrame.TryGetProjectionMatrix(/*Camera.main.nearClipPlane, Camera.main.farClipPlane, */out Matrix4x4 projectionMatrix);
 						
-						scanTransPV = projectionMatrix * scanTransPV;
+						//projectionMatrix = projectionMatrix.transpose;
+						
+						scanTransPV = projectionMatrix * scanTransPV;// * scanTransPV;
 						
 						//scanTransPV is now the MVP matrix of the color camera, this is used to project back unprojected depth image data to the color image
 						//to look up what corresponding color matches the depth, if any
@@ -973,13 +1009,13 @@ public class ResearchModeVideoStream : MonoBehaviour
 							scanTrans[i] = depthPos[i];
 						}
 						
-						//scanTrans = scanTrans.transpose;
+						//scanTrans = zScale2 * scanTrans;//scanTrans.transpose;
 
 						var commandBuffer = new UnityEngine.Rendering.CommandBuffer();
 						commandBuffer.name = "Color Blit Pass";
 						
 						_colorCopyMaterial.SetTexture("_MainTex", targetTexture);
-						_colorCopyMaterial.SetTexture("_DepthTex", longDepthMediaTexture);
+						_colorCopyMaterial.SetTexture("_DepthTex", _depthTexFromHololens);	//this is being passed in different from what is being written out... (perhaps upside down and reversed)
 						_colorCopyMaterial.SetFloat("_depthWidth", (float)DEPTH_WIDTH);
 						_colorCopyMaterial.SetFloat("_depthHeight", (float)DEPTH_HEIGHT);
 						_colorCopyMaterial.SetMatrix("_camIntrinsicsInv", _camIntrinsicsInv);
@@ -1007,68 +1043,85 @@ public class ResearchModeVideoStream : MonoBehaviour
 						
 						//at this point we have the depth mvp matrix, and the color proj / view matrix.
 						//need to project world space depth value into color image that matches depth image size...
-						
+						/*string debugOut = Path.Combine(Application.persistentDataPath, DateTime.Now.ToString("M_dd_yyyy_hh_mm_ss_")+_fileOutNumber.ToString()+".xyz");
+						_fileOutNumber++;
+						StreamWriter s = new StreamWriter(File.Open(debugOut, FileMode.Create));
+						Vector4 pos = Vector4.zero;
 						//this should happen in the BLIT shader above...
-						/*for(int n = 0; n < DEPTH_WIDTH*DEPTH_HEIGHT; ++n)
+						for(int i = 0; i < DEPTH_HEIGHT; ++i)
 						{
-							float depth = (float)((float)depthTextureBytes[n] / 255f) * 4000f;
-							//Debug.Log("Depth: " + depth);
-
-							int wIndex = (int)(n % DEPTH_WIDTH);
-							int hIndex = (int)DEPTH_HEIGHT - (int)(n / DEPTH_WIDTH);
+							for(int j = 0; j < DEPTH_WIDTH; ++j)
+							{
+								int idx = (DEPTH_HEIGHT-i-1) * DEPTH_WIDTH + j;
 							
-							//uint numRows = numPoints / numCols;
-
-							int colorWidth = (int)760;
-							int colorHeight = (int)428;
-				
-							uint idx = (uint)(hIndex * (int)DEPTH_WIDTH + wIndex);
-							//byte cData = confData[idx];
-							
-							pos.x = 0f;
-							pos.y = 0f;
-							pos.z = 0f;
-							pos.w = 1.0f;*/
-							
-							//if(cData >= ipadConfidence)
-							/*{
-								Vector3 cameraPoint = new Vector3(wIndex + 0.5f, hIndex + 0.5f, 1f);
-								cameraPoint = _camIntrinsicsInv.MultiplyVector(cameraPoint);
-								cameraPoint *= depth;
-								//cameraPoint.z = -cameraPoint.z;
-								Vector4 newCamPoint = new Vector4(cameraPoint.x, cameraPoint.y, cameraPoint.z, 1f);
-								//Debug.Log(newCamPoint.ToString("F3"));
 								
-								Vector4 projectedPoint = scanTrans * newCamPoint;
+								//Debug.Log("Depth: " + depth);
+
+								//int wIndex = (int)(n % DEPTH_WIDTH);
+								//int hIndex = (int)DEPTH_HEIGHT - (int)(n / DEPTH_WIDTH);
 								
-								pos.x = projectedPoint.x / projectedPoint.w;
-								pos.y = projectedPoint.y / projectedPoint.w;
-								pos.z = projectedPoint.z / projectedPoint.w;
+								//uint numRows = numPoints / numCols;
 
-							}
-							
-							//Debug.Log(pos.ToString("F4"));
-							//we now want to project pos into the color image to look up the color value for the new color image
-							//this will replace the below colorIdx calculation...
-							//need full view projection...
-							//do we have this?
-							
-							Vector4 projPos = scanTransPV * pos;
-							//projPos = camIntrinsics2 * projPos;
-							//Debug.Log(projPos.ToString("F4"));
-							projPos.x /= projPos.w;
-							projPos.y /= projPos.w;
-							projPos.z /= projPos.w;
-							projPos.x = projPos.x * 0.5f + 0.5f;
-							projPos.y = projPos.y * 0.5f + 0.5f;
-							//projPos.x = 1f - projPos.x;
-							//projPos.y = 1f - projPos.y;
+								int colorWidth = (int)760;
+								int colorHeight = (int)428;
+					
+								//uint idx = (uint)(j * (int)DEPTH_WIDTH + i);
+								//byte cData = confData[idx];
+								float fD = (float)frameTextureFiltered[idx] / 5000f;
+								
+								pos.x = 0f;
+								pos.y = 0f;
+								pos.z = 0f;
+								pos.w = 1.0f;
+								
+								if(fD > 0)
+								//if(cData >= ipadConfidence)
+								{
+									Vector3 cameraPoint = new Vector3(j + 0.5f, i + 0.5f, 1f);
+									cameraPoint = _camIntrinsicsInv.MultiplyVector(cameraPoint);
+									cameraPoint *= fD;
+									//cameraPoint.z = -cameraPoint.z;
+									Vector4 newCamPoint = new Vector4(cameraPoint.x, cameraPoint.y, cameraPoint.z, 1f);
+									//Debug.Log(newCamPoint.ToString("F3"));
+									
+									Vector4 projectedPoint = scanTrans * newCamPoint;
+									
+									pos.x = projectedPoint.x / projectedPoint.w;
+									pos.y = projectedPoint.y / projectedPoint.w;
+									pos.z = projectedPoint.z / projectedPoint.w;
+									
+									s.Write(pos.x.ToString("F4") + " " + pos.y.ToString("F4") + " " + pos.z.ToString("F4") + " 0.5 0.5 0.5\n");
+								}
+								else
+								{
+									s.Write("0 0 0 0.5 0.5 0.5\n");
+								}*/
+								
+								//Debug.Log(pos.ToString("F4"));
+								//we now want to project pos into the color image to look up the color value for the new color image
+								//this will replace the below colorIdx calculation...
+								//need full view projection...
+								//do we have this?
+								
+								/*Vector4 projPos = scanTransPV * pos;
+								//projPos = camIntrinsics2 * projPos;
+								//Debug.Log(projPos.ToString("F4"));
+								projPos.x /= projPos.w;
+								projPos.y /= projPos.w;
+								projPos.z /= projPos.w;
+								projPos.x = projPos.x * 0.5f + 0.5f;
+								projPos.y = projPos.y * 0.5f + 0.5f;
+								//projPos.x = 1f - projPos.x;
+								//projPos.y = 1f - projPos.y;
 
-							//Debug.Log(projPos.x);
-							//Debug.Log(projPos.y);
-							int hIdx = (int)((float)colorHeight * projPos.y);
-							int wIdx = (int)((float)colorWidth * projPos.x);*/
-						//}
+								//Debug.Log(projPos.x);
+								//Debug.Log(projPos.y);
+								int hIdx = (int)((float)colorHeight * projPos.y);
+								int wIdx = (int)((float)colorWidth * projPos.x);*/
+						/*	}
+						}
+						
+						s.Close();*/
 
 						if(_gpuIndices.Count > 0)
 						{
@@ -1081,7 +1134,9 @@ public class ResearchModeVideoStream : MonoBehaviour
 							if(_gridsFound)
 							{	
 								_lastCopyCount = ManageMemory();
-							
+								
+								System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "test.txt"), _lastCopyCount.ToString());
+								
 								UnprojectPoints(_lastCopyCount);
 
 								_updateImages = true;
@@ -1127,35 +1182,36 @@ public class ResearchModeVideoStream : MonoBehaviour
 						}
 					}
 					
-					/*var commandBufferDepth = new UnityEngine.Rendering.CommandBuffer();
+					var commandBufferDepth = new UnityEngine.Rendering.CommandBuffer();
 					commandBufferDepth.name = "Depth Blit Pass";
 					
-					_depthCopyMaterial.SetTexture("_MainTex", longDepthMediaTexture);
+					_depthCopyMaterial.SetTexture("_MainTex", _depthTexFromHololens);
 					
-					currentActiveRT = RenderTexture.active;
+					RenderTexture currentActiveRT2 = RenderTexture.active;
 					
 					Graphics.SetRenderTarget(_depthRT.colorBuffer,_depthRT.depthBuffer);
-					//commandBuffer.ClearRenderTarget(false, true, Color.black);
-					commandBufferDepth.Blit(longDepthMediaTexture, UnityEngine.Rendering.BuiltinRenderTextureType.CurrentActive, _depthCopyMaterial);
+					commandBufferDepth.ClearRenderTarget(false, true, Color.black);
+					commandBufferDepth.Blit(_depthTexFromHololens, UnityEngine.Rendering.BuiltinRenderTextureType.CurrentActive, _depthCopyMaterial);
 					Graphics.ExecuteCommandBuffer(commandBufferDepth);
 					
 					_ourDepth.ReadPixels(new Rect(0, 0, _ourDepth.width, _ourDepth.height), 0, 0, false);
 					_ourDepth.Apply();
 					
-					if(currentActiveRT != null)
+					if(currentActiveRT2 != null)
 					{
-						Graphics.SetRenderTarget(currentActiveRT.colorBuffer, currentActiveRT.depthBuffer);
+						Graphics.SetRenderTarget(currentActiveRT2.colorBuffer, currentActiveRT2.depthBuffer);
 					}
 					else
 					{
 						RenderTexture.active = null;
-					}*/
+					}
 					
 					//not using 16 bit depth as the raw depth buffer from the research mode plugin doesn't handle the sigma buffer within it ahead of time..
 					if(WriteImagesToDisk)
 					{
 						string filename = string.Format(@"CapturedImageDepth{0}_n.png", currTime);
-						File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(depthTextureBytes, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
+						//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(depthTextureBytes, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
+						File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(depthTextureFilteredBytes, UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm, 320, 288));
 						//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(frameTexture, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
 						//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(_ourDepth.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm, 320, 288));
 					}

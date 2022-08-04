@@ -6,6 +6,7 @@ namespace HL2UnityPlugin
 
         UInt16 GetCenterDepth();
         UInt16[] GetDepthMapBuffer();
+        UInt16[] GetDepthMapBufferFiltered();
         UInt8[] GetDepthMapTextureBuffer();
         UInt16[] GetShortAbImageBuffer();
         UInt8[] GetShortAbImageTextureBuffer();
