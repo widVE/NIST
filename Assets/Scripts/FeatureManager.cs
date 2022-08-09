@@ -117,43 +117,41 @@ public class FeatureManager : MonoBehaviour
         
         //Serialize the feature into JSON
         var data = JsonUtility.ToJson(feature_to_post);
-       // Debug.Log("Json utility: " + feature_to_post.id);
-       // Debug.Log("locations/" + manager.LocationID + "/features");
+        // Debug.Log("Json utility: " + feature_to_post.id);
+        // Debug.Log("locations/" + manager.LocationID + "/features");
         //for sending stuff to the server 
-        
-        EasyVizARServer.Instance.Post("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, data, PostFeature);
+
+        EasyVizARServer.Instance.Post("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, data, delegate (string result)
+        {
+            // Pass the relevant marker GameObject to the callback so that it can be updated.
+            PostFeature(result, marker);
+        });
    
-        
         featureHolder = feature_to_post;
-        markerHolder = marker;
-        
+        markerHolder = marker;     
     }
 
     // a callback function
-    void PostFeature(string result)
+    void PostFeature(string result, GameObject marker)
     {
-        var resultJSON = JsonUtility.FromJson<EasyVizAR.Feature>(result);
         if (result != "error")
         {
-            Debug.Log("SUCCESS: " + result);
-            //ListFeatures();
-            //Debug.Log("new ID added: " + resultJSON.id);
-            feature_dictionary.Add(resultJSON.id, featureHolder);
-            //Debug.Log("Post: number of elements in dictionary right now: " + feature_dictionary.Count);
+            var resultJSON = JsonUtility.FromJson<EasyVizAR.Feature>(result);
 
-            // enabling the Update() 
-            isChanged = true;
+            // Remove the temporary local marker and add a new one with a valid ID.
+            Destroy(marker);
+            UpdateFeatureFromServer(resultJSON);
 
+            //feature_dictionary.Add(resultJSON.id, featureHolder);
+            //marker.name = string.Format("feature-{0}", resultJSON.id);
         }
         else
         {
             Debug.Log("ERROR: " + result);
         }
         
-
-
         // the line below will be kept, the ones above might get deleted in the future based on new implementation
-        markerHolder.AddComponent<MarkerObject>().feature = featureHolder; // TODO: test if this exist    
+        //markerHolder.AddComponent<MarkerObject>().feature = featureHolder; // TODO: test if this exist    
         //feature_gameobj_dictionary.Add(resultJSON.id, markerHolder);
         //Debug.Log("added key?: " + feature_gameobj_dictionary.ContainsKey(resultJSON.id));
         //Debug.Log("post contain id?: " + feature_dictionary.ContainsKey(resultJSON.id));
@@ -197,25 +195,15 @@ public class FeatureManager : MonoBehaviour
     void ListFeatureCallBack(string result) {
         if (result != "error")
         {
-            Debug.Log("SUCCESS: " + result);
             this.feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList> ("{\"features\":" + result + "}");
             
             //Debug.Log("feature_list length: " + feature_list.features.Length);
             
             foreach (EasyVizAR.Feature feature in feature_list.features)
             {
-                if (!this.feature_dictionary.ContainsKey(feature.id) && feature_type_dictionary.ContainsKey(feature.type))
-                {
-                    //Added from SpawnListIndex 
-                    GameObject feature_object = feature_type_dictionary[feature.type];
-                    Instantiate(feature_object, new Vector3(feature.position.x, feature.position.y, feature.position.z), feature_object.transform.rotation, spawn_parent.transform);
-
-
-                    this.feature_dictionary.Add(feature.id, feature);
-                    //Debug.Log("added id: " + feature.id + " to the feature_dictionary");
-                }
+                // This will add the feature if it is new or update an existing one.
+                UpdateFeatureFromServer(feature);
             }
-            
 
             //disabling the Update()
             isChanged = false;
@@ -227,9 +215,6 @@ public class FeatureManager : MonoBehaviour
         }
 
     }
-
-
-
 
 
     [ContextMenu("UpateFeature")]
@@ -339,21 +324,8 @@ public class FeatureManager : MonoBehaviour
     {
         if (result != "error")
         {
-            Debug.Log("SUCCESS: " + result);
-
-            // update the respective dictionaries
-            //feature_gameobj_dictionary.Remove(featureID);
-
-
-            //feature_dictionary.Remove(featureID);
-            feature_dictionary.Clear();
-            foreach (Transform child in spawn_parent.transform)
-            {
-                Destroy(child.gameObject);
-            }
-            // trigger update
-            isChanged = true;
-
+            var resultJSON = JsonUtility.FromJson<EasyVizAR.Feature>(result);
+            DeleteFeatureFromServer(resultJSON.id);
         }
         else
         {
@@ -367,6 +339,7 @@ public class FeatureManager : MonoBehaviour
     {
         GameObject feature_to_spawn = feature_type_dictionary[feature_type];
         GameObject cloned_feature = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
+        cloned_feature.name = "feature-local";
         CreateNewFeature(feature_type, cloned_feature);
 
     }
@@ -386,23 +359,24 @@ public class FeatureManager : MonoBehaviour
     {
         feature_dictionary.Add(feature.id, feature);
 
+        GameObject feature_to_spawn;
         if (feature_type_dictionary.ContainsKey(feature.type))
         {
-            Vector3 pos = Vector3.zero;
-            pos.x = feature.position.x;
-            pos.y = feature.position.y;
-            pos.z = feature.position.z;
-
-            GameObject feature_to_spawn = feature_type_dictionary[feature.type];
-            GameObject marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
-
-            marker.AddComponent<MarkerObject>().feature = feature;
-            feature_gameobj_dictionary.Add(feature.id, marker);
+            feature_to_spawn = feature_type_dictionary[feature.type];
         } 
         else
         {
             Debug.Log("Feature type dictionary does not contain " + feature.type);
+            feature_to_spawn = warning_icon;
         }
+
+        Vector3 pos = Vector3.zero;
+        pos.x = feature.position.x;
+        pos.y = feature.position.y;
+        pos.z = feature.position.z;
+
+        GameObject marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
+        marker.name = string.Format("feature-{0}", feature.id);
     }
 
     public void UpdateFeatureFromServer(EasyVizAR.Feature feature)
@@ -420,10 +394,10 @@ public class FeatureManager : MonoBehaviour
             feature_dictionary.Remove(id);
         }
 
-        if (feature_gameobj_dictionary.ContainsKey(id))
+        var feature_object = spawn_parent.transform.Find(string.Format("feature-{0}", id));
+        if (feature_object)
         {
-            Destroy(feature_gameobj_dictionary[id]);
-            feature_gameobj_dictionary.Remove(id);
+            Destroy(feature_object.gameObject);
         }
     }
 
