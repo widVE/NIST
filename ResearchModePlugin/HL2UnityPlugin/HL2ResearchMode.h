@@ -68,6 +68,8 @@ namespace winrt::HL2UnityPlugin::implementation
         com_array<float> GetCenterPoint();
         com_array<float> GetDepthSensorPosition();
         com_array<float> GetDepthToWorld();
+        com_array<float> GetCurrRotation();
+        com_array<float> GetCurrPosition();
         std::mutex mu;
 
     private:
@@ -117,6 +119,8 @@ namespace winrt::HL2UnityPlugin::implementation
         float m_centerPoint[3]{ 0,0,0 };
         float m_depthSensorPosition[3]{ 0,0,0 };
         float m_depthToWorld[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
+        float m_currRotation[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
+        float m_currPosition[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
         std::atomic_bool m_depthSensorLoopStarted = false;
         std::atomic_bool m_longDepthSensorLoopStarted = false;
         std::atomic_bool m_spatialCamerasFrontLoopStarted = false;

@@ -424,7 +424,7 @@ namespace winrt::HL2UnityPlugin::implementation
                 auto rotMat = XMMatrixRotationQuaternion(XMLoadFloat4(&quatInDx));
                 auto pos = transToWorld.Position();
                 auto posMat = XMMatrixTranslation(pos.x, pos.y, pos.z);
-                auto depthToWorld = pHL2ResearchMode->m_longDepthCameraPoseInvMatrix * rotMat * posMat;
+                auto depthToWorld = pHL2ResearchMode->m_longDepthCameraPoseInvMatrix *rotMat* posMat;
 
                 pHL2ResearchMode->mu.lock();
                 
@@ -436,6 +436,8 @@ namespace winrt::HL2UnityPlugin::implementation
                     for (int q = 0; q < 4; ++q)
                     {
                         pHL2ResearchMode->m_depthToWorld[p * 4 + q] = depthToWorld.r[p].n128_f32[q];
+                        pHL2ResearchMode->m_currRotation[p * 4 + q] = rotMat.r[p].n128_f32[q];
+                        pHL2ResearchMode->m_currPosition[p * 4 + q] = posMat.r[p].n128_f32[q];
                     }
                 }
 
@@ -903,7 +905,7 @@ namespace winrt::HL2UnityPlugin::implementation
             return com_array<uint16_t>();
         }
         com_array<UINT16> tempBuffer = com_array<UINT16>(m_depthMap, m_depthMap + m_depthBufferSize);
-        
+        m_depthMapTextureUpdated = false;
         return tempBuffer;
     }
 
@@ -955,7 +957,7 @@ namespace winrt::HL2UnityPlugin::implementation
             return com_array<uint16_t>();
         }
         com_array<UINT16> tempBuffer = com_array<UINT16>(m_longDepthMap, m_longDepthMap + m_longDepthBufferSize);
-
+        m_longDepthMapTextureUpdated = false;
         return tempBuffer;
     }
 	
@@ -967,7 +969,7 @@ namespace winrt::HL2UnityPlugin::implementation
             return com_array<uint16_t>();
         }
         com_array<UINT16> tempBuffer = com_array<UINT16>(m_depthMapFiltered, m_depthMapFiltered + m_longDepthBufferSize);
-
+        m_longDepthMapTextureUpdated = false;
         return tempBuffer;
     }
 	
@@ -1071,6 +1073,22 @@ namespace winrt::HL2UnityPlugin::implementation
     {
         std::lock_guard<std::mutex> l(mu);
         com_array<float> depthToWorld = com_array<float>(std::move_iterator(m_depthToWorld), std::move_iterator(m_depthToWorld + 16));
+
+        return depthToWorld;
+    }
+
+    com_array<float> HL2ResearchMode::GetCurrRotation()
+    {
+        std::lock_guard<std::mutex> l(mu);
+        com_array<float> depthToWorld = com_array<float>(std::move_iterator(m_currRotation), std::move_iterator(m_currRotation + 16));
+
+        return depthToWorld;
+    }
+
+    com_array<float> HL2ResearchMode::GetCurrPosition()
+    {
+        std::lock_guard<std::mutex> l(mu);
+        com_array<float> depthToWorld = com_array<float>(std::move_iterator(m_currPosition), std::move_iterator(m_currPosition + 16));
 
         return depthToWorld;
     }

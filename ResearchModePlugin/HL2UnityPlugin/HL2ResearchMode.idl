@@ -23,6 +23,9 @@ namespace HL2UnityPlugin
         Single[] GetCenterPoint();
         Single[] GetDepthSensorPosition();
         Single[] GetDepthToWorld();
+        Single[] GetCurrRotation();
+        Single[] GetCurrPosition();
+
         Int32 GetDepthBufferSize();
         Int32 GetLongDepthBufferSize();
         String PrintDepthResolution();
