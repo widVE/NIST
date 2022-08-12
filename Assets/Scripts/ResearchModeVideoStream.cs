@@ -855,13 +855,35 @@ public class ResearchModeVideoStream : MonoBehaviour
 						if(res != false)
 						{
 							
-							for(int i = 0; i < DEPTH_HEIGHT; ++i)
+							/*for(int i = 0; i < DEPTH_HEIGHT; ++i)
 							{
 								int b2Row = i * 2 * DEPTH_WIDTH;
 								int b4Row = i * 4 * DEPTH_WIDTH;
 								for(int j = 0; j < DEPTH_WIDTH; ++j)
 								{
 									int idx = (DEPTH_HEIGHT-i-1) * DEPTH_WIDTH + j;
+									int ourIdx = i * DEPTH_WIDTH + j;
+									depthTextureBytes[ourIdx] = frameTexture[idx];
+									byte[] bd = BitConverter.GetBytes(frameTextureFiltered[idx]);
+									depthTextureFilteredBytes[b2Row + j * 2] = bd[0];
+									depthTextureFilteredBytes[b2Row + j * 2 + 1] = bd[1];
+									float fD = (float)frameTextureFiltered[idx] / 1000f;	//values are in millimeters..., so divide by 1000 to get meters...
+									byte[] b = BitConverter.GetBytes(fD);
+									
+									floatDepthTextureBytes[b4Row + j * 4] = b[0];
+									floatDepthTextureBytes[b4Row + j * 4 + 1] = b[1];
+									floatDepthTextureBytes[b4Row + j * 4 + 2] = b[2];
+									floatDepthTextureBytes[b4Row + j * 4 + 3] = b[3];
+								}
+							}*/
+							
+							for(int i = 0; i < DEPTH_HEIGHT; ++i)
+							{
+								int b2Row = i * 2 * DEPTH_WIDTH;
+								int b4Row = i * 4 * DEPTH_WIDTH;
+								for(int j = 0; j < DEPTH_WIDTH; ++j)
+								{
+									int idx = i * DEPTH_WIDTH + j;
 									int ourIdx = i * DEPTH_WIDTH + j;
 									depthTextureBytes[ourIdx] = frameTexture[idx];
 									byte[] bd = BitConverter.GetBytes(frameTextureFiltered[idx]);
@@ -902,6 +924,19 @@ public class ResearchModeVideoStream : MonoBehaviour
 							targetTexture.SetPixels(colorArray.ToArray());
 							targetTexture.Apply();
 
+							Matrix4x4 scanTrans = Matrix4x4.identity;
+							//Matrix4x4 currPosMat = Matrix4x4.identity;
+							//Matrix4x4 currRotMat = Matrix4x4.identity;
+							
+							//float[] currRot = researchMode.GetCurrRotation();
+							//float[] currPos = researchMode.GetCurrPosition();
+							
+							for(int i = 0; i < 16; ++i)
+							{
+								scanTrans[i] = depthPos[i];
+								//currPosMat[i] = currPos[i];
+								//currRotMat[i] = currRot[i];
+							}
 							
 							//in the manual processing, the cameraToWorldMatrix here corresponds to the color camera's extrinsic matrix
 							//its 3rd column is negated, and we take the transpose of it
@@ -912,9 +947,23 @@ public class ResearchModeVideoStream : MonoBehaviour
 							col3 = -col3;
 							zScale2.SetColumn(2, col3);
 							
-							scanTransPV = zScale2 * scanTransPV;
-							scanTransPV = scanTransPV.inverse;
+							//scanTransPV = scanTransPV.transpose;
+							//scanTransPV = zScale2 * scanTransPV;
 							
+							Matrix4x4 worldToCamera = scanTransPV.inverse;
+							
+							worldToCamera[3] = -worldToCamera[12];
+							worldToCamera[7] = worldToCamera[13];
+							worldToCamera[11] = worldToCamera[14];
+							worldToCamera[12] = 0f;
+							worldToCamera[13] = 0f;
+							worldToCamera[14] = 0f;
+							
+							//scanTransPV = scanTransPV * currRotMat.transpose * currPosMat.transpose;
+							Matrix4x4 flippedWtC = /*zScale2 */ worldToCamera;
+						
+							
+							//scanTransPV = scanTransPV.transpose;
 							
 							//Vector3 position = cameraToWorldMatrix.GetColumn(3) - cameraToWorldMatrix.GetColumn(2);
 							//Quaternion rotation = Quaternion.LookRotation(-cameraToWorldMatrix.GetColumn(2), cameraToWorldMatrix.GetColumn(1));
@@ -926,31 +975,22 @@ public class ResearchModeVideoStream : MonoBehaviour
 							
 							//scanTransPV is now the MVP matrix of the color camera, this is used to project back unprojected depth image data to the color image
 							//to look up what corresponding color matches the depth, if any
-							//float[] currRot = researchMode.GetCurrRotation();
-							//float[] currPos = researchMode.GetCurrPosition();
+
+							scanTransPV = projectionMatrix * flippedWtC;// * scanTransPV;
 							
-							Matrix4x4 scanTrans = Matrix4x4.identity;
-							//Matrix4x4 currPosMat = Matrix4x4.identity;
-							//Matrix4x4 currRotMat = Matrix4x4.identity;
+							scanTrans = zScale2 * scanTrans;//scanTrans.transpose;
 							
-							for(int i = 0; i < 16; ++i)
-							{
-								scanTrans[i] = depthPos[i];
-								//currPosMat[i] = currPos[i];
-								//currRotMat[i] = currRot[i];
-							}
-							
-							//scanTransPV = scanTransPV * currRotMat * currPosMat;
-							//scanTransPV = zScale2 * scanTransPV;
-							
-							scanTransPV = projectionMatrix * scanTransPV;// * scanTransPV;
+							scanTrans[3] = -scanTrans[12];
+							scanTrans[7] = scanTrans[13];
+							scanTrans[11] = -scanTrans[14];
+							scanTrans[12] = 0f;
+							scanTrans[13] = 0f;
+							scanTrans[14] = 0f;
 							
 							_tsdfShader.SetMatrix("localToWorld", scanTrans);
 							_tsdfShader.SetMatrix("viewProjMatrix", scanTransPV);
 							
-							//scanTrans = zScale2 * scanTrans;//scanTrans.transpose;
-							//scanTrans = scanTrans.transpose;
-							
+
 							var commandBuffer = new UnityEngine.Rendering.CommandBuffer();
 							commandBuffer.name = "Color Blit Pass";
 							
@@ -1088,22 +1128,37 @@ public class ResearchModeVideoStream : MonoBehaviour
 							//RenderPoints(_lastCopyCount);
 
 							//write pv / projection matrices...
-							/*if(WriteImagesToDisk)
+							if(WriteImagesToDisk)
 							{
 								string colorString = cameraToWorldMatrix[0].ToString("F4") + " " + cameraToWorldMatrix[1].ToString("F4") + " " + cameraToWorldMatrix[2].ToString("F4") + " " + cameraToWorldMatrix[3].ToString("F4") + "\n";
 								colorString = colorString + (cameraToWorldMatrix[4].ToString("F4") + " " + cameraToWorldMatrix[5].ToString("F4") + " " + cameraToWorldMatrix[6].ToString("F4") + " " + cameraToWorldMatrix[7].ToString("F4") + "\n");
 								colorString = colorString + (cameraToWorldMatrix[8].ToString("F4") + " " + cameraToWorldMatrix[9].ToString("F4") + " " + cameraToWorldMatrix[10].ToString("F4") + " " + cameraToWorldMatrix[11].ToString("F4") + "\n");
 								colorString = colorString + (cameraToWorldMatrix[12].ToString("F4") + " " + cameraToWorldMatrix[13].ToString("F4") + " " + cameraToWorldMatrix[14].ToString("F4") + " " + cameraToWorldMatrix[15].ToString("F4") + "\n");
 								
-								colorString = colorString + (projectionMatrix[0].ToString("F4") + " " + projectionMatrix[1].ToString("F4") + " " + projectionMatrix[2].ToString("F4") + " " + projectionMatrix[3].ToString("F4") + "\n");
-								colorString = colorString + (projectionMatrix[4].ToString("F4") + " " + projectionMatrix[5].ToString("F4") + " " + projectionMatrix[6].ToString("F4") + " " + projectionMatrix[7].ToString("F4") + "\n");
-								colorString = colorString + (projectionMatrix[8].ToString("F4") + " " + projectionMatrix[9].ToString("F4") + " " + projectionMatrix[10].ToString("F4") + " " + projectionMatrix[11].ToString("F4") + "\n");
-								colorString = colorString + (projectionMatrix[12].ToString("F4") + " " + projectionMatrix[13].ToString("F4") + " " + projectionMatrix[14].ToString("F4") + " " + projectionMatrix[15].ToString("F4") + "\n");
+								colorString = colorString + "\n";
 								
+								colorString = colorString + (worldToCamera[0].ToString("F4") + " " + worldToCamera[1].ToString("F4") + " " + worldToCamera[2].ToString("F4") + " " + worldToCamera[3].ToString("F4") + "\n");
+								colorString = colorString + (worldToCamera[4].ToString("F4") + " " + worldToCamera[5].ToString("F4") + " " + worldToCamera[6].ToString("F4") + " " + worldToCamera[7].ToString("F4") + "\n");
+								colorString = colorString + (worldToCamera[8].ToString("F4") + " " + worldToCamera[9].ToString("F4") + " " + worldToCamera[10].ToString("F4") + " " + worldToCamera[11].ToString("F4") + "\n");
+								colorString = colorString + (worldToCamera[12].ToString("F4") + " " + worldToCamera[13].ToString("F4") + " " + worldToCamera[14].ToString("F4") + " " + worldToCamera[15].ToString("F4") + "\n");
+								
+								colorString = colorString + "\n";
+								
+								colorString = colorString + (flippedWtC[0].ToString("F4") + " " + flippedWtC[1].ToString("F4") + " " + flippedWtC[2].ToString("F4") + " " + flippedWtC[3].ToString("F4") + "\n");
+								colorString = colorString + (flippedWtC[4].ToString("F4") + " " + flippedWtC[5].ToString("F4") + " " + flippedWtC[6].ToString("F4") + " " + flippedWtC[7].ToString("F4") + "\n");
+								colorString = colorString + (flippedWtC[8].ToString("F4") + " " + flippedWtC[9].ToString("F4") + " " + flippedWtC[10].ToString("F4") + " " + flippedWtC[11].ToString("F4") + "\n");
+								colorString = colorString + (flippedWtC[12].ToString("F4") + " " + flippedWtC[13].ToString("F4") + " " + flippedWtC[14].ToString("F4") + " " + flippedWtC[15].ToString("F4") + "\n");
+								
+								colorString = colorString + "\n";
+								
+								colorString = colorString + (scanTrans[0].ToString("F4") + " " + scanTrans[1].ToString("F4") + " " + scanTrans[2].ToString("F4") + " " + scanTrans[3].ToString("F4") + "\n");
+								colorString = colorString + (scanTrans[4].ToString("F4") + " " + scanTrans[5].ToString("F4") + " " + scanTrans[6].ToString("F4") + " " + scanTrans[7].ToString("F4") + "\n");
+								colorString = colorString + (scanTrans[8].ToString("F4") + " " + scanTrans[9].ToString("F4") + " " + scanTrans[10].ToString("F4") + " " + scanTrans[11].ToString("F4") + "\n");
+								colorString = colorString + (scanTrans[12].ToString("F4") + " " + scanTrans[13].ToString("F4") + " " + scanTrans[14].ToString("F4") + " " + scanTrans[15].ToString("F4") + "\n");
 								
 								string filenameTxtC = string.Format(@"CapturedImage{0}_n.txt", currTime);
 								System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxtC), colorString);
-							}*/
+							}
 							
 							
 							

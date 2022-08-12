@@ -63,14 +63,14 @@ Shader "Unlit/CopyColorShader" {
 				
 				//do lookups etc here...
 				float2 tc = i.texcoord;
-				//tc.y = 1.0 - tc.y;
+				tc.y = 1.0 - tc.y;
 				float d = tex2D(_DepthTex, tc);
 				//also does sample screenspace texture return 0->1 or 0->255?
 				if(d > 0)
 				{
-					float wIndex = (i.texcoord.x * _depthWidth);
-					float hIndex = _depthHeight - (i.texcoord.y * _depthHeight);
-					float4 cameraPoint = float4(wIndex, hIndex, 1.0, 0.0);
+					float wIndex = (tc.x * _depthWidth);
+					float hIndex = (tc.y * _depthHeight);
+					float4 cameraPoint = float4(wIndex + 0.5, hIndex + 0.5, 1.0, 0.0);
 					if(cameraPoint.x >= 0 && cameraPoint.x < _depthWidth && cameraPoint.y >= 0 && cameraPoint.y < _depthHeight)
 					{
 						cameraPoint = mul(_camIntrinsicsInv, cameraPoint);
@@ -82,9 +82,9 @@ Shader "Unlit/CopyColorShader" {
 						float4 projPos = mul(_mvpColor, newCameraPoint);
 						projPos.xyz /= projPos.w;
 						projPos.xyz = projPos.xyz * 0.5 + 0.5;
-						if(projPos.x >= 0 && projPos.x < 1.0 && projPos.y >= 0 && projPos.y < 1.0)// && projPos.z >= 0 && projPos.z < 1.0)
+						projPos.y = 1.0 - projPos.y;
+						if(projPos.x >= 0 && projPos.x < 1.0 && projPos.y >= 0 && projPos.y < 1.0)// && projPos.z >= 0 && projPos.z < 1.0)	//adding the z checks causes it to not work...
 						{
-							projPos.y = 1.0 - projPos.y;
 							return UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, projPos.xy); 
 						}
 						else
