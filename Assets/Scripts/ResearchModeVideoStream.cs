@@ -326,6 +326,9 @@ public class ResearchModeVideoStream : MonoBehaviour
 		}
 #endif
 #endif
+		//_camIntrinsicsInv.SetColumn(0, new Vector4(200.0f, 0f, 0f, 0f));
+		//_camIntrinsicsInv.SetColumn(1, new Vector4(0f, 200.0f, 0f, 0f));
+		//_camIntrinsicsInv.SetColumn(2, new Vector4(160f, 144f, 1f, 0f));
 		_camIntrinsicsInv[0] = 200.0f;//587.189f/2.375f;//(float)int.Parse(camIntrinsicData[0]); // 7.5f;
 		_camIntrinsicsInv[5] = 200.0f;//585.766f/1.4861f;//(float)int.Parse(camIntrinsicData[1]); // 7.5f;
 		_camIntrinsicsInv[8] = 160.0f;//373.018f/2.375f;//(float)int.Parse(camIntrinsicData[2]); // 7.5f;
@@ -950,14 +953,21 @@ public class ResearchModeVideoStream : MonoBehaviour
 							//scanTransPV = scanTransPV.transpose;
 							//scanTransPV = zScale2 * scanTransPV;
 							
+							/*scanTransPV[12] = -scanTransPV[3];
+							scanTransPV[13] = scanTransPV[7];
+							scanTransPV[14] = -scanTransPV[11];
+							scanTransPV[3] = 0f;
+							scanTransPV[7] = 0f;
+							scanTransPV[11] = 0f;*/
+							
 							Matrix4x4 worldToCamera = scanTransPV.inverse;
 							
-							worldToCamera[3] = -worldToCamera[12];
-							worldToCamera[7] = worldToCamera[13];
-							worldToCamera[11] = worldToCamera[14];
+							/*worldToCamera[3] = -worldToCamera[12];
+							worldToCamera[7] = -worldToCamera[13];
+							worldToCamera[11] = -worldToCamera[14];
 							worldToCamera[12] = 0f;
 							worldToCamera[13] = 0f;
-							worldToCamera[14] = 0f;
+							worldToCamera[14] = 0f;*/
 							
 							//scanTransPV = scanTransPV * currRotMat.transpose * currPosMat.transpose;
 							Matrix4x4 flippedWtC = /*zScale2 */ worldToCamera;
@@ -968,7 +978,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 							//Vector3 position = cameraToWorldMatrix.GetColumn(3) - cameraToWorldMatrix.GetColumn(2);
 							//Quaternion rotation = Quaternion.LookRotation(-cameraToWorldMatrix.GetColumn(2), cameraToWorldMatrix.GetColumn(1));
 
-							photoCaptureFrame.TryGetProjectionMatrix(Camera.main.nearClipPlane, Camera.main.farClipPlane, out Matrix4x4 projectionMatrix);// out Matrix4x4 projectionMatrix);
+							photoCaptureFrame.TryGetProjectionMatrix(0.01f, 100f, out Matrix4x4 projectionMatrix);// out Matrix4x4 projectionMatrix);
 							
 							//projectionMatrix = projectionMatrix.transpose;
 							
@@ -980,12 +990,12 @@ public class ResearchModeVideoStream : MonoBehaviour
 							
 							scanTrans = zScale2 * scanTrans;//scanTrans.transpose;
 							
-							scanTrans[3] = -scanTrans[12];
+							/*scanTrans[3] = scanTrans[12];
 							scanTrans[7] = scanTrans[13];
-							scanTrans[11] = -scanTrans[14];
+							scanTrans[11] = scanTrans[14];
 							scanTrans[12] = 0f;
 							scanTrans[13] = 0f;
-							scanTrans[14] = 0f;
+							scanTrans[14] = 0f;*/
 							
 							_tsdfShader.SetMatrix("localToWorld", scanTrans);
 							_tsdfShader.SetMatrix("viewProjMatrix", scanTransPV);
@@ -1156,6 +1166,13 @@ public class ResearchModeVideoStream : MonoBehaviour
 								colorString = colorString + (scanTrans[8].ToString("F4") + " " + scanTrans[9].ToString("F4") + " " + scanTrans[10].ToString("F4") + " " + scanTrans[11].ToString("F4") + "\n");
 								colorString = colorString + (scanTrans[12].ToString("F4") + " " + scanTrans[13].ToString("F4") + " " + scanTrans[14].ToString("F4") + " " + scanTrans[15].ToString("F4") + "\n");
 								
+								colorString = colorString + "\n";
+								
+								colorString = colorString + (_camIntrinsicsInv[0].ToString("F4") + " " + _camIntrinsicsInv[1].ToString("F4") + " " + _camIntrinsicsInv[2].ToString("F4") + " " + _camIntrinsicsInv[3].ToString("F4") + "\n");
+								colorString = colorString + (_camIntrinsicsInv[4].ToString("F4") + " " + _camIntrinsicsInv[5].ToString("F4") + " " + _camIntrinsicsInv[6].ToString("F4") + " " + _camIntrinsicsInv[7].ToString("F4") + "\n");
+								colorString = colorString + (_camIntrinsicsInv[8].ToString("F4") + " " + _camIntrinsicsInv[9].ToString("F4") + " " + _camIntrinsicsInv[10].ToString("F4") + " " + _camIntrinsicsInv[11].ToString("F4") + "\n");
+								colorString = colorString + (_camIntrinsicsInv[12].ToString("F4") + " " + _camIntrinsicsInv[13].ToString("F4") + " " + _camIntrinsicsInv[14].ToString("F4") + " " + _camIntrinsicsInv[15].ToString("F4") + "\n");
+								
 								string filenameTxtC = string.Format(@"CapturedImage{0}_n.txt", currTime);
 								System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxtC), colorString);
 							}
@@ -1206,7 +1223,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 							{
 								string filename = string.Format(@"CapturedImageDepth{0}_n.png", currTime);
 								//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(depthTextureBytes, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
-								File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(depthTextureFilteredBytes, UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm, 320, 288));
+								File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(depthTextureFilteredBytes, UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm, DEPTH_WIDTH, DEPTH_HEIGHT));
 								//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(frameTexture, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
 								//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(_ourDepth.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm, 320, 288));
 							}
@@ -1423,7 +1440,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 					
 					
 					string filename = string.Format(@"CapturedImageDepth{0}_n.png", currTime);
-					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(frameTexture, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, 320, 288));
+					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(frameTexture, UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, DEPTH_WIDTH, DEPTH_HEIGHT));
 					
 					float[] depthPos = researchMode.GetDepthToWorld();
 					string depthString = depthPos[0].ToString("F4") + " " + depthPos[1].ToString("F4") + " " + depthPos[2].ToString("F4") + " " + depthPos[3].ToString("F4") + "\n";

@@ -30,9 +30,9 @@ StructuredBuffer<int> volumeLookup;
 
 Texture2D<float4> colorTexture;
 Texture2D<float> depthTexture;
-Texture2D<float> confTexture;
+//Texture2D<float> confTexture;
 
-SamplerState samplerconfTexture;
+//SamplerState samplerconfTexture;
 
 RWStructuredBuffer<int> rangeBuf;
 
@@ -144,18 +144,9 @@ void CSOctant(uint3 gid : SV_DispatchThreadID)
     const float CONFIDENCE_THRESH = 2.0/255.0;
 
     float2 tCoords = float2(gid.xy);
-    //tCoords = mul(tCoords, displayMatrix);
-    /*tCoords.x = 1.0 - tCoords.x;
 
-    if(orientation == 3)
-    {
-        tCoords.xy = float2(1.0 - tCoords.x, 1.0 - tCoords.y);
-    }
-    else if(orientation == 1)
-    {
-        tCoords.xy = float2(1.0 - tCoords.y, tCoords.x);
-    }*/
-
+	tCoords.y = depthHeight - tCoords.y;
+	
     uint id = tCoords.y * depthWidth + tCoords.x;
     if(id >= depthResolution)
     {
@@ -165,10 +156,10 @@ void CSOctant(uint3 gid : SV_DispatchThreadID)
     octantBuffer[id] = -1;
 
     float d = depthTexture[tCoords];
-    /*if(d < 0.0 || d > 8.0)
+    if(d <= 0.0 || d > 8.0)
     {
         return;
-    }*/
+    }
 
     const float DEPTH_THRESH = 0.04;
 
@@ -248,18 +239,9 @@ void CSTsdfGrid (uint3 gid : SV_DispatchThreadID)
     //uint totalGridCount = (uint)volumeGridSize.x * (uint)volumeGridSize.y * (uint)volumeGridSize.z;
 
     float2 tCoords = float2(gid.xy);
-    //tc = mul(tc, displayMatrix);
-    /*tc.xy = float2(1.0-tc.x, tc.y);
-           
-    if (orientation == 1) {
-        // Portrait
-        tc.xy = float2(1.0 - tc.y, tc.x);
-    }
-    else if (orientation == 3) {
-        // Landscape left
-        tc.xy = float2(1.0 - tc.x, 1.0 - tc.y);
-    }*/
-
+	
+	tCoords.y = depthHeight - tCoords.y;
+	
     uint id = tCoords.y * depthWidth + tCoords.x;
     if(id >= depthResolution)
     {
@@ -273,10 +255,11 @@ void CSTsdfGrid (uint3 gid : SV_DispatchThreadID)
     }
 
     float d = depthTexture[tCoords];
-    /*if(d < 0.0 || d > 8.0)
+	
+    if(d <= 0.0 || d > 8.0)
     {
         return;
-    }*/
+    }
 
     const float CONFIDENCE_THRESH = 2.0/255.0;
     const float2 ONE_O_WH = float2(1.0, 1.0) / float2(depthWidth, depthHeight);
@@ -369,7 +352,12 @@ void CSTsdfGrid (uint3 gid : SV_DispatchThreadID)
             uint old_b = (volumeColorBuffer[cellIdx] >> 16) & 0x000000FF;
             uint old_w = (volumeColorBuffer[cellIdx] >> 24) & 0x000000FF;
 
-            float4 sampledColor = colorTexture[tCoords * 0.9375];//float4(c*0.5, c*0.5, c*0.5, 1.0);//
+            float4 sampledColor = colorTexture[float2(gid.xy) * 0.9375];//float4(c*0.5, c*0.5, c*0.5, 1.0);//
+			if(length(sampledColor) == 0)
+			{
+				return;
+			}
+			
             /*if(c == 2.0/255.0)
             {
                 sampledColor = float4(0.0, 1.0, 0.0, 1.0);
