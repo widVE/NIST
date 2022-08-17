@@ -29,7 +29,9 @@ StructuredBuffer<int> volumeLookup;
 //StructuredBuffer<int> allOctantBuffer;
 
 Texture2D<float4> colorTexture;
-Texture2D<float> depthTexture;
+Texture2D<float> depthTextureX;
+Texture2D<float> depthTextureY;
+Texture2D<float> depthTextureZ;
 //Texture2D<float> confTexture;
 
 //SamplerState samplerconfTexture;
@@ -155,11 +157,13 @@ void CSOctant(uint3 gid : SV_DispatchThreadID)
 
     octantBuffer[id] = -1;
 
-    float d = depthTexture[tCoords];
-    if(d <= 0.0 || d > 8.0)
+    float dX = depthTextureX[tCoords];
+	float dY = depthTextureY[tCoords];
+	float dZ = depthTextureZ[tCoords];
+   /*if(d <= 0.0 || d > 8.0)
     {
         return;
-    }
+    }*/
 
     const float DEPTH_THRESH = 0.04;
 
@@ -197,8 +201,8 @@ void CSOctant(uint3 gid : SV_DispatchThreadID)
         return;
     }
 
-    float4 localPoint = mul(camIntrinsicsInverse, float4(tCoords, 1.0, 0.0)) * d;
-    localPoint.w = 1.0;
+    float4 localPoint = float4(dX, dY, dZ, 1.0);//mul(camIntrinsicsInverse, float4(tCoords, 1.0, 0.0)) * d;
+    //localPoint.w = 1.0;
     float4 worldPoint = mul(localToWorld, localPoint);
     worldPoint = worldPoint / worldPoint.w;
 
@@ -254,12 +258,13 @@ void CSTsdfGrid (uint3 gid : SV_DispatchThreadID)
         return;
     }
 
-    float d = depthTexture[tCoords];
-	
-    if(d <= 0.0 || d > 8.0)
+    float dX = depthTextureX[tCoords];
+	float dY = depthTextureY[tCoords];
+	float dZ = depthTextureZ[tCoords];
+    /*if(d <= 0.0 || d > 8.0)
     {
         return;
-    }
+    }*/
 
     const float CONFIDENCE_THRESH = 2.0/255.0;
     const float2 ONE_O_WH = float2(1.0, 1.0) / float2(depthWidth, depthHeight);
@@ -299,8 +304,8 @@ void CSTsdfGrid (uint3 gid : SV_DispatchThreadID)
         return;
     }
 
-    float4 localPoint = mul(camIntrinsicsInverse, float4(tCoords, 1.0, 0.0)) * d;
-    localPoint.w = 1.0;
+    float4 localPoint = float4(dX, dY, dZ, 1.0);//mul(camIntrinsicsInverse, float4(tCoords, 1.0, 0.0)) * d;
+    //localPoint.w = 1.0;
     float4 worldPoint = mul(localToWorld, localPoint);
     worldPoint = worldPoint / worldPoint.w;
 
@@ -545,7 +550,7 @@ void CSWorldBounds(uint3 id : SV_DispatchThreadID)
 [numthreads(32,32,1)]
 void CSDepthRange(uint3 id : SV_DispatchThreadID)
 {
-    const int3 zeros = float3(0,0,0);
+   /* const int3 zeros = float3(0,0,0);
     const int3 gridSize = int3(volumeGridSize.xyz);
     const int3 compressGridSizeMinusOne = int3(gridSize.x-1, gridSize.y-1, gridSize.z-1);
     
@@ -561,7 +566,7 @@ void CSDepthRange(uint3 id : SV_DispatchThreadID)
 
     int dInt = (int)(d * 1000.0);
     InterlockedMin(rangeBuf[0], dInt);
-    InterlockedMax(rangeBuf[1], dInt);
+    InterlockedMax(rangeBuf[1], dInt);*/
 }
 
 

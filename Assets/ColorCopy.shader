@@ -15,7 +15,9 @@ Shader "Unlit/CopyColorShader" {
 
             //UNITY_DECLARE_SCREENSPACE_TEXTURE(_MainTex);
 			sampler2D _MainTex;
-			sampler2D_float _DepthTex;
+			sampler2D_float _DepthTexX;
+			sampler2D_float _DepthTexY;
+			sampler2D_float _DepthTexZ;
             uniform float4 _MainTex_ST;
             uniform float4 _Color;
 			uniform float _depthWidth;
@@ -65,18 +67,20 @@ Shader "Unlit/CopyColorShader" {
 				//do lookups etc here...
 				float2 tc = i.texcoord;
 				tc.y = 1.0 - tc.y;
-				float d = tex2D(_DepthTex, tc);
+				float dX = tex2D(_DepthTexX, tc);
+				float dY = tex2D(_DepthTexY, tc);
+				float dZ = tex2D(_DepthTexZ, tc);
 				//also does sample screenspace texture return 0->1 or 0->255?
-				if(d > 0)
+				if(length(float3(dX, dY, dZ)) > 0)
 				{
 					float wIndex = (tc.x * _depthWidth);
 					float hIndex = (tc.y * _depthHeight);
 					float4 cameraPoint = float4(wIndex + 0.5, hIndex + 0.5, 1.0, 0.0);
 					if(cameraPoint.x >= 0 && cameraPoint.x < _depthWidth && cameraPoint.y >= 0 && cameraPoint.y < _depthHeight)
 					{
-						cameraPoint = mul(_camIntrinsicsInv, cameraPoint);
-						cameraPoint *= d;
-						float4 newCameraPoint = float4(cameraPoint.x, cameraPoint.y, cameraPoint.z, 1.0);
+						//cameraPoint = mul(_camIntrinsicsInv, cameraPoint);
+						//cameraPoint *= d;
+						float4 newCameraPoint = float4(dX, dY, dZ, 1.0);//cameraPoint.x, cameraPoint.y, cameraPoint.z, 1.0);
 						newCameraPoint = mul(_depthToWorld, newCameraPoint);
 						newCameraPoint.xyz /= newCameraPoint.w;
 						newCameraPoint.w = 1.0;
@@ -90,14 +94,14 @@ Shader "Unlit/CopyColorShader" {
 						}
 						else
 						{
-							return fixed4(0,0,0,0);//fixed4(0,0,1,1);
+							return fixed4(0,0,0,0);//
 						}
 					}
 					//return UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, i.texcoord) * _Color;
-					return fixed4(0,0,0,0);//fixed4(0,1,0,1);
+					return fixed4(0,0,0,0);//
 				}
 				
-				return fixed4(0,0,0,0);//fixed4(1,0,0,1);
+				return fixed4(0,0,0,0);//
             }
             ENDCG
 

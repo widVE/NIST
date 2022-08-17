@@ -46,7 +46,9 @@ public class ResearchModeVideoStream : MonoBehaviour
     private Texture2D longDepthMediaTexture = null;
     private byte[] longDepthFrameData = null;
 
-	private Texture2D _depthTexFromHololens = null;
+	private Texture2D _depthTexFromHololensX = null;
+	private Texture2D _depthTexFromHololensY = null;
+	private Texture2D _depthTexFromHololensZ = null;
 	
     public GameObject LFPreviewPlane = null;
     private Material LFMediaMaterial = null;
@@ -98,7 +100,9 @@ public class ResearchModeVideoStream : MonoBehaviour
 	
 	byte[] depthTextureBytes = new byte[DEPTH_WIDTH*DEPTH_HEIGHT];
 	byte[] depthTextureFilteredBytes = new byte[DEPTH_WIDTH*DEPTH_HEIGHT*2];
-	byte[] floatDepthTextureBytes = new byte[DEPTH_WIDTH*DEPTH_HEIGHT*4];
+	byte[] floatDepthTextureBytesX = new byte[DEPTH_WIDTH*DEPTH_HEIGHT*4];
+	byte[] floatDepthTextureBytesY = new byte[DEPTH_WIDTH*DEPTH_HEIGHT*4];
+	byte[] floatDepthTextureBytesZ = new byte[DEPTH_WIDTH*DEPTH_HEIGHT*4];
 	
 	[SerializeField]
 	float _writeTime = 1f;
@@ -352,7 +356,9 @@ public class ResearchModeVideoStream : MonoBehaviour
 	{
 		Debug.Log("Initializing TSDF");
 		
-		_depthTexFromHololens = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RFloat, false);
+		_depthTexFromHololensX = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RFloat, false);
+		_depthTexFromHololensY = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RFloat, false);
+		_depthTexFromHololensZ = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RFloat, false);
 		
 		if(_tsdfShader != null)
 		{
@@ -602,10 +608,14 @@ public class ResearchModeVideoStream : MonoBehaviour
 		_tsdfShader.SetBuffer(clearBufferID, "renderBuffer", _pointRenderBuffer);
 		
 		_tsdfShader.SetBuffer(octantComputeID, "octantBuffer", octantBuffer);
-		_tsdfShader.SetTexture(octantComputeID, "depthTexture", _depthTexFromHololens);
+		_tsdfShader.SetTexture(octantComputeID, "depthTextureX", _depthTexFromHololensX);
+		_tsdfShader.SetTexture(octantComputeID, "depthTextureY", _depthTexFromHololensY);
+		_tsdfShader.SetTexture(octantComputeID, "depthTextureZ", _depthTexFromHololensZ);
 		//_tsdfShader.SetTexture(octantComputeID, "confTexture", _renderTargetConfV);
 
-		_tsdfShader.SetTexture(processID, "depthTexture", _depthTexFromHololens);
+		_tsdfShader.SetTexture(processID, "depthTextureX", _depthTexFromHololensX);
+		_tsdfShader.SetTexture(processID, "depthTextureY", _depthTexFromHololensY);
+		_tsdfShader.SetTexture(processID, "depthTextureZ", _depthTexFromHololensZ);
 		//_tsdfShader.SetTexture(processID, "confTexture", _renderTargetConfV);
 		_tsdfShader.SetTexture(processID, "colorTexture", _ourColor);
 
@@ -848,7 +858,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 				ushort[] frameTextureFiltered = researchMode.GetDepthMapBufferFiltered();
 				byte[] frameTexture = researchMode.GetLongDepthMapTextureBuffer();
 				float[] depthPos = researchMode.GetDepthToWorld();
-					
+				
 				if (frameTexture.Length > 0)
 				{
 					if(photoCaptureFrame.hasLocationData)
@@ -857,7 +867,17 @@ public class ResearchModeVideoStream : MonoBehaviour
 						bool res = photoCaptureFrame.TryGetCameraToWorldMatrix(out Matrix4x4 cameraToWorldMatrix);
 						if(res != false)
 						{
-							
+							float[] pointCloudBuffer = researchMode.GetPointCloudBuffer();
+							int pointCloudLength = pointCloudBuffer.Length / 3;
+							Vector3[] pointCloudVector3 = new Vector3[pointCloudLength];
+							if (pointCloudBuffer.Length > 0)
+							{	
+								for (int i = 0; i < pointCloudLength; i++)
+								{
+									pointCloudVector3[i] = new Vector3(pointCloudBuffer[3 * i], pointCloudBuffer[3 * i + 1], pointCloudBuffer[3 * i + 2]);
+								}
+							}
+				
 							/*for(int i = 0; i < DEPTH_HEIGHT; ++i)
 							{
 								int b2Row = i * 2 * DEPTH_WIDTH;
@@ -892,18 +912,38 @@ public class ResearchModeVideoStream : MonoBehaviour
 									byte[] bd = BitConverter.GetBytes(frameTextureFiltered[idx]);
 									depthTextureFilteredBytes[b2Row + j * 2] = bd[0];
 									depthTextureFilteredBytes[b2Row + j * 2 + 1] = bd[1];
-									float fD = (float)frameTextureFiltered[idx] / 1000f;	//values are in millimeters..., so divide by 1000 to get meters...
-									byte[] b = BitConverter.GetBytes(fD);
+									float fD = (float)frameTextureFiltered[idx] / 1000f;//values are in millimeters..., so divide by 1000 to get meters...
+									float fDX = pointCloudVector3[idx].x * fD;	
+									float fDY = pointCloudVector3[idx].y * fD;	
+									float fDZ = pointCloudVector3[idx].z * fD;
 									
-									floatDepthTextureBytes[b4Row + j * 4] = b[0];
-									floatDepthTextureBytes[b4Row + j * 4 + 1] = b[1];
-									floatDepthTextureBytes[b4Row + j * 4 + 2] = b[2];
-									floatDepthTextureBytes[b4Row + j * 4 + 3] = b[3];
+									byte[] bX = BitConverter.GetBytes(fDX);
+									byte[] bY = BitConverter.GetBytes(fDY);
+									byte[] bZ = BitConverter.GetBytes(fDZ);
+									
+									floatDepthTextureBytesX[b4Row + j * 4] = bX[0];
+									floatDepthTextureBytesX[b4Row + j * 4 + 1] = bX[1];
+									floatDepthTextureBytesX[b4Row + j * 4 + 2] = bX[2];
+									floatDepthTextureBytesX[b4Row + j * 4 + 3] = bX[3];
+									
+									floatDepthTextureBytesY[b4Row + j * 4] = bY[0];
+									floatDepthTextureBytesY[b4Row + j * 4 + 1] = bY[1];
+									floatDepthTextureBytesY[b4Row + j * 4 + 2] = bY[2];
+									floatDepthTextureBytesY[b4Row + j * 4 + 3] = bY[3];
+									
+									floatDepthTextureBytesZ[b4Row + j * 4] = bZ[0];
+									floatDepthTextureBytesZ[b4Row + j * 4 + 1] = bZ[1];
+									floatDepthTextureBytesZ[b4Row + j * 4 + 2] = bZ[2];
+									floatDepthTextureBytesZ[b4Row + j * 4 + 3] = bZ[3];
 								}
 							}
 							
-							_depthTexFromHololens.LoadRawTextureData(floatDepthTextureBytes);
-							_depthTexFromHololens.Apply();
+							_depthTexFromHololensX.LoadRawTextureData(floatDepthTextureBytesX);
+							_depthTexFromHololensX.Apply();
+							_depthTexFromHololensY.LoadRawTextureData(floatDepthTextureBytesY);
+							_depthTexFromHololensY.Apply();
+							_depthTexFromHololensZ.LoadRawTextureData(floatDepthTextureBytesZ);
+							_depthTexFromHololensZ.Apply();
 							
 							//only if previewing the depth within our view do we need to load the depth data...
 
@@ -962,12 +1002,12 @@ public class ResearchModeVideoStream : MonoBehaviour
 							
 							Matrix4x4 worldToCamera = scanTransPV.inverse;
 							
-							/*worldToCamera[3] = -worldToCamera[12];
-							worldToCamera[7] = -worldToCamera[13];
-							worldToCamera[11] = -worldToCamera[14];
+							worldToCamera[3] = -worldToCamera[12];
+							worldToCamera[7] = worldToCamera[13];
+							worldToCamera[11] = worldToCamera[14];
 							worldToCamera[12] = 0f;
 							worldToCamera[13] = 0f;
-							worldToCamera[14] = 0f;*/
+							worldToCamera[14] = 0f;
 							
 							//scanTransPV = scanTransPV * currRotMat.transpose * currPosMat.transpose;
 							Matrix4x4 flippedWtC = /*zScale2 */ worldToCamera;
@@ -978,7 +1018,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 							//Vector3 position = cameraToWorldMatrix.GetColumn(3) - cameraToWorldMatrix.GetColumn(2);
 							//Quaternion rotation = Quaternion.LookRotation(-cameraToWorldMatrix.GetColumn(2), cameraToWorldMatrix.GetColumn(1));
 
-							photoCaptureFrame.TryGetProjectionMatrix(0.01f, 100f, out Matrix4x4 projectionMatrix);// out Matrix4x4 projectionMatrix);
+							photoCaptureFrame.TryGetProjectionMatrix(out Matrix4x4 projectionMatrix);// out Matrix4x4 projectionMatrix);
 							
 							//projectionMatrix = projectionMatrix.transpose;
 							
@@ -990,12 +1030,12 @@ public class ResearchModeVideoStream : MonoBehaviour
 							
 							scanTrans = zScale2 * scanTrans;//scanTrans.transpose;
 							
-							/*scanTrans[3] = scanTrans[12];
+							scanTrans[3] = scanTrans[12];
 							scanTrans[7] = scanTrans[13];
 							scanTrans[11] = scanTrans[14];
 							scanTrans[12] = 0f;
 							scanTrans[13] = 0f;
-							scanTrans[14] = 0f;*/
+							scanTrans[14] = 0f;
 							
 							_tsdfShader.SetMatrix("localToWorld", scanTrans);
 							_tsdfShader.SetMatrix("viewProjMatrix", scanTransPV);
@@ -1005,7 +1045,9 @@ public class ResearchModeVideoStream : MonoBehaviour
 							commandBuffer.name = "Color Blit Pass";
 							
 							_colorCopyMaterial.SetTexture("_MainTex", targetTexture);
-							_colorCopyMaterial.SetTexture("_DepthTex", _depthTexFromHololens);	//this is being passed in different from what is being written out... (perhaps upside down and reversed)
+							_colorCopyMaterial.SetTexture("_DepthTexX", _depthTexFromHololensX);
+							_colorCopyMaterial.SetTexture("_DepthTexY", _depthTexFromHololensY);
+							_colorCopyMaterial.SetTexture("_DepthTexZ", _depthTexFromHololensZ);
 							_colorCopyMaterial.SetFloat("_depthWidth", (float)DEPTH_WIDTH);
 							_colorCopyMaterial.SetFloat("_depthHeight", (float)DEPTH_HEIGHT);
 							_colorCopyMaterial.SetMatrix("_camIntrinsicsInv", _camIntrinsicsInv);
@@ -1271,7 +1313,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 		StreamWriter s = new StreamWriter(File.Open(debugOut, FileMode.Create));
 		if(s != null)
 		{
-			float gridSizeDiag = (float)1.1f * (float)(volumeBounds.magnitude / volumeGridSize.magnitude);
+			float gridSizeDiag = (float)1.05f * (float)(volumeBounds.magnitude / volumeGridSize.magnitude);
 			
 			Vector3Int octantDim = new Vector3Int((int)(volumeGridSize.x / cellDimensions.x), (int)(volumeGridSize.y / cellDimensions.y), (int)(volumeGridSize.z / cellDimensions.z));
    

@@ -468,12 +468,17 @@ namespace winrt::HL2UnityPlugin::implementation
                         {
                             float xy[2] = { 0, 0 };
                             float uv[2] = { j, i };
+                            float z = 1.0f;
                             pHL2ResearchMode->m_pLongDepthCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
-                            auto pointOnUnitPlane = XMFLOAT3(xy[0], xy[1], 1);
-                            
-                            auto tempPoint = (float)depth / 4000 * XMVector3Normalize(XMLoadFloat3(&pointOnUnitPlane));
+                            //auto pointOnUnitPlane = XMFLOAT3(xy[0], xy[1], 1);
+                            const float norm = sqrtf(xy[0] * xy[0] + xy[1] * xy[1] + z * z);
+                            const float invNorm = 1.0f / norm;
+                            xy[0] *= invNorm;
+                            xy[1] *= invNorm;
+                            z *= invNorm;
+                            //auto tempPoint = (float)depth / 4000 * XMVector3Normalize(XMLoadFloat3(&pointOnUnitPlane));
                             // apply transformation
-                            auto pointInWorld = XMVector3Transform(tempPoint, depthToWorld);
+                            //auto pointInWorld = XMVector3Transform(tempPoint, depthToWorld);
                             //pointInWorld.n128_f32[0] /= pointInWorld.n128_f32[3];
                             //pointInWorld.n128_f32[1] /= pointInWorld.n128_f32[3];
                             //pointInWorld.n128_f32[2] /= pointInWorld.n128_f32[3];
@@ -481,9 +486,9 @@ namespace winrt::HL2UnityPlugin::implementation
                             /*if (!pHL2ResearchMode->m_useRoiFilter ||
                                 (pHL2ResearchMode->m_useRoiFilter && XMVector3InBounds(pointInWorld - roiCenter, roiBound)))
                             {*/
-                                pointCloud.push_back(XMVectorGetX(pointInWorld));
-                                pointCloud.push_back(XMVectorGetY(pointInWorld));
-                                pointCloud.push_back(-XMVectorGetZ(pointInWorld));
+                                pointCloud.push_back(xy[0]);// XMVectorGetX(pointInWorld));
+                                pointCloud.push_back(xy[1]);// XMVectorGetY(pointInWorld));
+                                pointCloud.push_back(z);// -XMVectorGetZ(pointInWorld));
                             //}
                         }
 
@@ -517,6 +522,15 @@ namespace winrt::HL2UnityPlugin::implementation
                 // save data
                 {
                     std::lock_guard<std::mutex> l(pHL2ResearchMode->mu);
+                    // save point cloud
+                    if (!pHL2ResearchMode->m_pointCloud)
+                    {
+                        OutputDebugString(L"Create Space for point cloud...\n");
+                        pHL2ResearchMode->m_pointCloud = new float[outBufferCount * 3];
+                    }
+
+                    memcpy(pHL2ResearchMode->m_pointCloud, pointCloud.data(), pointCloud.size() * sizeof(float));
+                    pHL2ResearchMode->m_pointcloudLength = pointCloud.size();
 
                     // save raw depth map
                     if (!pHL2ResearchMode->m_longDepthMap)
