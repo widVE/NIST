@@ -82,7 +82,7 @@ Shader "Unlit/CopyColorShader" {
 						//cameraPoint *= d;
 						float4 newCameraPoint = float4(dX, dY, dZ, 1.0);//cameraPoint.x, cameraPoint.y, cameraPoint.z, 1.0);
 						newCameraPoint = mul(_depthToWorld, newCameraPoint);
-						newCameraPoint.xyz /= newCameraPoint.w;
+						//newCameraPoint.xyz /= newCameraPoint.w;
 						newCameraPoint.w = 1.0;
 						float4 projPos = mul(_mvpColor, newCameraPoint);
 						projPos.xyz /= projPos.w;

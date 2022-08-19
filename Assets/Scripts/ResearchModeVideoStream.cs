@@ -853,31 +853,38 @@ public class ResearchModeVideoStream : MonoBehaviour
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
 #else
-			if (startRealtimePreview && researchMode.LongDepthMapTextureUpdated())
+			if (startRealtimePreview && researchMode.LongDepthMapTextureUpdated() && researchMode.PointCloudUpdated())
 			{
-				ushort[] frameTextureFiltered = researchMode.GetDepthMapBufferFiltered();
 				byte[] frameTexture = researchMode.GetLongDepthMapTextureBuffer();
-				float[] depthPos = researchMode.GetDepthToWorld();
 				
 				if (frameTexture.Length > 0)
 				{
 					if(photoCaptureFrame.hasLocationData)
-					{
-						
+					{		
 						bool res = photoCaptureFrame.TryGetCameraToWorldMatrix(out Matrix4x4 cameraToWorldMatrix);
 						if(res != false)
 						{
+							ushort[] frameTextureFiltered = researchMode.GetDepthMapBufferFiltered();
 							float[] pointCloudBuffer = researchMode.GetPointCloudBuffer();
+							float[] depthPos = researchMode.GetDepthToWorld();
+				
 							int pointCloudLength = pointCloudBuffer.Length / 3;
 							Vector3[] pointCloudVector3 = new Vector3[pointCloudLength];
+							
 							if (pointCloudBuffer.Length > 0)
 							{	
+								//string debugOut = Path.Combine(Application.persistentDataPath, DateTime.Now.ToString("M_dd_yyyy_hh_mm_ss_")+_fileOutNumber.ToString()+".xyz");
+								//_fileOutNumber++;
+								//StreamWriter s = new StreamWriter(File.Open(debugOut, FileMode.Create));
+								
 								for (int i = 0; i < pointCloudLength; i++)
 								{
 									pointCloudVector3[i] = new Vector3(pointCloudBuffer[3 * i], pointCloudBuffer[3 * i + 1], pointCloudBuffer[3 * i + 2]);
+									//s.Write(i.ToString() + ": " + pointCloudVector3[i].x.ToString("F4") + " " + pointCloudVector3[i].y.ToString("F4")+ " " + pointCloudVector3[i].z.ToString("F4") + "\n");
 								}
+								//s.Close();
 							}
-				
+							
 							/*for(int i = 0; i < DEPTH_HEIGHT; ++i)
 							{
 								int b2Row = i * 2 * DEPTH_WIDTH;
@@ -908,6 +915,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 								{
 									int idx = i * DEPTH_WIDTH + j;
 									int ourIdx = i * DEPTH_WIDTH + j;
+									int otherIndex = i * DEPTH_WIDTH + (DEPTH_WIDTH-1-j);
 									depthTextureBytes[ourIdx] = frameTexture[idx];
 									byte[] bd = BitConverter.GetBytes(frameTextureFiltered[idx]);
 									depthTextureFilteredBytes[b2Row + j * 2] = bd[0];
@@ -992,16 +1000,11 @@ public class ResearchModeVideoStream : MonoBehaviour
 							
 							//scanTransPV = scanTransPV.transpose;
 							//scanTransPV = zScale2 * scanTransPV;
-							
-							/*scanTransPV[12] = -scanTransPV[3];
-							scanTransPV[13] = scanTransPV[7];
-							scanTransPV[14] = -scanTransPV[11];
-							scanTransPV[3] = 0f;
-							scanTransPV[7] = 0f;
-							scanTransPV[11] = 0f;*/
-							
+
 							Matrix4x4 worldToCamera = scanTransPV.inverse;
 							
+							//worldToCamera = zScale2 * worldToCamera;
+							//worldToCamera = worldToCamera.transpose;
 							worldToCamera[3] = -worldToCamera[12];
 							worldToCamera[7] = worldToCamera[13];
 							worldToCamera[11] = worldToCamera[14];
@@ -1009,16 +1012,13 @@ public class ResearchModeVideoStream : MonoBehaviour
 							worldToCamera[13] = 0f;
 							worldToCamera[14] = 0f;
 							
-							//scanTransPV = scanTransPV * currRotMat.transpose * currPosMat.transpose;
-							Matrix4x4 flippedWtC = /*zScale2 */ worldToCamera;
-						
-							
+
 							//scanTransPV = scanTransPV.transpose;
 							
 							//Vector3 position = cameraToWorldMatrix.GetColumn(3) - cameraToWorldMatrix.GetColumn(2);
 							//Quaternion rotation = Quaternion.LookRotation(-cameraToWorldMatrix.GetColumn(2), cameraToWorldMatrix.GetColumn(1));
 
-							photoCaptureFrame.TryGetProjectionMatrix(out Matrix4x4 projectionMatrix);// out Matrix4x4 projectionMatrix);
+							photoCaptureFrame.TryGetProjectionMatrix(0.01f, 100f, out Matrix4x4 projectionMatrix);// out Matrix4x4 projectionMatrix);
 							
 							//projectionMatrix = projectionMatrix.transpose;
 							
@@ -1026,9 +1026,10 @@ public class ResearchModeVideoStream : MonoBehaviour
 							//scanTransPV is now the MVP matrix of the color camera, this is used to project back unprojected depth image data to the color image
 							//to look up what corresponding color matches the depth, if any
 
-							scanTransPV = projectionMatrix * flippedWtC;// * scanTransPV;
+							scanTransPV = projectionMatrix * worldToCamera;// * scanTransPV;
 							
 							scanTrans = zScale2 * scanTrans;//scanTrans.transpose;
+							//scanTrans = scanTrans.transpose;
 							
 							scanTrans[3] = scanTrans[12];
 							scanTrans[7] = scanTrans[13];
@@ -1180,7 +1181,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 							//RenderPoints(_lastCopyCount);
 
 							//write pv / projection matrices...
-							if(WriteImagesToDisk)
+							/*if(WriteImagesToDisk)
 							{
 								string colorString = cameraToWorldMatrix[0].ToString("F4") + " " + cameraToWorldMatrix[1].ToString("F4") + " " + cameraToWorldMatrix[2].ToString("F4") + " " + cameraToWorldMatrix[3].ToString("F4") + "\n";
 								colorString = colorString + (cameraToWorldMatrix[4].ToString("F4") + " " + cameraToWorldMatrix[5].ToString("F4") + " " + cameraToWorldMatrix[6].ToString("F4") + " " + cameraToWorldMatrix[7].ToString("F4") + "\n");
@@ -1203,13 +1204,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 								
 								colorString = colorString + "\n";
 								
-								colorString = colorString + (scanTrans[0].ToString("F4") + " " + scanTrans[1].ToString("F4") + " " + scanTrans[2].ToString("F4") + " " + scanTrans[3].ToString("F4") + "\n");
-								colorString = colorString + (scanTrans[4].ToString("F4") + " " + scanTrans[5].ToString("F4") + " " + scanTrans[6].ToString("F4") + " " + scanTrans[7].ToString("F4") + "\n");
-								colorString = colorString + (scanTrans[8].ToString("F4") + " " + scanTrans[9].ToString("F4") + " " + scanTrans[10].ToString("F4") + " " + scanTrans[11].ToString("F4") + "\n");
-								colorString = colorString + (scanTrans[12].ToString("F4") + " " + scanTrans[13].ToString("F4") + " " + scanTrans[14].ToString("F4") + " " + scanTrans[15].ToString("F4") + "\n");
-								
-								colorString = colorString + "\n";
-								
 								colorString = colorString + (_camIntrinsicsInv[0].ToString("F4") + " " + _camIntrinsicsInv[1].ToString("F4") + " " + _camIntrinsicsInv[2].ToString("F4") + " " + _camIntrinsicsInv[3].ToString("F4") + "\n");
 								colorString = colorString + (_camIntrinsicsInv[4].ToString("F4") + " " + _camIntrinsicsInv[5].ToString("F4") + " " + _camIntrinsicsInv[6].ToString("F4") + " " + _camIntrinsicsInv[7].ToString("F4") + "\n");
 								colorString = colorString + (_camIntrinsicsInv[8].ToString("F4") + " " + _camIntrinsicsInv[9].ToString("F4") + " " + _camIntrinsicsInv[10].ToString("F4") + " " + _camIntrinsicsInv[11].ToString("F4") + "\n");
@@ -1217,7 +1211,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 								
 								string filenameTxtC = string.Format(@"CapturedImage{0}_n.txt", currTime);
 								System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxtC), colorString);
-							}
+							}*/
 							
 							
 							
@@ -1430,7 +1424,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 										float yPos = offset.y + (float)k * gridCellSize.y + 0.5f * gridCellSize.y;
 										float zPos = offset.z + (float)j * gridCellSize.z + 0.5f * gridCellSize.z;
 
-										s.Write(xPos.ToString("F4") + " " + yPos.ToString("F4") + " " + (-zPos).ToString("F4") + " ");
+										s.Write((xPos).ToString("F4") + " " + (yPos).ToString("F4") + " " + (-zPos).ToString("F4") + " ");
 
 										//float red = (float)bigColorCPUData[colorToBufferMapCPU[keys[i]]+bufIdx*4] / 255.0f;
 										//float green = (float)bigColorCPUData[colorToBufferMapCPU[keys[i]]+bufIdx*4+1] / 255.0f;

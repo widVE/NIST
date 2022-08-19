@@ -204,7 +204,7 @@ void CSOctant(uint3 gid : SV_DispatchThreadID)
     float4 localPoint = float4(dX, dY, dZ, 1.0);//mul(camIntrinsicsInverse, float4(tCoords, 1.0, 0.0)) * d;
     //localPoint.w = 1.0;
     float4 worldPoint = mul(localToWorld, localPoint);
-    worldPoint = worldPoint / worldPoint.w;
+    //worldPoint = worldPoint / worldPoint.w;
 
     float3 posCell = floor(((worldPoint.xyz - volumeMin.xyz) / volumeBounds.xyz) * volumeGridSize.xyz);
 
@@ -268,53 +268,15 @@ void CSTsdfGrid (uint3 gid : SV_DispatchThreadID)
 
     const float CONFIDENCE_THRESH = 2.0/255.0;
     const float2 ONE_O_WH = float2(1.0, 1.0) / float2(depthWidth, depthHeight);
-    /*float c = confTexture.SampleLevel(samplerconfTexture, tCoords * ONE_O_WH, 0);//[tCoords * 0.125];
-    //uint fourMult = id % 4;
-    //uint conf = ((c >> (fourMult*8)) & 0x000000FF);
-    if(c < CONFIDENCE_THRESH)
-    {
-        return;
-    }*/
-
     const float DEPTH_THRESH = 0.04;
 
-    int oneConfBad = 0;
-    /*int range = 2;
-    //or if any neighbors confidence is < 2, exit...
-    for(int i = -range; i <= range && !oneConfBad; ++i)
-    {
-        for(int j = -range; j <= range && !oneConfBad; ++j)
-        {
-            float2 tc2 = ((float2(gid.x+i*8+0.5, gid.y+j*8+0.5))); // uniforms.cameraResolution;
-            //float2 tc2 = tCoords + float2(i+0.5, j+0.5);
-            if(tc2.x >= 0 && tc2.x < depthWidth && tc2.y >= 0 && tc2.y < depthHeight)
-            {
-                float conf2 = confTexture.SampleLevel(samplerconfTexture, tc2 * ONE_O_WH, 0);
-                float d2 = depthTexture[tc2];
-                if(conf2 < CONFIDENCE_THRESH || abs(d-d2) > DEPTH_THRESH)
-                {
-                    oneConfBad = 1;
-                }
-            }
-        }
-    }*/
-    
-    if(oneConfBad == 1)
-    {
-        return;
-    }
 
     float4 localPoint = float4(dX, dY, dZ, 1.0);//mul(camIntrinsicsInverse, float4(tCoords, 1.0, 0.0)) * d;
     //localPoint.w = 1.0;
     float4 worldPoint = mul(localToWorld, localPoint);
-    worldPoint = worldPoint / worldPoint.w;
+    //worldPoint = worldPoint / worldPoint.w;
 
     float3 posCell = floor(((worldPoint.xyz - volumeMin.xyz) / volumeBounds.xyz) * volumeGridSize.xyz);
-
-    /*if(posCell.x < 0.0 || posCell.y < 0.0 || posCell.z < 0.0)
-    {
-        return;
-    }*/
 
     int3 idPos = clamp((int3)posCell.xyz, zeros, compressGridSizeMinusOne);
 
@@ -363,14 +325,6 @@ void CSTsdfGrid (uint3 gid : SV_DispatchThreadID)
 				return;
 			}
 			
-            /*if(c == 2.0/255.0)
-            {
-                sampledColor = float4(0.0, 1.0, 0.0, 1.0);
-            }
-            else if(c == 1.0/255.0)
-            {
-                sampledColor = float4(1.0, 0.0, 0.0, 1.0);
-            }*/
             uint sr = (uint)(sampledColor.x * 255.0);// & 0x000000FF;
             uint sg = (uint)(sampledColor.y * 255.0);// & 0x0000FF00) >> 8);
             uint sb = (uint)(sampledColor.z * 255.0);// & 0x00FF0000) >> 16);
