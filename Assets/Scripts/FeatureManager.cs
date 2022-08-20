@@ -101,13 +101,6 @@ public class FeatureManager : MonoBehaviour
     void Update()
     {
         headsetPos = curr_headset.GetComponent<Transform>().position; 
-        if (distance_updated)
-        {
-           foreach (Transform child in distance_parent.transform)
-            {
-                Destroy(child.gameObject);
-            }
-        }
         DisplayFeatureDistance();
         // We should only need to call ListFeatures once on entering a new location.
         // After that, we can update the existing feature list from websocket events.
@@ -433,17 +426,27 @@ public class FeatureManager : MonoBehaviour
     public void DisplayFeatureDistance()
     {
         Debug.Log("reach distance function");
+        distance_text = GetComponent<TextMeshPro>();
+        // before adding new text, it's easier to first delete all of them
+        foreach (Transform child in distance_parent.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
         foreach (EasyVizAR.Feature feature in feature_list.features)
         {
             //GetHeadSetPosition(); // TODO: I suspect that we'd need a boolean variable to ensure that this function has finished running before the next line 
-            Debug.Log("headset position x: " + headsetPos.x);
-            Debug.Log("headset position z: " + headsetPos.z);
-            Debug.Log("feature position x : " + feature.position.x);
-            Debug.Log("headset position z: " + feature.position.z);
+            //Debug.Log("headset position x: " + headsetPos.x);
+            //Debug.Log("headset position z: " + headsetPos.z);
+            //Debug.Log("feature position x : " + feature.position.x);
+            //Debug.Log("headset position z: " + feature.position.z);
+
 
             x_distance = (float)Math.Pow((headsetPos.x - feature.position.x), 2);
+            //Debug.Log("x_distance 1: " + x_distance);
+
             z_distance = (float)Math.Pow((headsetPos.z - feature.position.z), 2);
-            float distance = (float)Math.Sqrt(x_distance - z_distance);
+            float distance = (float)Math.Sqrt(x_distance + z_distance);
             Debug.Log("The distance currently: " + distance);
             distance_text.text = distance.ToString() + "m";
 
