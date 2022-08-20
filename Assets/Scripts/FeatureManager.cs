@@ -56,6 +56,10 @@ public class FeatureManager : MonoBehaviour
     public TextMeshPro distance_text;
     public float x_distance;
     public float z_distance;
+    public GameObject curr_headset;
+    public Vector3 headsetPos;
+    public bool distance_updated;
+    public GameObject distance_parent;
 
 
 
@@ -85,7 +89,10 @@ public class FeatureManager : MonoBehaviour
         feature_type_dictionary.Add("warning", warning_icon);
         // distance 
         distance_text = GetComponent<TextMeshPro>();
+        //distance_text.color = new Color32(191, 131, 6, 255);
 
+        headsetPos = curr_headset.GetComponent<Transform>().position;
+        distance_updated = false;
 
         ListFeatures(); // this populates all the features listed on the server currently
     }
@@ -93,6 +100,15 @@ public class FeatureManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        headsetPos = curr_headset.GetComponent<Transform>().position; 
+        if (distance_updated)
+        {
+           foreach (Transform child in distance_parent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+        DisplayFeatureDistance();
         // We should only need to call ListFeatures once on entering a new location.
         // After that, we can update the existing feature list from websocket events.
         if (false && isChanged)
@@ -412,7 +428,31 @@ public class FeatureManager : MonoBehaviour
         }
     }
 
-    // ARIS's added 8/20/2022 --> the three function below
+    // ARIS's added 8/20/2022 --> the three functions below
+
+    public void DisplayFeatureDistance()
+    {
+        Debug.Log("reach distance function");
+        foreach (EasyVizAR.Feature feature in feature_list.features)
+        {
+            //GetHeadSetPosition(); // TODO: I suspect that we'd need a boolean variable to ensure that this function has finished running before the next line 
+            Debug.Log("headset position x: " + headsetPos.x);
+            Debug.Log("headset position z: " + headsetPos.z);
+            Debug.Log("feature position x : " + feature.position.x);
+            Debug.Log("headset position z: " + feature.position.z);
+
+            x_distance = (float)Math.Pow((headsetPos.x - feature.position.x), 2);
+            z_distance = (float)Math.Pow((headsetPos.z - feature.position.z), 2);
+            float distance = (float)Math.Sqrt(x_distance - z_distance);
+            Debug.Log("The distance currently: " + distance);
+            distance_text.text = distance.ToString() + "m";
+
+            //TODO: might need to change the y-axis scale, would like to place the text box below the feature
+            Instantiate(distance_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), distance_text.transform.rotation, distance_parent.transform);
+            distance_updated = true;
+        }
+    }
+    /*
     public void GetHeadSetPosition()
     {
     //TODO: how do I get the headset position? --> I tried to use the variable manager, but it I can't seem to figure out where to get the headset's id since it only contains locationID... 
@@ -437,22 +477,8 @@ public class FeatureManager : MonoBehaviour
             Debug.Log("ERROR: " + result);
         }
     }
+    */
 
-    public void DisplayFeatureDistance()
-    {
-        foreach (EasyVizAR.Feature feature in feature_list.features)
-        {
-            GetHeadSetPosition(); // TODO: I suspect that we'd need a boolean variable to ensure that this function has finished running before the next line 
-            x_distance = (float)Math.Pow((x_distance - feature.position.x), 2);
-            z_distance = (float)Math.Pow((z_distance - feature.position.z), 2);
-            float distance = (float)Math.Sqrt(x_distance - z_distance);
-            distance_text.text = distance.ToString() + "m";
-            //TODO: might need to change the y-axis scale, would like to place the text box below the feature
-            Instantiate(distance_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z),distance_text.transform.rotation, spawn_parent.transform);
-
-        }
-    }
-    
 
 
     // This is alternative version for list feature --> not working though
