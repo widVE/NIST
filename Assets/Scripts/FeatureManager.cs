@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using System;
 
 public class FeatureManager : MonoBehaviour
 {
@@ -49,6 +51,12 @@ public class FeatureManager : MonoBehaviour
     public GameObject user_icon;
     public GameObject warning_icon;
 
+    //distance 
+    [SerializeField]
+    public TextMeshPro distance_text;
+    public float x_distance;
+    public float z_distance;
+
 
 
     // Start is called before the first frame update
@@ -75,6 +83,9 @@ public class FeatureManager : MonoBehaviour
         feature_type_dictionary.Add("stairs", stairs_icon);
         feature_type_dictionary.Add("user", user_icon);
         feature_type_dictionary.Add("warning", warning_icon);
+        // distance 
+        distance_text = GetComponent<TextMeshPro>();
+
 
         ListFeatures(); // this populates all the features listed on the server currently
     }
@@ -400,6 +411,49 @@ public class FeatureManager : MonoBehaviour
             Destroy(feature_object.gameObject);
         }
     }
+
+    // ARIS's added 8/20/2022 --> the three function below
+    public void GetHeadSetPosition()
+    {
+    //TODO: how do I get the headset position? --> I tried to use the variable manager, but it I can't seem to figure out where to get the headset's id since it only contains locationID... 
+       //I need the id for the headset 
+        EasyVizARServer.Instance.Get("headsets/" + id, EasyVizARServer.JSON_TYPE, GetFeatureCallBack);
+
+    }
+
+    void GetHeadSetPositionCallBack(string result)
+    {
+        var resultJSON = JsonUtility.FromJson<EasyVizAR.Headset>(result);
+
+        if (result != "error")
+        {
+            Debug.Log("SUCCESS: " + result);
+            x_distance = resultJSON.position.x;
+            z_distance = resultJSON.position.z;
+            // TODO: insert a boolean here? --> look at the comment in the next method (below) for future reference
+        }
+        else
+        {
+            Debug.Log("ERROR: " + result);
+        }
+    }
+
+    public void DisplayFeatureDistance()
+    {
+        foreach (EasyVizAR.Feature feature in feature_list.features)
+        {
+            GetHeadSetPosition(); // TODO: I suspect that we'd need a boolean variable to ensure that this function has finished running before the next line 
+            x_distance = (float)Math.Pow((x_distance - feature.position.x), 2);
+            z_distance = (float)Math.Pow((z_distance - feature.position.z), 2);
+            float distance = (float)Math.Sqrt(x_distance - z_distance);
+            distance_text.text = distance.ToString() + "m";
+            //TODO: might need to change the y-axis scale, would like to place the text box below the feature
+            Instantiate(distance_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z),distance_text.transform.rotation, spawn_parent.transform);
+
+        }
+    }
+    
+
 
     // This is alternative version for list feature --> not working though
     /*

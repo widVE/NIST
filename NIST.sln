@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.SpatialAudio.Spatializer", "Microsoft.SpatialAudio.Spatializer.csproj", "{AF0C9C37-8B5D-109C-9931-E606CC949DD8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "endel.nativewebsocket", "endel.nativewebsocket.csproj", "{B75E9945-21E2-83C5-22E9-A04B78E5B87F}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.VCRTForwarders.140", "Microsoft.VCRTForwarders.140.csproj", "{1151C445-9EAC-7276-B1E7-69B066F29844}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.SpatialAudio.Spatializer.Editor", "Microsoft.SpatialAudio.Spatializer.Editor.csproj", "{86E782CF-7E7A-0A47-2D1B-54779294481B}"
@@ -27,6 +29,10 @@ Global
 		{AF0C9C37-8B5D-109C-9931-E606CC949DD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF0C9C37-8B5D-109C-9931-E606CC949DD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF0C9C37-8B5D-109C-9931-E606CC949DD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B75E9945-21E2-83C5-22E9-A04B78E5B87F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B75E9945-21E2-83C5-22E9-A04B78E5B87F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B75E9945-21E2-83C5-22E9-A04B78E5B87F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B75E9945-21E2-83C5-22E9-A04B78E5B87F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1151C445-9EAC-7276-B1E7-69B066F29844}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1151C445-9EAC-7276-B1E7-69B066F29844}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1151C445-9EAC-7276-B1E7-69B066F29844}.Release|Any CPU.ActiveCfg = Release|Any CPU
