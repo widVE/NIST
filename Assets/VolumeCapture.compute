@@ -7,7 +7,6 @@
 #pragma kernel CSTexture
 #pragma kernel CSRender
 #pragma kernel CSRenderAll
-//#pragma kernel CSWorldBounds
 #pragma kernel CSDepthRange
 
 // Create a RenderTexture with enableRandomWrite flag and set it
@@ -38,10 +37,8 @@ Texture2D<float> depthTextureZ;
 
 RWStructuredBuffer<int> rangeBuf;
 
-uniform float4x4 camIntrinsicsInverse;
 uniform float4x4 localToWorld;
 uniform float4x4 viewProjMatrix;
-//uniform float4x4 displayMatrix;
 
 uniform float depthWidth;
 uniform float depthHeight;
@@ -201,7 +198,7 @@ void CSOctant(uint3 gid : SV_DispatchThreadID)
         return;
     }
 
-    float4 localPoint = float4(dX, dY, dZ, 1.0);//mul(camIntrinsicsInverse, float4(tCoords, 1.0, 0.0)) * d;
+    float4 localPoint = float4(dX, dY, dZ, 1.0);
     //localPoint.w = 1.0;
     float4 worldPoint = mul(localToWorld, localPoint);
     //worldPoint = worldPoint / worldPoint.w;
@@ -271,10 +268,8 @@ void CSTsdfGrid (uint3 gid : SV_DispatchThreadID)
     const float DEPTH_THRESH = 0.04;
 
 
-    float4 localPoint = float4(dX, dY, dZ, 1.0);//mul(camIntrinsicsInverse, float4(tCoords, 1.0, 0.0)) * d;
-    //localPoint.w = 1.0;
+    float4 localPoint = float4(dX, dY, dZ, 1.0);
     float4 worldPoint = mul(localToWorld, localPoint);
-    //worldPoint = worldPoint / worldPoint.w;
 
     float3 posCell = floor(((worldPoint.xyz - volumeMin.xyz) / volumeBounds.xyz) * volumeGridSize.xyz);
 
@@ -475,31 +470,6 @@ void CSTexture (uint3 id : SV_DispatchThreadID)
 
     return color;
 }*/
-/*[numthreads(32,32,1)]
-void CSWorldBounds(uint3 id : SV_DispatchThreadID)
-{
-    const int3 zeros = float3(0,0,0);
-    const int3 gridSize = int3(volumeGridSize.xyz);
-    const int3 compressGridSizeMinusOne = int3(gridSize.x-1, gridSize.y-1, gridSize.z-1);
-    
-    //uint totalGridCount = (uint)volumeGridSize.x * (uint)volumeGridSize.y * (uint)volumeGridSize.z;
-
-    float2 tCoords = float2(id.xy);
-
-    float d = depthTexture[tCoords];
-    if(d < 0.0 || d > 5.0)
-    {
-        return;
-    }
-
-    float4 localPoint = mul(camIntrinsicsInverse, float4(tCoords, 1.0, 0.0)) * d;
-    localPoint.w = 1.0;
-    float4 worldPoint = mul(localToWorld, localPoint);
-    worldPoint = worldPoint / worldPoint.w;
-
-    
-}
-*/
 
 [numthreads(32,32,1)]
 void CSDepthRange(uint3 id : SV_DispatchThreadID)
@@ -945,7 +915,7 @@ void DrawCube(float4 geo, uint3 color)
 void CSRender(uint3 id : SV_DispatchThreadID)
 {
     //take octant buffer and volume buffers and render valid points back out into space
-    const uint WRITE_THRESHOLD = 15;
+    const uint WRITE_THRESHOLD = 1;
 
     uint octantIdx = (volumeOffset + id.x) / totalCells;
     

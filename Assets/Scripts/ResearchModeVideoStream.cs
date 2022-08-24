@@ -29,8 +29,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 
 	private UnityEngine.Windows.WebCam.PhotoCapture photoCaptureObject = null;
 
-    //TCPClient tcpClient;
-
     public GameObject depthPreviewPlane = null;
     private Material depthMediaMaterial = null;
     private Texture2D depthMediaTexture = null;
@@ -70,22 +68,18 @@ public class ResearchModeVideoStream : MonoBehaviour
     private Texture2D RRMediaTexture = null;
     private byte[] RRFrameData = null;
 	
-    public GameObject pointCloudRendererGo;
-    public Color pointColor = Color.white;
-    private PointCloudRenderer pointCloudRenderer;
-	
 	public RenderTexture _colorRT;
-	public RenderTexture _depthRT;
+	//public RenderTexture _depthRT;
 	
 	public Material _colorCopyMaterial;
 	public Material _depthCopyMaterial;
 	
 	Texture2D _ourColor = null;
-	Texture2D _ourDepth = null;
+	//Texture2D _ourDepth = null;
 	Texture2D targetTexture = null;
 	
 	bool startRealtimePreview = true;
-	bool renderPointCloud = false;
+
 	bool _isCapturing = false;
 	
 	float _lastCaptureTime = 0.0f;
@@ -93,19 +87,20 @@ public class ResearchModeVideoStream : MonoBehaviour
 	const int DEPTH_WIDTH = 320;
 	const int DEPTH_HEIGHT = 288;
 	
+	const int DEPTH_RESOLUTION = DEPTH_WIDTH * DEPTH_HEIGHT;
 	//3904 x 2196...
 	//1952 x 1100...
 	const int COLOR_WIDTH = 760;
 	const int COLOR_HEIGHT = 428;
 	
-	byte[] depthTextureBytes = new byte[DEPTH_WIDTH*DEPTH_HEIGHT];
-	byte[] depthTextureFilteredBytes = new byte[DEPTH_WIDTH*DEPTH_HEIGHT*2];
-	byte[] floatDepthTextureBytesX = new byte[DEPTH_WIDTH*DEPTH_HEIGHT*4];
-	byte[] floatDepthTextureBytesY = new byte[DEPTH_WIDTH*DEPTH_HEIGHT*4];
-	byte[] floatDepthTextureBytesZ = new byte[DEPTH_WIDTH*DEPTH_HEIGHT*4];
+	byte[] depthTextureBytes = new byte[DEPTH_RESOLUTION];
+	byte[] depthTextureFilteredBytes = new byte[DEPTH_RESOLUTION*2];
+	byte[] floatDepthTextureBytesX = new byte[DEPTH_RESOLUTION*4];
+	byte[] floatDepthTextureBytesY = new byte[DEPTH_RESOLUTION*4];
+	byte[] floatDepthTextureBytesZ = new byte[DEPTH_RESOLUTION*4];
 	
 	[SerializeField]
-	float _writeTime = 1f;
+	float _writeTime = 1.0f;
 	public float WriteTime => _writeTime;
 
 #if INCLUDE_TSDF
@@ -199,14 +194,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 	public RenderTexture _pointRenderTexture;
 	public ComputeBuffer _pointRenderBuffer;
 
-	Matrix4x4 _lastProjMatrix = Matrix4x4.identity;
-
-	Camera _arCamera;
 #endif
-
-	Matrix4x4 _camIntrinsicsInv = Matrix4x4.identity;
-	
-	Matrix4x4 _pvIntrinsicsInv = Matrix4x4.identity;
 
 	[SerializeField]
 	bool _writeImagesToDisk = false;
@@ -240,8 +228,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 	
     void Start()
     {
-		_arCamera = Camera.main;
-
 		if(depthPreviewPlane != null)
 		{
 			depthMediaMaterial = depthPreviewPlane.GetComponent<MeshRenderer>().material;
@@ -291,18 +277,13 @@ public class ResearchModeVideoStream : MonoBehaviour
 			RRMediaMaterial.mainTexture = RRMediaTexture;
 		}
 
-		if(pointCloudRendererGo != null)
-		{
-			pointCloudRenderer = pointCloudRendererGo.GetComponent<PointCloudRenderer>();
-		}
-
         //tcpClient = GetComponent<TCPClient>();
 
 		// Depth sensor should be initialized in only one mode
         targetTexture = new Texture2D(COLOR_WIDTH, COLOR_HEIGHT, TextureFormat.RGBA32, false);
 		
 		_ourColor = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RGBA32, false);
-		_ourDepth = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.R8, false);
+		//_ourDepth = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.R8, false);
 		
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
@@ -311,11 +292,13 @@ public class ResearchModeVideoStream : MonoBehaviour
 	
         researchMode.SetPointCloudDepthOffset(0);
 
-
+		
 		//if(longDepthPreviewPlane != null)
 		//{
 			researchMode.InitializeLongDepthSensor();
-			researchMode.StartLongDepthSensorLoop(); 
+			researchMode.StartLongDepthSensorLoop();
+			
+			//PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
 		/*}
 		else if(depthPreviewPlane && shortAbImagePreviewPlane)
 		{
@@ -330,27 +313,55 @@ public class ResearchModeVideoStream : MonoBehaviour
 		}
 #endif
 #endif
-		//_camIntrinsicsInv.SetColumn(0, new Vector4(200.0f, 0f, 0f, 0f));
-		//_camIntrinsicsInv.SetColumn(1, new Vector4(0f, 200.0f, 0f, 0f));
-		//_camIntrinsicsInv.SetColumn(2, new Vector4(160f, 144f, 1f, 0f));
-		_camIntrinsicsInv[0] = 200.0f;//587.189f/2.375f;//(float)int.Parse(camIntrinsicData[0]); // 7.5f;
-		_camIntrinsicsInv[5] = 200.0f;//585.766f/1.4861f;//(float)int.Parse(camIntrinsicData[1]); // 7.5f;
-		_camIntrinsicsInv[8] = 160.0f;//373.018f/2.375f;//(float)int.Parse(camIntrinsicData[2]); // 7.5f;
-		_camIntrinsicsInv[9] = 144.0f;//200.805f/1.4861f;//(float)int.Parse(camIntrinsicData[3]); // 7.5f;
-		_camIntrinsicsInv = _camIntrinsicsInv.inverse;
-		
-		_pvIntrinsicsInv[0] = 587.189f;
-		_pvIntrinsicsInv[5] = 585.766f;
-		_pvIntrinsicsInv[8] = 373.018f;
-		_pvIntrinsicsInv[9] = 200.805f;
-		
-		_pvIntrinsicsInv = _pvIntrinsicsInv.inverse;
 		
 #if INCLUDE_TSDF
 		InitializeTSDF();
 #endif
     }
 
+	void OnDestroy()
+	{
+		_isCapturing = false;
+#if INCLUDE_TSDF
+		if(bigColorBuffer != null)
+		{
+			bigColorBuffer.Release();
+			bigColorBuffer = null;
+		}
+		
+		if(bigVolumeBuffer != null)
+		{
+			bigVolumeBuffer.Release();
+			bigVolumeBuffer = null;
+		}
+		
+		if(octantBuffer != null)
+		{
+			octantBuffer.Release();
+			octantBuffer = null;
+		}
+		
+		if(cellBuffer != null)
+		{
+			cellBuffer.Release();
+			cellBuffer = null;
+		}
+		
+		if(octantLookup != null)
+		{
+			octantLookup.Release();
+			octantLookup = null;
+		}
+		
+		if(volumeLookup != null)
+		{
+			volumeLookup.Release();
+			volumeLookup = null;
+		}
+#endif
+		photoCaptureObject.StopPhotoModeAsync(OnStoppedPhotoMode);	
+	}
+	
 #if INCLUDE_TSDF
 	void InitializeTSDF()
 	{
@@ -446,10 +457,10 @@ public class ResearchModeVideoStream : MonoBehaviour
 
 		if(octantBuffer == null)
 		{
-			octantBuffer = new ComputeBuffer(_depthRT.width * _depthRT.height, sizeof(int));
-			octantData = new int[_depthRT.width * _depthRT.height];
+			octantBuffer = new ComputeBuffer(DEPTH_RESOLUTION, sizeof(int));
+			octantData = new int[DEPTH_RESOLUTION];
 			//Debug.Log("Image depth: " + imageDepth.width + " " + imageDepth.height);
-			for(int i = 0; i < _depthRT.width * _depthRT.height; ++i)
+			for(int i = 0; i < DEPTH_RESOLUTION; ++i)
 			{
 				octantData[i] = -1;
 			}
@@ -459,9 +470,9 @@ public class ResearchModeVideoStream : MonoBehaviour
 
 		if(cellBuffer == null)
 		{
-			cellBuffer = new ComputeBuffer(_depthRT.width * _depthRT.height, sizeof(int), ComputeBufferType.Default, ComputeBufferMode.SubUpdates);
-			cellData = new int[_depthRT.width * _depthRT.height];
-			for(int i = 0; i < _depthRT.width * _depthRT.height; ++i)
+			cellBuffer = new ComputeBuffer(DEPTH_RESOLUTION, sizeof(int), ComputeBufferType.Default, ComputeBufferMode.SubUpdates);
+			cellData = new int[DEPTH_RESOLUTION];
+			for(int i = 0; i < DEPTH_RESOLUTION; ++i)
 			{
 				cellData[i] = -1;
 			}
@@ -521,10 +532,10 @@ public class ResearchModeVideoStream : MonoBehaviour
 		octantLookup.SetData(octantLookupData);
 		volumeLookup.SetData(volumeLookupData);
 
-		_totalRes = (uint)_depthRT.width * (uint)_depthRT.height;
+		_totalRes = DEPTH_RESOLUTION;
 
-		_currWidth = (uint)_depthRT.width;
-		_currHeight = (uint)_depthRT.height;
+		_currWidth = (uint)DEPTH_WIDTH;
+		_currHeight = (uint)DEPTH_HEIGHT;
 
 		for(int i = 0; i < TOTAL_NUM_OCTANTS; ++i)
 		{
@@ -635,9 +646,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 		_tsdfShader.SetBuffer(renderID, "volumeLookup", volumeLookup);
 		_tsdfShader.SetBuffer(renderID, "renderBuffer", _pointRenderBuffer);
 		
-		_tsdfShader.SetMatrix("camIntrinsicsInverse", _camIntrinsicsInv);
-
 	}
+
 
 	int ManageMemory()
 	{
@@ -815,9 +825,23 @@ public class ResearchModeVideoStream : MonoBehaviour
 			// Take a picture
 			//string filename = string.Format(@"CapturedImage{0}_n.png", Time.time);
 			//string filePath = System.IO.Path.Combine(Application.persistentDataPath, filename);
-
-			//photoCaptureObject.TakePhotoAsync(filePath, PhotoCaptureFileOutputFormat.PNG, OnCapturedPhotoToDisk);
-			photoCaptureObject.TakePhotoAsync(OnCapturedPhotoToMemory);
+			/*_isCapturing = true;
+			while(_isCapturing)
+			{
+				float currTime = Time.time;
+				
+				if(_lastCaptureTime == 0.0)
+				{
+					_lastCaptureTime = currTime;
+				}
+				
+				if((currTime - _lastCaptureTime) > WriteTime)
+				{*/
+					//photoCaptureObject.TakePhotoAsync(filePath, PhotoCaptureFileOutputFormat.PNG, OnCapturedPhotoToDisk);
+					photoCaptureObject.TakePhotoAsync(OnCapturedPhotoToMemory);
+			//		_lastCaptureTime = currTime;
+			//	}
+			//}
 		});
 	}
 	
@@ -827,7 +851,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 		photoCaptureObject = null;
 	}
 	
-	private void OnPhotoModeStarted(PhotoCapture.PhotoCaptureResult result)
+	/*private void OnPhotoModeStarted(PhotoCapture.PhotoCaptureResult result)
 	{
 		if (result.success)
 		{
@@ -841,7 +865,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 		{
 			Debug.LogError("Unable to start photo mode!");
 		}
-	}
+	}*/
 	
 	//this the function we're using for image capture (color and depth), goto memory first, so we can write additional synchronized info (transforms)
 	void OnCapturedPhotoToMemory(PhotoCapture.PhotoCaptureResult result, PhotoCaptureFrame photoCaptureFrame)
@@ -884,28 +908,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 								}
 								//s.Close();
 							}
-							
-							/*for(int i = 0; i < DEPTH_HEIGHT; ++i)
-							{
-								int b2Row = i * 2 * DEPTH_WIDTH;
-								int b4Row = i * 4 * DEPTH_WIDTH;
-								for(int j = 0; j < DEPTH_WIDTH; ++j)
-								{
-									int idx = (DEPTH_HEIGHT-i-1) * DEPTH_WIDTH + j;
-									int ourIdx = i * DEPTH_WIDTH + j;
-									depthTextureBytes[ourIdx] = frameTexture[idx];
-									byte[] bd = BitConverter.GetBytes(frameTextureFiltered[idx]);
-									depthTextureFilteredBytes[b2Row + j * 2] = bd[0];
-									depthTextureFilteredBytes[b2Row + j * 2 + 1] = bd[1];
-									float fD = (float)frameTextureFiltered[idx] / 1000f;	//values are in millimeters..., so divide by 1000 to get meters...
-									byte[] b = BitConverter.GetBytes(fD);
-									
-									floatDepthTextureBytes[b4Row + j * 4] = b[0];
-									floatDepthTextureBytes[b4Row + j * 4 + 1] = b[1];
-									floatDepthTextureBytes[b4Row + j * 4 + 2] = b[2];
-									floatDepthTextureBytes[b4Row + j * 4 + 3] = b[3];
-								}
-							}*/
 							
 							for(int i = 0; i < DEPTH_HEIGHT; ++i)
 							{
@@ -998,45 +1000,32 @@ public class ResearchModeVideoStream : MonoBehaviour
 							col3 = -col3;
 							zScale2.SetColumn(2, col3);
 							
-							//scanTransPV = scanTransPV.transpose;
-							//scanTransPV = zScale2 * scanTransPV;
-
+							scanTransPV = zScale2 * scanTransPV;
+							
 							Matrix4x4 worldToCamera = scanTransPV.inverse;
 							
-							//worldToCamera = zScale2 * worldToCamera;
-							//worldToCamera = worldToCamera.transpose;
-							worldToCamera[3] = -worldToCamera[12];
+							worldToCamera[3] = worldToCamera[12];
 							worldToCamera[7] = worldToCamera[13];
-							worldToCamera[11] = worldToCamera[14];
-							worldToCamera[12] = 0f;
-							worldToCamera[13] = 0f;
-							worldToCamera[14] = 0f;
+							worldToCamera[11] = -worldToCamera[14];
+							//worldToCamera[12] = 0f;
+							//worldToCamera[13] = 0f;
+							//worldToCamera[14] = 0f;
 							
-
-							//scanTransPV = scanTransPV.transpose;
-							
-							//Vector3 position = cameraToWorldMatrix.GetColumn(3) - cameraToWorldMatrix.GetColumn(2);
-							//Quaternion rotation = Quaternion.LookRotation(-cameraToWorldMatrix.GetColumn(2), cameraToWorldMatrix.GetColumn(1));
-
 							photoCaptureFrame.TryGetProjectionMatrix(0.01f, 100f, out Matrix4x4 projectionMatrix);// out Matrix4x4 projectionMatrix);
 							
-							//projectionMatrix = projectionMatrix.transpose;
-							
-							
+
 							//scanTransPV is now the MVP matrix of the color camera, this is used to project back unprojected depth image data to the color image
 							//to look up what corresponding color matches the depth, if any
 
-							scanTransPV = projectionMatrix * worldToCamera;// * scanTransPV;
+							scanTransPV = projectionMatrix * worldToCamera;
 							
-							scanTrans = zScale2 * scanTrans;//scanTrans.transpose;
-							//scanTrans = scanTrans.transpose;
-							
+							//scanTrans = zScale2 * scanTrans;	//don't want this here as this translates incorrectly...
 							scanTrans[3] = scanTrans[12];
 							scanTrans[7] = scanTrans[13];
 							scanTrans[11] = scanTrans[14];
-							scanTrans[12] = 0f;
-							scanTrans[13] = 0f;
-							scanTrans[14] = 0f;
+							//scanTrans[12] = 0f;
+							//scanTrans[13] = 0f;
+							//scanTrans[14] = 0f;
 							
 							_tsdfShader.SetMatrix("localToWorld", scanTrans);
 							_tsdfShader.SetMatrix("viewProjMatrix", scanTransPV);
@@ -1051,7 +1040,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 							_colorCopyMaterial.SetTexture("_DepthTexZ", _depthTexFromHololensZ);
 							_colorCopyMaterial.SetFloat("_depthWidth", (float)DEPTH_WIDTH);
 							_colorCopyMaterial.SetFloat("_depthHeight", (float)DEPTH_HEIGHT);
-							_colorCopyMaterial.SetMatrix("_camIntrinsicsInv", _camIntrinsicsInv);
 							_colorCopyMaterial.SetMatrix("_mvpColor", scanTransPV);
 							_colorCopyMaterial.SetMatrix("_depthToWorld", scanTrans);
 							
@@ -1074,88 +1062,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 								RenderTexture.active = null;
 							}
 							
-							//at this point we have the depth mvp matrix, and the color proj / view matrix.
-							//need to project world space depth value into color image that matches depth image size...
-							/*string debugOut = Path.Combine(Application.persistentDataPath, DateTime.Now.ToString("M_dd_yyyy_hh_mm_ss_")+_fileOutNumber.ToString()+".xyz");
-							_fileOutNumber++;
-							StreamWriter s = new StreamWriter(File.Open(debugOut, FileMode.Create));
-							Vector4 pos = Vector4.zero;
-							//this should happen in the BLIT shader above...
-							for(int i = 0; i < DEPTH_HEIGHT; ++i)
-							{
-								for(int j = 0; j < DEPTH_WIDTH; ++j)
-								{
-									int idx = (DEPTH_HEIGHT-i-1) * DEPTH_WIDTH + j;
-								
-									
-									//Debug.Log("Depth: " + depth);
-
-									//int wIndex = (int)(n % DEPTH_WIDTH);
-									//int hIndex = (int)DEPTH_HEIGHT - (int)(n / DEPTH_WIDTH);
-									
-									//uint numRows = numPoints / numCols;
-
-									int colorWidth = (int)760;
-									int colorHeight = (int)428;
-						
-									//uint idx = (uint)(j * (int)DEPTH_WIDTH + i);
-									//byte cData = confData[idx];
-									float fD = (float)frameTextureFiltered[idx] / 5000f;
-									
-									pos.x = 0f;
-									pos.y = 0f;
-									pos.z = 0f;
-									pos.w = 1.0f;
-									
-									if(fD > 0)
-									//if(cData >= ipadConfidence)
-									{
-										Vector3 cameraPoint = new Vector3(j + 0.5f, i + 0.5f, 1f);
-										cameraPoint = _camIntrinsicsInv.MultiplyVector(cameraPoint);
-										cameraPoint *= fD;
-										//cameraPoint.z = -cameraPoint.z;
-										Vector4 newCamPoint = new Vector4(cameraPoint.x, cameraPoint.y, cameraPoint.z, 1f);
-										//Debug.Log(newCamPoint.ToString("F3"));
-										
-										Vector4 projectedPoint = scanTrans * newCamPoint;
-										
-										pos.x = projectedPoint.x / projectedPoint.w;
-										pos.y = projectedPoint.y / projectedPoint.w;
-										pos.z = projectedPoint.z / projectedPoint.w;
-										
-										s.Write(pos.x.ToString("F4") + " " + pos.y.ToString("F4") + " " + pos.z.ToString("F4") + " 0.5 0.5 0.5\n");
-									}
-									else
-									{
-										s.Write("0 0 0 0.5 0.5 0.5\n");
-									}*/
-									
-									//Debug.Log(pos.ToString("F4"));
-									//we now want to project pos into the color image to look up the color value for the new color image
-									//this will replace the below colorIdx calculation...
-									//need full view projection...
-									//do we have this?
-									
-									/*Vector4 projPos = scanTransPV * pos;
-									//projPos = camIntrinsics2 * projPos;
-									//Debug.Log(projPos.ToString("F4"));
-									projPos.x /= projPos.w;
-									projPos.y /= projPos.w;
-									projPos.z /= projPos.w;
-									projPos.x = projPos.x * 0.5f + 0.5f;
-									projPos.y = projPos.y * 0.5f + 0.5f;
-									//projPos.x = 1f - projPos.x;
-									//projPos.y = 1f - projPos.y;
-
-									//Debug.Log(projPos.x);
-									//Debug.Log(projPos.y);
-									int hIdx = (int)((float)colorHeight * projPos.y);
-									int wIdx = (int)((float)colorWidth * projPos.x);*/
-							/*	}
-							}
-							
-							s.Close();*/
-
 							if(_gpuIndices.Count > 0)
 							{
 								if(!_waitingForGrids)
@@ -1178,8 +1084,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 								}
 							}
 
-							//RenderPoints(_lastCopyCount);
-
 							//write pv / projection matrices...
 							/*if(WriteImagesToDisk)
 							{
@@ -1201,13 +1105,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 								colorString = colorString + (flippedWtC[4].ToString("F4") + " " + flippedWtC[5].ToString("F4") + " " + flippedWtC[6].ToString("F4") + " " + flippedWtC[7].ToString("F4") + "\n");
 								colorString = colorString + (flippedWtC[8].ToString("F4") + " " + flippedWtC[9].ToString("F4") + " " + flippedWtC[10].ToString("F4") + " " + flippedWtC[11].ToString("F4") + "\n");
 								colorString = colorString + (flippedWtC[12].ToString("F4") + " " + flippedWtC[13].ToString("F4") + " " + flippedWtC[14].ToString("F4") + " " + flippedWtC[15].ToString("F4") + "\n");
-								
-								colorString = colorString + "\n";
-								
-								colorString = colorString + (_camIntrinsicsInv[0].ToString("F4") + " " + _camIntrinsicsInv[1].ToString("F4") + " " + _camIntrinsicsInv[2].ToString("F4") + " " + _camIntrinsicsInv[3].ToString("F4") + "\n");
-								colorString = colorString + (_camIntrinsicsInv[4].ToString("F4") + " " + _camIntrinsicsInv[5].ToString("F4") + " " + _camIntrinsicsInv[6].ToString("F4") + " " + _camIntrinsicsInv[7].ToString("F4") + "\n");
-								colorString = colorString + (_camIntrinsicsInv[8].ToString("F4") + " " + _camIntrinsicsInv[9].ToString("F4") + " " + _camIntrinsicsInv[10].ToString("F4") + " " + _camIntrinsicsInv[11].ToString("F4") + "\n");
-								colorString = colorString + (_camIntrinsicsInv[12].ToString("F4") + " " + _camIntrinsicsInv[13].ToString("F4") + " " + _camIntrinsicsInv[14].ToString("F4") + " " + _camIntrinsicsInv[15].ToString("F4") + "\n");
 								
 								string filenameTxtC = string.Format(@"CapturedImage{0}_n.txt", currTime);
 								System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxtC), colorString);
@@ -1292,6 +1189,48 @@ public class ResearchModeVideoStream : MonoBehaviour
 		_isCapturing = false;
 	}
 	
+	
+	void RenderPoints(int copyCount)
+	{
+		int screenWidthMult = (int)((float)Screen.width * SCREEN_MULTIPLIER);
+		int screenHeightMult = (int)((float)Screen.height * SCREEN_MULTIPLIER);
+
+		if(copyCount > 0)
+		{
+			
+			_tsdfShader.Dispatch(clearTextureID, (screenWidthMult + 31) / 32, (screenHeightMult + 31) / 32, 1);
+			
+			_tsdfShader.Dispatch(clearBufferID, ((screenWidthMult * screenHeightMult * 4) + 1023) / 1024, 1, 1);
+			
+			if((copyCount*TOTAL_CELLS+1023)/1024 > 65535)
+			{
+				int numCalls = (int)((copyCount*TOTAL_CELLS) / (1024*65535)) + 1;
+				int totalCount = 0;
+				int singleCallMax = (65535 * 1024);
+				for(int j = 0; j < numCalls; ++j)
+				{
+					_tsdfShader.SetInt("volumeOffset", j * singleCallMax);
+					if((j+1) * singleCallMax > copyCount*TOTAL_CELLS)
+					{
+						_tsdfShader.Dispatch(renderID, (int)((copyCount*TOTAL_CELLS-totalCount) + 1023) / 1024, 1, 1);
+					}
+					else
+					{
+						_tsdfShader.Dispatch(renderID, singleCallMax / 1024, 1, 1);
+					}
+					totalCount += singleCallMax;
+				}
+			}
+			else
+			{
+				_tsdfShader.Dispatch(renderID, (int)(copyCount * TOTAL_CELLS + 1023) / 1024, 1, 1);
+			}
+		}
+
+		//"blit" the render buffer to the render texture...
+		_tsdfShader.Dispatch(textureID, (screenWidthMult + 31) / 32, (screenHeightMult + 31) / 32, 1);
+	}
+
 	void UnprojectPoints(int copyCount)
 	{
 		_tsdfShader.SetInt("numVolumes", copyCount);
@@ -1424,7 +1363,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 										float yPos = offset.y + (float)k * gridCellSize.y + 0.5f * gridCellSize.y;
 										float zPos = offset.z + (float)j * gridCellSize.z + 0.5f * gridCellSize.z;
 
-										s.Write((xPos).ToString("F4") + " " + (yPos).ToString("F4") + " " + (-zPos).ToString("F4") + " ");
+										s.Write((xPos).ToString("F4") + " " + (yPos).ToString("F4") + " " + (zPos).ToString("F4") + " ");
 
 										//float red = (float)bigColorCPUData[colorToBufferMapCPU[keys[i]]+bufIdx*4] / 255.0f;
 										//float green = (float)bigColorCPUData[colorToBufferMapCPU[keys[i]]+bufIdx*4+1] / 255.0f;
@@ -1450,7 +1389,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 	}
 
 	//4/26/2022 - Ross T - this writes the color image to disk directly, but we aren't using this one at the moment
-	void OnCapturedPhotoToDisk(PhotoCapture.PhotoCaptureResult result)
+	/*void OnCapturedPhotoToDisk(PhotoCapture.PhotoCaptureResult result)
 	{
 		float currTime = Time.time;
 		
@@ -1498,8 +1437,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 		}
 		
 		_lastCaptureTime = currTime;
-		_isCapturing = false;
-	}
+		//_isCapturing = false;
+	}*/
 	
 	void UpdateImagePreviews()
 	{
@@ -1670,28 +1609,11 @@ public class ResearchModeVideoStream : MonoBehaviour
 	
     void LateUpdate()
     {
-		/*Resolution cameraResolution = PhotoCapture.SupportedResolutions.OrderByDescending((res) => res.width * res.height).First();
-		foreach (Resolution resolution in PhotoCapture.SupportedResolutions)
-        {
-            Debug.Log(resolution);
-        }*/
+		
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
 #else
-		
-		_writeTimer += Time.deltaTime;
-		if(_writeTimer > 20f)
-		{
-			WriteXYZ();
-			_writeTimer = 0f;
-		}
-		
-		if(ShowImagesInView && startRealtimePreview)
-		{
-			UpdateImagePreviews();
-		}
-		
-        // update long depth map texture
+		 // update long depth map texture
         if (startRealtimePreview && researchMode.LongDepthMapTextureUpdated())
         {
 			float currTime = Time.time;
@@ -1710,24 +1632,21 @@ public class ResearchModeVideoStream : MonoBehaviour
 				}
 			}
         }
-
-        // Update point cloud - not currently used...
-        if (renderPointCloud)
-        {
-            float[] pointCloud = researchMode.GetPointCloudBuffer();
-            if (pointCloud.Length > 0)
-            {
-                int pointCloudLength = pointCloud.Length / 3;
-                Vector3[] pointCloudVector3 = new Vector3[pointCloudLength];
-                for (int i = 0; i < pointCloudLength; i++)
-                {
-                    pointCloudVector3[i] = new Vector3(pointCloud[3 * i], pointCloud[3 * i + 1], pointCloud[3 * i + 2]);
-                }
-                //Debug.LogError("Point Cloud Size: " + pointCloudVector3.Length.ToString());
-                pointCloudRenderer.Render(pointCloudVector3, pointColor);
-
-            }
-        }
+		
+		_writeTimer += Time.deltaTime;
+		if(_writeTimer > 30f)
+		{
+			WriteXYZ();
+			_writeTimer = 0f;
+		}
+		
+		if(ShowImagesInView && startRealtimePreview)
+		{
+			UpdateImagePreviews();
+		}
+		
+		//RenderPoints(_lastCopyCount);
+		
 #endif
 #endif
     }
@@ -1739,25 +1658,6 @@ public class ResearchModeVideoStream : MonoBehaviour
         startRealtimePreview = !startRealtimePreview;
     }
     
-    public void TogglePointCloudEvent()
-    {
-        renderPointCloud = !renderPointCloud;
-        if (renderPointCloud)
-        {
-			if(pointCloudRendererGo != null)
-			{
-            	pointCloudRendererGo.SetActive(true);
-			}
-        }
-        else
-        {
-			if(pointCloudRendererGo != null)
-			{
-            	pointCloudRendererGo.SetActive(false);
-			}
-        }
-    }
-
     public void StopSensorsEvent()
     {
 #if ENABLE_WINMD_SUPPORT
@@ -1769,19 +1669,6 @@ public class ResearchModeVideoStream : MonoBehaviour
         startRealtimePreview = false;
     }
 
-    public void SaveAHATSensorDataEvent()
-    {
-#if ENABLE_WINMD_SUPPORT
-#if UNITY_EDITOR
-#else
-        var depthMap = researchMode.GetDepthMapBuffer();
-        var AbImage = researchMode.GetShortAbImageBuffer();
-#endif
-#if WINDOWS_UWP
-        //tcpClient.SendUINT16Async(depthMap, AbImage);
-#endif
-#endif
-    }
     #endregion
     private void OnApplicationFocus(bool focus)
     {

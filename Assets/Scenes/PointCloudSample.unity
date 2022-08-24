@@ -155,59 +155,10 @@ Transform:
   - {fileID: 1517424694}
   - {fileID: 891080481}
   - {fileID: 3905784940121933185}
-  - {fileID: 168399717}
   - {fileID: 1539913615}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &168399716
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 168399717}
-  - component: {fileID: 168399718}
-  m_Layer: 0
-  m_Name: PointCloudRenderer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &168399717
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 168399716}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 46054713}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &168399718
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 168399716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d062ae27eb741b3408bf4753a1aac7ef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxChunkSize: 65535
-  pointSize: 0.005
-  pointCloudElem: {fileID: 7258565985952825044, guid: 0e103885be9aa884ebc9d16411d8b804, type: 3}
-  pointCloudMaterial: {fileID: 2100000, guid: 410bd770d3b6d8943be1474daa7e822c, type: 2}
 --- !u!1 &278560614
 GameObject:
   m_ObjectHideFlags: 0
@@ -460,7 +411,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &382997461
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -558,7 +509,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &446940271
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1181,17 +1132,14 @@ MonoBehaviour:
   depthPreviewPlane: {fileID: 0}
   shortAbImagePreviewPlane: {fileID: 0}
   longDepthPreviewPlane: {fileID: 0}
-  LFPreviewPlane: {fileID: 446940270}
+  LFPreviewPlane: {fileID: 0}
   RFPreviewPlane: {fileID: 0}
-  LRPreviewPlane: {fileID: 1968632944}
-  RRPreviewPlane: {fileID: 382997460}
-  pointCloudRendererGo: {fileID: 168399716}
-  pointColor: {r: 1, g: 0, b: 0.8657131, a: 1}
+  LRPreviewPlane: {fileID: 0}
+  RRPreviewPlane: {fileID: 0}
   _colorRT: {fileID: 8400000, guid: 5a7ecc7d9f6de6843b3778389dad01ce, type: 2}
-  _depthRT: {fileID: 8400000, guid: bc4ac553eae35ae4bb3e56b8c9ab7f76, type: 2}
   _colorCopyMaterial: {fileID: 2100000, guid: 748aaa792b540014dab1d631cface284, type: 2}
   _depthCopyMaterial: {fileID: 2100000, guid: e2751f21b4f612748b9979193f5a11ad, type: 2}
-  _writeTime: 3
+  _writeTime: 0.4
   _performTSDFReconstruction: 1
   _tsdfShader: {fileID: 7200000, guid: 2940ca67a277a8c4998cf58e1466cf16, type: 3}
   _pointRenderTexture: {fileID: 0}
@@ -1465,8 +1413,8 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.1
-  far clip plane: 1000
+  near clip plane: 0.01
+  far clip plane: 100
   field of view: 36.43
   orthographic: 0
   orthographic size: 5
@@ -2036,7 +1984,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &1968632945
 MeshCollider:
   m_ObjectHideFlags: 0

@@ -372,6 +372,8 @@ namespace winrt::HL2UnityPlugin::implementation
         }
 
         pHL2ResearchMode->m_longDepthSensor->OpenStream();
+        //FILE* f = fopen("test_out.txt", "w");
+        int fc = 0;
 
         try
         {
@@ -404,6 +406,13 @@ namespace winrt::HL2UnityPlugin::implementation
                 // get tracking transform
                 ResearchModeSensorTimestamp timestamp;
                 pDepthSensorFrame->GetTimeStamp(&timestamp);
+
+                //timestamp continuosly increases... but does depth buffer change?
+                /*std::stringstream ss;
+                ss << fc << ": " << timestamp.HostTicks << " , " << timestamp.SensorTicks << "\n";
+                std::string msg = ss.str();
+                std::wstring widemsg = std::wstring(msg.begin(), msg.end());
+                OutputDebugString(widemsg.c_str());*/
 
                 auto ts = PerceptionTimestampHelper::FromSystemRelativeTargetTime(HundredsOfNanoseconds(checkAndConvertUnsigned(timestamp.HostTicks)));
                 auto transToWorld = pHL2ResearchMode->m_locator.TryLocateAtTimestamp(ts, pHL2ResearchMode->m_refFrame);
@@ -467,15 +476,31 @@ namespace winrt::HL2UnityPlugin::implementation
                             //depth > pHL2ResearchMode->depthCamRoi.depthNearClip && depth < pHL2ResearchMode->depthCamRoi.depthFarClip)
                         {
                             float xy[2] = { 0, 0 };
-                            float uv[2] = { j, i };
+                            float uv[2] = { ((float)j)+0.5f, ((float)i)+0.5f };
                             float z = 1.0f;
-                            pHL2ResearchMode->m_pLongDepthCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
+                            HRESULT hr = pHL2ResearchMode->m_pLongDepthCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
                             //auto pointOnUnitPlane = XMFLOAT3(xy[0], xy[1], 1);
+                            if (FAILED(hr))
+                            {
+                                z = 0.0f;
+                                pointCloud.push_back(xy[0]);// XMVectorGetX(pointInWorld));
+                                pointCloud.push_back(xy[1]);// XMVectorGetY(pointInWorld));
+                                pointCloud.push_back(z);
+                                continue;
+                            }
+
                             const float norm = sqrtf(xy[0] * xy[0] + xy[1] * xy[1] + z * z);
-                            const float invNorm = 1.0f / norm;
-                            xy[0] *= invNorm;
-                            xy[1] *= invNorm;
-                            z *= invNorm;
+                            if (norm > 0.0f)
+                            {
+                                const float invNorm = 1.0f / norm;
+                                xy[0] *= invNorm;
+                                xy[1] *= invNorm;
+                                z *= invNorm;
+                            }
+                            else
+                            {
+                                z = 0.0f;
+                            }
                             //auto tempPoint = (float)depth / 4000 * XMVector3Normalize(XMLoadFloat3(&pointOnUnitPlane));
                             // apply transformation
                             //auto pointInWorld = XMVector3Transform(tempPoint, depthToWorld);
@@ -558,6 +583,7 @@ namespace winrt::HL2UnityPlugin::implementation
                 }
 
                 pHL2ResearchMode->m_longDepthMapTextureUpdated = true;
+                pHL2ResearchMode->m_pointCloudUpdated = true;
 
                 pDepthTexture.reset();
 
@@ -572,6 +598,7 @@ namespace winrt::HL2UnityPlugin::implementation
                     pDepthSensorFrame->Release();
                 }
 
+                fc++;
             }
         }
         catch (...) {}

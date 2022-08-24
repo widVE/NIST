@@ -23,7 +23,6 @@ Shader "Unlit/CopyColorShader" {
 			uniform float _depthWidth;
 			uniform float _depthHeight;
             uniform int _Orientation;
-			uniform float4x4 _camIntrinsicsInv;
 			uniform float4x4 _mvpColor;
 			uniform float4x4 _depthToWorld;
             
@@ -78,11 +77,8 @@ Shader "Unlit/CopyColorShader" {
 					float4 cameraPoint = float4(wIndex + 0.5, hIndex + 0.5, 1.0, 0.0);
 					if(cameraPoint.x >= 0 && cameraPoint.x < _depthWidth && cameraPoint.y >= 0 && cameraPoint.y < _depthHeight)
 					{
-						//cameraPoint = mul(_camIntrinsicsInv, cameraPoint);
-						//cameraPoint *= d;
 						float4 newCameraPoint = float4(dX, dY, dZ, 1.0);//cameraPoint.x, cameraPoint.y, cameraPoint.z, 1.0);
 						newCameraPoint = mul(_depthToWorld, newCameraPoint);
-						//newCameraPoint.xyz /= newCameraPoint.w;
 						newCameraPoint.w = 1.0;
 						float4 projPos = mul(_mvpColor, newCameraPoint);
 						projPos.xyz /= projPos.w;
