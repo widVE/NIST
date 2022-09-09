@@ -140,7 +140,6 @@ void CSOctant(uint3 gid : SV_DispatchThreadID)
     const int3 zeros = float3(0,0,0);
     const int3 gridSize = int3(volumeGridSize.xyz);
     const int3 compressGridSizeMinusOne = int3(gridSize.x-1, gridSize.y-1, gridSize.z-1);
-    const float CONFIDENCE_THRESH = 2.0/255.0;
 
     float2 tCoords = float2(gid.xy);
 
@@ -157,10 +156,11 @@ void CSOctant(uint3 gid : SV_DispatchThreadID)
     float dX = depthTextureX[tCoords];
 	float dY = depthTextureY[tCoords];
 	float dZ = depthTextureZ[tCoords];
-   /*if(d <= 0.0 || d > 8.0)
+    
+	/*if(d <= 0.0 || d > 8.0)
     {
         return;
-    }*/
+    }
 
     const float DEPTH_THRESH = 0.04;
 
@@ -174,7 +174,7 @@ void CSOctant(uint3 gid : SV_DispatchThreadID)
     //}
 
     int oneConfBad = 0;
-    /*int range = 2;
+    int range = 2;
     for(int i = -range; i <= range && !oneConfBad; ++i)
     {
         for(int j = -range; j <= range && !oneConfBad; ++j)
@@ -191,12 +191,12 @@ void CSOctant(uint3 gid : SV_DispatchThreadID)
                 }
             }
         }
-    }*/
+    }
 
     if(oneConfBad == 1)
     {
         return;
-    }
+    }*/
 
     float4 localPoint = float4(dX, dY, dZ, 1.0);
     //localPoint.w = 1.0;
@@ -261,11 +261,11 @@ void CSTsdfGrid (uint3 gid : SV_DispatchThreadID)
     /*if(d <= 0.0 || d > 8.0)
     {
         return;
-    }*/
+    }
 
     const float CONFIDENCE_THRESH = 2.0/255.0;
     const float2 ONE_O_WH = float2(1.0, 1.0) / float2(depthWidth, depthHeight);
-    const float DEPTH_THRESH = 0.04;
+    const float DEPTH_THRESH = 0.04;*/
 
 
     float4 localPoint = float4(dX, dY, dZ, 1.0);
@@ -313,8 +313,11 @@ void CSTsdfGrid (uint3 gid : SV_DispatchThreadID)
             uint old_g = (volumeColorBuffer[cellIdx] >> 8) & 0x000000FF;
             uint old_b = (volumeColorBuffer[cellIdx] >> 16) & 0x000000FF;
             uint old_w = (volumeColorBuffer[cellIdx] >> 24) & 0x000000FF;
-
-            float4 sampledColor = colorTexture[float2(gid.xy) * 0.9375];//float4(c*0.5, c*0.5, c*0.5, 1.0);//
+			
+			/*float3 dVec = float3(dX, dY, dZ);
+			float distVec = length(dVec) / 4.0;
+			float4 sampledColor = float4(distVec, distVec, distVec, 1.0);*/
+            float4 sampledColor = colorTexture[float2(gid.xy)];//float4(distVec, distVec, distVec, 1.0);
 			if(length(sampledColor) == 0)
 			{
 				return;

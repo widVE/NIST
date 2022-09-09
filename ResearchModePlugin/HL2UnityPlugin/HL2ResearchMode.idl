@@ -39,6 +39,8 @@ namespace HL2UnityPlugin
         Boolean ShortAbImageTextureUpdated();
         Boolean PointCloudUpdated();
         Boolean LongDepthMapTextureUpdated();
+        void SetLongDepthMapTextureUpdatedOff();
+        void SetShouldGetDepth();
 		Boolean LFImageUpdated();
 		Boolean RFImageUpdated();
         Boolean LRImageUpdated();

@@ -375,38 +375,48 @@ namespace winrt::HL2UnityPlugin::implementation
         //FILE* f = fopen("test_out.txt", "w");
         int fc = 0;
 
-        try
+        while (pHL2ResearchMode->m_longDepthSensorLoopStarted)
         {
-            while (pHL2ResearchMode->m_longDepthSensorLoopStarted)
-            {
-                IResearchModeSensorFrame* pDepthSensorFrame = nullptr;
-                ResearchModeSensorResolution resolution;
-                pHL2ResearchMode->m_longDepthSensor->GetNextBuffer(&pDepthSensorFrame);
+            IResearchModeSensorFrame* pDepthSensorFrame = nullptr;
+            ResearchModeSensorResolution resolution;
+            pHL2ResearchMode->m_longDepthSensor->GetNextBuffer(&pDepthSensorFrame);
+                
+            pDepthSensorFrame->GetResolution(&resolution);
+            pHL2ResearchMode->m_longDepthResolution = resolution;
+
+            IResearchModeSensorDepthFrame* pDepthFrame = nullptr;
+            winrt::check_hresult(pDepthSensorFrame->QueryInterface(IID_PPV_ARGS(&pDepthFrame)));
+
+            size_t outBufferCount = 0;
+            const UINT16* pDepth = nullptr;
+
+            const BYTE* pSigma = nullptr;
+            pDepthFrame->GetSigmaBuffer(&pSigma, &outBufferCount);
+            pDepthFrame->GetBuffer(&pDepth, &outBufferCount);
+            pHL2ResearchMode->m_longDepthBufferSize = outBufferCount;
+            ResearchModeSensorTimestamp timestamp;
+            pDepthSensorFrame->GetTimeStamp(&timestamp);
+
+            /*bool shouldGetDepth;
+            pHL2ResearchMode->mu.lock();
+            shouldGetDepth = pHL2ResearchMode->m_shouldGetDepth;
+            pHL2ResearchMode->mu.unlock();*/
+            //if (shouldGetDepth)
+            //{
+                //OutputDebugString(L"Getting depth...\n");
+                /*pHL2ResearchMode->mu.lock();
+                pHL2ResearchMode->m_shouldGetDepth = false;
+                pHL2ResearchMode->mu.unlock();*/
 
                 // process sensor frame
-                pDepthSensorFrame->GetResolution(&resolution);
-                pHL2ResearchMode->m_longDepthResolution = resolution;
-
-                IResearchModeSensorDepthFrame* pDepthFrame = nullptr;
-                winrt::check_hresult(pDepthSensorFrame->QueryInterface(IID_PPV_ARGS(&pDepthFrame)));
-
-                size_t outBufferCount = 0;
-                const UINT16* pDepth = nullptr;
-                
-                const BYTE* pSigma = nullptr;
-                pDepthFrame->GetSigmaBuffer(&pSigma, &outBufferCount);
-                pDepthFrame->GetBuffer(&pDepth, &outBufferCount);
-                pHL2ResearchMode->m_longDepthBufferSize = outBufferCount;
-
+                    
                 auto pDepthTexture = std::make_unique<uint8_t[]>(outBufferCount);
                 auto pDepthTextureFiltered = std::make_unique<uint16_t[]>(outBufferCount);
 
                 std::vector<float> pointCloud;
 
                 // get tracking transform
-                ResearchModeSensorTimestamp timestamp;
-                pDepthSensorFrame->GetTimeStamp(&timestamp);
-
+                    
                 //timestamp continuosly increases... but does depth buffer change?
                 /*std::stringstream ss;
                 ss << fc << ": " << timestamp.HostTicks << " , " << timestamp.SensorTicks << "\n";
@@ -418,6 +428,10 @@ namespace winrt::HL2UnityPlugin::implementation
                 auto transToWorld = pHL2ResearchMode->m_locator.TryLocateAtTimestamp(ts, pHL2ResearchMode->m_refFrame);
                 if (transToWorld == nullptr)
                 {
+                    OutputDebugString(L"Null trans...\n");
+                    pHL2ResearchMode->mu.lock();
+                    pHL2ResearchMode->m_longDepthMapTextureUpdated = true;
+                    pHL2ResearchMode->mu.unlock();
                     continue;
                 }
 
@@ -433,10 +447,10 @@ namespace winrt::HL2UnityPlugin::implementation
                 auto rotMat = XMMatrixRotationQuaternion(XMLoadFloat4(&quatInDx));
                 auto pos = transToWorld.Position();
                 auto posMat = XMMatrixTranslation(pos.x, pos.y, pos.z);
-                auto depthToWorld = pHL2ResearchMode->m_longDepthCameraPoseInvMatrix *rotMat* posMat;
+                auto depthToWorld = pHL2ResearchMode->m_longDepthCameraPoseInvMatrix * rotMat * posMat;
 
                 pHL2ResearchMode->mu.lock();
-                
+
                 pHL2ResearchMode->m_depthSensorPosition[0] = pos.x;
                 pHL2ResearchMode->m_depthSensorPosition[1] = pos.y;
                 pHL2ResearchMode->m_depthSensorPosition[2] = pos.z;
@@ -452,7 +466,7 @@ namespace winrt::HL2UnityPlugin::implementation
 
                 auto roiCenterFloat = XMFLOAT3(pHL2ResearchMode->m_roiCenter[0], pHL2ResearchMode->m_roiCenter[1], pHL2ResearchMode->m_roiCenter[2]);
                 auto roiBoundFloat = XMFLOAT3(pHL2ResearchMode->m_roiBound[0], pHL2ResearchMode->m_roiBound[1], pHL2ResearchMode->m_roiBound[2]);
-                
+
                 pHL2ResearchMode->mu.unlock();
 
                 XMVECTOR roiCenter = XMLoadFloat3(&roiCenterFloat);
@@ -476,7 +490,7 @@ namespace winrt::HL2UnityPlugin::implementation
                             //depth > pHL2ResearchMode->depthCamRoi.depthNearClip && depth < pHL2ResearchMode->depthCamRoi.depthFarClip)
                         {
                             float xy[2] = { 0, 0 };
-                            float uv[2] = { ((float)j)+0.5f, ((float)i)+0.5f };
+                            float uv[2] = { ((float)j) + 0.5f, ((float)i) + 0.5f };
                             float z = 1.0f;
                             HRESULT hr = pHL2ResearchMode->m_pLongDepthCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
                             //auto pointOnUnitPlane = XMFLOAT3(xy[0], xy[1], 1);
@@ -511,25 +525,25 @@ namespace winrt::HL2UnityPlugin::implementation
                             /*if (!pHL2ResearchMode->m_useRoiFilter ||
                                 (pHL2ResearchMode->m_useRoiFilter && XMVector3InBounds(pointInWorld - roiCenter, roiBound)))
                             {*/
-                                pointCloud.push_back(xy[0]);// XMVectorGetX(pointInWorld));
-                                pointCloud.push_back(xy[1]);// XMVectorGetY(pointInWorld));
-                                pointCloud.push_back(z);// -XMVectorGetZ(pointInWorld));
-                            //}
+                            pointCloud.push_back(xy[0]);// XMVectorGetX(pointInWorld));
+                            pointCloud.push_back(xy[1]);// XMVectorGetY(pointInWorld));
+                            pointCloud.push_back(z);// -XMVectorGetZ(pointInWorld));
+                        //}
                         }
 
                         // save as grayscale texture pixel into temp buffer
-                        if (depth == 0) { 
-							pDepthTexture.get()[idx] = 0;
+                        if (depth == 0) {
+                            pDepthTexture.get()[idx] = 0;
                             pDepthTextureFiltered.get()[idx] = 0;
-						}
-						
-                        else { 
+                        }
+
+                        else {
                             pDepthTexture.get()[idx] = (uint8_t)((float)depth / 4000 * 255);
                             pDepthTextureFiltered.get()[idx] = depth;
                         }
 
                         // save the depth of center pixel
-                        if (i == (UINT)(0.35 * resolution.Height) && j == (UINT)(0.5 * resolution.Width)
+                        /*if (i == (UINT)(0.35 * resolution.Height) && j == (UINT)(0.5 * resolution.Width)
                             && pointCloud.size() >= 3)
                         {
                             pHL2ResearchMode->m_centerDepth = depth;
@@ -540,50 +554,52 @@ namespace winrt::HL2UnityPlugin::implementation
                                 pHL2ResearchMode->m_centerPoint[1] = *(pointCloud.end() - 2);
                                 pHL2ResearchMode->m_centerPoint[2] = *(pointCloud.end() - 1);
                             }
-                        }
+                        }*/
                     }
                 }
 
-                // save data
+                pHL2ResearchMode->mu.lock();
+                   
+                //std::lock_guard<std::mutex> l(pHL2ResearchMode->mu);
+                // save point cloud
+                if (!pHL2ResearchMode->m_pointCloud)
                 {
-                    std::lock_guard<std::mutex> l(pHL2ResearchMode->mu);
-                    // save point cloud
-                    if (!pHL2ResearchMode->m_pointCloud)
-                    {
-                        OutputDebugString(L"Create Space for point cloud...\n");
-                        pHL2ResearchMode->m_pointCloud = new float[outBufferCount * 3];
-                    }
-
-                    memcpy(pHL2ResearchMode->m_pointCloud, pointCloud.data(), pointCloud.size() * sizeof(float));
-                    pHL2ResearchMode->m_pointcloudLength = pointCloud.size();
-
-                    // save raw depth map
-                    if (!pHL2ResearchMode->m_longDepthMap)
-                    {
-                        OutputDebugString(L"Create Space for depth map...\n");
-                        pHL2ResearchMode->m_longDepthMap = new UINT16[outBufferCount];
-                    }
-                    memcpy(pHL2ResearchMode->m_longDepthMap, pDepth, outBufferCount * sizeof(UINT16));
-                    
-                    if (!pHL2ResearchMode->m_depthMapFiltered)
-                    {
-                        OutputDebugString(L"Create Space for depth map...\n");
-                        pHL2ResearchMode->m_depthMapFiltered = new UINT16[outBufferCount];
-                    }
-
-                    memcpy(pHL2ResearchMode->m_depthMapFiltered, pDepthTextureFiltered.get(), outBufferCount * sizeof(UINT16));
-
-                    // save pre-processed depth map texture (for visualization)
-                    if (!pHL2ResearchMode->m_longDepthMapTexture)
-                    {
-                        OutputDebugString(L"Create Space for depth map texture...\n");
-                        pHL2ResearchMode->m_longDepthMapTexture = new UINT8[outBufferCount];
-                    }
-                    memcpy(pHL2ResearchMode->m_longDepthMapTexture, pDepthTexture.get(), outBufferCount * sizeof(UINT8));
+                    OutputDebugString(L"Create Space for point cloud...\n");
+                    pHL2ResearchMode->m_pointCloud = new float[outBufferCount * 3];
                 }
 
+                memcpy(pHL2ResearchMode->m_pointCloud, pointCloud.data(), pointCloud.size() * sizeof(float));
+                pHL2ResearchMode->m_pointcloudLength = pointCloud.size();
+
+                // save raw depth map
+                if (!pHL2ResearchMode->m_longDepthMap)
+                {
+                    OutputDebugString(L"Create Space for depth map...\n");
+                    pHL2ResearchMode->m_longDepthMap = new UINT16[outBufferCount];
+                }
+                memcpy(pHL2ResearchMode->m_longDepthMap, pDepth, outBufferCount * sizeof(UINT16));
+
+                if (!pHL2ResearchMode->m_depthMapFiltered)
+                {
+                    OutputDebugString(L"Create Space for depth map...\n");
+                    pHL2ResearchMode->m_depthMapFiltered = new UINT16[outBufferCount];
+                }
+
+                memcpy(pHL2ResearchMode->m_depthMapFiltered, pDepthTextureFiltered.get(), outBufferCount * sizeof(UINT16));
+
+                // save pre-processed depth map texture (for visualization)
+                if (!pHL2ResearchMode->m_longDepthMapTexture)
+                {
+                    OutputDebugString(L"Create Space for depth map texture...\n");
+                    pHL2ResearchMode->m_longDepthMapTexture = new UINT8[outBufferCount];
+                }
+                memcpy(pHL2ResearchMode->m_longDepthMapTexture, pDepthTexture.get(), outBufferCount * sizeof(UINT8));
+
+                //OutputDebugString(L"Setting long depth updated to TRUE..\n");
                 pHL2ResearchMode->m_longDepthMapTextureUpdated = true;
                 pHL2ResearchMode->m_pointCloudUpdated = true;
+
+                pHL2ResearchMode->mu.unlock();
 
                 pDepthTexture.reset();
 
@@ -599,13 +615,21 @@ namespace winrt::HL2UnityPlugin::implementation
                 }
 
                 fc++;
-            }
+            /*}
+            else
+            {
+                OutputDebugString(L"Shouldn't get depth...\n");
+            }*/
         }
-        catch (...) {}
+        
+        /*catch (...)
+        {
+            OutputDebugString(L"In catch..\n");
+        }*/
         pHL2ResearchMode->m_longDepthSensor->CloseStream();
         pHL2ResearchMode->m_longDepthSensor->Release();
         pHL2ResearchMode->m_longDepthSensor = nullptr;
-
+        OutputDebugString(L"Closing Stream...\n");
     }
 
     void HL2ResearchMode::StartSpatialCamerasFrontLoop()
@@ -811,7 +835,38 @@ namespace winrt::HL2UnityPlugin::implementation
 
     inline int HL2ResearchMode::GetLongDepthBufferSize() { return m_longDepthBufferSize; }
 
-    inline bool HL2ResearchMode::LongDepthMapTextureUpdated() { return m_longDepthMapTextureUpdated; }
+    bool HL2ResearchMode::LongDepthMapTextureUpdated() 
+    { 
+        bool updated;
+        mu.lock();
+        updated = m_longDepthMapTextureUpdated; 
+        mu.unlock();
+        /*if (updated)
+        {
+            OutputDebugString(L"Long depth updated...\n");
+        }
+        else
+        {
+            OutputDebugString(L"Long depth not updated...\n");
+        }*/
+        return updated;
+    }
+       
+    void HL2ResearchMode::SetLongDepthMapTextureUpdatedOff() 
+    {
+        mu.lock();
+        m_longDepthMapTextureUpdated = false; 
+        mu.unlock();
+        //OutputDebugString(L"Setting long depth off...\n");
+    }
+
+    void HL2ResearchMode::SetShouldGetDepth() 
+    { 
+        mu.lock();
+        m_shouldGetDepth = true;
+        mu.unlock();
+        //OutputDebugString(L"Setting should get depth...\n");
+    }
 
 	inline bool HL2ResearchMode::LFImageUpdated() { return m_LFImageUpdated; }
 
@@ -998,7 +1053,7 @@ namespace winrt::HL2UnityPlugin::implementation
             return com_array<uint16_t>();
         }
         com_array<UINT16> tempBuffer = com_array<UINT16>(m_longDepthMap, m_longDepthMap + m_longDepthBufferSize);
-        m_longDepthMapTextureUpdated = false;
+        //m_longDepthMapTextureUpdated = false;
         return tempBuffer;
     }
 	
@@ -1010,7 +1065,7 @@ namespace winrt::HL2UnityPlugin::implementation
             return com_array<uint16_t>();
         }
         com_array<UINT16> tempBuffer = com_array<UINT16>(m_depthMapFiltered, m_depthMapFiltered + m_longDepthBufferSize);
-        m_longDepthMapTextureUpdated = false;
+        //m_longDepthMapTextureUpdated = false;
         return tempBuffer;
     }
 	
@@ -1023,7 +1078,7 @@ namespace winrt::HL2UnityPlugin::implementation
         }
         com_array<UINT8> tempBuffer = com_array<UINT8>(std::move_iterator(m_longDepthMapTexture), std::move_iterator(m_longDepthMapTexture + m_longDepthBufferSize));
 
-        m_longDepthMapTextureUpdated = false;
+        //m_longDepthMapTextureUpdated = false;
         return tempBuffer;
     }
 

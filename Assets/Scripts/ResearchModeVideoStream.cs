@@ -99,14 +99,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 	byte[] floatDepthTextureBytesY = new byte[DEPTH_RESOLUTION*4];
 	byte[] floatDepthTextureBytesZ = new byte[DEPTH_RESOLUTION*4];
 	
-	[SerializeField]
-	float _writeTime = 1.0f;
-	public float WriteTime => _writeTime;
 
 #if INCLUDE_TSDF
-	[SerializeField]
-	bool _performTSDFReconstruction = false;
-	public bool PerformTSDF => _performTSDFReconstruction;
 	
 	const uint NUM_GRIDS = 4096;		
 	const uint NUM_GRIDS_CPU = 4096;
@@ -147,7 +141,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 	int[] octantData = null;
 	int[] cellData = null;
 	
-	Vector4 volumeBounds = new Vector4(8f, 4f, 8f, 0f);
+	Vector4 volumeBounds = new Vector4(16f, 8f, 16f, 0f);
 	Vector4 volumeOrigin = new Vector4(0f, 0f, 0f, 0f);		
 	Vector4 cellDimensions = new Vector4(32f, 16f, 32f, 0f);
 
@@ -206,9 +200,11 @@ public class ResearchModeVideoStream : MonoBehaviour
 	
 	bool _firstHeadsetSend = true;
 	
-	float _writeTimer = 0f;
+	float _startTimer = 0f;
 	
 	int _fileOutNumber = 0;
+	
+	bool _firstLoop = true;
 	
 	//[SerializeField]
 	//Texture2D _testTexture;
@@ -285,19 +281,21 @@ public class ResearchModeVideoStream : MonoBehaviour
 		_ourColor = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RGBA32, false);
 		//_ourDepth = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.R8, false);
 		
+		_startTimer = UnityEngine.Time.time;
+		
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
 #else
         researchMode = new HL2ResearchMode();
 	
         researchMode.SetPointCloudDepthOffset(0);
-
+		
 		
 		//if(longDepthPreviewPlane != null)
 		//{
 			researchMode.InitializeLongDepthSensor();
 			researchMode.StartLongDepthSensorLoop();
-			
+			researchMode.SetShouldGetDepth();
 			//PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
 		/*}
 		else if(depthPreviewPlane && shortAbImagePreviewPlane)
@@ -871,13 +869,14 @@ public class ResearchModeVideoStream : MonoBehaviour
 	void OnCapturedPhotoToMemory(PhotoCapture.PhotoCaptureResult result, PhotoCaptureFrame photoCaptureFrame)
 	{
 		float currTime = Time.time;
-		
-		if(result.success)
-		{
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
 #else
-			if (startRealtimePreview && researchMode.LongDepthMapTextureUpdated() && researchMode.PointCloudUpdated())
+		
+		if(result.success)
+		{
+			Debug.Log("Captured new photo");
+			if (startRealtimePreview)
 			{
 				byte[] frameTexture = researchMode.GetLongDepthMapTextureBuffer();
 				
@@ -1000,18 +999,25 @@ public class ResearchModeVideoStream : MonoBehaviour
 							col3 = -col3;
 							zScale2.SetColumn(2, col3);
 							
+							//scanTransPV = scanTransPV;
 							scanTransPV = zScale2 * scanTransPV;
+							
+							/*Matrix4x4 cameraToWorld = cameraToWorldMatrix;// * zScale2;
+							
+							cameraToWorld[12] = -cameraToWorld[3];
+							cameraToWorld[13] = -cameraToWorld[7];
+							cameraToWorld[14] = -cameraToWorld[11];*/
 							
 							Matrix4x4 worldToCamera = scanTransPV.inverse;
 							
 							worldToCamera[3] = worldToCamera[12];
 							worldToCamera[7] = worldToCamera[13];
-							worldToCamera[11] = -worldToCamera[14];
+							worldToCamera[11] = worldToCamera[14];
 							//worldToCamera[12] = 0f;
 							//worldToCamera[13] = 0f;
 							//worldToCamera[14] = 0f;
 							
-							photoCaptureFrame.TryGetProjectionMatrix(0.01f, 100f, out Matrix4x4 projectionMatrix);// out Matrix4x4 projectionMatrix);
+							photoCaptureFrame.TryGetProjectionMatrix( out Matrix4x4 projectionMatrix);// out Matrix4x4 projectionMatrix);
 							
 
 							//scanTransPV is now the MVP matrix of the color camera, this is used to project back unprojected depth image data to the color image
@@ -1021,7 +1027,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 							
 							//scanTrans = zScale2 * scanTrans;	//don't want this here as this translates incorrectly...
 							scanTrans[3] = scanTrans[12];
-							scanTrans[7] = scanTrans[13];
+							scanTrans[7] = -scanTrans[13];
 							scanTrans[11] = scanTrans[14];
 							//scanTrans[12] = 0f;
 							//scanTrans[13] = 0f;
@@ -1175,16 +1181,22 @@ public class ResearchModeVideoStream : MonoBehaviour
 						else
 						{
 							System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "test2.txt"), "wha");
-									
 						}
 					}
 				}
 			}
-#endif
-#endif
+			
+			Debug.Log("Stopping photo mode async");
 			photoCaptureObject.StopPhotoModeAsync(OnStoppedPhotoMode);
+			researchMode.SetShouldGetDepth();
 		}
-		
+		else
+		{
+			Debug.Log("Stopping photo mode async 2");
+			researchMode.SetShouldGetDepth();
+		}
+#endif
+#endif	
 		_lastCaptureTime = currTime;
 		_isCapturing = false;
 	}
@@ -1613,10 +1625,18 @@ public class ResearchModeVideoStream : MonoBehaviour
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
 #else
+		if(_firstLoop)
+		{
+			researchMode.SetShouldGetDepth();
+			_firstLoop = false;
+		}
+		
 		 // update long depth map texture
-        if (startRealtimePreview && researchMode.LongDepthMapTextureUpdated())
+        if (startRealtimePreview && researchMode.LongDepthMapTextureUpdated() && !_isCapturing)
         {
-			float currTime = Time.time;
+			researchMode.SetLongDepthMapTextureUpdatedOff();
+			//Debug.Log("Starting Photo Capture");
+			/*float currTime = Time.time;
 			
 			if(_lastCaptureTime == 0.0)
 			{
@@ -1626,18 +1646,18 @@ public class ResearchModeVideoStream : MonoBehaviour
 			if(currTime - _lastCaptureTime > WriteTime)
 			{
 				if(!_isCapturing)
-				{
+				{*/
 					_isCapturing = true;
 					PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
-				}
-			}
+					
+				//}
+			//}
         }
 		
-		_writeTimer += Time.deltaTime;
-		if(_writeTimer > 30f)
+		if(UnityEngine.Time.time - _startTimer > 30f)
 		{
 			WriteXYZ();
-			_writeTimer = 0f;
+			_startTimer = UnityEngine.Time.time;
 		}
 		
 		if(ShowImagesInView && startRealtimePreview)

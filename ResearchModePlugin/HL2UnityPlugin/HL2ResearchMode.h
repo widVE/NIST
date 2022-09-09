@@ -45,6 +45,8 @@ namespace winrt::HL2UnityPlugin::implementation
         bool ShortAbImageTextureUpdated();
         bool PointCloudUpdated();
         bool LongDepthMapTextureUpdated();
+        void SetLongDepthMapTextureUpdatedOff();
+        void SetShouldGetDepth();
 		bool LFImageUpdated();
 		bool RFImageUpdated();
         bool LRImageUpdated();
@@ -133,6 +135,7 @@ namespace winrt::HL2UnityPlugin::implementation
 		std::atomic_bool m_RFImageUpdated = false;
         std::atomic_bool m_LRImageUpdated = false;
         std::atomic_bool m_RRImageUpdated = false;
+        std::atomic_bool m_shouldGetDepth = false;
 
         float m_roiBound[3]{ 0,0,0 };
         float m_roiCenter[3]{ 0,0,0 };
