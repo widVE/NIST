@@ -53,7 +53,7 @@ public class FeatureManager : MonoBehaviour
 
     //distance 
     [SerializeField]
-    public TextMeshPro distance_text;
+    public GameObject distance_text;
     public float x_distance;
     public float z_distance;
     public GameObject curr_headset;
@@ -88,7 +88,7 @@ public class FeatureManager : MonoBehaviour
         feature_type_dictionary.Add("user", user_icon);
         feature_type_dictionary.Add("warning", warning_icon);
         // distance 
-        distance_text = GetComponent<TextMeshPro>();
+        //distance_text = GetComponent<TextMeshPro>();
         //distance_text.color = new Color32(191, 131, 6, 255);
 
         headsetPos = curr_headset.GetComponent<Transform>().position;
@@ -315,17 +315,6 @@ public class FeatureManager : MonoBehaviour
     }
 
 
-    // implement later but might not need it 
-    public void ReplaceFeature()
-    {
-
-    }
-
-    void ReplaceFeatureCallback()
-    {
-
-    }
-
     //[ContextMenu("DeleteFeature")]
     public void DeleteFeature(int id)
     {
@@ -426,7 +415,7 @@ public class FeatureManager : MonoBehaviour
     public void DisplayFeatureDistance()
     {
         Debug.Log("reach distance function");
-        distance_text = GetComponent<TextMeshPro>();
+        TextMeshPro display_dist_text = distance_text.GetComponent<TextMeshPro>();
         // before adding new text, it's easier to first delete all of them
         foreach (Transform child in distance_parent.transform)
         {
@@ -448,13 +437,26 @@ public class FeatureManager : MonoBehaviour
             z_distance = (float)Math.Pow((headsetPos.z - feature.position.z), 2);
             float distance = (float)Math.Sqrt(x_distance + z_distance);
             Debug.Log("The distance currently: " + distance);
-            distance_text.text = distance.ToString() + "m";
+            display_dist_text.text = distance.ToString() + "m";
 
             //TODO: might need to change the y-axis scale, would like to place the text box below the feature
-            Instantiate(distance_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), distance_text.transform.rotation, distance_parent.transform);
+            Instantiate(display_dist_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), display_dist_text.transform.rotation, distance_parent.transform);
             distance_updated = true;
         }
     }
+
+
+    // implement later but might not need it 
+    public void ReplaceFeature()
+    {
+
+    }
+
+    void ReplaceFeatureCallback()
+    {
+
+    }
+
     /*
     public void GetHeadSetPosition()
     {
