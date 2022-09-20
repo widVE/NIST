@@ -60,6 +60,7 @@ public class FeatureManager : MonoBehaviour
     public Vector3 headsetPos;
     public bool distance_updated;
     public GameObject distance_parent;
+    public bool isFeet;
 
 
 
@@ -88,11 +89,10 @@ public class FeatureManager : MonoBehaviour
         feature_type_dictionary.Add("user", user_icon);
         feature_type_dictionary.Add("warning", warning_icon);
         // distance 
-        //distance_text = GetComponent<TextMeshPro>();
-        //distance_text.color = new Color32(191, 131, 6, 255);
+        isFeet = true; 
 
         headsetPos = curr_headset.GetComponent<Transform>().position;
-        distance_updated = false;
+        distance_updated = true;
 
         ListFeatures(); // this populates all the features listed on the server currently
     }
@@ -101,6 +101,7 @@ public class FeatureManager : MonoBehaviour
     void Update()
     {
         headsetPos = curr_headset.GetComponent<Transform>().position; 
+        
         DisplayFeatureDistance();
         // We should only need to call ListFeatures once on entering a new location.
         // After that, we can update the existing feature list from websocket events.
@@ -424,20 +425,27 @@ public class FeatureManager : MonoBehaviour
 
         foreach (EasyVizAR.Feature feature in feature_list.features)
         {
-            //GetHeadSetPosition(); // TODO: I suspect that we'd need a boolean variable to ensure that this function has finished running before the next line 
-            //Debug.Log("headset position x: " + headsetPos.x);
-            //Debug.Log("headset position z: " + headsetPos.z);
-            //Debug.Log("feature position x : " + feature.position.x);
-            //Debug.Log("headset position z: " + feature.position.z);
+            
 
-
-            x_distance = (float)Math.Pow((headsetPos.x - feature.position.x), 2);
             //Debug.Log("x_distance 1: " + x_distance);
-
+            x_distance = (float)Math.Pow((headsetPos.x - feature.position.x), 2);
             z_distance = (float)Math.Pow((headsetPos.z - feature.position.z), 2);
-            float distance = (float)Math.Sqrt(x_distance + z_distance);
+            if (isFeet)
+            {
+                x_distance = (float)(x_distance * 3.281);
+                z_distance = (float)(z_distance * 3.281);
+            }
+            float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
             Debug.Log("The distance currently: " + distance);
-            display_dist_text.text = distance.ToString() + "m";
+            if (isFeet)
+            {
+                display_dist_text.text = feature.type + " - " + distance.ToString() + "ft";
+            }
+            else
+            {
+                display_dist_text.text = feature.type + " - " + distance.ToString() + "m";
+
+            }
 
             //TODO: might need to change the y-axis scale, would like to place the text box below the feature
             Instantiate(display_dist_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), display_dist_text.transform.rotation, distance_parent.transform);
