@@ -1,4 +1,5 @@
 ﻿#define INCLUDE_TSDF
+#define ONLY_UNPROJECT
 
 using System.Collections;
 using System.Collections.Generic;
@@ -77,7 +78,12 @@ public class ResearchModeVideoStream : MonoBehaviour
 	Texture2D _ourColor = null;
 	//Texture2D _ourDepth = null;
 	Texture2D targetTexture = null;
-	
+#if ONLY_UNPROJECT
+	ComputeBuffer _ourPoints = null;
+	ComputeBuffer _ourColorBuffer = null;
+	float[] _pointData;
+	uint[] _colorData;
+#endif
 	bool startRealtimePreview = true;
 
 	bool _isCapturing = false;
@@ -280,7 +286,12 @@ public class ResearchModeVideoStream : MonoBehaviour
 		
 		_ourColor = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RGBA32, false);
 		//_ourDepth = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.R8, false);
-		
+#if ONLY_UNPROJECT
+		_ourPoints = new ComputeBuffer(DEPTH_RESOLUTION, sizeof(float)*4);
+		_ourColorBuffer = new ComputeBuffer(DEPTH_RESOLUTION, sizeof(uint));
+		_pointData = new float[DEPTH_WIDTH*DEPTH_HEIGHT*4];
+		_colorData = new uint[DEPTH_WIDTH*DEPTH_HEIGHT];
+#endif
 		_startTimer = UnityEngine.Time.time;
 		
 #if ENABLE_WINMD_SUPPORT
@@ -620,6 +631,12 @@ public class ResearchModeVideoStream : MonoBehaviour
 		_tsdfShader.SetTexture(octantComputeID, "depthTextureX", _depthTexFromHololensX);
 		_tsdfShader.SetTexture(octantComputeID, "depthTextureY", _depthTexFromHololensY);
 		_tsdfShader.SetTexture(octantComputeID, "depthTextureZ", _depthTexFromHololensZ);
+		
+#if ONLY_UNPROJECT
+		_tsdfShader.SetBuffer(octantComputeID, "pointBuffer", _ourPoints);
+		_tsdfShader.SetBuffer(octantComputeID, "colorBuffer", _ourColorBuffer);
+		_tsdfShader.SetTexture(octantComputeID, "colorTexture", _ourColor);
+#endif
 		//_tsdfShader.SetTexture(octantComputeID, "confTexture", _renderTargetConfV);
 
 		_tsdfShader.SetTexture(processID, "depthTextureX", _depthTexFromHololensX);
@@ -784,9 +801,39 @@ public class ResearchModeVideoStream : MonoBehaviour
 		_tsdfShader.Dispatch(octantComputeID, ((int)_currWidth + 31) / 32, ((int)_currHeight + 31) / 32, 1);
 
 		octantBuffer.GetData(octantData);
+		
+#if ONLY_UNPROJECT
+		_ourPoints.GetData(_pointData);
+		_ourColorBuffer.GetData(_colorData);
+		
+		string debugOut = Path.Combine(Application.persistentDataPath, DateTime.Now.ToString("M_dd_yyyy_hh_mm_ss")+".txt");
+		//Debug.Log("Writing data to: " + debugOut);
+		
+		StreamWriter s = new StreamWriter(File.Open(debugOut, FileMode.Create));
+		for(int i = 0; i < DEPTH_RESOLUTION; ++i)
+		{
+			float xPos = _pointData[i*4];
+			float yPos = _pointData[i*4+1];
+			float zPos = _pointData[i*4+2];
 
+			s.Write((xPos).ToString("F4") + " " + (yPos).ToString("F4") + " " + (zPos).ToString("F4") + " ");
+			
+			uint c = _colorData[i];
+			uint red = c & 0x000000FF;
+			uint green = ((c >> 8) & 0x000000FF);
+			uint blue = ((c >> 16) & 0x000000FF);
+			//float red = (float)_colorData[i * (int)COLOR_BYTE_COUNT+bufIdx*4];
+			//float green = (float)_colorData[i * (int)COLOR_BYTE_COUNT+bufIdx*4+1];
+			//float blue = (float)_colorData[i * (int)COLOR_BYTE_COUNT+bufIdx*4+2];
+			
+			s.Write(red.ToString() + " " + green.ToString() + " " + blue.ToString() + "\n");
+		}
+		
+		s.Close();
+#endif
 		_gridsFound = true;
 	}
+	
 #endif
 
 	/*public void SetVisualizationOfSpatialMapping(Microsoft.MixedReality.Toolkit.SpatialAwarenessSystem.SpatialAwarenessMeshDisplayOptions option)
@@ -807,7 +854,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 	{
 		photoCaptureObject = captureObject;
 
-		Resolution cameraResolution = PhotoCapture.SupportedResolutions.OrderByDescending((res) => res.width * res.height).First();
+		//Resolution cameraResolution = PhotoCapture.SupportedResolutions.OrderByDescending((res) => res.width * res.height).First();
 		/*foreach (Resolution resolution in PhotoCapture.SupportedResolutions)
         {
             Debug.Log(resolution);
@@ -964,7 +1011,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 							List<Color> colorArray = new List<Color>();
 							for (int i = 0; i < imageBufferList.Count; i += stride)
 							{
-								//int idx = imageBufferList.Count-1-i;
+								int idx = imageBufferList.Count-stride-i;
 								float a = (int)(imageBufferList[i + 3]) * denominator;
 								float r = (int)(imageBufferList[i + 2]) * denominator;
 								float g = (int)(imageBufferList[i + 1]) * denominator;
@@ -999,20 +1046,23 @@ public class ResearchModeVideoStream : MonoBehaviour
 							col3 = -col3;
 							zScale2.SetColumn(2, col3);
 							
-							//scanTransPV = scanTransPV;
 							scanTransPV = zScale2 * scanTransPV;
 							
-							/*Matrix4x4 cameraToWorld = cameraToWorldMatrix;// * zScale2;
+							/*Matrix4x4 cameraToWorld = zScale2 * cameraToWorldMatrix;
 							
-							cameraToWorld[12] = -cameraToWorld[3];
-							cameraToWorld[13] = -cameraToWorld[7];
-							cameraToWorld[14] = -cameraToWorld[11];*/
+							cameraToWorld[3] = cameraToWorld[12];
+							cameraToWorld[7] = -cameraToWorld[13];
+							cameraToWorld[11] = cameraToWorld[14];
+							
+							cameraToWorld[12] = cameraToWorld[12];
+							cameraToWorld[13] = -cameraToWorld[13];
+							cameraToWorld[14] = cameraToWorld[14];*/
 							
 							Matrix4x4 worldToCamera = scanTransPV.inverse;
 							
-							worldToCamera[3] = worldToCamera[12];
+							worldToCamera[3] = -worldToCamera[12];
 							worldToCamera[7] = worldToCamera[13];
-							worldToCamera[11] = worldToCamera[14];
+							worldToCamera[11] = -worldToCamera[14];
 							//worldToCamera[12] = 0f;
 							//worldToCamera[13] = 0f;
 							//worldToCamera[14] = 0f;
@@ -1070,6 +1120,9 @@ public class ResearchModeVideoStream : MonoBehaviour
 							
 							if(_gpuIndices.Count > 0)
 							{
+#if ONLY_UNPROJECT
+								FindSuboctants();
+#else
 								if(!_waitingForGrids)
 								{
 									FindSuboctants();
@@ -1088,6 +1141,9 @@ public class ResearchModeVideoStream : MonoBehaviour
 									_gridsFound = false;
 									_waitingForGrids = false;
 								}
+#endif
+								//instead let's just project out the points in compute shader, read back and write out....
+								
 							}
 
 							//write pv / projection matrices...
@@ -1369,7 +1425,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 								{
 									byte wCount = bigColorCPUData2[totalOs * (int)COLOR_BYTE_COUNT+bufIdx*4+3];
 
-									if(wCount > 0)
+									if(wCount > 1)
 									{
 										float xPos = offset.x + (float)m * gridCellSize.x + 0.5f * gridCellSize.x;
 										float yPos = offset.y + (float)k * gridCellSize.y + 0.5f * gridCellSize.y;
@@ -1632,9 +1688,9 @@ public class ResearchModeVideoStream : MonoBehaviour
 		}
 		
 		 // update long depth map texture
-        if (startRealtimePreview && researchMode.LongDepthMapTextureUpdated() && !_isCapturing)
+        if (startRealtimePreview && /*researchMode.LongDepthMapTextureUpdated() &&*/ !_isCapturing)
         {
-			researchMode.SetLongDepthMapTextureUpdatedOff();
+			//researchMode.SetLongDepthMapTextureUpdatedOff();
 			//Debug.Log("Starting Photo Capture");
 			/*float currTime = Time.time;
 			

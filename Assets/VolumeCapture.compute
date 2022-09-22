@@ -15,12 +15,19 @@
 #define USE_SINGLE_RGB_BUFFER
 #define USE_RGBD_BUFFER
 #define SINGLE_POINTS
+#define ONLY_UNPROJECT
 
 RWStructuredBuffer<uint> volumeBuffer;
 RWStructuredBuffer<uint> volumeColorBuffer;
+
 RWStructuredBuffer<int> octantBuffer;
 RWStructuredBuffer<uint> renderBuffer;
+
 RWTexture2D<float4> renderTexture;
+#ifdef ONLY_UNPROJECT
+RWStructuredBuffer<float4> pointBuffer;
+RWStructuredBuffer<uint> colorBuffer;
+#endif
 
 StructuredBuffer<int> cellBuffer;
 StructuredBuffer<int> octantLookup;
@@ -201,8 +208,20 @@ void CSOctant(uint3 gid : SV_DispatchThreadID)
     float4 localPoint = float4(dX, dY, dZ, 1.0);
     //localPoint.w = 1.0;
     float4 worldPoint = mul(localToWorld, localPoint);
+#ifdef ONLY_UNPROJECT
+	pointBuffer[id] = worldPoint;
+	float4 sampledColor = colorTexture[gid.xy];
+	uint sr = (uint)(sampledColor.x * 255.0);// & 0x000000FF;
+	uint sg = (uint)(sampledColor.y * 255.0);// & 0x0000FF00) >> 8);
+	uint sb = (uint)(sampledColor.z * 255.0);
+	colorBuffer[id] = (sr & 0x000000FF) | ((sg & 0x000000FF) << 8) | ((sb & 0x000000FF) << 16) | ((((uint)1) & 0x000000FF) << 24);
+	return;
+#endif
+	//don't need to divide by w as that comes through in the dX, dY, dZ for Hololens 2 case...
     //worldPoint = worldPoint / worldPoint.w;
-
+	
+	//add a buffer to grab worldPoint data right here...
+	
     float3 posCell = floor(((worldPoint.xyz - volumeMin.xyz) / volumeBounds.xyz) * volumeGridSize.xyz);
 
     /*if(posCell.x < 0.0 || posCell.y < 0.0 || posCell.z < 0.0)
@@ -314,13 +333,13 @@ void CSTsdfGrid (uint3 gid : SV_DispatchThreadID)
             uint old_b = (volumeColorBuffer[cellIdx] >> 16) & 0x000000FF;
             uint old_w = (volumeColorBuffer[cellIdx] >> 24) & 0x000000FF;
 			
-			/*float3 dVec = float3(dX, dY, dZ);
-			float distVec = length(dVec) / 4.0;
-			float4 sampledColor = float4(distVec, distVec, distVec, 1.0);*/
+			
             float4 sampledColor = colorTexture[float2(gid.xy)];//float4(distVec, distVec, distVec, 1.0);
 			if(length(sampledColor) == 0)
 			{
-				return;
+				float3 dVec = float3(dX, dY, dZ);
+                float distVec = length(dVec) / 4.0;
+                sampledColor = float4(1.0, 1.0, 1.0, 1.0);
 			}
 			
             uint sr = (uint)(sampledColor.x * 255.0);// & 0x000000FF;
@@ -918,7 +937,7 @@ void DrawCube(float4 geo, uint3 color)
 void CSRender(uint3 id : SV_DispatchThreadID)
 {
     //take octant buffer and volume buffers and render valid points back out into space
-    const uint WRITE_THRESHOLD = 1;
+    const uint WRITE_THRESHOLD = 2;
 
     uint octantIdx = (volumeOffset + id.x) / totalCells;
     
