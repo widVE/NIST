@@ -336,6 +336,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
+  feature_manager: {fileID: 0}
   spawn_list:
   - {fileID: 5318789042369293505, guid: 407ca288127f083438f60ed7cf8ef487, type: 3}
   - {fileID: 5318789042369293505, guid: 87f7d5c97f1905d41b8ba2e58de72e21, type: 3}
@@ -343,6 +344,24 @@ MonoBehaviour:
   spawn_root: {fileID: 1208393620}
   spawn_parent: {fileID: 1968206798}
   offset_distance_z: 1
+  ambulance_icon: {fileID: 0}
+  audio_icon: {fileID: 0}
+  bad_person_icon: {fileID: 0}
+  biohazard_icon: {fileID: 0}
+  door_icon: {fileID: 0}
+  elevator_icon: {fileID: 0}
+  exit_icon: {fileID: 0}
+  extinguisher_icon: {fileID: 0}
+  fire_icon: {fileID: 0}
+  headset_icon: {fileID: 0}
+  injury_icon: {fileID: 0}
+  message_icon: {fileID: 0}
+  object_icon: {fileID: 0}
+  person_icon: {fileID: 0}
+  radiation_icon: {fileID: 0}
+  stairs_icon: {fileID: 0}
+  user_icon: {fileID: 0}
+  warning_icon: {fileID: 0}
 --- !u!1 &349520856
 GameObject:
   m_ObjectHideFlags: 0
@@ -1243,6 +1262,63 @@ Transform:
   m_Father: {fileID: 278560615}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &942300949
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_RootOrder
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5318789042369293505, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_Name
+      value: First Aid
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
 --- !u!1 &1196214171
 GameObject:
   m_ObjectHideFlags: 0
@@ -1288,6 +1364,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _webSocketURL: ws://halo05.wings.cs.wisc.edu:5000/ws
+  _locationId: 66a4e9f2-e978-4405-988e-e168a9429030
+  featureManager: {fileID: 0}
+  headsetManager: {fileID: 0}
 --- !u!1 &1208393620
 GameObject:
   m_ObjectHideFlags: 0
