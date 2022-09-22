@@ -20,6 +20,10 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	[SerializeField]
 	string _localHeadsetName;
 	public string LocalHeadsetName => _localHeadsetName;
+
+	[SerializeField]
+	bool _shouldCreateHeadsets = false;
+	public bool ShouldCreateHeadsets => _shouldCreateHeadsets;
 	
 	List<EasyVizARHeadset> _activeHeadsets = new List<EasyVizARHeadset>();
 	
@@ -46,7 +50,10 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
     {
-		//CreateAllHeadsets();
+		if (_shouldCreateHeadsets)
+		{
+			CreateAllHeadsets();
+		}
     }
 
     // Update is called once per frame
