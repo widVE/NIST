@@ -89,7 +89,7 @@ public class FeatureManager : MonoBehaviour
         feature_type_dictionary.Add("user", user_icon);
         feature_type_dictionary.Add("warning", warning_icon);
         // distance 
-        isFeet = true; 
+        isFeet = true;  // should change in the future, but by default it's shown in ft.
 
         headsetPos = curr_headset.GetComponent<Transform>().position;
         distance_updated = true;

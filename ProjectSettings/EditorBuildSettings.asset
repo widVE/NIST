@@ -14,9 +14,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/v1.6 Hide_Text_Indicator.unity
     guid: 088fc35e5c7dbd643b6d0fc4c63be458
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/v2.0 Marker_Menu_not_tracking.unity
     guid: ae74498e008eacc47b7c2f3723627aa4
+  - enabled: 1
+    path: Assets/Scenes/v2.3 Marker_with_distance_indicator.unity
+    guid: d038747f60cc07a46948974302f1a80c
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 24efe516db1dbf446a155a698a288aae, type: 2}
     Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: 8ff3c7c77ccd00441a88cebd82b4144c, type: 2}
