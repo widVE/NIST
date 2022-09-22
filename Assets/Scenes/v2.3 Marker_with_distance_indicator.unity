@@ -5736,6 +5736,10 @@ PrefabInstance:
       value: ross_test
       objectReference: {fileID: 0}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
+      propertyPath: _shouldCreateHeadsets
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: _mapObjects.Array.size
       value: 3
       objectReference: {fileID: 0}
