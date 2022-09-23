@@ -45,9 +45,8 @@ public class QRScanner : MonoBehaviour
 			return result;
 		}
 	}
-
 	
-	QRCodeWatcher watcher;
+	QRCodeWatcher watcher = null;
 	DateTime      watcherStart;
 	Dictionary<Guid, QRData> poses = new Dictionary<Guid, QRData>();
 	
@@ -67,37 +66,25 @@ public class QRScanner : MonoBehaviour
 	/// The default behavior for the QR code library is to provide all QR
 	/// codes that it knows about, and that includes ones that were found
 	/// before the session began. We don't need that, so we're ignoring those.
-	void Start()
+	async void Start()
 	{
-#if UNITY_EDITOR
-
-		if(!UnityEditor.SessionState.GetBool("FirstInitDone", false))
-		{
-			var status = QRCodeWatcher.RequestAccessAsync().Result;
-			if (status != QRCodeWatcherAccessStatus.Allowed)
-				return;
-			
-			UnityEditor.SessionState.SetBool("FirstInitDone", true);
-		}
-#else
-		// Ask for permission to use the QR code tracking system
-		
-		//THE CRASH STARTS HERE, When this block is commented out you can
-		//reuse play mode witout crash. I just ended up disabling the entire
-		//QR watcher game object and that also fixes it. But this is what
-		//I tracked it down to. I couldn't get the watcher to stop with
-		//on application end, but if we shut down this async request there 
-		//that might do it.
-		var status = QRCodeWatcher.RequestAccessAsync().Result;
-		if (status != QRCodeWatcherAccessStatus.Allowed)
+		if (!QRCodeWatcher.IsSupported())
+        {
+			Debug.Log("QR code tracking is not supported");
 			return;
-#endif
-		
+        }
+
+		var access = await QRCodeWatcher.RequestAccessAsync();
+		if (access != QRCodeWatcherAccessStatus.Allowed)
+        {
+			Debug.Log("QR code access was denied");
+			return;
+        }
+
 		// Set up the watcher, and listen for QR code events.
 		watcherStart = DateTime.Now;
-		watcher      = new QRCodeWatcher();
-
-
+		watcher = new QRCodeWatcher();
+		
 		// What does this mean? += (o, qr) =>
 		watcher.Added   += (o, qr) => {
 			// QRCodeWatcher will provide QR codes from before session start,
@@ -121,8 +108,9 @@ public class QRScanner : MonoBehaviour
 		};
 		
 		watcher.Removed += (o, qr) => poses.Remove(qr.Code.Id);
+
 		watcher.Start();
-		
+				
 		Debug.Log("Starting QR Watcher");
 	}
 
@@ -130,13 +118,17 @@ public class QRScanner : MonoBehaviour
 	void DestroyObject()
 	{
 		Debug.Log("Stopping QR Watcher");
-		// Why is there a question mark here?
-		watcher?.Stop();
+
+		if (watcher is not null)
+        {
+			watcher.Stop();
+			watcher = null;
+        }
 	}
 
 	void Update()
 	{
-		foreach(QRData d in poses.Values)
+		foreach (QRData d in poses.Values)
 		{ 
 			if(!_updatedServerFromQR)
 			{
@@ -185,7 +177,13 @@ public class QRScanner : MonoBehaviour
 	void OnApplicationQuit()
 	{
 		Debug.Log("Stopping QR Watcher");
-		watcher.Stop();
+
+		if (watcher is not null)
+        {
+			watcher.Stop();
+			watcher = null;
+        }
+
 		Debug.Log("Application ending after " + Time.time + " seconds");
 	}
 }
