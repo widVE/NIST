@@ -2227,24 +2227,24 @@ MonoBehaviour:
   spawn_parent: {fileID: 1968206798}
   isChanged: 1
   curr_list_size: 0
-  ambulance_icon: {fileID: 5318789042369293505, guid: 37a86163c230e41469810596b56b6f2d, type: 3}
-  audio_icon: {fileID: 5318789042369293505, guid: 37a86163c230e41469810596b56b6f2d, type: 3}
-  bad_person_icon: {fileID: 2478914508260619661, guid: c9766c7764d19e94f97b33532628fe97, type: 3}
-  biohazard_icon: {fileID: 5318789042369293505, guid: 407ca288127f083438f60ed7cf8ef487, type: 3}
-  door_icon: {fileID: 5318789042369293505, guid: 87f7d5c97f1905d41b8ba2e58de72e21, type: 3}
-  elevator_icon: {fileID: 5318789042369293505, guid: 87f7d5c97f1905d41b8ba2e58de72e21, type: 3}
-  exit_icon: {fileID: 5318789042369293505, guid: 407ca288127f083438f60ed7cf8ef487, type: 3}
-  extinguisher_icon: {fileID: 5318789042369293505, guid: 37a86163c230e41469810596b56b6f2d, type: 3}
-  fire_icon: {fileID: 5318789042369293505, guid: 407ca288127f083438f60ed7cf8ef487, type: 3}
-  headset_icon: {fileID: 5318789042369293505, guid: 407ca288127f083438f60ed7cf8ef487, type: 3}
-  injury_icon: {fileID: 5318789042369293505, guid: 87f7d5c97f1905d41b8ba2e58de72e21, type: 3}
-  message_icon: {fileID: 5318789042369293505, guid: 37a86163c230e41469810596b56b6f2d, type: 3}
-  object_icon: {fileID: 5318789042369293505, guid: 407ca288127f083438f60ed7cf8ef487, type: 3}
-  person_icon: {fileID: 5318789042369293505, guid: 407ca288127f083438f60ed7cf8ef487, type: 3}
-  radiation_icon: {fileID: 5318789042369293505, guid: 37a86163c230e41469810596b56b6f2d, type: 3}
-  stairs_icon: {fileID: 5318789042369293505, guid: 37a86163c230e41469810596b56b6f2d, type: 3}
-  user_icon: {fileID: 5318789042369293505, guid: 407ca288127f083438f60ed7cf8ef487, type: 3}
-  warning_icon: {fileID: 5318789042369293505, guid: 37a86163c230e41469810596b56b6f2d, type: 3}
+  ambulance_icon: {fileID: 9199646796446568662, guid: 219510e2126b2f44cbcc6b9119597ec0, type: 3}
+  audio_icon: {fileID: 3287684663553396786, guid: 2442bb792e63b4b4086871ef8747d8b6, type: 3}
+  bad_person_icon: {fileID: 2714185709105082305, guid: e7073129f4453ff43b19006c1af98c14, type: 3}
+  biohazard_icon: {fileID: 8472836948503744904, guid: 5ead7e8dd87c9674e85d0767e91ca3df, type: 3}
+  door_icon: {fileID: 5768835465149159710, guid: 276038058a482d5449f1b915684023e4, type: 3}
+  elevator_icon: {fileID: 4413004795778641156, guid: ee11c636ad58b8245a97fcbb09699bf0, type: 3}
+  exit_icon: {fileID: 3140010996445233141, guid: 80a6333689031964a91df9a68115a482, type: 3}
+  extinguisher_icon: {fileID: 4331337373351478003, guid: c416e020249acc443a8242e08be7c901, type: 3}
+  fire_icon: {fileID: 2005560289462229204, guid: be371bfdb7e83e84987073c32254b484, type: 3}
+  headset_icon: {fileID: 740466347194095177, guid: 769f7f842e5ca21458fc6a42c5ae732c, type: 3}
+  injury_icon: {fileID: 202343477376530035, guid: fb08555b69fc7d845a7a8abeb3070f83, type: 3}
+  message_icon: {fileID: 7075250966255036755, guid: d97dc6b4415b21d46a8667f88b9a4df5, type: 3}
+  object_icon: {fileID: 1416711397748327800, guid: 2828d449951ac8c4a9b1b72a71ebca16, type: 3}
+  person_icon: {fileID: 4262304109175930143, guid: e3905b9128050d743b5c2739af4f9595, type: 3}
+  radiation_icon: {fileID: 8943490349098414105, guid: 136a5275b9dec8a4cac29fef910bd3df, type: 3}
+  stairs_icon: {fileID: 2788638943498824565, guid: 4aa41690d1cbbb74c995d283a1b9d7cc, type: 3}
+  user_icon: {fileID: 345927283592416211, guid: 243609eb198ce2241b9e19f980dbe7d4, type: 3}
+  warning_icon: {fileID: 5065242801546265607, guid: 413996b3d03ac3c4e8b1b84f725dd034, type: 3}
   distance_text: {fileID: 415639110}
   x_distance: 0
   z_distance: 0
@@ -4179,7 +4179,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1958783570294104, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4001612315231318, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
       propertyPath: m_RootOrder
