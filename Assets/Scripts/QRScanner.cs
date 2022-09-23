@@ -8,6 +8,12 @@ using Microsoft.Windows.Perception.Spatial;
 using Microsoft.MixedReality.OpenXR;
 using Microsoft.MixedReality.Toolkit.Utilities;
 
+public class LocationChangedEventArgs
+{
+	public string Server;
+	public string LocationID;
+}
+
 public class QRScanner : MonoBehaviour
 {
 	struct QRData
@@ -57,6 +63,7 @@ public class QRScanner : MonoBehaviour
 	GameObject _qrPrefabParent;
 	
 	bool _updatedServerFromQR = false;
+	string _currentLocationID = null;
 	
 	/// Initialization is just a matter of asking for permission, and then
 	/// hooking up to the `QRCodeWatcher`'s events. `QRCodeWatcher.RequestAccessAsync`
@@ -86,6 +93,7 @@ public class QRScanner : MonoBehaviour
 		watcher = new QRCodeWatcher();
 		
 		// What does this mean? += (o, qr) =>
+		// Answer: add an anonymous callback function to the watcher Added event handler
 		watcher.Added   += (o, qr) => {
 			// QRCodeWatcher will provide QR codes from before session start,
 			// so we often want to filter those out.
@@ -145,11 +153,20 @@ public class QRScanner : MonoBehaviour
 					Debug.Log(EasyVizARServer.Instance._baseURL);
 					string loc = d.text.Substring(p+1, l-p-1);
 					Debug.Log(loc);
-					if(_qrPrefab != null)
-					{
-						int cc = _qrPrefab.transform.childCount;
-						_qrPrefab.transform.GetChild(cc-1).GetComponent<EasyVizARHeadsetManager>().LocationID = loc;
-					}	
+
+					if (loc != _currentLocationID)
+                    {
+						LocationChangedEventArgs args = new LocationChangedEventArgs();
+						args.Server = url;
+						args.LocationID = loc;
+
+						if (LocationChanged is not null)
+						{
+							LocationChanged(this, args);
+						}
+
+						_currentLocationID = loc;
+					}
 				}
 				_updatedServerFromQR = true;
 			}
@@ -186,4 +203,6 @@ public class QRScanner : MonoBehaviour
 
 		Debug.Log("Application ending after " + Time.time + " seconds");
 	}
+
+	public event EventHandler<LocationChangedEventArgs> LocationChanged;
 }

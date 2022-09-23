@@ -8,15 +8,19 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 {
 	[SerializeField]
 	string _locationId = "none";
-	public string LocationID 
+	public string LocationID
 	{
 		get { return _locationId; }
 		set { _locationId = value; }
 	}
-	
+
 	[SerializeField]
-	GameObject _headsetPrefab;	//prefab for loading other headsets...
-	
+	GameObject _headsetPrefab;  //prefab for loading other headsets...
+
+	// Attach QRScanner GameObject so we can listen for location change events.
+	[SerializeField]
+	GameObject _qrScanner;
+
 	[SerializeField]
 	string _localHeadsetName;
 	public string LocalHeadsetName => _localHeadsetName;
@@ -24,20 +28,20 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	[SerializeField]
 	bool _shouldCreateHeadsets = false;
 	public bool ShouldCreateHeadsets => _shouldCreateHeadsets;
-	
+
 	List<EasyVizARHeadset> _activeHeadsets = new List<EasyVizARHeadset>();
-	
+
 	bool _headsetsCreated = false;
-	
+
 	[SerializeField]
 	Material _localMaterial;
-	
+
 	[SerializeField]
 	bool _visualizePreviousLocal = false;
-	
+
 	[SerializeField]
 	bool _makeUniqueLocalHeadset = false;
-	
+
 	[SerializeField]
 	List<GameObject> _mapObjects = new List<GameObject>();
 
@@ -49,11 +53,18 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
 	// Start is called before the first frame update
 	void Start()
-    {
-		if (_shouldCreateHeadsets)
+	{
+		if (_qrScanner)
 		{
-			CreateAllHeadsets();
-		}
+			var scanner = _qrScanner.GetComponent<QRScanner>();
+			scanner.LocationChanged += (o, ev) =>
+			{
+				_locationId = ev.LocationID;
+				if (_shouldCreateHeadsets) {
+					CreateAllHeadsets();
+				}
+			};
+        }
     }
 
     // Update is called once per frame

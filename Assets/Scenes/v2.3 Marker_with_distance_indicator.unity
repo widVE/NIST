@@ -527,7 +527,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &291935031
 Transform:
   m_ObjectHideFlags: 0
@@ -880,6 +880,7 @@ MonoBehaviour:
   distance_updated: 0
   distance_parent: {fileID: 0}
   isFeet: 0
+  _qrScanner: {fileID: 0}
 --- !u!1 &349520856
 GameObject:
   m_ObjectHideFlags: 0
@@ -2253,6 +2254,7 @@ MonoBehaviour:
   distance_updated: 0
   distance_parent: {fileID: 1661586568}
   isFeet: 0
+  _qrScanner: {fileID: 291935030}
 --- !u!1 &752144242
 GameObject:
   m_ObjectHideFlags: 0
@@ -4179,7 +4181,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1958783570294104, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4001612315231318, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
       propertyPath: m_RootOrder
@@ -5723,6 +5725,10 @@ PrefabInstance:
       propertyPath: _qrCodes
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
+      propertyPath: _qrScanner
+      value: 
+      objectReference: {fileID: 291935030}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: _locationId
       value: 66a4e9f2-e978-4405-988e-e168a9429030

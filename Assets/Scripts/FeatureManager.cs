@@ -62,7 +62,9 @@ public class FeatureManager : MonoBehaviour
     public GameObject distance_parent;
     public bool isFeet;
 
-
+    // Attach QRScanner GameObject so we can listen for location change events.
+    [SerializeField]
+    GameObject _qrScanner;
 
     // Start is called before the first frame update
 
@@ -94,7 +96,20 @@ public class FeatureManager : MonoBehaviour
         headsetPos = curr_headset.GetComponent<Transform>().position;
         distance_updated = true;
 
+#if UNITY_EDITOR
+        // In editor mode, use the hard-coded location ID for testing.
         ListFeatures(); // this populates all the features listed on the server currently
+#else
+        // Otherwise, wait for a QR code to be scanned.
+        if (_qrScanner)
+        {
+            var scanner = _qrScanner.GetComponent<QRScanner>();
+            scanner.LocationChanged += (o, ev) =>
+            {
+                ListFeaturesFromLocation(ev.LocationID);
+            };
+        }
+#endif
     }
 
     // Update is called once per frame
@@ -184,7 +199,7 @@ public class FeatureManager : MonoBehaviour
     [ContextMenu("GetFeature")]
     public void GetFeature() //takes in id as parameter, for some reason Unity doesn't accept that convention
     {
-       var id = featureID;
+        var id = featureID;
         EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features/" + id, EasyVizARServer.JSON_TYPE, GetFeatureCallBack);
 
 
@@ -212,6 +227,11 @@ public class FeatureManager : MonoBehaviour
         EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
         Debug.Log("ListFeatures Called");
     }
+
+    public void ListFeaturesFromLocation(string locationID)
+    {
+        EasyVizARServer.Instance.Get("locations/" + locationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
+    }
     
     void ListFeatureCallBack(string result) {
         if (result != "error")
@@ -234,7 +254,6 @@ public class FeatureManager : MonoBehaviour
         {
             Debug.Log("ERROR: " + result);
         }
-
     }
 
 
