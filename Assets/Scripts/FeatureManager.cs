@@ -376,7 +376,10 @@ public class FeatureManager : MonoBehaviour
     public void spawnObjectAtIndex(string feature_type)
     {
         GameObject feature_to_spawn = feature_type_dictionary[feature_type];
+        // billboarding effect
         GameObject cloned_feature = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
+
+       // GameObject cloned_feature = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
         cloned_feature.name = "feature-local";
         CreateNewFeature(feature_type, cloned_feature);
 
@@ -480,11 +483,20 @@ public class FeatureManager : MonoBehaviour
                 display_dist_text.text = feature.type + " - " + distance.ToString() + "m";
 
             }
+            var parent = spawn_parent.transform.Find(string.Format("feature-{0}", feature.id));
+            Instantiate(display_dist_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), display_dist_text.transform.rotation, parent.transform);
+
+
 
             //TODO: might need to change the y-axis scale, would like to place the text box below the feature
-            Instantiate(display_dist_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), display_dist_text.transform.rotation, distance_parent.transform);
+            // Instantiate(display_dist_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), display_dist_text.transform.rotation, distance_parent.transform);
             distance_updated = true;
         }
+    }
+
+    public void DistanceCalculation()
+    {
+
     }
 
 
