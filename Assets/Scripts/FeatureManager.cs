@@ -301,9 +301,9 @@ public class FeatureManager : MonoBehaviour
 
             EasyVizAR.Position position = new EasyVizAR.Position();
 
-            position.x = feature_object.position.x;
-            position.y = feature_object.position.y;
-            position.z = feature_object.position.z;
+            position.x = feature_object_transform.position.x;
+            position.y = feature_object_transform.position.y;
+            position.z = feature_object_transform.position.z;
 
             feature_to_patch.position = position;
 
