@@ -256,17 +256,21 @@ public class FeatureManager : MonoBehaviour
         }
     }
 
-
-    [ContextMenu("UpateFeature")]
-    public void UpateFeature() //    public void UpateFeature(int id, GameObject new_feature)
+    [ContextMenu("UpdateFeatureTest")]
+    public void UpdateFeatureTest()
     {
-       // ListFeatures();
-        
+        var id = featureID; // parameter 
+        UpdateFeature(id);
+    }
+
+    public void UpdateFeature(int id) //    public void UpateFeature(int id, GameObject new_feature)
+    {
+        // ListFeatures();
+
         //Debug.Log("contain id?: " + feature_dictionary.ContainsKey(featureID));
         //Debug.Log("length of feature_list: " + this.feature_list.features.Length);
 
-
-        var id = featureID; // parameter 
+        //var id = featureID; // parameter 
         var new_feature = markerHolder; // parameter
         // the following feature will be specified by user
         
@@ -291,10 +295,15 @@ public class FeatureManager : MonoBehaviour
             Debug.Log("feature name: " + feature_to_patch.name);
             //eature_to_patch.name = "Updated name: ";
             // Main: updating the position
+
+            //Find the feature in the scene to get the game object's position
+            Transform feature_object_transform = spawn_parent.transform.Find(string.Format("feature-{0}", id));
+
             EasyVizAR.Position position = new EasyVizAR.Position();
-            position.x = new_position.x;
-            position.y = new_position.y;
-            position.z = new_position.z;
+
+            position.x = feature_object.position.x;
+            position.y = feature_object.position.y;
+            position.z = feature_object.position.z;
 
             feature_to_patch.position = position;
 
@@ -405,6 +414,12 @@ public class FeatureManager : MonoBehaviour
         pos.z = feature.position.z;
 
         GameObject marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
+        
+        MarkerObject new_marker_object = marker.GetComponent<MarkerObject>();
+        new_marker_object.feature_ID = feature.id;
+
+        new_marker_object.manager_script = this;
+
         marker.name = string.Format("feature-{0}", feature.id);
     }
 
