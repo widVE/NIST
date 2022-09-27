@@ -468,11 +468,20 @@ public class FeatureManager : MonoBehaviour
                 display_dist_text.text = feature.type + " - " + distance.ToString() + "m";
 
             }
+            var parent = spawn_parent.transform.Find(string.Format("feature-{0}", feature.id));
+            Instantiate(display_dist_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), display_dist_text.transform.rotation, parent.transform);
+
+
 
             //TODO: might need to change the y-axis scale, would like to place the text box below the feature
-            Instantiate(display_dist_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), display_dist_text.transform.rotation, distance_parent.transform);
+            // Instantiate(display_dist_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), display_dist_text.transform.rotation, distance_parent.transform);
             distance_updated = true;
         }
+    }
+
+    public void DistanceCalculation()
+    {
+
     }
 
 
