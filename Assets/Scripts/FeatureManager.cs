@@ -417,13 +417,13 @@ public class FeatureManager : MonoBehaviour
         pos.z = feature.position.z;
 
         GameObject marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
-        
+        marker.name = string.Format("feature-{0}", feature.id);
+
         MarkerObject new_marker_object = marker.GetComponent<MarkerObject>();
         new_marker_object.feature_ID = feature.id;
 
         new_marker_object.manager_script = this;
 
-        marker.name = string.Format("feature-{0}", feature.id);
     }
 
     public void UpdateFeatureFromServer(EasyVizAR.Feature feature)
@@ -492,11 +492,6 @@ public class FeatureManager : MonoBehaviour
             // Instantiate(display_dist_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), display_dist_text.transform.rotation, distance_parent.transform);
             distance_updated = true;
         }
-    }
-
-    public void DistanceCalculation()
-    {
-
     }
 
 
