@@ -367,7 +367,10 @@ public class FeatureManager : MonoBehaviour
     public void spawnObjectAtIndex(string feature_type)
     {
         GameObject feature_to_spawn = feature_type_dictionary[feature_type];
+        // billboarding effect
         GameObject cloned_feature = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
+
+       // GameObject cloned_feature = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
         cloned_feature.name = "feature-local";
         CreateNewFeature(feature_type, cloned_feature);
 
