@@ -2230,7 +2230,7 @@ MonoBehaviour:
   curr_list_size: 0
   ambulance_icon: {fileID: 9199646796446568662, guid: 219510e2126b2f44cbcc6b9119597ec0, type: 3}
   audio_icon: {fileID: 3287684663553396786, guid: 2442bb792e63b4b4086871ef8747d8b6, type: 3}
-  bad_person_icon: {fileID: 2714185709105082305, guid: e7073129f4453ff43b19006c1af98c14, type: 3}
+  bad_person_icon: {fileID: 3830154839079465287, guid: 15387a4909e7cd4459e56b35fff6ec8a, type: 3}
   biohazard_icon: {fileID: 8472836948503744904, guid: 5ead7e8dd87c9674e85d0767e91ca3df, type: 3}
   door_icon: {fileID: 5768835465149159710, guid: 276038058a482d5449f1b915684023e4, type: 3}
   elevator_icon: {fileID: 4413004795778641156, guid: ee11c636ad58b8245a97fcbb09699bf0, type: 3}

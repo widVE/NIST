@@ -11,6 +11,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 802a390739ad7144bb58e2d18ed5fead, type: 2}
+    - target: {fileID: 3961399598258537733, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_Name
+      value: Extinguisher
+      objectReference: {fileID: 0}
     - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
       propertyPath: m_RootOrder
       value: 0

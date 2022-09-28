@@ -11,6 +11,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 24770f5f9e96cdf459f6b433e68d10b4, type: 2}
+    - target: {fileID: 3961399598258537733, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_Name
+      value: Fire
+      objectReference: {fileID: 0}
     - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
       propertyPath: m_RootOrder
       value: 0

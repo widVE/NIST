@@ -418,6 +418,7 @@ public class FeatureManager : MonoBehaviour
 
         GameObject marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
         marker.name = string.Format("feature-{0}", feature.id);
+        //marker.name = feature.id; //for testing 
 
         MarkerObject new_marker_object = marker.GetComponent<MarkerObject>();
         new_marker_object.feature_ID = feature.id;
@@ -448,8 +449,6 @@ public class FeatureManager : MonoBehaviour
         }
     }
 
-    // ARIS's added 8/20/2022 --> the three functions below
-
     public void DisplayFeatureDistance()
     {
         Debug.Log("reach distance function");
@@ -460,13 +459,13 @@ public class FeatureManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        foreach (EasyVizAR.Feature feature in feature_list.features)
+        foreach (Transform child in spawn_parent.transform)
         {
-            
+          //  Debug.Log("current feature: " + feature.id);
 
             //Debug.Log("x_distance 1: " + x_distance);
-            x_distance = (float)Math.Pow((headsetPos.x - feature.position.x), 2);
-            z_distance = (float)Math.Pow((headsetPos.z - feature.position.z), 2);
+            x_distance = (float)Math.Pow((headsetPos.x - child.position.x), 2);
+            z_distance = (float)Math.Pow((headsetPos.z - child.position.z), 2);
             if (isFeet)
             {
                 x_distance = (float)(x_distance * 3.281);
@@ -474,22 +473,29 @@ public class FeatureManager : MonoBehaviour
             }
             float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
             Debug.Log("The distance currently: " + distance);
+            var type = child.transform.Find(string.Format("type"));
+            string feature_type = type.transform.GetChild(0).name;
             if (isFeet)
             {
-                display_dist_text.text = feature.type + " - " + distance.ToString() + "ft";
+                display_dist_text.text = feature_type + " - " + distance.ToString() + "ft";
+                //display_dist_text.text = distance.ToString() + "ft";
+
             }
             else
             {
-                display_dist_text.text = feature.type + " - " + distance.ToString() + "m";
+                display_dist_text.text = feature_type + " - " + distance.ToString() + "m";
 
             }
-            var parent = spawn_parent.transform.Find(string.Format("feature-{0}", feature.id));
-            Instantiate(display_dist_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), display_dist_text.transform.rotation, parent.transform);
 
+            var distParent = child.transform.Find(string.Format("DistanceParent"));
+            foreach (Transform txt in distParent.transform)
+            {
+                Destroy(txt.gameObject);
+            }
 
+            Instantiate(display_dist_text, new Vector3(child.position.x, (float)(child.position.y - 0.1), child.position.z), display_dist_text.transform.rotation, distParent.transform);
 
-            //TODO: might need to change the y-axis scale, would like to place the text box below the feature
-            // Instantiate(display_dist_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), display_dist_text.transform.rotation, distance_parent.transform);
+            
             distance_updated = true;
         }
     }
@@ -578,6 +584,71 @@ public class FeatureManager : MonoBehaviour
             Debug.Log("ERROR: " + result);
         }
 
+    }
+    */
+
+
+    /*
+    public void DisplayFeatureDistance()
+    {
+        Debug.Log("reach distance function");
+        TextMeshPro display_dist_text = distance_text.GetComponent<TextMeshPro>();
+        // before adding new text, it's easier to first delete all of them
+        foreach (Transform child in distance_parent.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (EasyVizAR.Feature feature in feature_list.features)
+        {
+            Debug.Log("current feature: " + feature.id);
+            
+
+            //Debug.Log("x_distance 1: " + x_distance);
+            x_distance = (float)Math.Pow((headsetPos.x - feature.position.x), 2);
+            z_distance = (float)Math.Pow((headsetPos.z - feature.position.z), 2);
+            if (isFeet)
+            {
+                x_distance = (float)(x_distance * 3.281);
+                z_distance = (float)(z_distance * 3.281);
+            }
+            float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
+            Debug.Log("The distance currently: " + distance);
+            if (isFeet)
+            {
+                display_dist_text.text = feature.type + " - " + distance.ToString() + "ft";
+            }
+            else
+            {
+                display_dist_text.text = feature.type + " - " + distance.ToString() + "m";
+
+            }
+            
+            var marker = spawn_parent.transform.Find(string.Format("feature-{0}", feature.id));
+            if (marker != null)
+            {
+
+                var distParent = marker.transform.Find(string.Format("DistanceParent"));
+                Debug.Log("reach the distparent for feature: " + feature.id);
+                if (distParent != null)
+                {
+                    foreach (Transform child in distParent.transform)
+                    {
+                        Destroy(child.gameObject);
+                    }
+
+                }
+                Instantiate(display_dist_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), display_dist_text.transform.rotation, distParent.transform);
+
+            }
+            
+
+
+
+            //TODO: might need to change the y-axis scale, would like to place the text box below the feature
+             //Instantiate(display_dist_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), display_dist_text.transform.rotation, distance_parent.transform);
+            distance_updated = true;
+        }
     }
     */
 }
