@@ -2255,6 +2255,20 @@ MonoBehaviour:
   distance_parent: {fileID: 1661586568}
   isFeet: 0
   _qrScanner: {fileID: 291935030}
+--- !u!114 &734827764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 734827754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2eb6ccb2c692c374ea231f2d07175907, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cam: {fileID: 1517424691}
+  marker_parent: {fileID: 1968206798}
 --- !u!1 &752144242
 GameObject:
   m_ObjectHideFlags: 0
@@ -4308,7 +4322,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1661586569}
-  - component: {fileID: 1661586570}
   m_Layer: 0
   m_Name: Distance Spawn Parent
   m_TagString: Untagged
@@ -4331,19 +4344,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1661586570
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1661586568}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2eb6ccb2c692c374ea231f2d07175907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cam: {fileID: 1517424691}
 --- !u!1001 &1747124927
 PrefabInstance:
   m_ObjectHideFlags: 0
