@@ -418,13 +418,17 @@ public class FeatureManager : MonoBehaviour
 
         GameObject marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
         marker.name = string.Format("feature-{0}", feature.id);
-        //marker.name = feature.id; //for testing 
 
         MarkerObject new_marker_object = marker.GetComponent<MarkerObject>();
-        new_marker_object.feature_ID = feature.id;
-
-        new_marker_object.manager_script = this;
-
+        if (new_marker_object is not null)
+        {
+            new_marker_object.feature_ID = feature.id;
+            new_marker_object.manager_script = this;
+        } else
+        {
+            Debug.Log("Warning: MarkerObject component is missing");
+        }
+        
     }
 
     public void UpdateFeatureFromServer(EasyVizAR.Feature feature)
@@ -451,7 +455,6 @@ public class FeatureManager : MonoBehaviour
 
     public void DisplayFeatureDistance()
     {
-        Debug.Log("reach distance function");
         TextMeshPro display_dist_text = distance_text.GetComponent<TextMeshPro>();
         // before adding new text, it's easier to first delete all of them
         foreach (Transform child in distance_parent.transform)
@@ -472,7 +475,7 @@ public class FeatureManager : MonoBehaviour
                 z_distance = (float)(z_distance * 3.281);
             }
             float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
-            Debug.Log("The distance currently: " + distance);
+
             var type = child.transform.Find(string.Format("type"));
             string feature_type = type.transform.GetChild(0).name;
             if (isFeet)
