@@ -72,6 +72,8 @@ public class FeatureManager : MonoBehaviour
 
     void Start()
     {
+        DisplayFeatureDistance();
+
         //Added from SpawnListIndex
         //populating the feature types dictionary 
         feature_type_dictionary.Add("ambulance", ambulance_icon);
@@ -113,19 +115,25 @@ public class FeatureManager : MonoBehaviour
             };
         }
 #endif
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        //headsetPos = curr_headset.GetComponent<Transform>().position;
         
+        //headsetPos = curr_headset.GetComponent<Transform>().position;
         newPos = curr_headset.GetComponent<Transform>().position;
-        if (oldPos != newPos)
+        float change_x = (float)Math.Pow((newPos.x - oldPos.x), 2);
+        float change_z = (float)Math.Pow((newPos.z - oldPos.z), 2);
+        float change_dist = (float)Math.Sqrt(change_x + change_z);
+        if (change_dist > 0.05)
         {
             DisplayFeatureDistance();
             oldPos = newPos;
         }
+
+
         // We should only need to call ListFeatures once on entering a new location.
         // After that, we can update the existing feature list from websocket events.
         if (false && isChanged)
@@ -505,7 +513,6 @@ public class FeatureManager : MonoBehaviour
             }
 
             Instantiate(display_dist_text, new Vector3(child.position.x, (float)(child.position.y - 0.1), child.position.z), display_dist_text.transform.rotation, distParent.transform);
-
             
             distance_updated = true;
         }
