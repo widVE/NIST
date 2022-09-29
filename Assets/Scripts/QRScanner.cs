@@ -137,38 +137,47 @@ public class QRScanner : MonoBehaviour
 	void Update()
 	{
 		foreach (QRData d in poses.Values)
-		{ 
+		{
+			Debug.Log("QR: " + d.text);
+
 			if(!_updatedServerFromQR)
 			{
-				//parse server and location from here...
-				int p = d.text.LastIndexOf("/");
-				if(p != -1)
-				{
-					int l = d.text.Length;
-					string serverString = d.text.Substring(0, p);
-					int p2 = serverString.LastIndexOf("/");
-					string url = serverString.Substring(0, p2+1);
-					url = url.Replace("vizar", "http");
-					EasyVizARServer.Instance._baseURL = url;
-					Debug.Log(EasyVizARServer.Instance._baseURL);
-					string loc = d.text.Substring(p+1, l-p-1);
-					Debug.Log(loc);
-
-					if (loc != _currentLocationID)
+				if (Uri.TryCreate(d.text, UriKind.Absolute, out Uri uri))
+                {
+					if (uri.Scheme == "vizar")
                     {
-						LocationChangedEventArgs args = new LocationChangedEventArgs();
-						args.Server = url;
-						args.LocationID = loc;
+						// Example: http://halo05.wings.cs.wisc.edu:5000/
+						string base_url = "http://" + uri.Authority + "/";
+						Debug.Log("Detected URL from QR code: " + base_url);
+						EasyVizARServer.Instance._baseURL = base_url;
+						_updatedServerFromQR = true;
+					}
+					else
+                    {
+						// Ignore QR codes without the vizar scheme.
+						continue;
+                    }
 
-						if (LocationChanged is not null)
+					// Expected path segments: "/", "locations/", and "<location-id>"
+					if (uri.Segments.Length == 3 && uri.Segments[1] == "locations/")
+                    {
+						string loc = uri.Segments[2];
+						Debug.Log("Detected location ID from QR code: " + loc);
+						if (loc != _currentLocationID)
 						{
-							LocationChanged(this, args);
-						}
+							LocationChangedEventArgs args = new LocationChangedEventArgs();
+							args.Server = uri.Authority; // Authority gives host:port
+							args.LocationID = loc;
 
-						_currentLocationID = loc;
+							if (LocationChanged is not null)
+							{
+								LocationChanged(this, args);
+							}
+
+							_currentLocationID = loc;
+						}
 					}
 				}
-				_updatedServerFromQR = true;
 			}
 			
 			if(_qrPrefab != null && _qrPrefabParent != null)

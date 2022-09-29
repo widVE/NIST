@@ -2928,6 +2928,7 @@ MonoBehaviour:
   _locationId: 66a4e9f2-e978-4405-988e-e168a9429030
   featureManager: {fileID: 734827754}
   headsetManager: {fileID: 1361342022}
+  _qrScanner: {fileID: 291935030}
 --- !u!1001 &1126021749
 PrefabInstance:
   m_ObjectHideFlags: 0

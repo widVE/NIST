@@ -39,7 +39,12 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     public GameObject featureManager = null;
     public GameObject headsetManager = null;
 
+    // Attach QRScanner GameObject so we can listen for location change events.
+    [SerializeField]
+    GameObject _qrScanner = null;
+
     private WebSocket _ws = null;
+    private bool isConnected = false;
 
     // Start is called before the first frame update
     async void Start()
@@ -54,6 +59,54 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
             headsetManager = GameObject.Find("EasyVizARHeadsetManager");
         }
 
+#if UNITY_EDITOR
+        // In editor mode, use the default server and location ID.
+        _ws = initializeWebSocket();
+        await _ws.Connect();
+#else
+        // Otherwise, wait for a QR code to be scanned.
+        if (_qrScanner)
+        {
+            var scanner = _qrScanner.GetComponent<QRScanner>();
+            scanner.LocationChanged += async (o, ev) =>
+            {
+                if (isConnected)
+                {
+                    await _ws.Close();
+                    isConnected = false;
+                }
+
+                this._locationId = ev.LocationID;
+                this._webSocketURL = string.Format("ws://{0}/ws", ev.Server);
+                _ws = initializeWebSocket();
+                await _ws.Connect();
+            };
+        }
+#endif
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+#if !UNITY_WEBGL || UNITY_EDITOR
+        if (_ws is not null)
+        {
+            _ws.DispatchMessageQueue();
+        }
+#endif
+    }
+
+    private async void OnApplicationQuit()
+    {
+        if (isConnected)
+        {
+            await _ws.Close();
+            isConnected = false;
+        }
+    }
+
+    private WebSocket initializeWebSocket()
+    {
         // This is just a placeholder. We may need to set authorization headers later on.
         var headers = new Dictionary<string, string>
         {
@@ -65,53 +118,37 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
         // route the message.
         string subprotocol = "json-with-header";
 
-        _ws = new WebSocket(_webSocketURL, subprotocol, headers);
+        var ws = new WebSocket(_webSocketURL, subprotocol, headers);
 
-        _ws.OnOpen += async () =>
-        {
-            Debug.Log("WS Connected: " + _webSocketURL);
-            if (headsetManager) {
-                await _ws.SendText("subscribe headsets:created");
-                await _ws.SendText("subscribe headsets:updated");
-                await _ws.SendText("subscribe headsets:deleted");
-                Debug.Log("Subscribed to headset events.");
-            }
-            if (featureManager) {
-                await _ws.SendText(string.Format("subscribe features:created /locations/{0}/*", _locationId));
-                await _ws.SendText(string.Format("subscribe features:updated /locations/{0}/*", _locationId));
-                await _ws.SendText(string.Format("subscribe features:deleted /locations/{0}/*", _locationId));
-                Debug.Log("Subscribed to feature events.");
-            }
-        };
-
-        _ws.OnError += (error) =>
+        ws.OnError += (error) =>
         {
             Debug.Log("WS Error: " + error);
         };
 
-        _ws.OnMessage += this.onMessage;
- /*       _ws.OnMessage += (data) =>
-        {
+        ws.OnOpen += this.onConnected;
+        ws.OnMessage += this.onMessage;
 
-        };*/
-
-        await _ws.Connect();
+        return ws;
     }
 
-    // Update is called once per frame
-    void Update()
+    private async void onConnected()
     {
-#if !UNITY_WEBGL || UNITY_EDITOR
-        _ws.DispatchMessageQueue();
-#endif
-    }
+        Debug.Log("WS Connected: " + _webSocketURL);
 
-    private async void OnApplicationQuit()
-    {
-        if (_ws != null)
+        if (headsetManager)
         {
-            await _ws.Close();
+            await _ws.SendText("subscribe headsets:created");
+            await _ws.SendText("subscribe headsets:updated");
+            await _ws.SendText("subscribe headsets:deleted");
         }
+
+        if (featureManager) {
+            await _ws.SendText(string.Format("subscribe features:created /locations/{0}/*", _locationId));
+            await _ws.SendText(string.Format("subscribe features:updated /locations/{0}/*", _locationId));
+            await _ws.SendText(string.Format("subscribe features:deleted /locations/{0}/*", _locationId));
+        }
+
+        isConnected = true;
     }
 
     private void onMessage(byte[] data)
