@@ -61,6 +61,8 @@ public class FeatureManager : MonoBehaviour
     public bool distance_updated;
     public GameObject distance_parent;
     public bool isFeet;
+    public Vector3 oldPos;
+    public Vector3 newPos;
 
     // Attach QRScanner GameObject so we can listen for location change events.
     [SerializeField]
@@ -94,6 +96,7 @@ public class FeatureManager : MonoBehaviour
         isFeet = true;  // should change in the future, but by default it's shown in ft.
 
         headsetPos = curr_headset.GetComponent<Transform>().position;
+        oldPos = headsetPos;
         distance_updated = true;
 
 #if UNITY_EDITOR
@@ -115,9 +118,14 @@ public class FeatureManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        headsetPos = curr_headset.GetComponent<Transform>().position; 
+        //headsetPos = curr_headset.GetComponent<Transform>().position;
         
-        DisplayFeatureDistance();
+        newPos = curr_headset.GetComponent<Transform>().position;
+        if (oldPos != newPos)
+        {
+            DisplayFeatureDistance();
+            oldPos = newPos;
+        }
         // We should only need to call ListFeatures once on entering a new location.
         // After that, we can update the existing feature list from websocket events.
         if (false && isChanged)
