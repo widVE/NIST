@@ -9,7 +9,7 @@ public class MarkerObject : MonoBehaviour
     public int feature_ID = -1;
     public FeatureManager manager_script = null;
 
-
+    // Notify the Feature Manager that this marker has changed so that it can then notify the server.
     public void UpdatedWithID()
     {
         //StartCoroutine(waiter());
