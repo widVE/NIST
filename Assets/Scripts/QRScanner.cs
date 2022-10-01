@@ -61,9 +61,21 @@ public class QRScanner : MonoBehaviour
 
 	[SerializeField]
 	GameObject _qrPrefabParent;
+
+	[SerializeField]
+	GameObject _headsetManager;
 	
 	bool _updatedServerFromQR = false;
 	string _currentLocationID = null;
+
+	/*
+	 * Simulate QR code detection through the Unity editor by setting the data field
+	 * and clicking the trigger check box which acts as a fake button.
+	 */
+	[Header("Manual Trigger")]
+	[Tooltip("Set the QR code data and click the checkbox to trigger a fake QR code detection.")]
+	public string testQRCodeData = "vizar://halo05.wings.cs.wisc.edu:5000/locations/66a4e9f2-e978-4405-988e-e168a9429030";
+	public bool triggerQRCodeDetected = false;
 	
 	/// Initialization is just a matter of asking for permission, and then
 	/// hooking up to the `QRCodeWatcher`'s events. `QRCodeWatcher.RequestAccessAsync`
@@ -106,13 +118,19 @@ public class QRScanner : MonoBehaviour
 				}
 				Debug.Log("QR Code: " + qr.Code.Data.ToString());
 				Debug.Log("Adding QR Code: " + qr.Code.Id.ToString());
-				poses.Add(qr.Code.Id, QRData.FromCode(qr.Code)); 
+				poses.Add(qr.Code.Id, QRData.FromCode(qr.Code));
+				onCodeDetected(QRData.FromCode(qr.Code));
 			}
+            else
+            {
+				Debug.Log("Skipped QR code: " + qr.Code.Data.ToString());
+            }
 		};
 		
 		watcher.Updated += (o, qr) => 
 		{
 			poses[qr.Code.Id] = QRData.FromCode(qr.Code);
+			onCodeDetected(QRData.FromCode(qr.Code));
 		};
 		
 		watcher.Removed += (o, qr) => poses.Remove(qr.Code.Id);
@@ -120,6 +138,67 @@ public class QRScanner : MonoBehaviour
 		watcher.Start();
 				
 		Debug.Log("Starting QR Watcher");
+	}
+
+	void onCodeDetected(QRData d)
+    {
+		if (Uri.TryCreate(d.text, UriKind.Absolute, out Uri uri))
+		{
+			if (uri.Scheme == "vizar")
+			{
+				// Example: http://halo05.wings.cs.wisc.edu:5000/
+				string base_url = "http://" + uri.Authority + "/";
+				Debug.Log("Detected URL from QR code: " + base_url);
+				EasyVizARServer.Instance._baseURL = base_url;
+				_updatedServerFromQR = true;
+			}
+			else
+			{
+				// Ignore QR codes without the vizar scheme.
+				return;
+			}
+
+			// Expected path segments: "/", "locations/", and "<location-id>"
+			if (uri.Segments.Length == 3 && uri.Segments[1] == "locations/")
+			{
+				string loc = uri.Segments[2];
+				Debug.Log("Detected location ID from QR code: " + loc);
+				if (loc != _currentLocationID)
+				{
+					LocationChangedEventArgs args = new LocationChangedEventArgs();
+					args.Server = uri.Authority; // Authority gives host:port
+					args.LocationID = loc;
+
+					if (LocationChanged is not null)
+					{
+						LocationChanged(this, args);
+					}
+
+					_currentLocationID = loc;
+				}
+			}
+		}
+
+		if (_qrPrefab != null && _qrPrefabParent != null)
+		{
+			_qrPrefabParent.SetActive(true);
+			_qrPrefab.SetActive(true);
+
+			Matrix4x4 m = Matrix4x4.TRS(d.pose.position, d.pose.rotation, Vector3.one);
+			Matrix4x4 mInv = m.inverse;
+			_qrPrefabParent.transform.SetPositionAndRotation(mInv.GetPosition(), mInv.rotation);
+
+			_qrPrefab.transform.localPosition = d.pose.position;
+			_qrPrefab.transform.localRotation = d.pose.rotation;
+
+			int cc = _qrPrefab.transform.childCount;
+
+			if (_headsetManager is not null)
+            {
+				var manager = _headsetManager.GetComponent<EasyVizARHeadsetManager>();
+				manager.CreateAllHeadsets();
+			}
+		}
 	}
 
 	// For shutdown, we just need to stop the watcher
@@ -136,67 +215,7 @@ public class QRScanner : MonoBehaviour
 
 	void Update()
 	{
-		foreach (QRData d in poses.Values)
-		{
-			Debug.Log("QR: " + d.text);
 
-			if(!_updatedServerFromQR)
-			{
-				if (Uri.TryCreate(d.text, UriKind.Absolute, out Uri uri))
-                {
-					if (uri.Scheme == "vizar")
-                    {
-						// Example: http://halo05.wings.cs.wisc.edu:5000/
-						string base_url = "http://" + uri.Authority + "/";
-						Debug.Log("Detected URL from QR code: " + base_url);
-						EasyVizARServer.Instance._baseURL = base_url;
-						_updatedServerFromQR = true;
-					}
-					else
-                    {
-						// Ignore QR codes without the vizar scheme.
-						continue;
-                    }
-
-					// Expected path segments: "/", "locations/", and "<location-id>"
-					if (uri.Segments.Length == 3 && uri.Segments[1] == "locations/")
-                    {
-						string loc = uri.Segments[2];
-						Debug.Log("Detected location ID from QR code: " + loc);
-						if (loc != _currentLocationID)
-						{
-							LocationChangedEventArgs args = new LocationChangedEventArgs();
-							args.Server = uri.Authority; // Authority gives host:port
-							args.LocationID = loc;
-
-							if (LocationChanged is not null)
-							{
-								LocationChanged(this, args);
-							}
-
-							_currentLocationID = loc;
-						}
-					}
-				}
-			}
-			
-			if(_qrPrefab != null && _qrPrefabParent != null)
-			{
-				_qrPrefabParent.SetActive(true);
-				_qrPrefab.SetActive(true);
-				
-				Matrix4x4 m = Matrix4x4.TRS(d.pose.position, d.pose.rotation, Vector3.one);
-				Matrix4x4 mInv = m.inverse;
-				_qrPrefabParent.transform.SetPositionAndRotation(mInv.GetPosition(), mInv.rotation);
-				
-				_qrPrefab.transform.localPosition = d.pose.position;
-				_qrPrefab.transform.localRotation = d.pose.rotation;
-
-				int cc = _qrPrefab.transform.childCount;
-				
-				_qrPrefab.transform.GetChild(cc-1).GetComponent<EasyVizARHeadsetManager>().CreateAllHeadsets();
-			}
-		}
 	}
 
 	//This is getting called on play mode exit, but it doesn't seem to be enough to stop the crashes
@@ -212,6 +231,20 @@ public class QRScanner : MonoBehaviour
 
 		Debug.Log("Application ending after " + Time.time + " seconds");
 	}
+
+	void OnValidate()
+    {
+		if (triggerQRCodeDetected)
+        {
+			var code = new QRData();
+			code.text = testQRCodeData;
+			code.size = 1.0f;
+			code.pose = Pose.identity;
+			onCodeDetected(code);
+
+			triggerQRCodeDetected = false;
+        }
+    }
 
 	public event EventHandler<LocationChangedEventArgs> LocationChanged;
 }

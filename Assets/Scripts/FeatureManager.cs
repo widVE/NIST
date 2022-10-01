@@ -104,8 +104,9 @@ public class FeatureManager : MonoBehaviour
 #if UNITY_EDITOR
         // In editor mode, use the hard-coded location ID for testing.
         ListFeatures(); // this populates all the features listed on the server currently
-#else
-        // Otherwise, wait for a QR code to be scanned.
+#endif
+
+        // Wait for a QR code to be scanned to fetch features from the correct location.
         if (_qrScanner)
         {
             var scanner = _qrScanner.GetComponent<QRScanner>();
@@ -114,8 +115,6 @@ public class FeatureManager : MonoBehaviour
                 ListFeaturesFromLocation(ev.LocationID);
             };
         }
-#endif
-
     }
 
     // Update is called once per frame
@@ -252,6 +251,11 @@ public class FeatureManager : MonoBehaviour
     void ListFeatureCallBack(string result) {
         if (result != "error")
         {
+            foreach (EasyVizAR.Feature feature in feature_list.features)
+            {
+                DeleteFeatureFromServer(feature.id);
+            }
+
             this.feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList> ("{\"features\":" + result + "}");
             
             //Debug.Log("feature_list length: " + feature_list.features.Length);
