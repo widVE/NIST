@@ -31,7 +31,7 @@ public class EasyVizARHeadset : MonoBehaviour
 	bool _postPositionChanges = false;
 	public bool PostPositionChanges => _postPositionChanges;
 	
-	string _headsetID;
+	public string _headsetID;
 	
 	public string _locationID;// will change this back to just string w/o public
 	

@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Microsoft.MixedReality.QR;
 using Microsoft.MixedReality.Toolkit.UI;
+using TMPro;
+using System;
+
+
 
 public class EasyVizARHeadsetManager : MonoBehaviour
 {
@@ -51,6 +55,16 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	public GameObject horizontal_offset_slider;
 	public GameObject vertical_offset_slider;
 
+	// For displaying distance
+	public GameObject headset_marker;
+	public GameObject cam;
+	public GameObject headsets_parent;
+	public GameObject TextObject;
+	public bool isFeet;
+	public Vector3 head_pos;
+	public Vector3 cam_pos;
+
+
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -65,11 +79,16 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 				}
 			};
         }
-    }
+		isFeet = true;
+		head_pos = Vector3.zero;
+        cam_pos = cam.GetComponent<Transform>().position;
+	}
 
     // Update is called once per frame
     void Update()
     {
+		// added for displaying distance
+		DisplayHeadsetsDistance();
 
     }
 	
@@ -426,4 +445,94 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		//list headsets from server for our location, create a prefab of each...
 		EasyVizARServer.Instance.Get("headsets?location_id="+_locationId, EasyVizARServer.JSON_TYPE, CreateHeadsetsCallback);
 	}
+
+	// Displaying Headset icon 
+	public void DisplayHeadsetsDistance()
+    {
+		Debug.Log("reached DisplayHeadsetsDistance()");
+		// this method will be called from Update(), so it's better to delete them then added them each frame
+		foreach (Transform child in headsets_parent.transform)
+        {
+			Destroy(child.transform);
+        }
+		foreach (EasyVizARHeadset headset_cur in _activeHeadsets)
+        {
+			//head_pos = Vector3.zero; //resetting
+			// Note: for the position, might want to add 0.1 to the y-axis for future reference
+			// DO a get 
+			//EasyVizARServer.Instance.Get("headsets/" + headset_cur._headsetID, EasyVizARServer.JSON_TYPE, PositionCallback);
+			
+			
+			GameObject marker = Instantiate(headset_marker, headset_cur.gameObject.transform.position, headset_marker.transform.rotation, headsets_parent.transform);
+			marker.name = headset_cur.Name; // set to the headset name for now, TODO: ask if this is preferred. 
+
+			//if (head_pos != Vector3.zero)
+            //{
+				DistanceCalculation(headset_cur);
+			//}
+			
+
+		}
+	}
+
+	public void DistanceCalculation(EasyVizARHeadset h)
+    {
+		TextMeshPro display_dist_text = TextObject.GetComponent<TextMeshPro>();
+		// if gameobject position doesn't work, then i might have to do a get() to get the position of the given headset
+		float x_distance = (float)Math.Pow(h.gameObject.transform.position.x - cam_pos.x, 2);
+		float z_distance = (float)Math.Pow(h.gameObject.transform.position.z - cam_pos.z, 2);
+
+		if (isFeet)
+		{
+			x_distance = (float)(x_distance * 3.281);
+			z_distance = (float)(z_distance * 3.281);
+		}
+		float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
+
+		if (isFeet)
+		{
+			display_dist_text.text = distance.ToString() + "ft";
+			//display_dist_text.text = distance.ToString() + "ft";
+
+		}
+		else
+		{
+			display_dist_text.text = distance.ToString() + "m";
+
+		}
+		var head_mark = headsets_parent.transform.Find(h.Name);
+		if (head_mark.transform.Find("DistanceParent").childCount > 0)
+		{
+			Destroy(head_mark.transform.Find("DistanceParent").GetChild(0));
+		}
+
+		var dist_parent = head_mark.transform.Find("DistanceParent");
+		Instantiate(display_dist_text, new Vector3(h.gameObject.transform.position.x, (float)(h.gameObject.transform.position.y + 0.1), h.gameObject.transform.position.z), display_dist_text.transform.rotation, dist_parent.transform);
+
+		Debug.Log("reach updating distance for headsets users");
+	}
+
+	/*
+	void PositionCallback(string resultData)
+	{
+		if (resultData != "error")
+		{
+			//Debug.Log(resultData);
+			EasyVizAR.Headset h = JsonUtility.FromJson<EasyVizAR.Headset>(resultData);
+			//fill in any local data here from the server...
+			head_pos = new Vector3(h.position.x, h.position.y, h.position.z);
+
+			GameObject marker = Instantiate(headset_marker, head_pos, headset_marker.transform.rotation, headsets_parent.transform);
+			marker.name = h.name; // set to the headset name for now, TODO: ask if this is preferred. 
+			DistanceCalculation(head_pos.x, head_pos.z);
+
+		}
+		else
+		{
+
+		}
+	}
+	*/
+
+
 }
