@@ -451,21 +451,24 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     {
 		Debug.Log("reached DisplayHeadsetsDistance()");
 		// this method will be called from Update(), so it's better to delete them then added them each frame
+		
 		foreach (Transform child in headsets_parent.transform)
         {
 			Destroy(child.transform);
         }
+		
 		foreach (EasyVizARHeadset headset_cur in _activeHeadsets)
         {
+			Debug.Log("successfully added headset");
+
 			//head_pos = Vector3.zero; //resetting
 			// Note: for the position, might want to add 0.1 to the y-axis for future reference
 			// DO a get 
 			//EasyVizARServer.Instance.Get("headsets/" + headset_cur._headsetID, EasyVizARServer.JSON_TYPE, PositionCallback);
-			
-			
+
+
 			GameObject marker = Instantiate(headset_marker, headset_cur.gameObject.transform.position, headset_marker.transform.rotation, headsets_parent.transform);
 			marker.name = headset_cur.Name; // set to the headset name for now, TODO: ask if this is preferred. 
-
 			//if (head_pos != Vector3.zero)
             //{
 				DistanceCalculation(headset_cur);
