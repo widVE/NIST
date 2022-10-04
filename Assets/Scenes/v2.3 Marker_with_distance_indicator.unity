@@ -557,6 +557,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _qrPrefab: {fileID: 1539913616}
   _qrPrefabParent: {fileID: 46054712}
+  _headsetManager: {fileID: 1361342022}
 --- !u!1 &303111019
 GameObject:
   m_ObjectHideFlags: 0
