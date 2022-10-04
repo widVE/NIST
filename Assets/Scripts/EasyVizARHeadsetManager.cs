@@ -454,7 +454,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		
 		foreach (Transform child in headsets_parent.transform)
         {
-			Destroy(child.transform);
+			Destroy(child.gameObject);
         }
 		Debug.Log("Number of active headsets: " + _activeHeadsets.Count);
 		foreach (EasyVizARHeadset headset_cur in _activeHeadsets)

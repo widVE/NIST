@@ -121,16 +121,16 @@ public class FeatureManager : MonoBehaviour
     void Update()
     {
         
-        //headsetPos = curr_headset.GetComponent<Transform>().position;
+        headsetPos = curr_headset.GetComponent<Transform>().position;
         newPos = curr_headset.GetComponent<Transform>().position;
         float change_x = (float)Math.Pow((newPos.x - oldPos.x), 2);
         float change_z = (float)Math.Pow((newPos.z - oldPos.z), 2);
         float change_dist = (float)Math.Sqrt(change_x + change_z);
-        if (change_dist > 0.05)
-        {
+        //if (change_dist > 0.05)
+        //{
             DisplayFeatureDistance();
-            oldPos = newPos;
-        }
+           // oldPos = newPos;
+        //}
 
 
         // We should only need to call ListFeatures once on entering a new location.
