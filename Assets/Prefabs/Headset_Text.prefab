@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4437965853890161148}
   - component: {fileID: 4068502573564129320}
   m_Layer: 0
-  m_Name: Feature_Text
+  m_Name: Headset_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27,7 +27,7 @@ RectTransform:
   m_GameObject: {fileID: 7137453166730415838}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.003, y: 0.003, z: 0.003}
+  m_LocalScale: {x: 0.005, y: 0.005, z: 0.005}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
