@@ -47,7 +47,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     private bool isConnected = false;
 
     // Start is called before the first frame update
-    async void Start()
+    void Start()
     {
         if (!featureManager)
         {
@@ -58,6 +58,15 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
         {
             headsetManager = GameObject.Find("EasyVizARHeadsetManager");
         }
+
+#if UNITY_EDITOR
+        // In editor mode, use the default server and location ID.
+        _ws = initializeWebSocket();
+
+        // Connect returns a Task that only completes after the connection closes.
+        // If we 'await' it here, it will prevent the code below from running as we might expect.
+        var _ = _ws.Connect();
+#endif
 
         // Otherwise, wait for a QR code to be scanned.
         if (_qrScanner)
@@ -73,18 +82,12 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
                 _locationId = ev.LocationID;
                 _webSocketURL = string.Format("ws://{0}/ws", ev.Server);
                 _ws = initializeWebSocket();
-                await _ws.Connect();
+
+                // Connect returns a Task that only completes after the connection closes.
+                // If we 'await' it here, it might block other code that needs to respond to the LocationChanged event.
+                var _ = _ws.Connect();
             };
         }
-
-#if UNITY_EDITOR
-        // In editor mode, use the default server and location ID.
-        _ws = initializeWebSocket();
-
-        // Warning: this does not return until the connection eventually closes, I think.
-        // Do not put important code after the connect call!
-        await _ws.Connect();
-#endif
     }
 
     // Update is called once per frame
