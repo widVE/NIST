@@ -79,16 +79,18 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 				}
 			};
         }
+		/*
 		isFeet = true;
 		head_pos = Vector3.zero;
         cam_pos = cam.GetComponent<Transform>().position;
+		*/
 	}
 
     // Update is called once per frame
     void Update()
     {
 		// added for displaying distance
-		DisplayHeadsetsDistance();
+		//DisplayHeadsetsDistance();
 
     }
 	
@@ -445,7 +447,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		//list headsets from server for our location, create a prefab of each...
 		EasyVizARServer.Instance.Get("headsets?location_id="+_locationId, EasyVizARServer.JSON_TYPE, CreateHeadsetsCallback);
 	}
-
+	/*
 	// Displaying Headset icon 
 	public void DisplayHeadsetsDistance()
     {
@@ -509,7 +511,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		var dist_parent = head_mark.transform.Find("DistanceParent");
 		Instantiate(display_dist_text, new Vector3(h.gameObject.transform.position.x, (float)(h.gameObject.transform.position.y + 0.1), h.gameObject.transform.position.z), display_dist_text.transform.rotation, dist_parent.transform);
 	}
-
+	*/
 	/*
 	void PositionCallback(string resultData)
 	{
