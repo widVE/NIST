@@ -59,11 +59,6 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
             headsetManager = GameObject.Find("EasyVizARHeadsetManager");
         }
 
-#if UNITY_EDITOR
-        // In editor mode, use the default server and location ID.
-        _ws = initializeWebSocket();
-        await _ws.Connect();
-#else
         // Otherwise, wait for a QR code to be scanned.
         if (_qrScanner)
         {
@@ -75,13 +70,20 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
                     await _ws.Close();
                     isConnected = false;
                 }
-
-                this._locationId = ev.LocationID;
-                this._webSocketURL = string.Format("ws://{0}/ws", ev.Server);
+                _locationId = ev.LocationID;
+                _webSocketURL = string.Format("ws://{0}/ws", ev.Server);
                 _ws = initializeWebSocket();
                 await _ws.Connect();
             };
         }
+
+#if UNITY_EDITOR
+        // In editor mode, use the default server and location ID.
+        _ws = initializeWebSocket();
+
+        // Warning: this does not return until the connection eventually closes, I think.
+        // Do not put important code after the connect call!
+        await _ws.Connect();
 #endif
     }
 

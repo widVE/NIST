@@ -449,17 +449,14 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	// Displaying Headset icon 
 	public void DisplayHeadsetsDistance()
     {
-		Debug.Log("reached DisplayHeadsetsDistance()");
 		// this method will be called from Update(), so it's better to delete them then added them each frame
 		
 		foreach (Transform child in headsets_parent.transform)
         {
 			Destroy(child.gameObject);
         }
-		Debug.Log("Number of active headsets: " + _activeHeadsets.Count);
 		foreach (EasyVizARHeadset headset_cur in _activeHeadsets)
         {
-			Debug.Log("successfully added headset");
 
 			//head_pos = Vector3.zero; //resetting
 			// Note: for the position, might want to add 0.1 to the y-axis for future reference
@@ -511,8 +508,6 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
 		var dist_parent = head_mark.transform.Find("DistanceParent");
 		Instantiate(display_dist_text, new Vector3(h.gameObject.transform.position.x, (float)(h.gameObject.transform.position.y + 0.1), h.gameObject.transform.position.z), display_dist_text.transform.rotation, dist_parent.transform);
-
-		Debug.Log("reach updating distance for headsets users");
 	}
 
 	/*
