@@ -67,8 +67,6 @@ public class DistanceCalculation : MonoBehaviour
 			// Destroy(cur_prefab.transform.Find("Text").GetChild(0));
         }
 		Instantiate(display_dist_text, new Vector3(capsule.transform.position.x, (float)(capsule.transform.position.y + 0.3), capsule.transform.position.z), display_dist_text.transform.rotation, dist_parent.transform);
-
-		Debug.Log("reach updating distance for headsets users");
 	}
 
 }
