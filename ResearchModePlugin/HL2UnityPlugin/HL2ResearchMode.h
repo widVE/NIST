@@ -14,6 +14,9 @@
 #include <vector>
 #include<winrt/Windows.Perception.Spatial.h>
 #include<winrt/Windows.Perception.Spatial.Preview.h>
+#include "VideoCameraFrameProcessor.h"
+#include "VideoCameraStreamer.h"
+
 
 namespace winrt::HL2UnityPlugin::implementation
 {
@@ -34,13 +37,15 @@ namespace winrt::HL2UnityPlugin::implementation
         void InitializeDepthSensor();
         void InitializeLongDepthSensor();
         void InitializeSpatialCamerasFront();
+        void InitializePVCamera();
 
         void StartDepthSensorLoop();
         void StartLongDepthSensorLoop();
         void StartSpatialCamerasFrontLoop();
+        void StartPVCameraLoop();
 
         void StopAllSensorDevice();
-
+        
         bool DepthMapTextureUpdated();
         bool ShortAbImageTextureUpdated();
         bool PointCloudUpdated();
@@ -75,6 +80,10 @@ namespace winrt::HL2UnityPlugin::implementation
         std::mutex mu;
 
     private:
+
+        std::unique_ptr<VideoCameraFrameProcessor> m_pVideoFrameProcessor = nullptr;
+        std::shared_ptr<VideoCameraStreamer> m_pVideoFrameStreamer = nullptr;
+
         float* m_pointCloud = nullptr;
         int m_pointcloudLength = 0;
         UINT16* m_depthMapFiltered = nullptr;

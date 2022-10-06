@@ -49,10 +49,12 @@ namespace HL2UnityPlugin
         void InitializeDepthSensor();
         void InitializeLongDepthSensor();
         void InitializeSpatialCamerasFront();
+        void InitializePVCamera();
 
         void StartDepthSensorLoop();
         void StartLongDepthSensorLoop();
 		void StartSpatialCamerasFrontLoop();
+        void StartPVCameraLoop();
 
         void StopAllSensorDevice();
 

@@ -1139,11 +1139,9 @@ MonoBehaviour:
   _colorRT: {fileID: 8400000, guid: 5a7ecc7d9f6de6843b3778389dad01ce, type: 2}
   _colorCopyMaterial: {fileID: 2100000, guid: 748aaa792b540014dab1d631cface284, type: 2}
   _depthCopyMaterial: {fileID: 2100000, guid: e2751f21b4f612748b9979193f5a11ad, type: 2}
-  _writeTime: 0.4
-  _performTSDFReconstruction: 1
   _tsdfShader: {fileID: 7200000, guid: 2940ca67a277a8c4998cf58e1466cf16, type: 3}
   _pointRenderTexture: {fileID: 0}
-  _writeImagesToDisk: 1
+  _writeImagesToDisk: 0
   _showImagesInView: 1
 --- !u!4 &891080481
 Transform:

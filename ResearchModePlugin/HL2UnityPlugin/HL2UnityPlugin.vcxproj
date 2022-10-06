@@ -119,11 +119,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="IVideoFrameSink.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="HL2ResearchMode.h">
       <DependentUpon>HL2ResearchMode.idl</DependentUpon>
     </ClInclude>
     <ClInclude Include="ResearchModeApi.h" />
+    <ClInclude Include="TimeConverter.h" />
+    <ClInclude Include="VideoCameraFrameProcessor.h" />
+    <ClInclude Include="VideoCameraStreamer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -133,6 +137,9 @@
       <DependentUpon>HL2ResearchMode.idl</DependentUpon>
     </ClCompile>
     <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
+    <ClCompile Include="TimeConverter.cpp" />
+    <ClCompile Include="VideoCameraFrameProcessor.cpp" />
+    <ClCompile Include="VideoCameraStreamer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="HL2ResearchMode.idl" />

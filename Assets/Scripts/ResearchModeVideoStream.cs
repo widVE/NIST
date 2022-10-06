@@ -305,8 +305,11 @@ public class ResearchModeVideoStream : MonoBehaviour
 		//if(longDepthPreviewPlane != null)
 		//{
 			researchMode.InitializeLongDepthSensor();
+			researchMode.InitializePVCamera();
+			
 			researchMode.StartLongDepthSensorLoop();
 			researchMode.SetShouldGetDepth();
+			researchMode.StartPVCameraLoop();
 			//PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
 		/*}
 		else if(depthPreviewPlane && shortAbImagePreviewPlane)
@@ -815,18 +818,25 @@ public class ResearchModeVideoStream : MonoBehaviour
 			float xPos = _pointData[i*4];
 			float yPos = _pointData[i*4+1];
 			float zPos = _pointData[i*4+2];
-
-			s.Write((xPos).ToString("F4") + " " + (yPos).ToString("F4") + " " + (zPos).ToString("F4") + " ");
-			
 			uint c = _colorData[i];
 			uint red = c & 0x000000FF;
 			uint green = ((c >> 8) & 0x000000FF);
 			uint blue = ((c >> 16) & 0x000000FF);
-			//float red = (float)_colorData[i * (int)COLOR_BYTE_COUNT+bufIdx*4];
-			//float green = (float)_colorData[i * (int)COLOR_BYTE_COUNT+bufIdx*4+1];
-			//float blue = (float)_colorData[i * (int)COLOR_BYTE_COUNT+bufIdx*4+2];
 			
-			s.Write(red.ToString() + " " + green.ToString() + " " + blue.ToString() + "\n");
+			if(red == 0 && green == 0 && blue == 0)
+			{
+				
+			}
+			else
+			{
+				s.Write((xPos).ToString("F4") + " " + (yPos).ToString("F4") + " " + (zPos).ToString("F4") + " ");
+				
+				//float red = (float)_colorData[i * (int)COLOR_BYTE_COUNT+bufIdx*4];
+				//float green = (float)_colorData[i * (int)COLOR_BYTE_COUNT+bufIdx*4+1];
+				//float blue = (float)_colorData[i * (int)COLOR_BYTE_COUNT+bufIdx*4+2];
+				
+				s.Write(red.ToString() + " " + green.ToString() + " " + blue.ToString() + "\n");
+			}
 		}
 		
 		s.Close();

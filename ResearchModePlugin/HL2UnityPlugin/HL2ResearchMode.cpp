@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "HL2ResearchMode.h"
 #include "HL2ResearchMode.g.cpp"
+#include "VideoCameraStreamer.h"
+#include "IVideoFrameSink.h"
 
 extern "C"
 HMODULE LoadLibraryA(
@@ -47,6 +49,8 @@ namespace winrt::HL2UnityPlugin::implementation
         winrt::check_hresult(pSensorDevicePerception->GetRigNodeId(&guid));
         pSensorDevicePerception->Release();
         m_locator = SpatialGraphInteropPreview::CreateLocatorForNode(guid);
+        
+        winrt::Windows::Perception::Spatial::SpatialCoordinateSystem m_worldOrigin = m_locator.CreateStationaryFrameOfReferenceAtCurrentLocation().CoordinateSystem();
 
         size_t sensorCount = 0;
 
@@ -58,6 +62,26 @@ namespace winrt::HL2UnityPlugin::implementation
         winrt::check_hresult(m_pSensorDevice->GetSensorCount(&sensorCount));
         m_sensorDescriptors.resize(sensorCount);
         winrt::check_hresult(m_pSensorDevice->GetSensorDescriptors(m_sensorDescriptors.data(), m_sensorDescriptors.size(), &sensorCount));
+        
+        m_pVideoFrameStreamer = std::make_shared<VideoCameraStreamer>(m_worldOrigin, L"23940");
+        if (!m_pVideoFrameStreamer.get())
+        {
+            throw winrt::hresult(E_POINTER);
+        }
+
+        m_pVideoFrameProcessor = std::make_unique<VideoCameraFrameProcessor>();
+        //m_pVideoFrameStreamer = std::make_shared<VideoCameraStreamer>(m_worldOrigin, L"23940");
+        /*if (!m_pVideoFrameStreamer.get())
+        {
+            throw winrt::hresult(E_POINTER);
+        }*/
+        // initialize the frame processor with a streamer sink
+        
+    }
+
+    void HL2ResearchMode::InitializePVCamera()
+    {
+        m_pVideoFrameProcessor->InitializeAsync(m_pVideoFrameStreamer);
     }
 
     void HL2ResearchMode::InitializeDepthSensor() 
@@ -126,6 +150,14 @@ namespace winrt::HL2UnityPlugin::implementation
                 winrt::check_hresult(m_RFCameraSensorSide->GetCameraExtrinsicsMatrix(&m_RFCameraPoseSide));
                 m_RFCameraPoseInvMatrixSide = XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_RFCameraPoseSide));
             }
+        }
+    }
+
+    void HL2ResearchMode::StartPVCameraLoop()
+    {
+        if (m_pVideoFrameProcessor != nullptr)
+        {
+            m_pVideoFrameProcessor->StartAsync();
         }
     }
 
