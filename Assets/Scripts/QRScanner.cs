@@ -67,6 +67,10 @@ public class QRScanner : MonoBehaviour
 
 	[SerializeField]
 	GameObject _headsetManager;
+
+	[SerializeField]
+	[Tooltip("Whether we should continue to adjust the world coordinate system if the currently tracked QR code moves.")]
+	bool followMovingQRCode = false;
 	
 	bool _updatedServerFromQR = false;
 	string _currentLocationID = null;
@@ -89,6 +93,7 @@ public class QRScanner : MonoBehaviour
 	Guid currentOriginId = Guid.Empty;
 	DateTimeOffset lastDetectedTime = DateTimeOffset.MinValue;
 	bool isOriginChanging = false;
+	bool isCoordinateSystemChanging = false;
 
 	/// Initialization is just a matter of asking for permission, and then
 	/// hooking up to the `QRCodeWatcher`'s events. `QRCodeWatcher.RequestAccessAsync`
@@ -178,7 +183,13 @@ public class QRScanner : MonoBehaviour
 					currentOriginId = qr.Id;
 					lastDetectedTime = qr.LastDetectedTime;
 					isOriginChanging = true;
+					isCoordinateSystemChanging = true;
                 }
+				else if(followMovingQRCode && qr.Id == currentOriginId)
+                {
+					// We may have a better estimate of the QR code location, so trigger an update of the world coordinate system.
+					isCoordinateSystemChanging = true;
+				}
             }
         }
     }
@@ -222,6 +233,15 @@ public class QRScanner : MonoBehaviour
 			}
 		}
 
+		if (_headsetManager is not null)
+        {
+			var manager = _headsetManager.GetComponent<EasyVizARHeadsetManager>();
+			manager.CreateAllHeadsets();
+		}
+	}
+
+	void ChangeCoordinateSystemFromCode(QRData d)
+    {
 		if (_qrPrefab != null && _qrPrefabParent != null)
 		{
 			_qrPrefabParent.SetActive(true);
@@ -235,12 +255,6 @@ public class QRScanner : MonoBehaviour
 			_qrPrefab.transform.localRotation = d.pose.rotation;
 
 			int cc = _qrPrefab.transform.childCount;
-
-			if (_headsetManager is not null)
-            {
-				var manager = _headsetManager.GetComponent<EasyVizARHeadsetManager>();
-				manager.CreateAllHeadsets();
-			}
 		}
 	}
 
@@ -263,6 +277,12 @@ public class QRScanner : MonoBehaviour
 			audioSource.Play();
 			ChangeOriginFromCode(originCodes[currentOriginId]);
 			isOriginChanging = false;
+        }
+
+		if (isCoordinateSystemChanging)
+        {
+			ChangeCoordinateSystemFromCode(originCodes[currentOriginId]);
+			isCoordinateSystemChanging = false;
         }
 	}
 
