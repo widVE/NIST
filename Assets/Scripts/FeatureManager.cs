@@ -105,7 +105,7 @@ public class FeatureManager : MonoBehaviour
 
         //We're getting a lot of performance losses in the update function]
         //Distance calculation might be the cause, so we're moving that to a looping coroutine.
-        StartCoroutine("HeadsetDistanceCalulate");
+        StartCoroutine("HeadsetDistanceCalculate");
 
 #if UNITY_EDITOR
         // In editor mode, use the hard-coded location ID for testing.
@@ -127,7 +127,7 @@ public class FeatureManager : MonoBehaviour
     void Update()
     {
         
-        headsetPos = curr_headset.GetComponent<Transform>().position;
+ /*       headsetPos = curr_headset.GetComponent<Transform>().position;
         newPos = curr_headset.GetComponent<Transform>().position;
         float change_x = (float)Math.Pow((newPos.x - oldPos.x), 2);
         float change_z = (float)Math.Pow((newPos.z - oldPos.z), 2);
@@ -136,7 +136,7 @@ public class FeatureManager : MonoBehaviour
         {
             DisplayFeatureDistance();
             oldPos = newPos;
-        }
+        }*/
 
 
         // We should only need to call ListFeatures once on entering a new location.
@@ -151,19 +151,22 @@ public class FeatureManager : MonoBehaviour
         
     }
 
-    IEnumerable HeadsetDistanceCalulate()
+    IEnumerable HeadsetDistanceCalculate()
     {
-        headsetPos = curr_headset.GetComponent<Transform>().position;
-        newPos = curr_headset.GetComponent<Transform>().position;
-        float change_x = (float)Math.Pow((newPos.x - oldPos.x), 2);
-        float change_z = (float)Math.Pow((newPos.z - oldPos.z), 2);
-        float change_dist = (float)Math.Sqrt(change_x + change_z);
-        if (change_dist > 0.05)
+        while (true)
         {
-            DisplayFeatureDistance();
-            oldPos = newPos;
+            headsetPos = curr_headset.GetComponent<Transform>().position;
+            newPos = curr_headset.GetComponent<Transform>().position;
+            float change_x = (float)Math.Pow((newPos.x - oldPos.x), 2);
+            float change_z = (float)Math.Pow((newPos.z - oldPos.z), 2);
+            float change_dist = (float)Math.Sqrt(change_x + change_z);
+            if (change_dist > 0.05)
+            {
+                DisplayFeatureDistance();
+                oldPos = newPos;
+            }
+            yield return new WaitForSeconds(1f);
         }
-        yield return new WaitForSeconds(1f);
     }
 
     // POST 
