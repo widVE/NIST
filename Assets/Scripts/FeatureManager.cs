@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System;
+using Color = UnityEngine.Color;
+
 
 public class FeatureManager : MonoBehaviour
 {
@@ -457,6 +459,13 @@ public class FeatureManager : MonoBehaviour
 
         GameObject marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
         marker.name = string.Format("feature-{0}", feature.id);
+        var material = marker.transform.Find("Cube");
+        Color myColor;
+        if (ColorUtility.TryParseHtmlString(feature.color, out myColor))
+        {
+           marker.transform.Find("Cube").GetComponent<Renderer>().material.SetColor("_Color", myColor);
+
+        }
 
         MarkerObject new_marker_object = marker.GetComponent<MarkerObject>();
         if (new_marker_object is not null)
