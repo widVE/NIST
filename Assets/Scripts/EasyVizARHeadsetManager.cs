@@ -28,6 +28,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	[SerializeField]
 	string _localHeadsetName;
 	public string LocalHeadsetName => _localHeadsetName;
+	GameObject _localHeadset;
 
 	[SerializeField]
 	bool _shouldCreateHeadsets = false;
@@ -74,6 +75,14 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 			scanner.LocationChanged += (o, ev) =>
 			{
 				_locationId = ev.LocationID;
+
+				// Update the location ID in the headset object, which will be sent with pose updates to the server.
+				if (_localHeadset is not null)
+                {
+					EasyVizARHeadset h = _localHeadset.GetComponent<EasyVizARHeadset>();
+					h._locationID = _locationId;
+				}
+
 				if (_shouldCreateHeadsets) {
 					CreateAllHeadsets();
 				}
@@ -334,13 +343,13 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	{
 		if(!_visualizePreviousLocal)
 		{
-			GameObject localHeadset = Instantiate(_headsetPrefab, transform);
-			if(localHeadset != null)
+			_localHeadset = Instantiate(_headsetPrefab, transform);
+			if(_localHeadset != null)
 			{
-				EasyVizARHeadset h = localHeadset.GetComponent<EasyVizARHeadset>();
+				EasyVizARHeadset h = _localHeadset.GetComponent<EasyVizARHeadset>();
 				if(_localMaterial != null)
 				{
-					localHeadset.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
+					_localHeadset.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
 				}
 				
 				if(_makeUniqueLocalHeadset)
