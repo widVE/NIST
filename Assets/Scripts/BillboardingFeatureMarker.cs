@@ -18,7 +18,7 @@ public class BillboardingFeatureMarker : MonoBehaviour
         foreach (Transform child in marker_parent.transform)
         {
             child.transform.LookAt(cam.transform);
-            child.rotation = Quaternion.Euler(0f, child.transform.rotation.eulerAngles.y, 0f);
+            child.rotation = Quaternion.Euler(0f, child.transform.rotation.eulerAngles.y-180, 0f);
             if (child.transform.Find(string.Format("DistanceParent")).childCount > 0)
             {
                 var text = child.transform.Find(string.Format("DistanceParent")).GetChild(0);

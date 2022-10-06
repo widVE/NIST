@@ -101,6 +101,10 @@ public class FeatureManager : MonoBehaviour
         oldPos = headsetPos;
         distance_updated = true;
 
+        //We're getting a lot of performance losses in the update function]
+        //Distance calculation might be the cause, so we're moving that to a looping coroutine.
+        StartCoroutine("HeadsetDistanceCalulate");
+
 #if UNITY_EDITOR
         // In editor mode, use the hard-coded location ID for testing.
         ListFeatures(); // this populates all the features listed on the server currently
@@ -143,6 +147,21 @@ public class FeatureManager : MonoBehaviour
         
         //ListFeatures();
         
+    }
+
+    IEnumerable HeadsetDistanceCalulate()
+    {
+        headsetPos = curr_headset.GetComponent<Transform>().position;
+        newPos = curr_headset.GetComponent<Transform>().position;
+        float change_x = (float)Math.Pow((newPos.x - oldPos.x), 2);
+        float change_z = (float)Math.Pow((newPos.z - oldPos.z), 2);
+        float change_dist = (float)Math.Sqrt(change_x + change_z);
+        if (change_dist > 0.05)
+        {
+            DisplayFeatureDistance();
+            oldPos = newPos;
+        }
+        yield return new WaitForSeconds(1f);
     }
 
     // POST 
