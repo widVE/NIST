@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System;
-using Color = UnityEngine.Color;
+//using Color = UnityEngine.Color;
 
 
 public class FeatureManager : MonoBehaviour
@@ -127,18 +127,6 @@ public class FeatureManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
- /*       headsetPos = curr_headset.GetComponent<Transform>().position;
-        newPos = curr_headset.GetComponent<Transform>().position;
-        float change_x = (float)Math.Pow((newPos.x - oldPos.x), 2);
-        float change_z = (float)Math.Pow((newPos.z - oldPos.z), 2);
-        float change_dist = (float)Math.Sqrt(change_x + change_z);
-        if (change_dist > 0.05)
-        {
-            DisplayFeatureDistance();
-            oldPos = newPos;
-        }*/
-
 
         // We should only need to call ListFeatures once on entering a new location.
         // After that, we can update the existing feature list from websocket events.
@@ -147,9 +135,7 @@ public class FeatureManager : MonoBehaviour
             Debug.Log("reached Update()");
             ListFeatures();
         }
-        
-        //ListFeatures();
-        
+                
     }
     /*
     IEnumerable HeadsetDistanceCalculate()
@@ -226,13 +212,6 @@ public class FeatureManager : MonoBehaviour
         {
             Debug.Log("ERROR: " + result);
         }
-        
-        // the line below will be kept, the ones above might get deleted in the future based on new implementation
-        //markerHolder.AddComponent<MarkerObject>().feature = featureHolder; // TODO: test if this exist    
-        //feature_gameobj_dictionary.Add(resultJSON.id, markerHolder);
-        //Debug.Log("added key?: " + feature_gameobj_dictionary.ContainsKey(resultJSON.id));
-        //Debug.Log("post contain id?: " + feature_dictionary.ContainsKey(resultJSON.id));
-
         
 
     }
@@ -464,15 +443,15 @@ public class FeatureManager : MonoBehaviour
 
         GameObject marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
         marker.name = string.Format("feature-{0}", feature.id);
-        /*
-        var material = marker.transform.Find("Cube");
+        
         Color myColor;
         if (ColorUtility.TryParseHtmlString(feature.color, out myColor))
         {
-           marker.transform.Find("Cube").GetComponent<Renderer>().material.SetColor("_Color", myColor);
-
+            marker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+           //marker.transform.Find("Quad").GetComponent<Renderer>().material.color = myColor;
+        
         }
-        */
+        
 
         MarkerObject new_marker_object = marker.GetComponent<MarkerObject>();
         if (new_marker_object is not null)
@@ -508,11 +487,8 @@ public class FeatureManager : MonoBehaviour
         }
     }
     
-    
-
-
-
-    // implement later but might not need it 
+  
+    // might implement in the future but might not need it 
     public void ReplaceFeature()
     {
 
@@ -522,144 +498,5 @@ public class FeatureManager : MonoBehaviour
     {
 
     }
-
-    /*
-    public void GetHeadSetPosition()
-    {
-    //TODO: how do I get the headset position? --> I tried to use the variable manager, but it I can't seem to figure out where to get the headset's id since it only contains locationID... 
-       //I need the id for the headset 
-        EasyVizARServer.Instance.Get("headsets/" + id, EasyVizARServer.JSON_TYPE, GetFeatureCallBack);
-
-    }
-
-    void GetHeadSetPositionCallBack(string result)
-    {
-        var resultJSON = JsonUtility.FromJson<EasyVizAR.Headset>(result);
-
-        if (result != "error")
-        {
-            Debug.Log("SUCCESS: " + result);
-            x_distance = resultJSON.position.x;
-            z_distance = resultJSON.position.z;
-            // TODO: insert a boolean here? --> look at the comment in the next method (below) for future reference
-        }
-        else
-        {
-            Debug.Log("ERROR: " + result);
-        }
-    }
-    */
-
-
-
-    // This is alternative version for list feature --> not working though
-    /*
-    void ListFeatureCallBack(string result)
-    {
-        if (result != "error")
-        {
-            Debug.Log("SUCCESS: " + result);
-            this.feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList>("{\"features\":" + result + "}");
-
-            //Debug.Log("feature_list length: " + feature_list.features.Length);
-            
-            if (curr_list_size == 0 || curr_list_size != feature_list.features.Length)
-            {
-                curr_list_size = feature_list.features.Length;
-                foreach (EasyVizAR.Feature feature in feature_list.features)
-                {
-                    if (!this.feature_dictionary.ContainsKey(feature.id))
-                    {
-                        //Added from SpawnListIndex 
-                        GameObject feature_object = feature_type_dictionary[feature.type];
-                        Instantiate(feature_object, new Vector3(feature.position.x, feature.position.y, feature.position.z), feature_object.transform.rotation, spawn_parent.transform);
-
-
-                        this.feature_dictionary.Add(feature.id, feature);
-                        //Debug.Log("added id: " + feature.id + " to the feature_dictionary");
-                    }
-                }
-            }
-            else
-            {
-                //DO NOTHING SINCE THERE IS NO CHANGE TO THE # OF FEATURES
-            }
-            
-
-            //disabling the Update()
-            isChanged = false;
-
-        }
-        else
-        {
-            Debug.Log("ERROR: " + result);
-        }
-
-    }
-    */
-
-
-    /*
-    public void DisplayFeatureDistance()
-    {
-        Debug.Log("reach distance function");
-        TextMeshPro display_dist_text = distance_text.GetComponent<TextMeshPro>();
-        // before adding new text, it's easier to first delete all of them
-        foreach (Transform child in distance_parent.transform)
-        {
-            Destroy(child.gameObject);
-        }
-
-        foreach (EasyVizAR.Feature feature in feature_list.features)
-        {
-            Debug.Log("current feature: " + feature.id);
-            
-
-            //Debug.Log("x_distance 1: " + x_distance);
-            x_distance = (float)Math.Pow((headsetPos.x - feature.position.x), 2);
-            z_distance = (float)Math.Pow((headsetPos.z - feature.position.z), 2);
-            if (isFeet)
-            {
-                x_distance = (float)(x_distance * 3.281);
-                z_distance = (float)(z_distance * 3.281);
-            }
-            float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
-            Debug.Log("The distance currently: " + distance);
-            if (isFeet)
-            {
-                display_dist_text.text = feature.type + " - " + distance.ToString() + "ft";
-            }
-            else
-            {
-                display_dist_text.text = feature.type + " - " + distance.ToString() + "m";
-
-            }
-            
-            var marker = spawn_parent.transform.Find(string.Format("feature-{0}", feature.id));
-            if (marker != null)
-            {
-
-                var distParent = marker.transform.Find(string.Format("DistanceParent"));
-                Debug.Log("reach the distparent for feature: " + feature.id);
-                if (distParent != null)
-                {
-                    foreach (Transform child in distParent.transform)
-                    {
-                        Destroy(child.gameObject);
-                    }
-
-                }
-                Instantiate(display_dist_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), display_dist_text.transform.rotation, distParent.transform);
-
-            }
-            
-
-
-
-            //TODO: might need to change the y-axis scale, would like to place the text box below the feature
-             //Instantiate(display_dist_text, new Vector3(feature.position.x, (float)(feature.position.y - 0.1), feature.position.z), display_dist_text.transform.rotation, distance_parent.transform);
-            distance_updated = true;
-        }
-    }
-    */
+    
 }

@@ -44,13 +44,13 @@ public class DistanceFeatureText : MonoBehaviour
 
         if (isFeet)
         {
-            feature_text.text = distance.ToString() + "ft";
+            feature_text.text = feature_type + " - " + distance.ToString() + "ft";
             //display_dist_text.text = distance.ToString() + "ft";
 
         }
         else
         {
-            feature_text.text = distance.ToString() + "m";
+            feature_text.text = feature_type + " - " + distance.ToString() + "m";
 
         }
 
