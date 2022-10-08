@@ -74,7 +74,7 @@ public class FeatureManager : MonoBehaviour
 
     void Start()
     {
-        DisplayFeatureDistance();
+        //DisplayFeatureDistance();
 
         //Added from SpawnListIndex
         //populating the feature types dictionary 
@@ -105,7 +105,8 @@ public class FeatureManager : MonoBehaviour
 
         //We're getting a lot of performance losses in the update function]
         //Distance calculation might be the cause, so we're moving that to a looping coroutine.
-        StartCoroutine("HeadsetDistanceCalculate");
+       
+        //StartCoroutine("HeadsetDistanceCalculate");
 
 #if UNITY_EDITOR
         // In editor mode, use the hard-coded location ID for testing.
@@ -150,7 +151,7 @@ public class FeatureManager : MonoBehaviour
         //ListFeatures();
         
     }
-
+    /*
     IEnumerable HeadsetDistanceCalculate()
     {
         while (true)
@@ -168,6 +169,7 @@ public class FeatureManager : MonoBehaviour
             yield return new WaitForSeconds(1f);
         }
     }
+    */
 
     // POST 
     public void CreateNewFeature(string feature_type, GameObject marker) //TODO: change the feature_type from int to string
@@ -462,6 +464,7 @@ public class FeatureManager : MonoBehaviour
 
         GameObject marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
         marker.name = string.Format("feature-{0}", feature.id);
+        /*
         var material = marker.transform.Find("Cube");
         Color myColor;
         if (ColorUtility.TryParseHtmlString(feature.color, out myColor))
@@ -469,6 +472,7 @@ public class FeatureManager : MonoBehaviour
            marker.transform.Find("Cube").GetComponent<Renderer>().material.SetColor("_Color", myColor);
 
         }
+        */
 
         MarkerObject new_marker_object = marker.GetComponent<MarkerObject>();
         if (new_marker_object is not null)
@@ -503,55 +507,9 @@ public class FeatureManager : MonoBehaviour
             Destroy(feature_object.gameObject);
         }
     }
+    
+    
 
-    public void DisplayFeatureDistance()
-    {
-        TextMeshPro display_dist_text = distance_text.GetComponent<TextMeshPro>();
-        // before adding new text, it's easier to first delete all of them
-        foreach (Transform child in distance_parent.transform)
-        {
-            Destroy(child.gameObject);
-        }
-
-        foreach (Transform child in spawn_parent.transform)
-        {
-          //  Debug.Log("current feature: " + feature.id);
-
-            //Debug.Log("x_distance 1: " + x_distance);
-            x_distance = (float)Math.Pow((headsetPos.x - child.position.x), 2);
-            z_distance = (float)Math.Pow((headsetPos.z - child.position.z), 2);
-            if (isFeet)
-            {
-                x_distance = (float)(x_distance * 3.281);
-                z_distance = (float)(z_distance * 3.281);
-            }
-            float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
-
-            var type = child.transform.Find(string.Format("type"));
-            string feature_type = type.transform.GetChild(0).name;
-            if (isFeet)
-            {
-                display_dist_text.text = feature_type + " - " + distance.ToString() + "ft";
-                //display_dist_text.text = distance.ToString() + "ft";
-
-            }
-            else
-            {
-                display_dist_text.text = feature_type + " - " + distance.ToString() + "m";
-
-            }
-
-            var distParent = child.transform.Find(string.Format("DistanceParent"));
-            foreach (Transform txt in distParent.transform)
-            {
-                Destroy(txt.gameObject);
-            }
-
-            Instantiate(display_dist_text, new Vector3(child.position.x, (float)(child.position.y - 0.1), child.position.z), display_dist_text.transform.rotation, distParent.transform);
-            
-            distance_updated = true;
-        }
-    }
 
 
     // implement later but might not need it 
