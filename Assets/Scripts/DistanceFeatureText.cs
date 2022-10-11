@@ -12,11 +12,16 @@ public class DistanceFeatureText : MonoBehaviour
     public GameObject quad;
     public bool isFeet;
 
+    public Vector3 oldPos;
+    public Vector3 newPos;
+
+
     // Start is called before the first frame update
     void Start()
     {
         cam = GameObject.Find("Main Camera");
         isFeet = true;
+        //StartCoroutine("HeadsetDistanceCalculate");
     }
 
     // Update is called once per frame
@@ -45,7 +50,6 @@ public class DistanceFeatureText : MonoBehaviour
         if (isFeet)
         {
             feature_text.text = feature_type + " - " + distance.ToString() + "ft";
-            //display_dist_text.text = distance.ToString() + "ft";
 
         }
         else
@@ -55,6 +59,25 @@ public class DistanceFeatureText : MonoBehaviour
         }
 
     }
+
+    IEnumerable HeadsetDistanceCalculate()
+    {
+        while (true)
+        {
+            cam_pos = cam.GetComponent<Transform>().position;
+            newPos = cam.GetComponent<Transform>().position;
+            float change_x = (float)Math.Pow((newPos.x - oldPos.x), 2);
+            float change_z = (float)Math.Pow((newPos.z - oldPos.z), 2);
+            float change_dist = (float)Math.Sqrt(change_x + change_z);
+            if (change_dist > 0.05)
+            {
+                CalcFeatureDist();
+                oldPos = newPos;
+            }
+            yield return new WaitForSeconds(1f);
+        }
+    }
+
 
 
 
