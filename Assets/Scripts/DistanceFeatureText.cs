@@ -38,7 +38,7 @@ public class DistanceFeatureText : MonoBehaviour
         }
         float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
         
-        var feature_text = feature.transform.Find("Feature_Text").GetComponent<TextMeshPro>(); ;
+        var feature_text = feature.transform.Find("Feature_Text").GetComponent<TextMeshPro>();
         var type = feature.transform.Find(string.Format("type"));
         string feature_type = type.transform.GetChild(0).name;
 

@@ -30,10 +30,12 @@ public class DistanceCalculation : MonoBehaviour
 		CalcHeadsetDist();
     }
 
-    public void CalcHeadsetDist()
-    {
+	public void CalcHeadsetDist()
+	{
 
-		TextMeshPro display_dist_text = distText.GetComponent<TextMeshPro>();
+
+
+		TextMeshPro display_dist_text = cur_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>(); ;
 		// if gameobject position doesn't work, then i might have to do a get() to get the position of the given headset
 		float x_distance = (float)Math.Pow(capsule.transform.position.x - cam_pos.x, 2);
 		float z_distance = (float)Math.Pow(capsule.gameObject.transform.position.z - cam_pos.z, 2);
@@ -44,7 +46,7 @@ public class DistanceCalculation : MonoBehaviour
 			z_distance = (float)(z_distance * 3.281);
 		}
 		float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
-
+		//string name 
 		if (isFeet)
 		{
 			display_dist_text.text = distance.ToString() + "ft";
@@ -54,19 +56,7 @@ public class DistanceCalculation : MonoBehaviour
 		else
 		{
 			display_dist_text.text = distance.ToString() + "m";
-
 		}
-
-		var dist_parent = cur_prefab.transform.Find("Text");
-		if(cur_prefab.transform.Find("Text").childCount > 0)
-        {
-			foreach (Transform child in cur_prefab.transform.Find("Text").transform)
-			{
-				Destroy(child.gameObject);
-            }
-			// Destroy(cur_prefab.transform.Find("Text").GetChild(0));
-        }
-		Instantiate(display_dist_text, new Vector3(capsule.transform.position.x, (float)(capsule.transform.position.y + 0.3), capsule.transform.position.z), display_dist_text.transform.rotation, dist_parent.transform);
 	}
 
 }
