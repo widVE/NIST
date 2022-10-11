@@ -25,7 +25,7 @@ public class DistanceFeatureText : MonoBehaviour
         cam_pos = cam.GetComponent<Transform>().position;
         oldPos = cam_pos;
         CalcFeatureDist();
-        StartCoroutine("HeadsetDistanceCalculate");
+        StartCoroutine(HeadsetDistanceCalculate());
     }
 
     // Update is called once per frame
@@ -64,10 +64,11 @@ public class DistanceFeatureText : MonoBehaviour
 
     }
 
-    IEnumerable HeadsetDistanceCalculate()
+    IEnumerator HeadsetDistanceCalculate()
     {
         while (true)
         {
+            Debug.Log("Got here");
             cam_pos = cam.GetComponent<Transform>().position;
             newPos = cam.GetComponent<Transform>().position;
             float change_x = (float)Math.Pow((newPos.x - oldPos.x), 2);

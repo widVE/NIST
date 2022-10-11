@@ -27,7 +27,7 @@ public class DistanceCalculation : MonoBehaviour
 		cam_pos = cam.GetComponent<Transform>().position;
 		oldPos = cam_pos;
 		CalcHeadsetDist();
-		StartCoroutine("HeadsetDistanceCalculate");
+		StartCoroutine(HeadsetDistanceCalculate());
 
 	}
 
@@ -65,7 +65,7 @@ public class DistanceCalculation : MonoBehaviour
 	}
 
 
-	IEnumerable HeadsetDistanceCalculate()
+	IEnumerator HeadsetDistanceCalculate()
 	{
 		while (true)
 		{
