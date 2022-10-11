@@ -12,29 +12,34 @@ public class DistanceCalculation : MonoBehaviour
 	public GameObject capsule;
 	public GameObject cur_prefab;
 	public bool isFeet;
-    // Start is called before the first frame update
-    void Start()
+
+	public Vector3 oldPos;
+	public Vector3 newPos;
+
+	// Start is called before the first frame update
+	void Start()
     {
 
 		cam = GameObject.Find("Main Camera");
 		//capsule = cur_prefeb.transform.Find("Capsule");
-
 		isFeet = true;
+
+		cam_pos = cam.GetComponent<Transform>().position;
+		oldPos = cam_pos;
+		StartCoroutine("HeadsetDistanceCalculate");
+
 	}
 
 	// Update is called once per frame
 	void Update()
     {
-		cam_pos = cam.GetComponent<Transform>().position;
+		//cam_pos = cam.GetComponent<Transform>().position;
 
-		CalcHeadsetDist();
+		//CalcHeadsetDist();
     }
 
 	public void CalcHeadsetDist()
 	{
-
-
-
 		TextMeshPro display_dist_text = cur_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>(); ;
 		// if gameobject position doesn't work, then i might have to do a get() to get the position of the given headset
 		float x_distance = (float)Math.Pow(capsule.transform.position.x - cam_pos.x, 2);
@@ -57,5 +62,25 @@ public class DistanceCalculation : MonoBehaviour
 			display_dist_text.text = cur_prefab.name + " - " + distance.ToString() + "m";
 		}
 	}
+
+
+	IEnumerable HeadsetDistanceCalculate()
+	{
+		while (true)
+		{
+			cam_pos = cam.GetComponent<Transform>().position;
+			newPos = cam.GetComponent<Transform>().position;
+			float change_x = (float)Math.Pow((newPos.x - oldPos.x), 2);
+			float change_z = (float)Math.Pow((newPos.z - oldPos.z), 2);
+			float change_dist = (float)Math.Sqrt(change_x + change_z);
+			if (change_dist > 0.05)
+			{
+				CalcHeadsetDist();
+				oldPos = newPos;
+			}
+			yield return new WaitForSeconds(1f);
+		}
+	}
+
 
 }
