@@ -21,9 +21,10 @@ public class DistanceFeatureText : MonoBehaviour
     {
         cam = GameObject.Find("Main Camera");
         isFeet = true;
-        cam_pos = cam.GetComponent<Transform>().position;
         
+        cam_pos = cam.GetComponent<Transform>().position;
         oldPos = cam_pos;
+        CalcFeatureDist();
         StartCoroutine("HeadsetDistanceCalculate");
     }
 

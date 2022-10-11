@@ -23,9 +23,10 @@ public class DistanceCalculation : MonoBehaviour
 		cam = GameObject.Find("Main Camera");
 		//capsule = cur_prefeb.transform.Find("Capsule");
 		isFeet = true;
-
+		
 		cam_pos = cam.GetComponent<Transform>().position;
 		oldPos = cam_pos;
+		CalcHeadsetDist();
 		StartCoroutine("HeadsetDistanceCalculate");
 
 	}
