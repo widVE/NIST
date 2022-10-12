@@ -41,6 +41,8 @@ public class DistanceCalculation : MonoBehaviour
 
 	public void CalcHeadsetDist()
 	{
+		cam_pos = cam.GetComponent<Transform>().position;
+
 		TextMeshPro display_dist_text = cur_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>(); ;
 		// if gameobject position doesn't work, then i might have to do a get() to get the position of the given headset
 		float x_distance = (float)Math.Pow(capsule.transform.position.x - cam_pos.x, 2);

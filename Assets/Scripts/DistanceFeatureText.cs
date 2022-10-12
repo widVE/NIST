@@ -37,6 +37,8 @@ public class DistanceFeatureText : MonoBehaviour
 
     void CalcFeatureDist()
     {
+        cam_pos = cam.GetComponent<Transform>().position;
+
         float x_distance = (float)Math.Pow(quad.transform.position.x - cam_pos.x, 2);
         float z_distance = (float)Math.Pow(quad.gameObject.transform.position.z - cam_pos.z, 2);
 
@@ -68,8 +70,6 @@ public class DistanceFeatureText : MonoBehaviour
     {
         while (true)
         {
-            Debug.Log("Got here");
-            cam_pos = cam.GetComponent<Transform>().position;
             newPos = cam.GetComponent<Transform>().position;
             float change_x = (float)Math.Pow((newPos.x - oldPos.x), 2);
             float change_z = (float)Math.Pow((newPos.z - oldPos.z), 2);
