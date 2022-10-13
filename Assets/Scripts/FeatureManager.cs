@@ -446,6 +446,7 @@ public class FeatureManager : MonoBehaviour
         // its display settings such as the feature type may have changed.
         DeleteFeatureFromServer(feature.id);
         AddFeatureFromServer(feature);
+        isChanged = true;
     }
 
     public void DeleteFeatureFromServer(int id)

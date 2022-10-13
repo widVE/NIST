@@ -56,13 +56,13 @@ public class DistanceCalculation : MonoBehaviour
 		float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
 		if (isFeet)
 		{
-			display_dist_text.text = cur_prefab.name + " - " + distance.ToString() + "ft";
+			display_dist_text.text = cur_prefab.name + " : " + distance.ToString() + "ft";
 			//display_dist_text.text = distance.ToString() + "ft";
 
 		}
 		else
 		{
-			display_dist_text.text = cur_prefab.name + " - " + distance.ToString() + "m";
+			display_dist_text.text = cur_prefab.name + " : " + distance.ToString() + "m";
 		}
 	}
 

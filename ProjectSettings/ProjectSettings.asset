@@ -232,6 +232,8 @@ PlayerSettings:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 8880289550110572756, guid: 83d1380544b4b094d815fc57648a9999, type: 2}
   - {fileID: -5691421039504993335, guid: 5f5776f591d9edd4c8c0ffc2a876792f, type: 2}
   metroInputSource: 0
@@ -858,6 +860,7 @@ PlayerSettings:
   ps4videoRecordingFeaturesUsed: 0
   ps4contentSearchFeaturesUsed: 0
   ps4CompatibilityPS5: 0
+  ps4AllowPS5Detection: 0
   ps4GPU800MHz: 1
   ps4attribEyeToEyeDistanceSettingVR: 0
   ps4IncludedModules: []
