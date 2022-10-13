@@ -66,6 +66,8 @@ public class FeatureManager : MonoBehaviour
     public Vector3 oldPos;
     public Vector3 newPos;
 
+    string location_id = "";
+
     // Attach QRScanner GameObject so we can listen for location change events.
     [SerializeField]
     GameObject _qrScanner;
@@ -115,6 +117,8 @@ public class FeatureManager : MonoBehaviour
             scanner.LocationChanged += (o, ev) =>
             {
                 ListFeaturesFromLocation(ev.LocationID);
+                location_id = ev.LocationID;
+               
             };
         }
     }
@@ -122,7 +126,7 @@ public class FeatureManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        /*
         // We should only need to call ListFeatures once on entering a new location.
         // After that, we can update the existing feature list from websocket events.
         if (false && isChanged)
@@ -130,6 +134,7 @@ public class FeatureManager : MonoBehaviour
             Debug.Log("reached Update()");
             ListFeatures();
         }
+        */
                 
     }
     // POST 
@@ -334,7 +339,7 @@ public class FeatureManager : MonoBehaviour
             // updates the dictionary
             //Destroy(feature_gameobj_dictionary[featureID].GetComponent<MarkerObject>());
             //feature_gameobj_dictionary[featureID].AddComponent<MarkerObject>().feature = featureHolder;
-
+            ListFeaturesFromLocation(location_id);
         }
         else
         {
@@ -437,6 +442,7 @@ public class FeatureManager : MonoBehaviour
         {
             Debug.Log("Warning: MarkerObject component is missing");
         }
+
         
     }
 
