@@ -336,10 +336,13 @@ public class FeatureManager : MonoBehaviour
             Debug.Log("SUCCESS: " + result);
 
             feature_dictionary[featureID] = featureHolder;
+            UpdateFeatureFromServer(featureHolder); // testing added: this will get the updated features back to the scene
+
             // updates the dictionary
             //Destroy(feature_gameobj_dictionary[featureID].GetComponent<MarkerObject>());
             //feature_gameobj_dictionary[featureID].AddComponent<MarkerObject>().feature = featureHolder;
-            ListFeaturesFromLocation(location_id);
+
+            //ListFeaturesFromLocation(location_id);
         }
         else
         {
