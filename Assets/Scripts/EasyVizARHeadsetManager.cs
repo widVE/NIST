@@ -145,17 +145,18 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	[ContextMenu("DisplayPNGMap")]
 	public void DisplayPNGMap()
     {
-		EasyVizARServer.Instance.Get("location/" + _locationId + "/layers/1/", EasyVizARServer.JSON_TYPE, DisplayPNGMapCallback);
+		EasyVizARServer.Instance.Get("locations/" + _locationId + "/layers/1/", EasyVizARServer.JSON_TYPE, DisplayPNGMapCallback);
 
 	}
 
 	public void DisplayPNGMapCallback(string results)
 	{
-		var resultJSON = JsonUtility.FromJson<EasyVizAR.MapInfo>(results);
 
 		if (results != "error")
 		{
 			Debug.Log("SUCCESS: " + results);
+			var resultJSON = JsonUtility.FromJson<EasyVizAR.MapInfo>(results);
+
 			Debug.Log("the top is: " + resultJSON.viewBox.top);
 
 		}
