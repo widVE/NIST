@@ -65,9 +65,11 @@ namespace EasyVizAR
 		public string imagePath;
 		public string imageUrl;
 		public string id;
-		
+
 		public int width;
 		public int height;
+		//added for display map 
+		public float viewBox;
 	}
 	
 	[System.Serializable]
@@ -125,8 +127,10 @@ namespace EasyVizAR
 		public string placement;
 		public float radius;
 		public float topOffset;
-
     }
+
+
+
 }
 
 public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>

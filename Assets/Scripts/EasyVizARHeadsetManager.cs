@@ -137,7 +137,33 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	public void DisplayHandMap()
 	{
 		EasyVizARServer.Instance.Texture("locations/" + _locationId + "/layers/1/image", "image/png", "1200", DisplayMapCallback); 
+		//EasyVizARServer.Instance.Texture("locations/" + _locationId + "/layers/1/image", "image/png", "100", DisplayMapCallback);
+
 	}
+
+	//ADDED FOR NEW MAP
+	public void DisplayPNGMap()
+    {
+		EasyVizARServer.Instance.Get("location/" + _locationId + "/layers/1/" + EasyVizARServer.JSON_TYPE, DisplayPNGMapCallback)
+
+	}
+
+	public void DisplayPNGMapCallback()
+	{
+		var resultJSON = JsonUtility.FromJson<EasyVizAR.Hololens2PhotoPut>(result);
+
+		if (result != "error")
+		{
+			Debug.Log("SUCCESS: " + result);
+			//resultJSON.viewBox.
+
+		}
+		else
+		{
+			Debug.Log("ERROR: " + result);
+		}
+	}
+
 
 
 
