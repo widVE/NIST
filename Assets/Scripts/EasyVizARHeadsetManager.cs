@@ -142,27 +142,29 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	}
 
 	//ADDED FOR NEW MAP
+	[ContextMenu("DisplayPNGMap")]
 	public void DisplayPNGMap()
     {
-		EasyVizARServer.Instance.Get("location/" + _locationId + "/layers/1/" + EasyVizARServer.JSON_TYPE, DisplayPNGMapCallback)
+		EasyVizARServer.Instance.Get("location/" + _locationId + "/layers/1/", EasyVizARServer.JSON_TYPE, DisplayPNGMapCallback);
 
 	}
 
-	public void DisplayPNGMapCallback()
+	public void DisplayPNGMapCallback(string results)
 	{
-		var resultJSON = JsonUtility.FromJson<EasyVizAR.Hololens2PhotoPut>(result);
+		var resultJSON = JsonUtility.FromJson<EasyVizAR.MapInfo>(results);
 
-		if (result != "error")
+		if (results != "error")
 		{
-			Debug.Log("SUCCESS: " + result);
-			//resultJSON.viewBox.
+			Debug.Log("SUCCESS: " + results);
+			Debug.Log("the top is: " + resultJSON.viewBox.top);
 
 		}
 		else
 		{
-			Debug.Log("ERROR: " + result);
+			Debug.Log("ERROR: " + results);
 		}
 	}
+	
 
 
 

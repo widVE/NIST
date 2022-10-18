@@ -25,6 +25,9 @@ public class FeatureManager : MonoBehaviour
     public string color = "";
     public string name = "";
     public EasyVizAR.Position new_position;
+    // For displaying map 
+    public GameObject mapParent;
+    public GameObject PalmMap;
 
 
     //Added from SpawnListIndex
@@ -387,7 +390,6 @@ public class FeatureManager : MonoBehaviour
         // billboarding effect
         GameObject cloned_feature = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
 
-       // GameObject cloned_feature = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
         cloned_feature.name = "feature-local";
         CreateNewFeature(feature_type, cloned_feature);
 
@@ -427,6 +429,19 @@ public class FeatureManager : MonoBehaviour
         GameObject marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
         marker.name = string.Format("feature-{0}", feature.id);
         
+        Debug.Log("Palm is active?: " + PalmMap.activeSelf);
+
+        if (PalmMap.activeSelf)
+        {
+            Debug.Log("Got into spawning map markers!");
+            GameObject mapMarker = Instantiate(feature_to_spawn, mapParent.transform, false);
+
+        }
+        
+
+        //GameObject mapMarker = Instantiate(feature_to_spawn, mapParent.transform, false);
+
+
         Color myColor;
         if (ColorUtility.TryParseHtmlString(feature.color, out myColor))
         {

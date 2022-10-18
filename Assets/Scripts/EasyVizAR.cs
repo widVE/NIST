@@ -68,10 +68,37 @@ namespace EasyVizAR
 
 		public int width;
 		public int height;
-		//added for display map 
-		public float viewBox;
 	}
-	
+
+	[System.Serializable]
+	public class MapInfo
+	{
+		public string contentType;
+		public static float created;
+		public int id;
+		public string imagePath;
+		public string imageUrl;
+		public string name; 
+		public bool ready;
+		public string type;
+		public static float updated;
+		public int version;
+		public ViewBox viewBox;
+	}
+
+
+
+	[System.Serializable]
+	public class ViewBox
+	{
+		public float height;
+		public float left;
+		public float top;
+		public float width;
+	}
+
+
+
 	[System.Serializable]
 	public class HeadsetList
 	{
