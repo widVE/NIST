@@ -39,11 +39,13 @@ public class MapIconSpawn : MonoBehaviour
 
             Debug.Log("the top is: " + resultJSON.viewBox.top);
 
-            // this is where we make the set the local coordinate
+            /*
+            //this is where we might want to scale the finder based on the viewbox
             foreach (Transform child in iconParent.transform)
             {
                  //child.transform.localPosition = 
             }
+            */
 
         }
         else
