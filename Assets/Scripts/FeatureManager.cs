@@ -486,8 +486,8 @@ public class FeatureManager : MonoBehaviour
             Destroy(feature_object.gameObject);
         }
     }
-    
-  
+
+
     // might implement in the future but might not need it 
     public void ReplaceFeature()
     {
