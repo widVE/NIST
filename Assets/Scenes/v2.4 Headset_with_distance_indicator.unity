@@ -1031,7 +1031,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currHeadset: {fileID: 1361342022}
-  mapParent: {fileID: 335883421}
+  iconParent: {fileID: 335883421}
+  map: {fileID: 2070172276}
 --- !u!1 &349520856
 GameObject:
   m_ObjectHideFlags: 0
@@ -5248,6 +5249,11 @@ Transform:
   m_Father: {fileID: 1517424694}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
+--- !u!1 &2070172276 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1492607365964717172, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+  m_PrefabInstance: {fileID: 1810665664}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2071586760
 PrefabInstance:
   m_ObjectHideFlags: 0

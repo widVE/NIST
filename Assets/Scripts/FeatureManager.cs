@@ -146,6 +146,7 @@ public class FeatureManager : MonoBehaviour
         EasyVizAR.Feature feature_to_post = new EasyVizAR.Feature();
       
         feature_to_post.createdBy = manager.LocationID;
+        feature_to_post.createdBy = manager.LocationID;
 
         EasyVizAR.Position position = new EasyVizAR.Position();
         position.x = (float)marker.transform.position.x;
@@ -431,13 +432,14 @@ public class FeatureManager : MonoBehaviour
         
         Debug.Log("Palm is active?: " + PalmMap.activeSelf);
 
-        if (PalmMap.activeSelf)
-        {
-            Debug.Log("Got into spawning map markers!");
-            GameObject mapMarker = Instantiate(feature_to_spawn, mapParent.transform, false);
+        //if (PalmMap.activeSelf)
+        //{
+            //Debug.Log("Got into spawning map markers!");
+        GameObject mapMarker = Instantiate(feature_to_spawn, mapParent.transform, false);
+        mapMarker.transform.localPosition = pos;
 
-        }
-        
+        // }
+
 
         //GameObject mapMarker = Instantiate(feature_to_spawn, mapParent.transform, false);
 

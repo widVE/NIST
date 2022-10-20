@@ -5,11 +5,14 @@ using UnityEngine;
 public class MapIconSpawn : MonoBehaviour
 {
     public GameObject currHeadset;
-    public GameObject mapParent;
+    public GameObject iconParent;
+    //public GameObject map;
     // Start is called before the first frame update
     void Start()
     {
+        iconParent.transform.localPosition = new Vector3(0, 0, 0);
 
+        // DisplayPNGMap();
     }
 
     // Update is called once per frame
@@ -35,6 +38,12 @@ public class MapIconSpawn : MonoBehaviour
             var resultJSON = JsonUtility.FromJson<EasyVizAR.MapInfo>(results);
 
             Debug.Log("the top is: " + resultJSON.viewBox.top);
+
+            // this is where we make the set the local coordinate
+            foreach (Transform child in iconParent.transform)
+            {
+                 //child.transform.localPosition = 
+            }
 
         }
         else
