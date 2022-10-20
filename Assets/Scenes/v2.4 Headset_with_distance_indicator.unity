@@ -1031,6 +1031,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currHeadset: {fileID: 1361342022}
+  mapParent: {fileID: 335883421}
 --- !u!1 &349520856
 GameObject:
   m_ObjectHideFlags: 0
