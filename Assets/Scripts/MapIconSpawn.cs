@@ -6,7 +6,7 @@ public class MapIconSpawn : MonoBehaviour
 {
     public GameObject currHeadset;
     public GameObject iconParent;
-    //public GameObject map;
+    public GameObject mapShow;
     // Start is called before the first frame update
     void Start()
     {

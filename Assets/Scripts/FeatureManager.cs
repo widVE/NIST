@@ -129,6 +129,7 @@ public class FeatureManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        showMapIcon();
         /*
         // We should only need to call ListFeatures once on entering a new location.
         // After that, we can update the existing feature list from websocket events.
@@ -139,6 +140,18 @@ public class FeatureManager : MonoBehaviour
         }
         */
                 
+    }
+
+    public void showMapIcon()
+    {
+        if (!PalmMap.activeSelf)
+        {
+            mapParent.SetActive(false);
+        }
+        else
+        {
+            mapParent.SetActive(true);
+        }
     }
     // POST 
     public void CreateNewFeature(string feature_type, GameObject marker) //TODO: change the feature_type from int to string
