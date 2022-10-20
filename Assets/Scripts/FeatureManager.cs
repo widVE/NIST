@@ -449,7 +449,7 @@ public class FeatureManager : MonoBehaviour
         //{
             //Debug.Log("Got into spawning map markers!");
         GameObject mapMarker = Instantiate(feature_to_spawn, mapParent.transform, false);
-        mapMarker.transform.localPosition = pos;
+        mapMarker.transform.localPosition = new Vector3(pos.x, 0, pos.z);
 
         // }
 
