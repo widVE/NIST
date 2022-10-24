@@ -3,6 +3,9 @@
 #include "HL2ResearchMode.g.cpp"
 #include "VideoCameraStreamer.h"
 #include "IVideoFrameSink.h"
+#include <codecvt>
+
+#define COLOR_FROM_PLUGIN
 
 extern "C"
 HMODULE LoadLibraryA(
@@ -50,8 +53,7 @@ namespace winrt::HL2UnityPlugin::implementation
         pSensorDevicePerception->Release();
         m_locator = SpatialGraphInteropPreview::CreateLocatorForNode(guid);
         
-        winrt::Windows::Perception::Spatial::SpatialCoordinateSystem m_worldOrigin = m_locator.CreateStationaryFrameOfReferenceAtCurrentLocation().CoordinateSystem();
-
+        
         size_t sensorCount = 0;
 
         winrt::check_hresult(m_pSensorDevice->QueryInterface(IID_PPV_ARGS(&m_pSensorDeviceConsent)));
@@ -63,25 +65,105 @@ namespace winrt::HL2UnityPlugin::implementation
         m_sensorDescriptors.resize(sensorCount);
         winrt::check_hresult(m_pSensorDevice->GetSensorDescriptors(m_sensorDescriptors.data(), m_sensorDescriptors.size(), &sensorCount));
         
+        /*winrt::Windows::Perception::Spatial::SpatialCoordinateSystem m_worldOrigin = m_locator.CreateStationaryFrameOfReferenceAtCurrentLocation().CoordinateSystem();
+
+        OutputDebugString(L"Initializing Video Frame Streamer...\n");
         m_pVideoFrameStreamer = std::make_shared<VideoCameraStreamer>(m_worldOrigin, L"23940");
         if (!m_pVideoFrameStreamer.get())
         {
             throw winrt::hresult(E_POINTER);
         }
 
-        m_pVideoFrameProcessor = std::make_unique<VideoCameraFrameProcessor>();
-        //m_pVideoFrameStreamer = std::make_shared<VideoCameraStreamer>(m_worldOrigin, L"23940");
-        /*if (!m_pVideoFrameStreamer.get())
-        {
-            throw winrt::hresult(E_POINTER);
-        }*/
+        OutputDebugString(L"Initializing Video Frame Processor...\n");
+        m_pVideoFrameProcessor = std::make_unique<VideoCameraFrameProcessor>();*/
+
         // initialize the frame processor with a streamer sink
-        
+        winrt::Windows::Foundation::IAsyncAction processOp{ InitializePVCamera() };
+        processOp.get();
+
     }
 
-    void HL2ResearchMode::InitializePVCamera()
+    winrt::Windows::Foundation::IAsyncAction HL2ResearchMode::InitializePVCamera()
     {
-        m_pVideoFrameProcessor->InitializeAsync(m_pVideoFrameStreamer);
+        OutputDebugString(L"Initializing Async PV Camera...\n");
+        //co_await m_pVideoFrameProcessor->InitializeAsync(m_pVideoFrameStreamer);
+        winrt::Windows::Foundation::Collections::IVectorView<winrt::Windows::Media::Capture::Frames::MediaFrameSourceGroup>
+            mediaFrameSourceGroups{ co_await winrt::Windows::Media::Capture::Frames::MediaFrameSourceGroup::FindAllAsync() };
+
+        winrt::Windows::Media::Capture::Frames::MediaFrameSourceGroup selectedSourceGroup = nullptr;
+        winrt::Windows::Media::Capture::MediaCaptureVideoProfile profile = nullptr;
+        winrt::Windows::Media::Capture::MediaCaptureVideoProfileMediaDescription desc = nullptr;
+        std::vector<winrt::Windows::Media::Capture::Frames::MediaFrameSourceInfo> selectedSourceInfos;
+
+        // Find MediaFrameSourceGroup
+        for (const winrt::Windows::Media::Capture::Frames::MediaFrameSourceGroup& mediaFrameSourceGroup : mediaFrameSourceGroups)
+        {
+            auto knownProfiles = winrt::Windows::Media::Capture::MediaCapture::FindKnownVideoProfiles(
+                mediaFrameSourceGroup.Id(),
+                winrt::Windows::Media::Capture::KnownVideoProfile::VideoConferencing);
+
+            for (const auto& knownProfile : knownProfiles)
+            {
+                for (auto knownDesc : knownProfile.SupportedRecordMediaDescription())
+                {
+                    if ((knownDesc.Width() == 760)) // && (std::round(knownDesc.FrameRate()) == 15))
+                    {
+                        profile = knownProfile;
+                        desc = knownDesc;
+                        selectedSourceGroup = mediaFrameSourceGroup;
+                        break;
+                    }
+                }
+            }
+        }
+
+        winrt::check_bool(selectedSourceGroup != nullptr);
+
+        for (auto sourceInfo : selectedSourceGroup.SourceInfos())
+        {
+            // Workaround since multiple Color sources can be found,
+            // and not all of them are necessarily compatible with the selected video profile
+            if (sourceInfo.SourceKind() == winrt::Windows::Media::Capture::Frames::MediaFrameSourceKind::Color)
+            {
+                selectedSourceInfos.push_back(sourceInfo);
+            }
+        }
+        winrt::check_bool(!selectedSourceInfos.empty());
+
+        // Initialize a MediaCapture object
+        winrt::Windows::Media::Capture::MediaCaptureInitializationSettings settings;
+        settings.VideoProfile(profile);
+        settings.RecordMediaDescription(desc);
+        settings.VideoDeviceId(selectedSourceGroup.Id());
+        settings.StreamingCaptureMode(winrt::Windows::Media::Capture::StreamingCaptureMode::Video);
+        settings.MemoryPreference(winrt::Windows::Media::Capture::MediaCaptureMemoryPreference::Cpu);
+        settings.SharingMode(winrt::Windows::Media::Capture::MediaCaptureSharingMode::ExclusiveControl);
+        settings.SourceGroup(selectedSourceGroup);
+
+        winrt::Windows::Media::Capture::MediaCapture mediaCapture = winrt::Windows::Media::Capture::MediaCapture();
+        co_await mediaCapture.InitializeAsync(settings);
+
+        winrt::Windows::Media::Capture::Frames::MediaFrameSource selectedSource = nullptr;
+        winrt::Windows::Media::Capture::Frames::MediaFrameFormat preferredFormat = nullptr;
+
+        for (winrt::Windows::Media::Capture::Frames::MediaFrameSourceInfo sourceInfo : selectedSourceInfos)
+        {
+            auto tmpSource = mediaCapture.FrameSources().Lookup(sourceInfo.Id());
+            for (winrt::Windows::Media::Capture::Frames::MediaFrameFormat format : tmpSource.SupportedFormats())
+            {
+                if (format.VideoFormat().Width() == 760)
+                {
+                    selectedSource = tmpSource;
+                    preferredFormat = format;
+                    break;
+                }
+            }
+        }
+
+        winrt::check_bool(preferredFormat != nullptr);
+
+        co_await selectedSource.SetFormatAsync(preferredFormat);
+        m_mediaFrameReader = co_await mediaCapture.CreateFrameReaderAsync(selectedSource);
     }
 
     void HL2ResearchMode::InitializeDepthSensor() 
@@ -155,10 +237,23 @@ namespace winrt::HL2UnityPlugin::implementation
 
     void HL2ResearchMode::StartPVCameraLoop()
     {
-        if (m_pVideoFrameProcessor != nullptr)
+        StartColorAsync();
+        /*if (m_pVideoFrameProcessor != nullptr)
         {
+            OutputDebugString(L"Starting PV Camera Loop...\n");
             m_pVideoFrameProcessor->StartAsync();
-        }
+        }*/
+    }
+
+    winrt::Windows::Foundation::IAsyncAction HL2ResearchMode::StartColorAsync()
+    {
+        winrt::Windows::Media::Capture::Frames::MediaFrameReaderStartStatus status = co_await m_mediaFrameReader.StartAsync();
+        winrt::check_bool(status == winrt::Windows::Media::Capture::Frames::MediaFrameReaderStartStatus::Success);
+
+        m_pColorUpdateThread = new std::thread(HL2ResearchMode::ColorSensorLoop, this);
+    
+        m_OnFrameArrivedRegistration = m_mediaFrameReader.FrameArrived(
+            { this, &HL2ResearchMode::OnFrameArrived });
     }
 
     void HL2ResearchMode::StartDepthSensorLoop() 
@@ -170,6 +265,125 @@ namespace winrt::HL2UnityPlugin::implementation
         }
 
         m_pDepthUpdateThread = new std::thread(HL2ResearchMode::DepthSensorLoop, this);
+    }
+
+    void HL2ResearchMode::OnFrameArrived(
+        const winrt::Windows::Media::Capture::Frames::MediaFrameReader& sender,
+        const winrt::Windows::Media::Capture::Frames::MediaFrameArrivedEventArgs& args)
+    {
+        if (winrt::Windows::Media::Capture::Frames::MediaFrameReference frame = sender.TryAcquireLatestFrame())
+        {
+            std::lock_guard<std::shared_mutex> lock(m_frameMutex);
+            m_latestFrame = frame;
+        }
+    }
+
+    void HL2ResearchMode::ColorSensorLoop(HL2ResearchMode* pHL2ResearchMode)
+    {
+        if (!pHL2ResearchMode->m_PVLoopStarted)
+        {
+            pHL2ResearchMode->m_PVLoopStarted = true;
+        }
+        else {
+            return;
+        }
+
+        while (pHL2ResearchMode->m_PVLoopStarted)
+        {
+            std::lock_guard<std::shared_mutex> reader_guard(pHL2ResearchMode->m_frameMutex);
+            if (pHL2ResearchMode->m_latestFrame != nullptr)
+            {
+                winrt::Windows::Media::Capture::Frames::MediaFrameReference frame = pHL2ResearchMode->m_latestFrame;
+                /*long long timestamp = pProcessor->m_converter.RelativeTicksToAbsoluteTicks(
+                    HundredsOfNanoseconds(frame.SystemRelativeTime().Value().count())).count();
+                if (timestamp != pProcessor->m_latestTimestamp)
+                {
+                    long long delta = timestamp - pProcessor->m_latestTimestamp;
+                    if (delta > pProcessor->m_minDelta)
+                    {*/
+                        //pProcessor->m_latestTimestamp = timestamp;
+                        //pProcessor->m_pFrameSink->Send(frame, timestamp);
+                    //}
+                //}
+                float fx = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().x;
+                float fy = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().y;
+
+                winrt::Windows::Foundation::Numerics::float4x4 PVtoWorldtransform;
+                auto PVtoWorld =
+                    frame.CoordinateSystem().TryGetTransformTo(pHL2ResearchMode->m_refFrame);
+                
+                if (PVtoWorld)
+                {
+                    PVtoWorldtransform = PVtoWorld.Value();
+                    //_PVtoWorldtransform = PVtoWorldtransform;
+                }
+                else
+                {
+#if DBG_ENABLE_VERBOSE_LOGGING
+                    OutputDebugStringW(L"Streamer::SendFrame: Could not locate frame.\n");
+#endif
+                    return;
+                }
+
+                // grab the frame data
+                winrt::Windows::Graphics::Imaging::SoftwareBitmap softwareBitmap = winrt::Windows::Graphics::Imaging::SoftwareBitmap::Convert(
+                    frame.VideoMediaFrame().SoftwareBitmap(), winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Bgra8);
+
+                int imageWidth = softwareBitmap.PixelWidth();
+                int imageHeight = softwareBitmap.PixelHeight();
+
+                int pixelStride = 4;
+                int scaleFactor = 1;
+
+                int rowStride = imageWidth * pixelStride;
+
+                // Get bitmap buffer object of the frame
+                winrt::Windows::Graphics::Imaging::BitmapBuffer bitmapBuffer = softwareBitmap.LockBuffer(winrt::Windows::Graphics::Imaging::BitmapBufferAccessMode::Read);
+
+                // Get raw pointer to the buffer object
+                uint32_t pixelBufferDataLength = 0;
+                uint8_t* pixelBufferData;
+
+                auto spMemoryBufferByteAccess{ bitmapBuffer.CreateReference()
+                    .as<::Windows::Foundation::IMemoryBufferByteAccess>() };
+
+                try
+                {
+                    spMemoryBufferByteAccess->
+                        GetBuffer(&pixelBufferData, &pixelBufferDataLength);
+                }
+                catch (winrt::hresult_error const& ex)
+                {
+#if DBG_ENABLE_ERROR_LOGGING
+                    winrt::hresult hr = ex.code(); // HRESULT_FROM_WIN32
+                    winrt::hstring message = ex.message();
+                    OutputDebugStringW(L"VideoCameraStreamer::SendFrame: Failed to get buffer with ");
+                    OutputDebugStringW(message.c_str());
+                    OutputDebugStringW(L"\n");
+#endif
+                }
+
+                if (pHL2ResearchMode->m_pixelBufferData == 0)
+                {
+                    pHL2ResearchMode->m_pixelBufferData = new UINT8[pixelBufferDataLength];
+                    pHL2ResearchMode->m_colorBufferSize = pixelBufferDataLength;
+                }
+
+                //std::vector<uint8_t> imageBufferAsVector;
+                for (int row = 0; row < imageHeight; row += scaleFactor)
+                {
+                    for (int col = 0; col < rowStride; col += scaleFactor * pixelStride)
+                    {
+                        for (int j = 0; j < pixelStride - 1; j++)
+                        {
+                            //imageBufferAsVector.emplace_back(
+                                //pixelBufferData[row * rowStride + col + j]);
+                            pHL2ResearchMode->m_pixelBufferData[row * rowStride + col + j] = pixelBufferData[row * rowStride + col + j];
+                        }
+                    }
+                }
+            }
+        }
     }
 
     void HL2ResearchMode::DepthSensorLoop(HL2ResearchMode* pHL2ResearchMode)
@@ -975,6 +1189,7 @@ namespace winrt::HL2UnityPlugin::implementation
     void HL2ResearchMode::StopAllSensorDevice()
     {
         m_depthSensorLoopStarted = false;
+        m_PVLoopStarted = false;
         //m_pDepthUpdateThread->join();
         if (m_depthMap) 
         {
@@ -1012,6 +1227,11 @@ namespace winrt::HL2UnityPlugin::implementation
             m_longDepthMapTexture = nullptr;
         }
 
+        /*if (m_pVideoFrameProcessor)
+        {
+            m_pVideoFrameProcessor->Stop();
+        }*/
+
         if (m_pSensorDevice != nullptr)
         {
             m_pSensorDevice->Release();
@@ -1023,6 +1243,19 @@ namespace winrt::HL2UnityPlugin::implementation
             m_pSensorDeviceConsent->Release();
             m_pSensorDeviceConsent = nullptr;
         }
+    }
+
+    com_array<uint8_t> HL2ResearchMode::GetPVColorBuffer()
+    {
+        std::lock_guard<std::mutex> l(mu);
+        if (!m_pixelBufferData)
+        {
+            return com_array<UINT8>();
+        }
+        com_array<UINT8> tempBuffer = com_array<UINT8>(std::move_iterator(m_pixelBufferData), std::move_iterator(m_pixelBufferData + m_colorBufferSize));
+
+        //m_depthMapTextureUpdated = false;
+        return tempBuffer;
     }
 
     com_array<uint16_t> HL2ResearchMode::GetDepthMapBuffer()
@@ -1221,6 +1454,14 @@ namespace winrt::HL2UnityPlugin::implementation
         return depthToWorld;
     }
 
+    com_array<float> HL2ResearchMode::GetPVMatrix()
+    {
+        std::lock_guard<std::mutex> l(mu);
+        com_array<float> colorToWorld = com_array<float>(std::move_iterator(m_PVToWorld), std::move_iterator(m_PVToWorld + 16));
+
+        return colorToWorld;
+    }
+
     // Set the reference coordinate system. Need to be set before the sensor loop starts; otherwise, default coordinate will be used.
     void HL2ResearchMode::SetReferenceCoordinateSystem(winrt::Windows::Perception::Spatial::SpatialCoordinateSystem refCoord)
     {
@@ -1248,7 +1489,7 @@ namespace winrt::HL2UnityPlugin::implementation
 
     long long HL2ResearchMode::checkAndConvertUnsigned(UINT64 val)
     {
-        assert(val <= kMaxLongLong);
+        //assert(val <= kMaxLongLong);
         return static_cast<long long>(val);
     }
 

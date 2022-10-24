@@ -1142,7 +1142,7 @@ MonoBehaviour:
   _tsdfShader: {fileID: 7200000, guid: 2940ca67a277a8c4998cf58e1466cf16, type: 3}
   _pointRenderTexture: {fileID: 0}
   _writeImagesToDisk: 0
-  _showImagesInView: 1
+  _showImagesInView: 0
 --- !u!4 &891080481
 Transform:
   m_ObjectHideFlags: 0

@@ -19,12 +19,14 @@ namespace HL2UnityPlugin
 		UInt8[] GetRFCameraBuffer();
         UInt8[] GetLRCameraBuffer();
         UInt8[] GetRRCameraBuffer();
+        UInt8[] GetPVColorBuffer();
 
         Single[] GetCenterPoint();
         Single[] GetDepthSensorPosition();
         Single[] GetDepthToWorld();
         Single[] GetCurrRotation();
         Single[] GetCurrPosition();
+        Single[] GetPVMatrix();
 
         Int32 GetDepthBufferSize();
         Int32 GetLongDepthBufferSize();
@@ -49,7 +51,6 @@ namespace HL2UnityPlugin
         void InitializeDepthSensor();
         void InitializeLongDepthSensor();
         void InitializeSpatialCamerasFront();
-        void InitializePVCamera();
 
         void StartDepthSensorLoop();
         void StartLongDepthSensorLoop();

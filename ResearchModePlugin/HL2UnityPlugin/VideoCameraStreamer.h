@@ -30,6 +30,7 @@ private:
     //bool m_streamingEnabled = true;
 
     TimeConverter m_converter;
+    winrt::Windows::Foundation::Numerics::float4x4 _PVtoWorldtransform;
 
     winrt::Windows::Perception::Spatial::SpatialCoordinateSystem m_worldCoordSystem = nullptr;
     winrt::Windows::Networking::Sockets::StreamSocketListener m_streamSocketListener;

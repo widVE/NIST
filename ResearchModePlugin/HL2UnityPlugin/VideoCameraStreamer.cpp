@@ -100,15 +100,16 @@ void VideoCameraStreamer::Send(
 #if DBG_ENABLE_VERBOSE_LOGGING
     OutputDebugStringW(L"VideoCameraStreamer::SendFrame: Received frame for sending!\n");
 #endif
-    if (!m_streamSocket || !m_writer)
-    {
+    //if (!m_streamSocket || !m_writer)
+    //{
 #if DBG_ENABLE_VERBOSE_LOGGING
         OutputDebugStringW(
             L"VideoCameraStreamer::SendFrame: No connection.\n");
 #endif
-        return;
-    }
+        //return;
+    //           }
 
+    OutputDebugString(L"Sent frame...\n");
 
     // grab the frame info
     float fx = pFrame.VideoMediaFrame().CameraIntrinsics().FocalLength().x;
@@ -120,6 +121,7 @@ void VideoCameraStreamer::Send(
     if (PVtoWorld)
     {
         PVtoWorldtransform = PVtoWorld.Value();
+        _PVtoWorldtransform = PVtoWorldtransform;
     }
     else
     {
@@ -183,14 +185,14 @@ void VideoCameraStreamer::Send(
     //instead just output to file here...
     //or save in variable...
 
-    if (m_writeInProgress)
-    {
+    //if (m_writeInProgress)
+    //{
 #if DBG_ENABLE_VERBOSE_LOGGING
         OutputDebugStringW(
             L"VideoCameraStreamer::SendFrame: Write in progress.\n");
 #endif
-        return;
-    }
+    //    return;
+    //}
     m_writeInProgress = true;
     
     /*try
