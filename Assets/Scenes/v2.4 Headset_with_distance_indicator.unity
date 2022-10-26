@@ -958,6 +958,24 @@ MonoBehaviour:
     z: 0
   mapParent: {fileID: 0}
   PalmMap: {fileID: 0}
+  map_ambulance_icon: {fileID: 0}
+  map_audio_icon: {fileID: 0}
+  map_bad_person_icon: {fileID: 0}
+  map_biohazard_icon: {fileID: 0}
+  map_door_icon: {fileID: 0}
+  map_elevator_icon: {fileID: 0}
+  map_exit_icon: {fileID: 0}
+  map_extinguisher_icon: {fileID: 0}
+  map_fire_icon: {fileID: 0}
+  map_headset_icon: {fileID: 0}
+  map_injury_icon: {fileID: 0}
+  map_message_icon: {fileID: 0}
+  map_object_icon: {fileID: 0}
+  map_person_icon: {fileID: 0}
+  map_radiation_icon: {fileID: 0}
+  map_stairs_icon: {fileID: 0}
+  map_user_icon: {fileID: 0}
+  map_warning_icon: {fileID: 0}
   spawn_root: {fileID: 0}
   spawn_parent: {fileID: 0}
   isChanged: 1
@@ -2383,6 +2401,24 @@ MonoBehaviour:
     z: 0
   mapParent: {fileID: 335883421}
   PalmMap: {fileID: 873797678}
+  map_ambulance_icon: {fileID: 290209382182822209, guid: 2e0cbd28fded53e4580ae7524b008bd3, type: 3}
+  map_audio_icon: {fileID: 1842730812392890949, guid: 007f6ed56c35b18429f1a59159f5b338, type: 3}
+  map_bad_person_icon: {fileID: 6538244069947008119, guid: a226e2832cf4e8743979c6853e9d9586, type: 3}
+  map_biohazard_icon: {fileID: 1981342878318901796, guid: 972690c0f7861754e9f4c3dd8db275d0, type: 3}
+  map_door_icon: {fileID: 2069925151985208245, guid: fcb4f40d1397af84fb17c92fc7f51175, type: 3}
+  map_elevator_icon: {fileID: 5702560553518286225, guid: fe45e9a9ef012c243b4d2deb95ce3fb0, type: 3}
+  map_exit_icon: {fileID: 4252723170412605694, guid: 1f6d11e0e84f1fb4d902fd794a6f7eae, type: 3}
+  map_extinguisher_icon: {fileID: 3800510486315543192, guid: 63e4cb30289512045b15c961cfc1ce43, type: 3}
+  map_fire_icon: {fileID: 5035943243370458903, guid: f2440b4ec2d22a24fafed66410029289, type: 3}
+  map_headset_icon: {fileID: 4402188086708784334, guid: d8bfdd92541e05d438e4d0d1945df5aa, type: 3}
+  map_injury_icon: {fileID: 2004794065475310447, guid: 0acf7b3895827f442bb669f1d9bd9f19, type: 3}
+  map_message_icon: {fileID: 5318789042369293505, guid: 900905efde3465c4daf62e7c1f5d4d10, type: 3}
+  map_object_icon: {fileID: 6875439886385581506, guid: 6b140dfc0095d114b85769204dbbfc09, type: 3}
+  map_person_icon: {fileID: 3853431206861463370, guid: 52942bd3952bbb446b88b6ed3fbe7d99, type: 3}
+  map_radiation_icon: {fileID: 9092256845123000539, guid: c246fefea99c3ce43bb921421b44cd1e, type: 3}
+  map_stairs_icon: {fileID: 848803944910143869, guid: 9655769b4642b974eb77ad4d47b2be60, type: 3}
+  map_user_icon: {fileID: 7768351483811375682, guid: e3c7207a7f381ba4cb586ef01b2ae0c0, type: 3}
+  map_warning_icon: {fileID: 2430657643644576839, guid: 34552eacdb62c7445b8531a16e496022, type: 3}
   spawn_root: {fileID: 1208393620}
   spawn_parent: {fileID: 1968206798}
   isChanged: 1

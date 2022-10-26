@@ -28,7 +28,26 @@ public class FeatureManager : MonoBehaviour
     // For displaying map 
     public GameObject mapParent;
     public GameObject PalmMap;
-
+    public Dictionary<string, GameObject> map_icon_dictionary = new Dictionary<string, GameObject>(); // contains all possible marker objects
+    //map icon
+    public GameObject map_ambulance_icon;
+    public GameObject map_audio_icon;
+    public GameObject map_bad_person_icon;
+    public GameObject map_biohazard_icon;
+    public GameObject map_door_icon;
+    public GameObject map_elevator_icon;
+    public GameObject map_exit_icon;
+    public GameObject map_extinguisher_icon;
+    public GameObject map_fire_icon;
+    public GameObject map_headset_icon;
+    public GameObject map_injury_icon;
+    public GameObject map_message_icon;
+    public GameObject map_object_icon;
+    public GameObject map_person_icon;
+    public GameObject map_radiation_icon;
+    public GameObject map_stairs_icon;
+    public GameObject map_user_icon;
+    public GameObject map_warning_icon;
 
     //Added from SpawnListIndex
     public GameObject spawn_root;
@@ -100,12 +119,33 @@ public class FeatureManager : MonoBehaviour
         feature_type_dictionary.Add("stairs", stairs_icon);
         feature_type_dictionary.Add("user", user_icon);
         feature_type_dictionary.Add("warning", warning_icon);
+
+        //for map 
+        map_icon_dictionary.Add("ambulance", map_ambulance_icon);
+        map_icon_dictionary.Add("audio", map_audio_icon);
+        map_icon_dictionary.Add("bad-person", map_bad_person_icon);
+        map_icon_dictionary.Add("biohazard", map_biohazard_icon);
+        map_icon_dictionary.Add("door", map_door_icon);
+        map_icon_dictionary.Add("elevator", map_elevator_icon);
+        map_icon_dictionary.Add("exit", map_exit_icon);
+        map_icon_dictionary.Add("extinguisher", map_extinguisher_icon);
+        map_icon_dictionary.Add("fire", map_fire_icon);
+        map_icon_dictionary.Add("headset", map_headset_icon);
+        map_icon_dictionary.Add("injury", map_injury_icon);
+        map_icon_dictionary.Add("message", map_message_icon);
+        map_icon_dictionary.Add("object", map_object_icon);
+        map_icon_dictionary.Add("person", map_person_icon);
+        map_icon_dictionary.Add("radiation", map_radiation_icon);
+        map_icon_dictionary.Add("stairs", map_stairs_icon);
+        map_icon_dictionary.Add("user", map_user_icon);
+        map_icon_dictionary.Add("warning", map_warning_icon);
         // distance 
         isFeet = true;  // should change in the future, but by default it's shown in ft.
 
         headsetPos = curr_headset.GetComponent<Transform>().position;
         oldPos = headsetPos;
         distance_updated = true;
+        
 
 
 #if UNITY_EDITOR
@@ -124,6 +164,8 @@ public class FeatureManager : MonoBehaviour
                
             };
         }
+
+        //StartCoroutine(FeatureCountFromServer()); --> will implement later if we want to delete feature from server
     }
 
     // Update is called once per frame
@@ -141,6 +183,16 @@ public class FeatureManager : MonoBehaviour
         */
                 
     }
+    
+    IEnumerator FeatureCountFromServer()
+    {
+        while (true)
+        {
+            GetFeature();
+            yield return new WaitForSeconds(1f);
+        }
+    }
+    
 
     public void showMapIcon()
     {
@@ -177,9 +229,6 @@ public class FeatureManager : MonoBehaviour
         
         //Serialize the feature into JSON
         var data = JsonUtility.ToJson(feature_to_post);
-        // Debug.Log("Json utility: " + feature_to_post.id);
-        // Debug.Log("locations/" + manager.LocationID + "/features");
-        //for sending stuff to the server 
 
         EasyVizARServer.Instance.Post("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, data, delegate (string result)
         {
@@ -221,14 +270,24 @@ public class FeatureManager : MonoBehaviour
 
 
     }
-
+    
     void GetFeatureCallBack(string result)
     {
-        var resultJSON = JsonUtility.FromJson<EasyVizAR.Feature>(result);
+        var resultJSON = JsonUtility.FromJson<List<EasyVizAR.Feature>>(result);
 
         if (result != "error")
         {
             Debug.Log("SUCCESS: " + result);
+            // this is for deleting features in the Unity Scene after deleting features from the server
+            if (resultJSON.Count != feature_dictionary.Count)
+            {
+                foreach (Transform child in spawn_parent.transform)
+                {
+                    //if (child.name )
+                }
+                
+            }
+
 
         }
         else
@@ -236,6 +295,7 @@ public class FeatureManager : MonoBehaviour
             Debug.Log("ERROR: " + result);
         }
     }
+    
 
     //NOTE: this function is now also displaying all the features listed on the server.
     [ContextMenu("ListFeatures")]
@@ -425,14 +485,17 @@ public class FeatureManager : MonoBehaviour
         feature_dictionary.Add(feature.id, feature);
 
         GameObject feature_to_spawn;
+        GameObject map_icon_to_spawn;
         if (feature_type_dictionary.ContainsKey(feature.type))
         {
             feature_to_spawn = feature_type_dictionary[feature.type];
-        } 
+            map_icon_to_spawn = map_icon_dictionary[feature.type];
+        }
         else
         {
             Debug.Log("Feature type dictionary does not contain " + feature.type);
             feature_to_spawn = warning_icon;
+            map_icon_to_spawn = warning_icon;
         }
 
         Vector3 pos = Vector3.zero;
@@ -448,9 +511,9 @@ public class FeatureManager : MonoBehaviour
         //if (PalmMap.activeSelf)
         //{
             //Debug.Log("Got into spawning map markers!");
-        GameObject mapMarker = Instantiate(feature_to_spawn, mapParent.transform, false);
+        GameObject mapMarker = Instantiate(map_icon_to_spawn, mapParent.transform, false);
         mapMarker.transform.localPosition = new Vector3(pos.x, 0, pos.z);
-
+        mapMarker.name = string.Format("feature-{0}", feature.id);
         // }
 
 
@@ -461,10 +524,10 @@ public class FeatureManager : MonoBehaviour
         if (ColorUtility.TryParseHtmlString(feature.color, out myColor))
         {
             marker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
-           //marker.transform.Find("Quad").GetComponent<Renderer>().material.color = myColor;
-        
+            //marker.transform.Find("Quad").GetComponent<Renderer>().material.color = myColor;
+            mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
         }
-        
+
 
         MarkerObject new_marker_object = marker.GetComponent<MarkerObject>();
         if (new_marker_object is not null)
@@ -496,9 +559,11 @@ public class FeatureManager : MonoBehaviour
         }
 
         var feature_object = spawn_parent.transform.Find(string.Format("feature-{0}", id));
-        if (feature_object)
+        var map_icon = mapParent.transform.Find(string.Format("feature-{0}", id));
+        if (feature_object && map_icon != null)
         {
             Destroy(feature_object.gameObject);
+            Destroy(map_icon.gameObject);
         }
     }
 

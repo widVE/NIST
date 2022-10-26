@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 605522721885768211}
   m_Layer: 0
-  m_Name: name
+  m_Name: Message
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -51,7 +51,7 @@ GameObject:
   - component: {fileID: 948566107858276302}
   - component: {fileID: 9114626056154776211}
   m_Layer: 0
-  m_Name: Map Icon Marker 1
+  m_Name: Map Icon Marker Variant - message
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -590,7 +590,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: bed6a29886c8a7f4985b163a03ed39ce, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
