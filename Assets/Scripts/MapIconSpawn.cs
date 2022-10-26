@@ -1,16 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class MapIconSpawn : MonoBehaviour
 {
     public GameObject currHeadset;
     public GameObject iconParent;
-    public GameObject mapShow;
     // Start is called before the first frame update
     void Start()
     {
-        iconParent.transform.localPosition = new Vector3(0, 0, 0);
+        //MapTest3 --> Location
+        //float x = -0.1121;
+        //float y = 0.1224;
+        //float z = -10.596918136310494 * 0.01;
+        iconParent.transform.localPosition = new Vector3((int)-0.1121, (int)0.1224, (int)(-10.596918136310494*0.01));
+        //iconParent.transform.localPosition = new Vector3(x, y, z);
 
         // DisplayPNGMap();
     }
@@ -38,6 +43,8 @@ public class MapIconSpawn : MonoBehaviour
             var resultJSON = JsonUtility.FromJson<EasyVizAR.MapInfo>(results);
 
             Debug.Log("the top is: " + resultJSON.viewBox.top);
+
+
 
             /*
             //this is where we might want to scale the finder based on the viewbox
