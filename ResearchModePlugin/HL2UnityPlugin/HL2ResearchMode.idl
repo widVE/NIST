@@ -27,6 +27,7 @@ namespace HL2UnityPlugin
         Single[] GetCurrRotation();
         Single[] GetCurrPosition();
         Single[] GetPVMatrix();
+        Single[] GetPVFOV();
 
         Int32 GetDepthBufferSize();
         Int32 GetLongDepthBufferSize();

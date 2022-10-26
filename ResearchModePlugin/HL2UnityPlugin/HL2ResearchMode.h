@@ -82,6 +82,7 @@ namespace winrt::HL2UnityPlugin::implementation
         com_array<float> GetCurrRotation();
         com_array<float> GetCurrPosition();
         com_array<float> GetPVMatrix();
+        com_array<float> GetPVFOV();
 
         std::mutex mu;
         std::shared_mutex m_frameMutex;
@@ -152,6 +153,7 @@ namespace winrt::HL2UnityPlugin::implementation
         float m_currRotation[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
         float m_currPosition[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
         float m_PVToWorld[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
+        float m_PVfov[2]{ 0,0 };
         std::atomic_bool m_depthSensorLoopStarted = false;
         std::atomic_bool m_PVLoopStarted = false;
         std::atomic_bool m_longDepthSensorLoopStarted = false;

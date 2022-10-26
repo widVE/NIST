@@ -315,6 +315,28 @@ namespace winrt::HL2UnityPlugin::implementation
                 if (PVtoWorld)
                 {
                     PVtoWorldtransform = PVtoWorld.Value();
+                    std::lock_guard<std::mutex> l(pHL2ResearchMode->mu);
+                    pHL2ResearchMode->m_PVToWorld[0] = PVtoWorldtransform.m11;
+                    pHL2ResearchMode->m_PVToWorld[1] = PVtoWorldtransform.m12;
+                    pHL2ResearchMode->m_PVToWorld[2] = PVtoWorldtransform.m13;
+                    pHL2ResearchMode->m_PVToWorld[3] = PVtoWorldtransform.m14;
+
+                    pHL2ResearchMode->m_PVToWorld[4] = PVtoWorldtransform.m21;
+                    pHL2ResearchMode->m_PVToWorld[5] = PVtoWorldtransform.m22;
+                    pHL2ResearchMode->m_PVToWorld[6] = PVtoWorldtransform.m23;
+                    pHL2ResearchMode->m_PVToWorld[7] = PVtoWorldtransform.m24;
+
+                    pHL2ResearchMode->m_PVToWorld[8] = PVtoWorldtransform.m31;
+                    pHL2ResearchMode->m_PVToWorld[9] = PVtoWorldtransform.m32;
+                    pHL2ResearchMode->m_PVToWorld[10] = PVtoWorldtransform.m33;
+                    pHL2ResearchMode->m_PVToWorld[11] = PVtoWorldtransform.m34;
+
+                    pHL2ResearchMode->m_PVToWorld[12] = PVtoWorldtransform.m41;
+                    pHL2ResearchMode->m_PVToWorld[13] = PVtoWorldtransform.m42;
+                    pHL2ResearchMode->m_PVToWorld[14] = PVtoWorldtransform.m43;
+                    pHL2ResearchMode->m_PVToWorld[15] = PVtoWorldtransform.m44;
+                    pHL2ResearchMode->m_PVfov[0] = fx;
+                    pHL2ResearchMode->m_PVfov[1] = fy;
                     //_PVtoWorldtransform = PVtoWorldtransform;
                 }
                 else
@@ -1460,6 +1482,14 @@ namespace winrt::HL2UnityPlugin::implementation
         com_array<float> colorToWorld = com_array<float>(std::move_iterator(m_PVToWorld), std::move_iterator(m_PVToWorld + 16));
 
         return colorToWorld;
+    }
+
+    com_array<float> HL2ResearchMode::GetPVFOV()
+    {
+        std::lock_guard<std::mutex> l(mu);
+        com_array<float> fov = com_array<float>(std::move_iterator(m_PVfov), std::move_iterator(m_PVfov + 2));
+
+        return fov;
     }
 
     // Set the reference coordinate system. Need to be set before the sensor loop starts; otherwise, default coordinate will be used.

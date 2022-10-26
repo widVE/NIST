@@ -1716,9 +1716,9 @@ public class ResearchModeVideoStream : MonoBehaviour
         {
 			//researchMode.SetLongDepthMapTextureUpdatedOff();
 			//Debug.Log("Starting Photo Capture");
-			/*float currTime = Time.time;
+			float currTime = Time.time;
 			
-			if(_lastCaptureTime == 0.0)
+			/*if(_lastCaptureTime == 0.0)
 			{
 				_lastCaptureTime = currTime;
 			}
@@ -1738,7 +1738,9 @@ public class ResearchModeVideoStream : MonoBehaviour
 				ushort[] frameTextureFiltered = researchMode.GetDepthMapBufferFiltered();
 				float[] pointCloudBuffer = researchMode.GetPointCloudBuffer();
 				float[] depthPos = researchMode.GetDepthToWorld();
-	
+				float[] camToWorld = researchMode.GetPVMatrix();
+				Matrix4x4 cameraToWorldMatrix = Matrix4x4.identity;
+				
 				int pointCloudLength = pointCloudBuffer.Length / 3;
 				Vector3[] pointCloudVector3 = new Vector3[pointCloudLength];
 				
@@ -1810,13 +1812,13 @@ public class ResearchModeVideoStream : MonoBehaviour
 				int stride = 4;
 				float denominator = 1.0f / 255.0f;
 				List<Color> colorArray = new List<Color>();
-				for (int i = 0; i < imageBufferList.Count; i += stride)
+				for (int i = 0; i < colorTextureBuffer.Length; i += stride)
 				{
-					int idx = imageBufferList.Count-stride-i;
-					float a = (int)(imageBufferList[i + 3]) * denominator;
-					float r = (int)(imageBufferList[i + 2]) * denominator;
-					float g = (int)(imageBufferList[i + 1]) * denominator;
-					float b = (int)(imageBufferList[i]) * denominator;
+					//int idx = colorTextureBuffer.Length-stride-i;
+					float a = (int)(colorTextureBuffer[i + 3]) * denominator;
+					float r = (int)(colorTextureBuffer[i + 2]) * denominator;
+					float g = (int)(colorTextureBuffer[i + 1]) * denominator;
+					float b = (int)(colorTextureBuffer[i]) * denominator;
 
 					colorArray.Add(new Color(r, g, b, a));
 				}
@@ -1834,6 +1836,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 				for(int i = 0; i < 16; ++i)
 				{
 					scanTrans[i] = depthPos[i];
+					cameraToWorldMatrix[i] = camToWorld[i];
 					//currPosMat[i] = currPos[i];
 					//currRotMat[i] = currRot[i];
 				}
@@ -1871,7 +1874,14 @@ public class ResearchModeVideoStream : MonoBehaviour
 
 				//scanTransPV is now the MVP matrix of the color camera, this is used to project back unprojected depth image data to the color image
 				//to look up what corresponding color matches the depth, if any
-
+				Matrix4x4 projectionMatrix = Matrix4x4.identity;
+				float[] fovVals = researchMode.GetPVFOV();
+				
+				projectionMatrix[0] = fovVals[0];
+				projectionMatrix[5] = fovVals[1];
+				projectionMatrix[8] = 373.018f;
+				projectionMatrix[9] = 200.805f;
+				
 				scanTransPV = projectionMatrix * worldToCamera;
 				
 				//scanTrans = zScale2 * scanTrans;	//don't want this here as this translates incorrectly...
