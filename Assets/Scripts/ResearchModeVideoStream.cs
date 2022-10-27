@@ -1718,14 +1718,15 @@ public class ResearchModeVideoStream : MonoBehaviour
 			//Debug.Log("Starting Photo Capture");
 			float currTime = Time.time;
 			
-			/*if(_lastCaptureTime == 0.0)
+			if(_lastCaptureTime == 0.0)
 			{
 				_lastCaptureTime = currTime;
 			}
 			
-			if(currTime - _lastCaptureTime > WriteTime)
+			if(currTime - _lastCaptureTime > 0.333f)
 			{
-				if(!_isCapturing)
+				_lastCaptureTime = currTime;
+				/*if(!_isCapturing)
 				{*/
 #if COLOR_FROM_PLUGIN
 
@@ -1879,8 +1880,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 				
 				projectionMatrix[0] = fovVals[0];
 				projectionMatrix[5] = fovVals[1];
-				projectionMatrix[8] = 373.018f;
-				projectionMatrix[9] = 200.805f;
+				projectionMatrix[2] = 373.018f;
+				projectionMatrix[6] = 200.805f;
 				
 				scanTransPV = projectionMatrix * worldToCamera;
 				
@@ -1998,7 +1999,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 #endif
 					
 				//}
-			//}
+			}
         }
 		
 		if(UnityEngine.Time.time - _startTimer > 30f)
