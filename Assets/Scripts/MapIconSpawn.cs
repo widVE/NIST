@@ -7,6 +7,7 @@ public class MapIconSpawn : MonoBehaviour
 {
     public GameObject currHeadset;
     public GameObject iconParent;
+    public GameObject map;
     // Start is called before the first frame update
     void Start()
     {
@@ -14,7 +15,14 @@ public class MapIconSpawn : MonoBehaviour
         //float x = -0.1121;
         //float y = 0.1224;
         //float z = -10.596918136310494 * 0.01;
-        iconParent.transform.localPosition = new Vector3((int)-0.1121, (int)0.1224, (int)(-10.596918136310494*0.01));
+        //iconParent.transform.localPosition = new Vector3(-1, 0, 0);
+
+        float x = (float)map.transform.position.x;
+        float y = (float)map.transform.position.y;
+        float z = (float)(map.transform.position.z - 0.125);
+
+        iconParent.transform.localPosition = new Vector3(x,y,z);
+
         //iconParent.transform.localPosition = new Vector3(x, y, z);
 
         // DisplayPNGMap();
