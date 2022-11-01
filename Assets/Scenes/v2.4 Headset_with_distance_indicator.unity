@@ -5961,6 +5961,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 291935030}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
+      propertyPath: map_parent
+      value: 
+      objectReference: {fileID: 335883421}
+    - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: _locationId
       value: 69e92dff-7138-4091-89c4-ed073035bfe6
       objectReference: {fileID: 0}

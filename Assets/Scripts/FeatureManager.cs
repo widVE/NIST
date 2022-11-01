@@ -560,10 +560,15 @@ public class FeatureManager : MonoBehaviour
 
         var feature_object = spawn_parent.transform.Find(string.Format("feature-{0}", id));
         var map_icon = mapParent.transform.Find(string.Format("feature-{0}", id));
-        if (feature_object && map_icon != null)
+        
+        if (feature_object)
         {
             Destroy(feature_object.gameObject);
+        }
+        if (map_icon)
+        {
             Destroy(map_icon.gameObject);
+
         }
     }
 

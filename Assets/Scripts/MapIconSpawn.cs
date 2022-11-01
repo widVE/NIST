@@ -20,12 +20,10 @@ public class MapIconSpawn : MonoBehaviour
         float x = (float)map.transform.position.x;
         float y = (float)map.transform.position.y;
         float z = (float)(map.transform.position.z - 0.125);
-
         iconParent.transform.localPosition = new Vector3(x,y,z);
 
-        //iconParent.transform.localPosition = new Vector3(x, y, z);
 
-        // DisplayPNGMap();
+         DisplayPNGMap();
     }
 
     // Update is called once per frame
@@ -49,9 +47,17 @@ public class MapIconSpawn : MonoBehaviour
         {
             Debug.Log("SUCCESS: " + results);
             var resultJSON = JsonUtility.FromJson<EasyVizAR.MapInfo>(results);
+            float mapTop = resultJSON.viewBox.top;
+            float mapLeft = resultJSON.viewBox.left;
+            float mapHeight = resultJSON.viewBox.height;
+            float mapWidth = resultJSON.viewBox.width;
+            Debug.Log("the top is: " + mapTop);
 
-            Debug.Log("the top is: " + resultJSON.viewBox.top);
-
+            //finding the origin of the QR Code
+            //float Rx = ((0 - mapLeft) / mapWidth);
+            //float Ry = ((0 - mapTop) / mapHeight);
+            //iconParent.transform.localPosition = new Vector3(, , (float)-0.125);
+            
 
 
             /*

@@ -64,6 +64,9 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	public bool isFeet;
 	public Vector3 head_pos;
 	public Vector3 cam_pos;
+	//for displaying headset icon
+	public GameObject map_parent;
+	public GameObject map_icon_spawn_parent;
 
 
 	// Start is called before the first frame update
@@ -346,6 +349,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		if(!_visualizePreviousLocal)
 		{
 			_localHeadset = Instantiate(_headsetPrefab, transform);
+			// TODO: add the headset icon for the headset users
+			
 			if(_localHeadset != null)
 			{
 				EasyVizARHeadset h = _localHeadset.GetComponent<EasyVizARHeadset>();
@@ -430,6 +435,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 					if(h.headsets[i].name == _localHeadsetName)
 					{
 						GameObject s = Instantiate(_headsetPrefab, transform);
+						// TODO: Add headsets icon to the map here
 						EasyVizARHeadset hs = s.GetComponent<EasyVizARHeadset>();
 						if(hs != null)
 						{
