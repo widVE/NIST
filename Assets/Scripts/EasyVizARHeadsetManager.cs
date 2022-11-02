@@ -66,7 +66,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	public Vector3 cam_pos;
 	//for displaying headset icon
 	public GameObject map_parent;
-	public GameObject map_icon_spawn_parent;
+	public GameObject map_icon;
 
 
 	// Start is called before the first frame update
@@ -349,7 +349,6 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		if(!_visualizePreviousLocal)
 		{
 			_localHeadset = Instantiate(_headsetPrefab, transform);
-			// TODO: add the headset icon for the headset users
 			
 			if(_localHeadset != null)
 			{
@@ -435,7 +434,16 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 					if(h.headsets[i].name == _localHeadsetName)
 					{
 						GameObject s = Instantiate(_headsetPrefab, transform);
-						// TODO: Add headsets icon to the map here
+						// TODO: Verify if this successfully add headsets icon to the map here
+						GameObject mapMarker = Instantiate(map_icon, map_parent.transform, false);
+						mapMarker.transform.localPosition = new Vector3(h.headsets[i].position.x, 0, h.headsets[i].position.z);
+						mapMarker.name = string.Format("headset-{0}", h.headsets[i].id);
+						Color myColor;
+						if (ColorUtility.TryParseHtmlString(h.headsets[i].color, out myColor))
+						{
+							mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+						}
+
 						EasyVizARHeadset hs = s.GetComponent<EasyVizARHeadset>();
 						if(hs != null)
 						{

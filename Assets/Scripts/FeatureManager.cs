@@ -508,13 +508,9 @@ public class FeatureManager : MonoBehaviour
         
         Debug.Log("Palm is active?: " + PalmMap.activeSelf);
 
-        //if (PalmMap.activeSelf)
-        //{
-            //Debug.Log("Got into spawning map markers!");
         GameObject mapMarker = Instantiate(map_icon_to_spawn, mapParent.transform, false);
         mapMarker.transform.localPosition = new Vector3(pos.x, 0, pos.z);
         mapMarker.name = string.Format("feature-{0}", feature.id);
-        // }
 
 
         //GameObject mapMarker = Instantiate(feature_to_spawn, mapParent.transform, false);
@@ -558,15 +554,19 @@ public class FeatureManager : MonoBehaviour
             feature_dictionary.Remove(id);
         }
 
-        var feature_object = spawn_parent.transform.Find(string.Format("feature-{0}", id));
-        var map_icon = mapParent.transform.Find(string.Format("feature-{0}", id));
-        
+        Transform feature_object = spawn_parent.transform.Find(string.Format("feature-{0}", id));
+        Transform map_icon = mapParent.transform.Find(string.Format("feature-{0}", id));
+        Debug.Log("Got into the delete method");
+        Debug.Log("deleting feature-"+id);
         if (feature_object)
         {
+            Debug.Log("deleted feature: " + id);
+
             Destroy(feature_object.gameObject);
         }
         if (map_icon)
         {
+            Debug.Log("deleted icon: "+ id);
             Destroy(map_icon.gameObject);
 
         }

@@ -37,7 +37,7 @@ namespace EasyVizAR
 	[System.Serializable]
 	public class Headset
 	{
-		// 
+		public string color; 
 		public int created;
 		public string id;
 		public string location_id;

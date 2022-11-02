@@ -29,7 +29,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     }
 
     [SerializeField]
-    string _locationId = "66a4e9f2-e978-4405-988e-e168a9429030";
+    string _locationId = "69e92dff-7138-4091-89c4-ed073035bfe6";
     public string LocationID
     {
         get { return _locationId; }

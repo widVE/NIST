@@ -123,11 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &46023205 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1492607365964717172, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
-  m_PrefabInstance: {fileID: 1810665664}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &46054712
 GameObject:
   m_ObjectHideFlags: 0
@@ -418,11 +413,6 @@ Transform:
 Transform:
   m_CorrespondingSourceObject: {fileID: 7244354893893614728, guid: 09d6c469c074395459ffbf079080f11b, type: 3}
   m_PrefabInstance: {fileID: 95083929}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &126597471 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 691170831096574497, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
-  m_PrefabInstance: {fileID: 1810665664}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &168399716
 GameObject:
@@ -1014,53 +1004,11 @@ MonoBehaviour:
   oldPos: {x: 0, y: 0, z: 0}
   newPos: {x: 0, y: 0, z: 0}
   _qrScanner: {fileID: 0}
---- !u!1 &335883421
+--- !u!1 &335883421 stripped
 GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 6272236855978299130, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+  m_PrefabInstance: {fileID: 1810665664}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 335883422}
-  - component: {fileID: 335883423}
-  m_Layer: 0
-  m_Name: Map_Spawn_Target
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &335883422
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 335883421}
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 126597471}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
---- !u!114 &335883423
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 335883421}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6335ff8fed030474a850e0152c887657, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currHeadset: {fileID: 1361342022}
-  iconParent: {fileID: 335883421}
-  map: {fileID: 46023205}
 --- !u!1 &349520856
 GameObject:
   m_ObjectHideFlags: 0
@@ -4926,6 +4874,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3728181045455103163, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: currHeadset
+      value: 
+      objectReference: {fileID: 1361342022}
     - target: {fileID: 6710163434822126697, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -5953,6 +5905,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
+      propertyPath: map_icon
+      value: 
+      objectReference: {fileID: 4402188086708784334, guid: d8bfdd92541e05d438e4d0d1945df5aa, type: 3}
+    - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: TextObject
       value: 
       objectReference: {fileID: 415639110}
@@ -5992,6 +5948,10 @@ PrefabInstance:
       propertyPath: _shouldCreateHeadsets
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
+      propertyPath: map_icon_spawn_parent
+      value: 
+      objectReference: {fileID: 4402188086708784334, guid: d8bfdd92541e05d438e4d0d1945df5aa, type: 3}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: _mapObjects.Array.size
       value: 3
