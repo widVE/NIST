@@ -313,10 +313,12 @@ public class FeatureManager : MonoBehaviour
     void ListFeatureCallBack(string result) {
         if (result != "error")
         {
+            
             foreach (EasyVizAR.Feature feature in feature_list.features)
             {
                 DeleteFeatureFromServer(feature.id);
             }
+            
 
             this.feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList> ("{\"features\":" + result + "}");
             
@@ -325,6 +327,7 @@ public class FeatureManager : MonoBehaviour
             foreach (EasyVizAR.Feature feature in feature_list.features)
             {
                 // This will add the feature if it is new or update an existing one.
+                //if (!feature_dictionary.ContainsValue(feature))
                 UpdateFeatureFromServer(feature);
             }
 
