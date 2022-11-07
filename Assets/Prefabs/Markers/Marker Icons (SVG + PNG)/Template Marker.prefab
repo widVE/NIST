@@ -746,6 +746,7 @@ MonoBehaviour:
   cam: {fileID: 0}
   cam_pos: {x: 0, y: 0, z: 0}
   feature: {fileID: 5318789042369293505}
+  feature_map: {fileID: 5318789042369293505, guid: 40f9c67d83a7bfb48b466cbac06b2f4f, type: 3}
   quad: {fileID: 8637939829010818463}
   isFeet: 0
   oldPos: {x: 0, y: 0, z: 0}
