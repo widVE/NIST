@@ -70,6 +70,9 @@ public class ResearchModeVideoStream : MonoBehaviour
     private Texture2D RRMediaTexture = null;
     private byte[] RRFrameData = null;
 	
+	[SerializeField]
+	float _captureTime = 1f;
+	
 	public RenderTexture _colorRT;
 	//public RenderTexture _depthRT;
 	
@@ -1723,7 +1726,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 				_lastCaptureTime = currTime;
 			}
 			
-			if(currTime - _lastCaptureTime > 0.333f)
+			if(currTime - _lastCaptureTime > _captureTime)
 			{
 				_lastCaptureTime = currTime;
 				/*if(!_isCapturing)
@@ -1866,7 +1869,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 				Matrix4x4 worldToCamera = scanTransPV.inverse;
 				
 				worldToCamera[3] = -worldToCamera[12];
-				worldToCamera[7] = worldToCamera[13];
+				worldToCamera[7] = -worldToCamera[13];
 				worldToCamera[11] = -worldToCamera[14];
 
 				//photoCaptureFrame.TryGetProjectionMatrix( out Matrix4x4 projectionMatrix);// out Matrix4x4 projectionMatrix);
@@ -1878,10 +1881,12 @@ public class ResearchModeVideoStream : MonoBehaviour
 				Matrix4x4 projectionMatrix = Matrix4x4.identity;
 				float[] fovVals = researchMode.GetPVFOV();
 				
-				projectionMatrix[0] = fovVals[0];
-				projectionMatrix[5] = fovVals[1];
-				projectionMatrix[2] = 373.018f;
-				projectionMatrix[6] = 200.805f;
+				//Debug.Log(fovVals[0] + " " + fovVals[1]);
+				
+				projectionMatrix[0] = 1f / fovVals[0];
+				projectionMatrix[5] = 1f / fovVals[1];
+				projectionMatrix[2] = -373.018f/fovVals[0];
+				projectionMatrix[6] = -200.805f/fovVals[1];
 				
 				scanTransPV = projectionMatrix * worldToCamera;
 				
@@ -1958,7 +1963,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 				{
 					//TODO - use above matrices to project color onto depth, write color image that matches depth image size and that have pixels with valid depth..
 					string filenameC = string.Format(@"CapturedImage{0}_n.png", currTime);
-					//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), targetTexture.EncodeToPNG());//ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
+					//string filenameC2 = string.Format(@"TargetImage{0}_n.png", currTime);
+					//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC2), targetTexture.EncodeToPNG());//ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
 					//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
 					string outPathColorImage = System.IO.Path.Combine(Application.persistentDataPath, filenameC);
 					File.WriteAllBytes(outPathColorImage, ImageConversion.EncodeArrayToPNG(_ourColor.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, (uint)_ourColor.width, (uint)_ourColor.height));
@@ -1972,13 +1978,14 @@ public class ResearchModeVideoStream : MonoBehaviour
 				//not using 16 bit depth as the raw depth buffer from the research mode plugin doesn't handle the sigma buffer within it ahead of time..
 				if(WriteImagesToDisk)
 				{
-
-					string filenameR = string.Format(@"CapturedImageRDepth{0}_n.exr", currTime);
+					string filename = string.Format(@"CapturedImageDepth{0}_n.png", currTime);
+					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(depthTextureFilteredBytes, UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm, DEPTH_WIDTH, DEPTH_HEIGHT));
+					/*string filenameR = string.Format(@"CapturedImageRDepth{0}_n.exr", currTime);
 					string filenameG = string.Format(@"CapturedImageGDepth{0}_n.exr", currTime);
 					string filenameB = string.Format(@"CapturedImageBDepth{0}_n.exr", currTime);
 					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameR), ImageConversion.EncodeArrayToEXR(_depthTexFromHololensX.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R32_SFloat, DEPTH_WIDTH, DEPTH_HEIGHT));
 					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameG), ImageConversion.EncodeArrayToEXR(_depthTexFromHololensY.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R32_SFloat, DEPTH_WIDTH, DEPTH_HEIGHT));
-					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameB), ImageConversion.EncodeArrayToEXR(_depthTexFromHololensZ.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R32_SFloat, DEPTH_WIDTH, DEPTH_HEIGHT));
+					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameB), ImageConversion.EncodeArrayToEXR(_depthTexFromHololensZ.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R32_SFloat, DEPTH_WIDTH, DEPTH_HEIGHT));*/
 				}
 				
 				if(WriteImagesToDisk)
@@ -1987,6 +1994,11 @@ public class ResearchModeVideoStream : MonoBehaviour
 					depthString = depthString + (scanTrans[4].ToString("F4") + " " + scanTrans[5].ToString("F4") + " " + scanTrans[6].ToString("F4") + " " + scanTrans[7].ToString("F4") + "\n");
 					depthString = depthString + (scanTrans[8].ToString("F4") + " " + scanTrans[9].ToString("F4") + " " + scanTrans[10].ToString("F4") + " " + scanTrans[11].ToString("F4") + "\n");
 					depthString = depthString + (scanTrans[12].ToString("F4") + " " + scanTrans[13].ToString("F4") + " " + scanTrans[14].ToString("F4") + " " + scanTrans[15].ToString("F4") + "\n");
+					
+					/*string depthString = cameraToWorldMatrix[0].ToString("F4") + " " + cameraToWorldMatrix[1].ToString("F4") + " " + cameraToWorldMatrix[2].ToString("F4") + " " + cameraToWorldMatrix[3].ToString("F4") + "\n";
+					depthString = depthString + (cameraToWorldMatrix[4].ToString("F4") + " " + cameraToWorldMatrix[5].ToString("F4") + " " + cameraToWorldMatrix[6].ToString("F4") + " " + projectionMatrix[0].ToString("F4") + "\n");
+					depthString = depthString + (cameraToWorldMatrix[8].ToString("F4") + " " + cameraToWorldMatrix[9].ToString("F4") + " " + cameraToWorldMatrix[10].ToString("F4") + " " + projectionMatrix[5].ToString("F4") + "\n");
+					depthString = depthString + (cameraToWorldMatrix[12].ToString("F4") + " " + cameraToWorldMatrix[13].ToString("F4") + " " + cameraToWorldMatrix[14].ToString("F4") + " " + cameraToWorldMatrix[15].ToString("F4") + "\n");*/
 					
 					string filenameTxt = string.Format(@"DepthToWorldMatrix{0}_n.txt", currTime);
 					System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxt), depthString);

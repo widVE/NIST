@@ -278,6 +278,22 @@ namespace winrt::HL2UnityPlugin::implementation
         }
     }
 
+    winrt::Windows::Foundation::IAsyncAction CreateLocalFile(const wchar_t* sName, winrt::Windows::Graphics::Imaging::SoftwareBitmap softwareBitmap)
+    {
+        winrt::Windows::Storage::StorageFolder storageFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
+        winrt::Windows::Storage::StorageFile saveTest = co_await storageFolder.CreateFileAsync(hstring(sName), winrt::Windows::Storage::CreationCollisionOption::ReplaceExisting);
+
+        winrt::Windows::Storage::Streams::IRandomAccessStream outputStream = co_await saveTest.OpenAsync(winrt::Windows::Storage::FileAccessMode::ReadWrite);
+        
+        winrt::Windows::Graphics::Imaging::BitmapEncoder be = co_await winrt::Windows::Graphics::Imaging::BitmapEncoder::CreateAsync(winrt::Windows::Graphics::Imaging::BitmapEncoder::JpegEncoderId(), outputStream);
+
+        be.SetSoftwareBitmap(softwareBitmap);
+
+        co_await be.FlushAsync();
+
+        
+    }
+
     void HL2ResearchMode::ColorSensorLoop(HL2ResearchMode* pHL2ResearchMode)
     {
         if (!pHL2ResearchMode->m_PVLoopStarted)
@@ -287,6 +303,8 @@ namespace winrt::HL2UnityPlugin::implementation
         else {
             return;
         }
+
+        unsigned int frameCount = 0;
 
         while (pHL2ResearchMode->m_PVLoopStarted)
         {
@@ -308,7 +326,7 @@ namespace winrt::HL2UnityPlugin::implementation
                 float fx = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().x;
                 float fy = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().y;
 
-                winrt::Windows::Foundation::Numerics::float4x4 PVtoWorldtransform;
+                //winrt::Windows::Foundation::Numerics::float4x4 PVtoWorldtransform;
                 auto PVtoWorld =
                     frame.CoordinateSystem().TryGetTransformTo(pHL2ResearchMode->m_refFrame);
                 
@@ -335,6 +353,7 @@ namespace winrt::HL2UnityPlugin::implementation
                     pHL2ResearchMode->m_PVToWorld[13] = PVtoWorldtransform.m42;
                     pHL2ResearchMode->m_PVToWorld[14] = PVtoWorldtransform.m43;
                     pHL2ResearchMode->m_PVToWorld[15] = PVtoWorldtransform.m44;
+
                     pHL2ResearchMode->m_PVfov[0] = fx;
                     pHL2ResearchMode->m_PVfov[1] = fy;
                     //_PVtoWorldtransform = PVtoWorldtransform;
@@ -350,6 +369,13 @@ namespace winrt::HL2UnityPlugin::implementation
                 // grab the frame data
                 winrt::Windows::Graphics::Imaging::SoftwareBitmap softwareBitmap = winrt::Windows::Graphics::Imaging::SoftwareBitmap::Convert(
                     frame.VideoMediaFrame().SoftwareBitmap(), winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Bgra8);
+                
+                /*wchar_t fName[50];
+                wprintf(fName, "test%u.jpg", frameCount);
+
+                CreateLocalFile(fName, softwareBitmap);*/
+
+                frameCount++;
 
                 int imageWidth = softwareBitmap.PixelWidth();
                 int imageHeight = softwareBitmap.PixelHeight();
@@ -593,6 +619,9 @@ namespace winrt::HL2UnityPlugin::implementation
                         pHL2ResearchMode->m_shortAbImageTexture = new UINT8[outBufferCount];
                     }
                     memcpy(pHL2ResearchMode->m_shortAbImageTexture, pAbTexture.get(), outBufferCount * sizeof(UINT8));
+
+                    //save color here as well...
+
                 }
                 pHL2ResearchMode->m_shortAbImageTextureUpdated = true;
                 pHL2ResearchMode->m_depthMapTextureUpdated = true;
