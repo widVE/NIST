@@ -67,6 +67,10 @@ PrefabInstance:
       propertyPath: constraintsManager
       value: 
       objectReference: {fileID: 1936987024441743337}
+    - target: {fileID: 7132239816822482889, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: feature_map
+      value: 
+      objectReference: {fileID: 2430657643644576839, guid: 34552eacdb62c7445b8531a16e496022, type: 3}
     - target: {fileID: 7862396145411509017, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
       propertyPath: m_Name
       value: warning

@@ -63,5 +63,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: Map Icon Marker Variant - biohazard
       objectReference: {fileID: 0}
+    - target: {fileID: 7132239816822482889, guid: 40f9c67d83a7bfb48b466cbac06b2f4f, type: 3}
+      propertyPath: feature
+      value: 
+      objectReference: {fileID: 8472836948503744904, guid: 5ead7e8dd87c9674e85d0767e91ca3df, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 40f9c67d83a7bfb48b466cbac06b2f4f, type: 3}

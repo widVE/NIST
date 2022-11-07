@@ -63,5 +63,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: Map Icon Marker Variant - extinguisher
       objectReference: {fileID: 0}
+    - target: {fileID: 7132239816822482889, guid: 40f9c67d83a7bfb48b466cbac06b2f4f, type: 3}
+      propertyPath: feature
+      value: 
+      objectReference: {fileID: 4331337373351478003, guid: c416e020249acc443a8242e08be7c901, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 40f9c67d83a7bfb48b466cbac06b2f4f, type: 3}

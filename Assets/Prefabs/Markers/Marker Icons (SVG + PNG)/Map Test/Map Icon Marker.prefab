@@ -750,7 +750,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3312077083037225709}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14cf7a2f492699c4594cd73beb00fc8d, type: 3}
   m_Name: 
@@ -761,6 +761,7 @@ MonoBehaviour:
   feature_map: {fileID: 5318789042369293505}
   quad: {fileID: 8637939829010818463}
   isFeet: 0
+  parent: {fileID: 0}
   oldPos: {x: 0, y: 0, z: 0}
   newPos: {x: 0, y: 0, z: 0}
 --- !u!224 &8818822813719591145 stripped

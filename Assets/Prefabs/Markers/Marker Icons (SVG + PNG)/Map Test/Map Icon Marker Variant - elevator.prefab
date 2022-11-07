@@ -63,5 +63,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: Map Icon Marker Variant - elevator
       objectReference: {fileID: 0}
+    - target: {fileID: 7132239816822482889, guid: 40f9c67d83a7bfb48b466cbac06b2f4f, type: 3}
+      propertyPath: feature
+      value: 
+      objectReference: {fileID: 4413004795778641156, guid: ee11c636ad58b8245a97fcbb09699bf0, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 40f9c67d83a7bfb48b466cbac06b2f4f, type: 3}

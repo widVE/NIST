@@ -63,5 +63,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: Map Icon Marker Variant - person
       objectReference: {fileID: 0}
+    - target: {fileID: 7132239816822482889, guid: 40f9c67d83a7bfb48b466cbac06b2f4f, type: 3}
+      propertyPath: feature
+      value: 
+      objectReference: {fileID: 4262304109175930143, guid: e3905b9128050d743b5c2739af4f9595, type: 3}
+    - target: {fileID: 7132239816822482889, guid: 40f9c67d83a7bfb48b466cbac06b2f4f, type: 3}
+      propertyPath: feature_map
+      value: 
+      objectReference: {fileID: 9092256845123000539, guid: c246fefea99c3ce43bb921421b44cd1e, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 40f9c67d83a7bfb48b466cbac06b2f4f, type: 3}

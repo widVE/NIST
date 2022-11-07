@@ -63,5 +63,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: Map Icon Marker Variant - warning
       objectReference: {fileID: 0}
+    - target: {fileID: 7132239816822482889, guid: 40f9c67d83a7bfb48b466cbac06b2f4f, type: 3}
+      propertyPath: feature
+      value: 
+      objectReference: {fileID: 5065242801546265607, guid: 413996b3d03ac3c4e8b1b84f725dd034, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 40f9c67d83a7bfb48b466cbac06b2f4f, type: 3}

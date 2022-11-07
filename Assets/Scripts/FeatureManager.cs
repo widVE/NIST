@@ -165,13 +165,13 @@ public class FeatureManager : MonoBehaviour
             };
         }
 
-        //StartCoroutine(FeatureCountFromServer()); --> will implement later if we want to delete feature from server
+        StartCoroutine(DisplayDist()); 
     }
 
     // Update is called once per frame
     void Update()
     {
-        showMapIcon();
+        //showMapIconDistance();
         /*
         // We should only need to call ListFeatures once on entering a new location.
         // After that, we can update the existing feature list from websocket events.
@@ -184,17 +184,17 @@ public class FeatureManager : MonoBehaviour
                 
     }
     
-    IEnumerator FeatureCountFromServer()
+    IEnumerator DisplayDist()
     {
         while (true)
         {
-            GetFeature();
+            showMapIconDistance();
             yield return new WaitForSeconds(1f);
         }
     }
     
 
-    public void showMapIcon()
+    public void showMapIconDistance()
     {
         if (!PalmMap.activeSelf)
         {
@@ -203,6 +203,15 @@ public class FeatureManager : MonoBehaviour
         else
         {
             mapParent.SetActive(true);
+        }
+
+        foreach (Transform child in mapParent.transform)
+        {
+            var feature = spawn_parent.transform.Find(child.name);
+            string input = feature.Find("Feature_Text").GetComponent<TextMeshPro>().text;
+            string dist = input.Substring(input.IndexOf(':') + 1);
+
+            child.Find("Feature_Text").GetComponent<TextMeshPro>().text = dist;
         }
     }
     // POST 
