@@ -49,6 +49,8 @@ public class FeatureManager : MonoBehaviour
     public GameObject map_user_icon;
     public GameObject map_warning_icon;
 
+    public GameObject headset_parent;
+
     //Added from SpawnListIndex
     public GameObject spawn_root;
     public GameObject spawn_parent;
@@ -98,6 +100,7 @@ public class FeatureManager : MonoBehaviour
 
     void Start()
     {
+        headset_parent = GameObject.Find("EasyVizARHeadsetManager");
 
         //Added from SpawnListIndex
         //populating the feature types dictionary 
@@ -207,12 +210,25 @@ public class FeatureManager : MonoBehaviour
 
         foreach (Transform child in mapParent.transform)
         {
-            var feature = spawn_parent.transform.Find(child.name);
-            string input = feature.Find("Feature_Text").GetComponent<TextMeshPro>().text;
-            string dist = input.Substring(input.IndexOf(':') + 1);
+            if (spawn_parent.transform.Find(child.name))
+            {
+                var feature = spawn_parent.transform.Find(child.name);
+                string input = feature.Find("Feature_Text").GetComponent<TextMeshPro>().text;
+                string dist = input.Substring(input.IndexOf(':') + 1);
+                child.Find("Feature_Text").GetComponent<TextMeshPro>().text = dist;
+            }
+            if (headset_parent.transform.Find(child.name))
+            {
+                var feature = headset_parent.transform.Find(child.name);
+                string input = feature.Find("Headset_Dist").GetComponent<TextMeshPro>().text;
+                string dist = input.Substring(input.IndexOf(':') + 1);
+                Debug.Log("Got into the headset update");
+                Debug.Log("this distance in headset is: " + dist);
+                child.Find("Feature_Text").GetComponent<TextMeshPro>().text = dist;
 
-            child.Find("Feature_Text").GetComponent<TextMeshPro>().text = dist;
+            }
         }
+        
     }
     // POST 
     public void CreateNewFeature(string feature_type, GameObject marker) //TODO: change the feature_type from int to string
@@ -521,7 +537,10 @@ public class FeatureManager : MonoBehaviour
         Debug.Log("Palm is active?: " + PalmMap.activeSelf);
 
         GameObject mapMarker = Instantiate(map_icon_to_spawn, mapParent.transform, false);
-        mapMarker.transform.localPosition = new Vector3(pos.x, 0, pos.z);
+        float y_offset = -1f*(feature.id / 100f);
+        mapMarker.transform.localPosition = new Vector3(pos.x, y_offset, pos.z);
+       //mapMarker.transform.localPosition = new Vector3(pos.x, 0, pos.z);
+
         mapMarker.name = string.Format("feature-{0}", feature.id);
 
 

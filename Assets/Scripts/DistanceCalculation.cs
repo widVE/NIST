@@ -16,17 +16,31 @@ public class DistanceCalculation : MonoBehaviour
 	public Vector3 oldPos;
 	public Vector3 newPos;
 
+	//For displaying the headset icon on map 
+	public GameObject headset_icon;
+	public GameObject mapParent;
+	public GameObject headset_parent;
+	public EasyVizAR.HeadsetList headset_list;
+
 	// Start is called before the first frame update
 	void Start()
     {
 
 		cam = GameObject.Find("Main Camera");
-		//capsule = cur_prefeb.transform.Find("Capsule");
+		mapParent = GameObject.Find("Map_Spawn_Target");
+		headset_parent = GameObject.Find("EasyVizARHeadsetManager");
 		isFeet = true;
 		
 		cam_pos = cam.GetComponent<Transform>().position;
 		oldPos = cam_pos;
 		CalcHeadsetDist();
+		// instantiate the headset icon
+		GameObject mapMarker = Instantiate(headset_icon, mapParent.transform, false);
+		mapMarker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
+		mapMarker.name = cur_prefab.name;
+
+		// TODO: get all the headset
+		GetHeadsets();
 		StartCoroutine(HeadsetDistanceCalculate());
 
 	}
@@ -34,11 +48,24 @@ public class DistanceCalculation : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
-		//cam_pos = cam.GetComponent<Transform>().position;
 
-		//CalcHeadsetDist();
     }
 
+	public void GetHeadsets()
+    {
+		EasyVizARServer.Instance.Get("headsets?location_id=" + headset_parent.GetComponent<EasyVizARHeadsetManager>().LocationID, EasyVizARServer.JSON_TYPE, GetHeadsetsCallback);
+
+	}
+
+	void GetHeadsetsCallback(string resultData)
+	{
+		if (resultData != "error" && resultData.Length > 2)
+		{
+			headset_list = JsonUtility.FromJson<EasyVizAR.HeadsetList>("{\"headsets\":" + resultData + "}");
+
+		}
+	}
+	// This function does 2 things: 1) calculate the distance 2) display the headset icon on palm map.
 	public void CalcHeadsetDist()
 	{
 		cam_pos = cam.GetComponent<Transform>().position;
@@ -64,6 +91,28 @@ public class DistanceCalculation : MonoBehaviour
 		{
 			display_dist_text.text = cur_prefab.name + " : " + distance.ToString() + "m";
 		}
+
+		// displaying headset on map here 
+		if (mapParent.transform.Find(cur_prefab.name))
+        {
+			Destroy(mapParent.transform.Find(cur_prefab.name).gameObject);
+			GameObject mapMarker = Instantiate(headset_icon, mapParent.transform, false);
+			mapMarker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
+			mapMarker.name = cur_prefab.name;
+			foreach (EasyVizAR.Headset child in headset_list.headsets)
+			{
+				if (child.name == mapMarker.name)
+                {
+					Color myColor;
+					if (ColorUtility.TryParseHtmlString(child.color, out myColor))
+					{
+						mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+					}
+
+				}
+			}
+
+		}
 	}
 
 
@@ -78,6 +127,7 @@ public class DistanceCalculation : MonoBehaviour
 			float change_dist = (float)Math.Sqrt(change_x + change_z);
 			if (change_dist > 0.05)
 			{
+				GetHeadsets();
 				CalcHeadsetDist();
 				oldPos = newPos;
 			}
