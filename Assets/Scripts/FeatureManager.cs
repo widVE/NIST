@@ -196,7 +196,7 @@ public class FeatureManager : MonoBehaviour
         }
     }
     
-
+    // This will display the distance indicator on the map
     public void showMapIconDistance()
     {
         if (!PalmMap.activeSelf)

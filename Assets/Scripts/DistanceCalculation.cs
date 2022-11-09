@@ -21,6 +21,7 @@ public class DistanceCalculation : MonoBehaviour
 	public GameObject mapParent;
 	public GameObject headset_parent;
 	public EasyVizAR.HeadsetList headset_list;
+	public int cnt;
 
 	// Start is called before the first frame update
 	void Start()
@@ -34,11 +35,6 @@ public class DistanceCalculation : MonoBehaviour
 		cam_pos = cam.GetComponent<Transform>().position;
 		oldPos = cam_pos;
 		CalcHeadsetDist();
-		// instantiate the headset icon
-		GameObject mapMarker = Instantiate(headset_icon, mapParent.transform, false);
-		mapMarker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
-		mapMarker.name = cur_prefab.name;
-
 		// TODO: get all the headset
 		GetHeadsets();
 		StartCoroutine(HeadsetDistanceCalculate());
@@ -93,9 +89,13 @@ public class DistanceCalculation : MonoBehaviour
 		}
 
 		// displaying headset on map here 
-		if (mapParent.transform.Find(cur_prefab.name))
+		//var temp = mapParent.transform.Find(cur_prefab.name);
+		if (mapParent != null)
         {
-			Destroy(mapParent.transform.Find(cur_prefab.name).gameObject);
+			if (mapParent.transform.Find(cur_prefab.name))
+            {
+				Destroy(mapParent.transform.Find(cur_prefab.name).gameObject);
+			}
 			GameObject mapMarker = Instantiate(headset_icon, mapParent.transform, false);
 			mapMarker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
 			mapMarker.name = cur_prefab.name;
@@ -103,6 +103,7 @@ public class DistanceCalculation : MonoBehaviour
 			{
 				if (child.name == mapMarker.name)
                 {
+					Debug.Log("Got here");
 					Color myColor;
 					if (ColorUtility.TryParseHtmlString(child.color, out myColor))
 					{
