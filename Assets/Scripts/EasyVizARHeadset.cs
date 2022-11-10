@@ -32,6 +32,7 @@ public class EasyVizARHeadset : MonoBehaviour
 	public bool PostPositionChanges => _postPositionChanges;
 	
 	public string _headsetID;
+	public Color _color = Color.red;
 	
 	public string _locationID;// will change this back to just string w/o public
 	
@@ -117,8 +118,12 @@ public class EasyVizARHeadset : MonoBehaviour
 		_headsetID = h.id;
 		_headsetName = h.name;
 		_locationID = h.location_id;
-		
-		if(_showPositionChanges)
+
+		Color newColor;
+		if (ColorUtility.TryParseHtmlString(h.color, out newColor))
+			_color = newColor;
+
+		if (_showPositionChanges)
 		{
 			GetPastPositions();
 		}
@@ -184,7 +189,11 @@ public class EasyVizARHeadset : MonoBehaviour
 			_headsetID = h.id;
 			_headsetName = h.name;
 			_locationID = h.location_id;
-			
+
+			Color newColor;
+			if (ColorUtility.TryParseHtmlString(h.color, out newColor))
+				_color = newColor;
+
 			Debug.Log("Successfully connected headset: " + h.name);
 		}
 		else
