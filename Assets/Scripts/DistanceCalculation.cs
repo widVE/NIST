@@ -21,6 +21,7 @@ public class DistanceCalculation : MonoBehaviour
 	public GameObject mapParent;
 	public GameObject headset_parent;
 	public EasyVizAR.HeadsetList headset_list;
+	public EasyVizAR.Headset cur_headset;
 	public int cnt;
 
 	// Start is called before the first frame update
@@ -58,7 +59,13 @@ public class DistanceCalculation : MonoBehaviour
 		if (resultData != "error" && resultData.Length > 2)
 		{
 			headset_list = JsonUtility.FromJson<EasyVizAR.HeadsetList>("{\"headsets\":" + resultData + "}");
-
+			foreach (EasyVizAR.Headset child in headset_list.headsets)
+            {
+				if (child.name == cur_prefab.name)
+                {
+					cur_headset = child;
+                }
+            }
 		}
 	}
 	// This function does 2 things: 1) calculate the distance 2) display the headset icon on palm map.
@@ -99,6 +106,17 @@ public class DistanceCalculation : MonoBehaviour
 			GameObject mapMarker = Instantiate(headset_icon, mapParent.transform, false);
 			mapMarker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
 			mapMarker.name = cur_prefab.name;
+			GetHeadsets();
+			if (cur_headset != null)
+            {
+				Color myColor;
+				if (ColorUtility.TryParseHtmlString(cur_headset.color, out myColor))
+				{
+					mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+				}
+
+			}
+			/*
 			foreach (EasyVizAR.Headset child in headset_list.headsets)
 			{
 				if (child.name == mapMarker.name)
@@ -112,6 +130,7 @@ public class DistanceCalculation : MonoBehaviour
 
 				}
 			}
+			*/
 
 		}
 	}
