@@ -195,7 +195,7 @@ public class EasyVizARHeadset : MonoBehaviour
 	
 	void PostPosition()
 	{
-		EasyVizAR.Headset h = new EasyVizAR.Headset();
+		EasyVizAR.HeadsetPositionUpdate h = new EasyVizAR.HeadsetPositionUpdate();
 		h.position = new EasyVizAR.Position();
 		h.position.x = -transform.position.x;
 		h.position.y = transform.position.y;
