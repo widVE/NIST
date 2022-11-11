@@ -217,18 +217,7 @@ public class FeatureManager : MonoBehaviour
                 string dist = input.Substring(input.IndexOf(':') + 1);
                 child.Find("Feature_Text").GetComponent<TextMeshPro>().text = dist;
             }
-            if (headset_parent.transform.Find(child.name))
-            {
-                var feature = headset_parent.transform.Find(child.name);
-                Debug.Log("the headset name: " + feature.gameObject.name);
-                string input = feature.Find("Headset_Dist").GetComponent<TextMeshPro>().text;
-                Debug.Log("The input is: " + input);
-                string dist = input.Substring(input.IndexOf(':') + 1);
-                Debug.Log("Got into the headset update");
-                Debug.Log("this distance in headset is: " + dist);
-                child.Find("Feature_Text").GetComponent<TextMeshPro>().text = dist;
-
-            }
+            
         }
         
     }

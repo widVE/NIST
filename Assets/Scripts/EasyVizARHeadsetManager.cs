@@ -371,11 +371,15 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 			}
 		}
 	}
-
+	// This is where we are instantiating the GameObject of Headset in Unity
     public void CreateRemoteHeadset(EasyVizAR.Headset remoteHeadset)
     {
         GameObject s = Instantiate(_headsetPrefab, transform);
         EasyVizARHeadset hs = s.GetComponent<EasyVizARHeadset>();
+		// Getting the reference for displaying the headset
+		DistanceCalculation d_s = s.GetComponent<DistanceCalculation>();
+		d_s.mapParent = map_parent;
+
         if(hs != null)
         {
             s.name = remoteHeadset.name;

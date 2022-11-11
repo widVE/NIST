@@ -29,15 +29,15 @@ public class DistanceCalculation : MonoBehaviour
     {
 
 		cam = GameObject.Find("Main Camera");
-		mapParent = GameObject.Find("Map_Spawn_Target");
+		//mapParent = GameObject.Find("Map_Spawn_Target"); // NOTE: this is returning null when object is inactive
 		headset_parent = GameObject.Find("EasyVizARHeadsetManager");
 		isFeet = true;
 		
 		cam_pos = cam.GetComponent<Transform>().position;
 		oldPos = cam_pos;
 		CalcHeadsetDist();
-		// TODO: get all the headset
-		GetHeadsets();
+		// get all the headset
+		//GetHeadsets();
 		StartCoroutine(HeadsetDistanceCalculate());
 
 	}
@@ -47,27 +47,6 @@ public class DistanceCalculation : MonoBehaviour
     {
 
     }
-
-	public void GetHeadsets()
-    {
-		EasyVizARServer.Instance.Get("headsets?location_id=" + headset_parent.GetComponent<EasyVizARHeadsetManager>().LocationID, EasyVizARServer.JSON_TYPE, GetHeadsetsCallback);
-
-	}
-
-	void GetHeadsetsCallback(string resultData)
-	{
-		if (resultData != "error" && resultData.Length > 2)
-		{
-			headset_list = JsonUtility.FromJson<EasyVizAR.HeadsetList>("{\"headsets\":" + resultData + "}");
-			foreach (EasyVizAR.Headset child in headset_list.headsets)
-            {
-				if (child.name == cur_prefab.name)
-                {
-					cur_headset = child;
-                }
-            }
-		}
-	}
 	// This function does 2 things: 1) calculate the distance 2) display the headset icon on palm map.
 	public void CalcHeadsetDist()
 	{
@@ -96,9 +75,10 @@ public class DistanceCalculation : MonoBehaviour
 		}
 
 		// displaying headset on map here 
-		//var temp = mapParent.transform.Find(cur_prefab.name);
 		if (mapParent != null)
         {
+			Debug.Log("rendered headset icon on map");
+
 			if (mapParent.transform.Find(cur_prefab.name))
             {
 				Destroy(mapParent.transform.Find(cur_prefab.name).gameObject);
@@ -106,31 +86,19 @@ public class DistanceCalculation : MonoBehaviour
 			GameObject mapMarker = Instantiate(headset_icon, mapParent.transform, false);
 			mapMarker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
 			mapMarker.name = cur_prefab.name;
-			GetHeadsets();
-			if (cur_headset != null)
-            {
-				Color myColor;
-				if (ColorUtility.TryParseHtmlString(cur_headset.color, out myColor))
-				{
-					mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
-				}
-
-			}
+			mapMarker.transform.Find("Feature_Text").GetComponent<TextMeshPro>().text = distance.ToString() + "ft";
+			//cur_prefab.GetComponent<EasyVizARHeadset>()
+			//GetHeadsets();
+			Color myColor = cur_prefab.GetComponent<EasyVizARHeadset>()._color;
 			/*
-			foreach (EasyVizAR.Headset child in headset_list.headsets)
+			if (ColorUtility.TryParseHtmlString(cur_headset.color, out myColor))
 			{
-				if (child.name == mapMarker.name)
-                {
-					Debug.Log("Got here");
-					Color myColor;
-					if (ColorUtility.TryParseHtmlString(child.color, out myColor))
-					{
-						mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
-					}
-
-				}
 			}
+			mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
 			*/
+			mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+
+
 
 		}
 	}
@@ -147,13 +115,39 @@ public class DistanceCalculation : MonoBehaviour
 			float change_dist = (float)Math.Sqrt(change_x + change_z);
 			if (change_dist > 0.05)
 			{
-				GetHeadsets();
+				//GetHeadsets();
 				CalcHeadsetDist();
 				oldPos = newPos;
 			}
 			yield return new WaitForSeconds(1f);
 		}
 	}
+
+
+
+	/*
+	public void GetHeadsets()
+    {
+		EasyVizARServer.Instance.Get("headsets?location_id=" + headset_parent.GetComponent<EasyVizARHeadsetManager>().LocationID, EasyVizARServer.JSON_TYPE, GetHeadsetsCallback);
+
+	}
+
+	void GetHeadsetsCallback(string resultData)
+	{
+		if (resultData != "error" && resultData.Length > 2)
+		{
+			headset_list = JsonUtility.FromJson<EasyVizAR.HeadsetList>("{\"headsets\":" + resultData + "}");
+			foreach (EasyVizAR.Headset child in headset_list.headsets)
+            {
+				if (child.name == cur_prefab.name)
+                {
+					cur_headset = child;
+					CalcHeadsetDist();
+                }
+            }
+		}
+	}
+	*/
 
 
 }
