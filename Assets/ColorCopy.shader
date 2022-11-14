@@ -86,18 +86,18 @@ Shader "Unlit/CopyColorShader" {
 						projPos.y = 1.0 - projPos.y;
 						if(projPos.x >= 0 && projPos.x < 1.0 && projPos.y >= 0 && projPos.y < 1.0)// && projPos.z >= 0 && projPos.z < 1.0)	//adding the z checks causes it to not work...
 						{
-							return tex2D(_MainTex, projPos.xy); 
+							return tex2D(_MainTex, projPos.xy);//UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, projPos.xy); 
 						}
 						else
 						{
-							return fixed4(0,0,0,0);//
+							return fixed4(1,0,0,1);//
 						}
 					}
 					//return UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, i.texcoord) * _Color;
-					return fixed4(0,0,0,0);//
+					return fixed4(0,1,0,1);//
 				}
 				
-				return fixed4(0,0,0,0);//
+				return fixed4(0,0,1,1);//
             }
             ENDCG
 

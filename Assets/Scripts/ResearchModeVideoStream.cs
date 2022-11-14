@@ -82,6 +82,10 @@ public class ResearchModeVideoStream : MonoBehaviour
 	Texture2D _ourColor = null;
 	//Texture2D _ourDepth = null;
 	Texture2D targetTexture = null;
+#if COLOR_FROM_PLUGIN
+	Texture2D targetTexturePNG = null;
+#endif
+
 #if ONLY_UNPROJECT
 	ComputeBuffer _ourPoints = null;
 	ComputeBuffer _ourColorBuffer = null;
@@ -287,7 +291,9 @@ public class ResearchModeVideoStream : MonoBehaviour
 
 		// Depth sensor should be initialized in only one mode
         targetTexture = new Texture2D(COLOR_WIDTH, COLOR_HEIGHT, TextureFormat.RGBA32, false);
-		
+#if COLOR_FROM_PLUGIN
+		targetTexturePNG = new Texture2D(COLOR_WIDTH, COLOR_HEIGHT, TextureFormat.RGBA32, false);
+#endif
 		_ourColor = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RGBA32, false);
 		//_ourDepth = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.R8, false);
 #if ONLY_UNPROJECT
@@ -1041,8 +1047,10 @@ public class ResearchModeVideoStream : MonoBehaviour
 							}
 
 							targetTexture.SetPixels(colorArray.ToArray());
-							targetTexture.Apply();
 
+							targetTexture.Apply();
+							
+							
 							Matrix4x4 scanTrans = Matrix4x4.identity;
 							//Matrix4x4 currPosMat = Matrix4x4.identity;
 							//Matrix4x4 currRotMat = Matrix4x4.identity;
@@ -1089,6 +1097,15 @@ public class ResearchModeVideoStream : MonoBehaviour
 							
 							photoCaptureFrame.TryGetProjectionMatrix( out Matrix4x4 projectionMatrix);// out Matrix4x4 projectionMatrix);
 							
+							/*projectionMatrix = Matrix4x4.identity;
+							float[] fovVals = researchMode.GetPVFOV();
+							
+							//Debug.Log(fovVals[0] + " " + fovVals[1]);
+							
+							projectionMatrix[0] = 1f / fovVals[0];
+							projectionMatrix[5] = 1f / fovVals[1];
+							projectionMatrix[2] = -373.018f/fovVals[0];
+							projectionMatrix[6] = -200.805f/fovVals[1];*/
 
 							//scanTransPV is now the MVP matrix of the color camera, this is used to project back unprojected depth image data to the color image
 							//to look up what corresponding color matches the depth, if any
@@ -1198,7 +1215,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 							{
 								//TODO - use above matrices to project color onto depth, write color image that matches depth image size and that have pixels with valid depth..
 								string filenameC = string.Format(@"CapturedImage{0}_n.png", currTime);
-								//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), targetTexture.EncodeToPNG());//ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
+								//string filenameC2 = string.Format(@"CapturedImageBig{0}_n.png", currTime);
+								//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC2), targetTexture.EncodeToPNG());//ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
 								//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
 								string outPathColorImage = System.IO.Path.Combine(Application.persistentDataPath, filenameC);
 								File.WriteAllBytes(outPathColorImage, ImageConversion.EncodeArrayToPNG(_ourColor.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, (uint)_ourColor.width, (uint)_ourColor.height));
@@ -1827,8 +1845,18 @@ public class ResearchModeVideoStream : MonoBehaviour
 					colorArray.Add(new Color(r, g, b, a));
 				}
 
+				//targetTexture.SetPixelData(ImageConversion.EncodeArrayToPNG(colorArray.ToArray(), targetTexture.graphicsFormat, COLOR_WIDTH, COLOR_HEIGHT, COLOR_WIDTH*4), 0, 0);
+
 				targetTexture.SetPixels(colorArray.ToArray());
 				targetTexture.Apply();
+				
+				//targetTexture.LoadRawTextureData(ImageConversion.EncodeArrayToPNG(colorArray.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, COLOR_WIDTH, COLOR_HEIGHT));
+				
+				//targetTexture.Apply();
+
+				//ImageConversion.LoadImage(targetTexturePNG, targetTexture.EncodeToPNG(), false);
+				
+				//targetTexturePNG.Apply();
 
 				Matrix4x4 scanTrans = Matrix4x4.identity;
 				//Matrix4x4 currPosMat = Matrix4x4.identity;
@@ -1883,10 +1911,17 @@ public class ResearchModeVideoStream : MonoBehaviour
 				
 				//Debug.Log(fovVals[0] + " " + fovVals[1]);
 				
+				Camera c = Camera.main;
+				
 				projectionMatrix[0] = 1f / fovVals[0];
 				projectionMatrix[5] = 1f / fovVals[1];
-				projectionMatrix[2] = -373.018f/fovVals[0];
-				projectionMatrix[6] = -200.805f/fovVals[1];
+				projectionMatrix[8] = 373.018f/fovVals[0];
+				projectionMatrix[9] = 200.805f/fovVals[1];
+				projectionMatrix[10] = 1f;//-(c.farClipPlane + c.nearClipPlane)/(c.farClipPlane - c.nearClipPlane);
+				projectionMatrix[11] = 0f;//1f;
+				projectionMatrix[14] = 0f;//-2f * (c.farClipPlane * c.nearClipPlane)/(c.farClipPlane - c.nearClipPlane);
+				projectionMatrix[15] = 0f;
+				
 				
 				scanTransPV = projectionMatrix * worldToCamera;
 				
@@ -1963,11 +1998,13 @@ public class ResearchModeVideoStream : MonoBehaviour
 				{
 					//TODO - use above matrices to project color onto depth, write color image that matches depth image size and that have pixels with valid depth..
 					string filenameC = string.Format(@"CapturedImage{0}_n.png", currTime);
-					//string filenameC2 = string.Format(@"TargetImage{0}_n.png", currTime);
-					//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC2), targetTexture.EncodeToPNG());//ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
+					string filenameC2 = string.Format(@"TargetImage{0}_n.png", currTime);
+					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC2), targetTexture.EncodeToPNG());
+					
+					//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC2), ImageConversion.EncodeArrayToPNG(colorArray.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, COLOR_WIDTH, COLOR_HEIGHT));
 					//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));
 					string outPathColorImage = System.IO.Path.Combine(Application.persistentDataPath, filenameC);
-					File.WriteAllBytes(outPathColorImage, ImageConversion.EncodeArrayToPNG(_ourColor.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, (uint)_ourColor.width, (uint)_ourColor.height));
+					File.WriteAllBytes(outPathColorImage, _ourColor.EncodeToPNG());//ImageConversion.EncodeArrayToPNG(_ourColor.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, (uint)_ourColor.width, (uint)_ourColor.height));
 					//if(_firstHeadsetSend)
 					{
 					//	StartCoroutine(UploadImage(outPathColorImage, _ourColor));
