@@ -68,9 +68,6 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	public GameObject map_parent;
 	public GameObject map_icon;
 
-	public Color _color = Color.red;
-
-
 
 	// Start is called before the first frame update
 	void Start()
@@ -382,14 +379,12 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		// Getting the reference for displaying the headset
 		DistanceCalculation d_s = s.GetComponent<DistanceCalculation>();
 		d_s.mapParent = map_parent;
-		hs.mapParent = map_parent;
 
-		if (hs != null)
+        if(hs != null)
         {
             s.name = remoteHeadset.name;
             hs.AssignValuesFromJson(remoteHeadset);
             _activeHeadsets.Add(hs);
-
         }
     }
 
@@ -402,9 +397,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             if(hs.Name == previousName)
             {
                 hs.AssignValuesFromJson(remoteHeadset);
-				Debug.Log("the id: " + hs.Name + " new color: " +  remoteHeadset.color);
-				
-				return;
+                return;
             }
         }
 
@@ -422,14 +415,6 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             {
                 Destroy(hs.gameObject);
                 _activeHeadsets.RemoveAt(i);
-				/*
-				if (map_parent != null)
-                {
-					Debug.Log("the delete name: " + name);
-					GameObject delete_headset = map_parent.transform.Find(hs.Name).gameObject;
-					Destroy(delete_headset);
-                }
-				*/
                 break;
             }
 

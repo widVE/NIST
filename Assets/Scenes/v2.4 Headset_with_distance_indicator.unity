@@ -3090,7 +3090,6 @@ MonoBehaviour:
   _locationId: 69e92dff-7138-4091-89c4-ed073035bfe6
   featureManager: {fileID: 734827754}
   headsetManager: {fileID: 1361342022}
-  map_parent: {fileID: 335883421}
   _qrScanner: {fileID: 291935030}
 --- !u!1 &925204594
 GameObject:
