@@ -48,6 +48,9 @@ public class EasyVizARHeadset : MonoBehaviour
 	
 	//if local, we set this to the MainCamera (the Hololens 2's camera)
 	Camera _mainCamera;
+
+	//
+	public GameObject mapParent;
 	
     // Start is called before the first frame update
     void Start()

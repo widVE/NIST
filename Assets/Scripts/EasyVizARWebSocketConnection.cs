@@ -38,6 +38,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
     public GameObject featureManager = null;
     public GameObject headsetManager = null;
+    public GameObject map_parent;
 
     // Attach QRScanner GameObject so we can listen for location change events.
     [SerializeField]
@@ -192,6 +193,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
                 {
                     HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
                     headsetManager.GetComponent<EasyVizARHeadsetManager>().DeleteRemoteHeadset(ev.previous.name);
+                    //Destroy(map_parent.transform.Find(ev.previous.name).gameObject);
                     break;
                 }
             case "features:created":

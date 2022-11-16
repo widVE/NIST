@@ -13,18 +13,6 @@ public class MapIconSpawn : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //MapTest3 --> Location
-        //float x = -0.1121;
-        //float y = 0.1224;
-        //float z = -10.596918136310494 * 0.01;
-        //iconParent.transform.localPosition = new Vector3(-1, 0, 0);
-/*
-        float x = (float)mainMap.transform.position.x;
-        float y = (float)mainMap.transform.position.y;
-        float z = (float)(mainMap.transform.position.z - 0.5);
-        iconParent.transform.localPosition = new Vector3(x,y,z);
-*/
-
          DisplayPNGMap();
     }
 
@@ -62,24 +50,6 @@ public class MapIconSpawn : MonoBehaviour
             float icon_z_offset = -0.12f;
 
             iconParent.transform.localPosition = new Vector3(icon_origin_x, icon_origin_y, icon_z_offset); // the scale may need to be adjusted
-            //mapCollection.transform.localScale = new Vector3((float)(1/mapWidth), (float)(1/mapHeight), 0);
-
-
-            //finding the origin of the QR Code
-            //float Rx = ((0 - mapLeft) / mapWidth);
-            //float Ry = ((0 - mapTop) / mapHeight);
-            //iconParent.transform.localPosition = new Vector3(, , (float)-0.125);
-
-
-
-            /*
-            //this is where we might want to scale the finder based on the viewbox
-            foreach (Transform child in iconParent.transform)
-            {
-                 //child.transform.localPosition = 
-            }
-            */
-
         }
         else
         {
