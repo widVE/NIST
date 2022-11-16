@@ -4961,6 +4961,10 @@ PrefabInstance:
       propertyPath: mapCollection
       value: 
       objectReference: {fileID: 665494468}
+    - target: {fileID: 3728181045455103163, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: feature_parent
+      value: 
+      objectReference: {fileID: 1968206798}
     - target: {fileID: 6710163434822126697, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: m_Mesh
       value: 

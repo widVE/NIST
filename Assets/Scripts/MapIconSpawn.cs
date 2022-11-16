@@ -10,10 +10,13 @@ public class MapIconSpawn : MonoBehaviour
     public GameObject map;
     public GameObject mainMap;
     public GameObject mapCollection;
+    public GameObject feature_parent;
     // Start is called before the first frame update
     void Start()
     {
          DisplayPNGMap();
+        //StartCoroutine(DeleteIcon());
+
     }
 
     // Update is called once per frame
@@ -56,4 +59,34 @@ public class MapIconSpawn : MonoBehaviour
             Debug.Log("ERROR: " + results);
         }
     }
+    // this method is used to track when we should delete the map icon 
+    // cannot do it synchronously in the DeleteRemoteHeadset() from the EasyVizARHeadsetManager
+    // because we cannot find inactive gameobject to delete.
+    IEnumerator DeleteIcon()
+    {
+        foreach (Transform child in iconParent.transform)
+        {
+            if (feature_parent.transform.Find(child.gameObject.name).gameObject != null)
+            {
+                continue;
+            }
+            else
+            {
+                if (currHeadset.transform.Find(child.gameObject.name).gameObject != null)
+                {
+                    continue;
+                }
+                else
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+            
+        }
+
+        yield return new WaitForSeconds(1f);
+
+
+    }
+
 }

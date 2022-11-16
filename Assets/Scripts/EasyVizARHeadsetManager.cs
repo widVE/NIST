@@ -422,12 +422,13 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             {
                 Destroy(hs.gameObject);
                 _activeHeadsets.RemoveAt(i);
+				// TODO: if this works, delete the DeleteIcon() from MapIconSpawn.cs
 				/*
 				if (map_parent != null)
                 {
 					Debug.Log("the delete name: " + name);
-					GameObject delete_headset = map_parent.transform.Find(hs.Name).gameObject;
-					Destroy(delete_headset);
+					Transform delete_headset = map_parent.transform.Find(hs.Name);
+					Destroy(delete_headset.gameObject);
                 }
 				*/
                 break;
