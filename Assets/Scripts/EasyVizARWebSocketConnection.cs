@@ -186,13 +186,13 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
             case "headsets:updated":
                 {
                     HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
-                    headsetManager.GetComponent<EasyVizARHeadsetManager>().UpdateRemoteHeadset(ev.previous.name, ev.current);
+                    headsetManager.GetComponent<EasyVizARHeadsetManager>().UpdateRemoteHeadset(ev.previous.id, ev.current);
                     break;
                 }
             case "headsets:deleted":
                 {
                     HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
-                    headsetManager.GetComponent<EasyVizARHeadsetManager>().DeleteRemoteHeadset(ev.previous.name);
+                    headsetManager.GetComponent<EasyVizARHeadsetManager>().DeleteRemoteHeadset(ev.previous.id);
                     //Destroy(map_parent.transform.Find(ev.previous.name).gameObject);
                     break;
                 }

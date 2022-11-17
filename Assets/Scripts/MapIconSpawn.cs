@@ -59,34 +59,69 @@ public class MapIconSpawn : MonoBehaviour
             Debug.Log("ERROR: " + results);
         }
     }
+    /*
     // this method is used to track when we should delete the map icon 
     // cannot do it synchronously in the DeleteRemoteHeadset() from the EasyVizARHeadsetManager
     // because we cannot find inactive gameobject to delete.
     IEnumerator DeleteIcon()
     {
-        foreach (Transform child in iconParent.transform)
+        Debug.Log("Got into DeleteIcon()");
+        if (iconParent != null)
         {
-            if (feature_parent.transform.Find(child.gameObject.name).gameObject != null)
+            foreach (Transform child in iconParent.transform)
             {
-                continue;
-            }
-            else
-            {
-                if (currHeadset.transform.Find(child.gameObject.name).gameObject != null)
+                Debug.Log("checking on child name: " + child.gameObject.name);
+                //Transform feature = feature_parent.transform.Find(child.gameObject.name);
+                if (feature_parent.transform.Find(child.gameObject.name).gameObject != null)
                 {
                     continue;
                 }
                 else
                 {
-                    Destroy(child.gameObject);
+                    if (currHeadset.transform.Find(child.gameObject.name).gameObject != null)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        Destroy(child.gameObject);
+                    }
                 }
+
             }
-            
         }
+        
 
         yield return new WaitForSeconds(1f);
 
 
+    }
+    */
+
+    IEnumerator DeleteIcon()
+    {
+        Debug.Log("Got into DeleteIcon()");
+        if (iconParent != null)
+        {
+            foreach (Transform child in iconParent.transform)
+            {
+                Debug.Log("checking on child name: " + child.gameObject.name);
+                Transform feature = feature_parent.transform.Find(child.gameObject.name);
+                Transform headset = currHeadset.transform.Find(child.gameObject.name);
+                if (feature)
+                {
+                    continue;
+                }
+                if (headset)
+                {
+                    continue;
+                }
+                Destroy(child.gameObject);
+            }
+        }
+
+
+        yield return new WaitForSeconds(1f);
     }
 
 }

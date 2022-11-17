@@ -48,9 +48,7 @@ public class EasyVizARHeadset : MonoBehaviour
 	
 	//if local, we set this to the MainCamera (the Hololens 2's camera)
 	Camera _mainCamera;
-
-	//
-	public GameObject mapParent;
+	public GameObject map_parent; // This will get populated by EasyVizARHeadsetManager.cs
 	
     // Start is called before the first frame update
     void Start()
@@ -125,6 +123,13 @@ public class EasyVizARHeadset : MonoBehaviour
 		Color newColor;
 		if (ColorUtility.TryParseHtmlString(h.color, out newColor))
 			_color = newColor;
+
+		Transform headset_icon = map_parent.transform.Find(h.id);
+		if (headset_icon)
+		{
+			headset_icon.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", newColor);
+		}
+
 
 		if (_showPositionChanges)
 		{

@@ -382,28 +382,28 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		// Getting the reference for displaying the headset
 		DistanceCalculation d_s = s.GetComponent<DistanceCalculation>();
 		d_s.mapParent = map_parent;
-		hs.mapParent = map_parent;
+		hs.map_parent = map_parent;
 
 		if (hs != null)
         {
-            s.name = remoteHeadset.name;
+            s.name = remoteHeadset.id;
             hs.AssignValuesFromJson(remoteHeadset);
             _activeHeadsets.Add(hs);
 
         }
     }
 
-    public void UpdateRemoteHeadset(string previousName, EasyVizAR.Headset remoteHeadset)
+    public void UpdateRemoteHeadset(string previous_id, EasyVizAR.Headset remoteHeadset)
     {
         foreach(var hs in _activeHeadsets)
         {
             // We should be matching on headset ID because names can change and
             // are also not guaranteed to be unique, though they should be.
-            if(hs.Name == previousName)
+            if(hs._headsetID == previous_id)
             {
+				Debug.Log("got into update remote headset");
                 hs.AssignValuesFromJson(remoteHeadset);
-				Debug.Log("the id: " + hs.Name + " new color: " +  remoteHeadset.color);
-				
+				//Debug.Log("the id: " + hs.Name + " new color: " +  remoteHeadset.color);				
 				return;
             }
         }
@@ -412,25 +412,32 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         CreateRemoteHeadset(remoteHeadset);
     }
 
-    public void DeleteRemoteHeadset(string name)
+    public void DeleteRemoteHeadset(string id)
     {
         int i = 0;
         foreach(var hs in _activeHeadsets)
         {
             // Definitely should be matching on ID rather than name.
-            if(hs.Name == name)
+            if(hs._headsetID == id)
             {
                 Destroy(hs.gameObject);
                 _activeHeadsets.RemoveAt(i);
 				// TODO: if this works, delete the DeleteIcon() from MapIconSpawn.cs
-				/*
+				
 				if (map_parent != null)
                 {
 					Debug.Log("the delete name: " + name);
-					Transform delete_headset = map_parent.transform.Find(hs.Name);
-					Destroy(delete_headset.gameObject);
-                }
-				*/
+					Transform delete_headset = map_parent.transform.Find(hs._headsetID);
+					if (delete_headset)
+                    {
+						Debug.Log("Found and Destroyed the headset");
+						Destroy(delete_headset.gameObject);
+
+					}
+				}
+				
+				
+				
                 break;
             }
 
@@ -458,8 +465,10 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 						EasyVizARHeadset hs = s.GetComponent<EasyVizARHeadset>();
 						if(hs != null)
 						{
-							s.name = h.headsets[i].name;
-							if(_localMaterial != null)
+							//s.name = h.headsets[i].name;
+							s.name = h.headsets[i].id;
+
+							if (_localMaterial != null)
 							{
 								s.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
 							}

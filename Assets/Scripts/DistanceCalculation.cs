@@ -24,11 +24,12 @@ public class DistanceCalculation : MonoBehaviour
 	public EasyVizAR.Headset cur_headset;
 	public int cnt = 0; // keep tracks of if map_icon has been displayed
 	public GameObject map_icon_holder;
+	public float curr_distance;
 
 	// Start is called before the first frame update
 	void Start()
     {
-
+		cnt = 0;
 		cam = GameObject.Find("Main Camera");
 		//mapParent = GameObject.Find("Map_Spawn_Target"); // NOTE: this is returning null when object is inactive
 		headset_parent = GameObject.Find("EasyVizARHeadsetManager");
@@ -46,11 +47,13 @@ public class DistanceCalculation : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
+		/*
 		if (cnt == 1)
         {
 			Color myColor = cur_prefab.GetComponent<EasyVizARHeadset>()._color;
 			map_icon_holder.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
         }
+		*/
     }
 	// This function does 2 things: 1) calculate the distance 2) display the headset icon on palm map.
 	public void CalcHeadsetDist()
@@ -68,6 +71,7 @@ public class DistanceCalculation : MonoBehaviour
 			z_distance = (float)(z_distance * 3.281);
 		}
 		float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
+		curr_distance = distance;
 		if (isFeet)
 		{
 			display_dist_text.text = cur_prefab.name + " : " + distance.ToString() + "ft";
