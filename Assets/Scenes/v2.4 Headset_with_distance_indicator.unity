@@ -6025,6 +6025,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: 30d693ff62c571241b431ef4e206b09a, type: 2}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
+      propertyPath: headsetManager
+      value: 
+      objectReference: {fileID: 1361342022}
+    - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: headset_marker
       value: 
       objectReference: {fileID: 7921857766092395872, guid: 972ca2cdcae494941a6a064c9ff1dd4c, type: 3}

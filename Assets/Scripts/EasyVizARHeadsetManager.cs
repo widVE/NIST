@@ -56,18 +56,9 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	public GameObject horizontal_offset_slider;
 	public GameObject vertical_offset_slider;
 
-	// For displaying distance
-	public GameObject headset_marker;
-	public GameObject cam;
-	public GameObject headsets_parent;
-	public GameObject TextObject;
-	public bool isFeet;
-	public Vector3 head_pos;
-	public Vector3 cam_pos;
 	//for displaying headset icon
 	public GameObject map_parent;
-	public GameObject map_icon;
-
+	public GameObject headsetManager;
 	public Color _color = Color.red;
 
 
@@ -94,11 +85,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 				}
 			};
         }
-		/*
-		isFeet = true;
-		head_pos = Vector3.zero;
-        cam_pos = cam.GetComponent<Transform>().position;
-		*/
+		
 	}
 
     // Update is called once per frame
@@ -382,6 +369,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		// Getting the reference for displaying the headset
 		DistanceCalculation d_s = s.GetComponent<DistanceCalculation>();
 		d_s.mapParent = map_parent;
+		d_s.headset_name = remoteHeadset.name;
 		hs.map_parent = map_parent;
 
 		if (hs != null)
@@ -417,10 +405,16 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         int i = 0;
         foreach(var hs in _activeHeadsets)
         {
-            // Definitely should be matching on ID rather than name.
+            // Definitely should be matching on ID rather than name.--> changed 
             if(hs._headsetID == id)
             {
-                Destroy(hs.gameObject);
+                //Destroy(hs.gameObject); //this wasn't working for some unkn
+				Transform cur_headset = headsetManager.transform.Find(hs._headsetID);
+				if (cur_headset)
+                {
+					Destroy(cur_headset.gameObject);
+                }
+
                 _activeHeadsets.RemoveAt(i);
 				// TODO: if this works, delete the DeleteIcon() from MapIconSpawn.cs
 				
