@@ -22,7 +22,7 @@ public class DistanceCalculation : MonoBehaviour
 	public GameObject headset_parent;
 	public EasyVizAR.HeadsetList headset_list;
 	public EasyVizAR.Headset cur_headset;
-	public string headset_name;
+	public string headset_name; // this is set in the EasyVizARHeadsetManager.cs script 
 
 	// Start is called before the first frame update
 	void Start()
