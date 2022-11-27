@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "HL2ResearchMode.h"
 #include "HL2ResearchMode.g.cpp"
-#include "VideoCameraStreamer.h"
-#include "IVideoFrameSink.h"
+//#include "VideoCameraStreamer.h"
+//#include "IVideoFrameSink.h"
 #include <codecvt>
 
 #define COLOR_FROM_PLUGIN
@@ -238,19 +238,16 @@ namespace winrt::HL2UnityPlugin::implementation
     void HL2ResearchMode::StartPVCameraLoop()
     {
         StartColorAsync();
-        /*if (m_pVideoFrameProcessor != nullptr)
-        {
-            OutputDebugString(L"Starting PV Camera Loop...\n");
-            m_pVideoFrameProcessor->StartAsync();
-        }*/
     }
 
     winrt::Windows::Foundation::IAsyncAction HL2ResearchMode::StartColorAsync()
     {
         winrt::Windows::Media::Capture::Frames::MediaFrameReaderStartStatus status = co_await m_mediaFrameReader.StartAsync();
         winrt::check_bool(status == winrt::Windows::Media::Capture::Frames::MediaFrameReaderStartStatus::Success);
-
+#ifdef COLOR_FROM_PLUGIN
+#else
         m_pColorUpdateThread = new std::thread(HL2ResearchMode::ColorSensorLoop, this);
+#endif
     
         m_OnFrameArrivedRegistration = m_mediaFrameReader.FrameArrived(
             { this, &HL2ResearchMode::OnFrameArrived });
@@ -273,12 +270,10 @@ namespace winrt::HL2UnityPlugin::implementation
     {
         if (winrt::Windows::Media::Capture::Frames::MediaFrameReference frame = sender.TryAcquireLatestFrame())
         {
-            std::lock_guard<std::shared_mutex> lock(m_frameMutex);
+#ifdef COLOR_FROM_PLUGIN
+            std::lock_guard<std::mutex> l(mu);
             m_latestFrame = frame;
-
-            /*float fx = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().x;
-            float fy = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().y;
-
+            /*
             winrt::Windows::Foundation::Numerics::float4x4 PVtoWorldtransform;
             auto PVtoWorld =
                 frame.CoordinateSystem().TryGetTransformTo(m_refFrame);
@@ -307,10 +302,14 @@ namespace winrt::HL2UnityPlugin::implementation
                 m_PVToWorld[14] = PVtoWorldtransform.m43;
                 m_PVToWorld[15] = PVtoWorldtransform.m44;
 
-                m_PVfov[0] = fx;
-                m_PVfov[1] = fy;
                 //_PVtoWorldtransform = PVtoWorldtransform;
             }*/
+#else
+            std::lock_guard<std::shared_mutex> lock(m_frameMutex);
+            m_latestFrame = frame;
+
+           
+#endif
         }
     }
 
@@ -349,13 +348,15 @@ namespace winrt::HL2UnityPlugin::implementation
             {
                 winrt::Windows::Media::Capture::Frames::MediaFrameReference frame = pHL2ResearchMode->m_latestFrame;
 
-                float fx = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().x;
-                float fy = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().y;
+                //float fx = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().x;
+                //float fy = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().y;
 
                 winrt::Windows::Foundation::Numerics::float4x4 PVtoWorldtransform;
-                auto PVtoWorld =
+                winrt::Windows::Foundation::Numerics::Matrix4x4 PVtoWorld =
                     frame.CoordinateSystem().TryGetTransformTo(pHL2ResearchMode->m_refFrame);
-                
+                //winrt::Windows::Foundation::Numerics::Matrix4x4 worldToPV = winrt::Windows::Foundation::Numerics::Matrix4x4.Identity;
+                //winrt::Windows::Foundation::Numerics::Matrix4x4.Invert(PVToWorld, &worldToPV);
+
                 if (PVtoWorld)
                 {
                     PVtoWorldtransform = PVtoWorld.Value();
@@ -801,7 +802,9 @@ namespace winrt::HL2UnityPlugin::implementation
 
                 XMVECTOR roiCenter = XMLoadFloat3(&roiCenterFloat);
                 XMVECTOR roiBound = XMLoadFloat3(&roiBoundFloat);
-
+#if COLOR_FROM_PLUGIN
+                VECTOR[] depthPts = new VECTOR[resolution.Height*resolution.Width]
+#endif
                 for (UINT i = 0; i < resolution.Height; i++)
                 {
                     for (UINT j = 0; j < resolution.Width; j++)
@@ -827,6 +830,9 @@ namespace winrt::HL2UnityPlugin::implementation
                             if (FAILED(hr))
                             {
                                 z = 0.0f;
+                                depthPts[idx].x = 0f;
+                                depthPts[idx].y = 0f;
+                                depthPts[idx].z = 0f;
                                 pointCloud.push_back(xy[0]);// XMVectorGetX(pointInWorld));
                                 pointCloud.push_back(xy[1]);// XMVectorGetY(pointInWorld));
                                 pointCloud.push_back(z);
@@ -855,6 +861,10 @@ namespace winrt::HL2UnityPlugin::implementation
                             /*if (!pHL2ResearchMode->m_useRoiFilter ||
                                 (pHL2ResearchMode->m_useRoiFilter && XMVector3InBounds(pointInWorld - roiCenter, roiBound)))
                             {*/
+                            float d = (float)depth/1000f;
+                            depthPts[idx].x = xy[0]*d;
+                            depthPts[idx].y = xy[1]*d;
+                            depthPts[idx].z = z*d;
                             pointCloud.push_back(xy[0]);// XMVectorGetX(pointInWorld));
                             pointCloud.push_back(xy[1]);// XMVectorGetY(pointInWorld));
                             pointCloud.push_back(z);// -XMVectorGetZ(pointInWorld));
@@ -887,9 +897,142 @@ namespace winrt::HL2UnityPlugin::implementation
                         }*/
                     }
                 }
-
+                
+#if COLOR_FROM_PLUGIN
+               
                 pHL2ResearchMode->mu.lock();
-                   
+
+                winrt::Windows::Foundation::Numerics::Matrix4x4 worldToPV = winrt::Windows::Foundation::Numerics::Matrix4x4.Identity;
+
+                if (pHL2ResearchMode->m_latestFrame != nullptr)
+                {
+                    winrt::Windows::Media::Capture::Frames::MediaFrameReference frame = pHL2ResearchMode->m_latestFrame;
+
+                    //float fx = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().x;
+                    //float fy = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().y;
+
+                    winrt::Windows::Foundation::Numerics::float4x4 PVtoWorldtransform;
+                    winrt::Windows::Foundation::Numerics::Matrix4x4 PVtoWorld =
+                        frame.CoordinateSystem().TryGetTransformTo(pHL2ResearchMode->m_refFrame);
+                    
+                    winrt::Windows::Foundation::Numerics::Matrix4x4.Invert(PVToWorld, &worldToPV);
+
+                    if (PVtoWorld)
+                    {
+                        PVtoWorldtransform = PVtoWorld.Value();
+                        std::lock_guard<std::mutex> l(pHL2ResearchMode->mu);
+                        pHL2ResearchMode->m_PVToWorld[0] = PVtoWorldtransform.m11;
+                        pHL2ResearchMode->m_PVToWorld[1] = PVtoWorldtransform.m12;
+                        pHL2ResearchMode->m_PVToWorld[2] = PVtoWorldtransform.m13;
+                        pHL2ResearchMode->m_PVToWorld[3] = PVtoWorldtransform.m14;
+
+                        pHL2ResearchMode->m_PVToWorld[4] = PVtoWorldtransform.m21;
+                        pHL2ResearchMode->m_PVToWorld[5] = PVtoWorldtransform.m22;
+                        pHL2ResearchMode->m_PVToWorld[6] = PVtoWorldtransform.m23;
+                        pHL2ResearchMode->m_PVToWorld[7] = PVtoWorldtransform.m24;
+
+                        pHL2ResearchMode->m_PVToWorld[8] = PVtoWorldtransform.m31;
+                        pHL2ResearchMode->m_PVToWorld[9] = PVtoWorldtransform.m32;
+                        pHL2ResearchMode->m_PVToWorld[10] = PVtoWorldtransform.m33;
+                        pHL2ResearchMode->m_PVToWorld[11] = PVtoWorldtransform.m34;
+
+                        pHL2ResearchMode->m_PVToWorld[12] = PVtoWorldtransform.m41;
+                        pHL2ResearchMode->m_PVToWorld[13] = PVtoWorldtransform.m42;
+                        pHL2ResearchMode->m_PVToWorld[14] = PVtoWorldtransform.m43;
+                        pHL2ResearchMode->m_PVToWorld[15] = PVtoWorldtransform.m44;
+
+                        //pHL2ResearchMode->m_PVfov[0] = fx;
+                        //pHL2ResearchMode->m_PVfov[1] = fy;
+                        //_PVtoWorldtransform = PVtoWorldtransform;
+                    }
+                    else
+                    {
+    #if DBG_ENABLE_VERBOSE_LOGGING
+                        OutputDebugStringW(L"Streamer::SendFrame: Could not locate frame.\n");
+    #endif
+                        return;
+                    }
+
+                    // grab the frame data
+                    winrt::Windows::Graphics::Imaging::SoftwareBitmap softwareBitmap = winrt::Windows::Graphics::Imaging::SoftwareBitmap::Convert(
+                        frame.VideoMediaFrame().SoftwareBitmap(), winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Bgra8);
+                    
+                    /*wchar_t fName[50];
+                    wprintf(fName, "test%u.jpg", frameCount);
+
+                    CreateLocalFile(fName, softwareBitmap);*/
+
+                    frameCount++;
+
+                    int imageWidth = softwareBitmap.PixelWidth();
+                    int imageHeight = softwareBitmap.PixelHeight();
+
+                    int pixelStride = 4;
+                    int scaleFactor = 1;
+
+                    int rowStride = imageWidth * pixelStride;
+
+                    // Get bitmap buffer object of the frame
+                    winrt::Windows::Graphics::Imaging::BitmapBuffer bitmapBuffer = softwareBitmap.LockBuffer(winrt::Windows::Graphics::Imaging::BitmapBufferAccessMode::Read);
+
+                    // Get raw pointer to the buffer object
+                    uint32_t pixelBufferDataLength = 0;
+                    uint8_t* pixelBufferData;
+
+                    auto spMemoryBufferByteAccess{ bitmapBuffer.CreateReference()
+                        .as<::Windows::Foundation::IMemoryBufferByteAccess>() };
+
+                    try
+                    {
+                        spMemoryBufferByteAccess->
+                            GetBuffer(&pixelBufferData, &pixelBufferDataLength);
+                    }
+                    catch (winrt::hresult_error const& ex)
+                    {
+                        winrt::hresult hr = ex.code(); // HRESULT_FROM_WIN32
+                        winrt::hstring message = ex.message();
+                        OutputDebugStringW(L"VideoCameraStreamer::SendFrame: Failed to get buffer with ");
+                        OutputDebugStringW(message.c_str());
+                        OutputDebugStringW(L"\n");
+                    }
+
+                    pHL2ResearchMode->mu.lock();
+                    if (pHL2ResearchMode->m_pixelBufferData == 0)
+                    {
+                        pHL2ResearchMode->m_pixelBufferData = new UINT8[pixelBufferDataLength];
+                        pHL2ResearchMode->m_colorBufferSize = pixelBufferDataLength;
+                    }
+
+                    //std::vector<uint8_t> imageBufferAsVector;
+                    /*for (int row = 0; row < imageHeight; row += scaleFactor)
+                    {
+                        for (int col = 0; col < rowStride; col += scaleFactor * pixelStride)
+                        {
+                            for (int j = 0; j < pixelStride - 1; j++)
+                            {
+                                //imageBufferAsVector.emplace_back(
+                                    //pixelBufferData[row * rowStride + col + j]);
+                                pHL2ResearchMode->m_pixelBufferData[row * rowStride + col + j] = pixelBufferData[row * rowStride + col + j];
+                            }
+                        }
+                    }*/
+
+                    memcpy(pHL2ResearchMode->m_pixelBufferData, pixelBufferData, pHL2ResearchMode->m_colorBufferSize); 
+
+                    for (UINT i = 0; i < resolution.Height; i++)
+                    {
+                        for (UINT j = 0; j < resolution.Width; j++)
+                        {
+                            UINT idx = resolution.Width * i + j;
+
+                            
+                        }
+                    }
+
+                }
+                
+                pHL2ResearchMode->mu.unlock();
+#endif 
                 //std::lock_guard<std::mutex> l(pHL2ResearchMode->mu);
                 // save point cloud
                 if (!pHL2ResearchMode->m_pointCloud)

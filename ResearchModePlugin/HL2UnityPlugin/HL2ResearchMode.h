@@ -189,6 +189,8 @@ namespace winrt::HL2UnityPlugin::implementation
         DirectX::XMMATRIX m_RFCameraPoseInvMatrix;
         DirectX::XMFLOAT4X4 m_RFCameraPoseSide;
         DirectX::XMMATRIX m_RFCameraPoseInvMatrixSide;
+        DirectX::XMFLOAT4X4 m_PVCameraPose;
+        DirectX::XMMATRIX m_PVCameraPoseInvMatrix;
         std::thread* m_pDepthUpdateThread;
         std::thread* m_pLongDepthUpdateThread;
         std::thread* m_pSpatialCamerasFrontUpdateThread;

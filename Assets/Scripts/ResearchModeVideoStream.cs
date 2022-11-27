@@ -571,12 +571,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 		}
 		//Debug.Log(_currWidth + " " +_currHeight);
 
-		/*if(_allOctantBuffer == null)
-		{
-			_allOctantBuffer = new ComputeBuffer((int)TOTAL_NUM_OCTANTS, sizeof(int));
-			_allOctantBuffer.SetData(octantToBufferMapGPU);
-		}*/
-
 		if(bigVolumeBuffer == null)
 		{
 			bigVolumeBuffer = new ComputeBuffer((int)NUM_GRIDS*(int)TOTAL_CELLS/2, sizeof(uint));
@@ -589,10 +583,8 @@ public class ResearchModeVideoStream : MonoBehaviour
 			bigColorBuffer.SetData(bigColorData);
 		}
 
-
 		_tsdfShader.SetBuffer(clearID, "volumeBuffer", bigVolumeBuffer);
 		_tsdfShader.SetBuffer(clearID, "volumeColorBuffer", bigColorBuffer);
-		
 
 		_tsdfShader.SetInt("numVolumes", (int)NUM_GRIDS);
 		if((NUM_GRIDS*TOTAL_CELLS+1023)/1024 > 65535)
@@ -681,7 +673,6 @@ public class ResearchModeVideoStream : MonoBehaviour
 		_tsdfShader.SetBuffer(renderID, "renderBuffer", _pointRenderBuffer);
 		
 	}
-
 
 	int ManageMemory()
 	{
