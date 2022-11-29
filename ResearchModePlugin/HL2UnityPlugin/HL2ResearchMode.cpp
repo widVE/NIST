@@ -833,9 +833,9 @@ namespace winrt::HL2UnityPlugin::implementation
                                 depthPts[idx].x = 0.0f;
                                 depthPts[idx].y = 0.0f;
                                 depthPts[idx].z = 0.0f;
-                                pointCloud.push_back(xy[0]);// XMVectorGetX(pointInWorld));
-                                pointCloud.push_back(xy[1]);// XMVectorGetY(pointInWorld));
-                                pointCloud.push_back(z);
+                                //pointCloud.push_back(xy[0]);// XMVectorGetX(pointInWorld));
+                                //pointCloud.push_back(xy[1]);// XMVectorGetY(pointInWorld));
+                                //pointCloud.push_back(z);
                                 continue;
                             }
 
@@ -865,9 +865,9 @@ namespace winrt::HL2UnityPlugin::implementation
                             depthPts[idx].x = xy[0]*d;
                             depthPts[idx].y = xy[1]*d;
                             depthPts[idx].z = z*d;
-                            pointCloud.push_back(xy[0]);// XMVectorGetX(pointInWorld));
-                            pointCloud.push_back(xy[1]);// XMVectorGetY(pointInWorld));
-                            pointCloud.push_back(z);// -XMVectorGetZ(pointInWorld));
+                            //pointCloud.push_back(xy[0]);// XMVectorGetX(pointInWorld));
+                            //pointCloud.push_back(xy[1]);// XMVectorGetY(pointInWorld));
+                            //pointCloud.push_back(z);// -XMVectorGetZ(pointInWorld));
                         //}
                         }
 
@@ -1079,10 +1079,18 @@ namespace winrt::HL2UnityPlugin::implementation
                             UINT cIdx = resolution.Width * screenPointsView[idx].Y + screenPointsView[idx].X;
                             if (cIdx < (resolution.Width * resolution.Height))
                             {
+                                
                                 UINT8 r = pHL2ResearchMode->m_pixelBufferData[cIdx * 4];
                                 UINT8 g = pHL2ResearchMode->m_pixelBufferData[cIdx * 4 + 1];
                                 UINT8 b = pHL2ResearchMode->m_pixelBufferData[cIdx * 4 + 2];
                                 UINT8 a = pHL2ResearchMode->m_pixelBufferData[cIdx * 4 + 3];
+
+                                pointCloud.push_back(depthPts[idx].x);
+                                pointCloud.push_back(depthPts[idx].y);
+                                pointCloud.push_back(depthPts[idx].z);
+                                pointCloud.push_back((float)r/255.0f));
+                                pointCloud.push_back((float)g/255.0f));
+                                pointCloud.push_back((float)b/255.0f));
                             }
                         }
                     }
@@ -1095,7 +1103,7 @@ namespace winrt::HL2UnityPlugin::implementation
                 if (!pHL2ResearchMode->m_pointCloud)
                 {
                     OutputDebugString(L"Create Space for point cloud...\n");
-                    pHL2ResearchMode->m_pointCloud = new float[outBufferCount * 3];
+                    pHL2ResearchMode->m_pointCloud = new float[outBufferCount * 6];
                 }
 
                 memcpy(pHL2ResearchMode->m_pointCloud, pointCloud.data(), pointCloud.size() * sizeof(float));

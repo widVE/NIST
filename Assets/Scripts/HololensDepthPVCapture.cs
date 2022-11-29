@@ -414,6 +414,22 @@ public class HololensDepthPVCapture : MonoBehaviour
             
             if (frameTexture.Length > 0)
             {
+				float[] pointCloudBuffer = researchMode.GetPointCloudBuffer();
+
+				if (pointCloudBuffer.Length > 0)
+                {	
+                    string debugOut = Path.Combine(Application.persistentDataPath, DateTime.Now.ToString("M_dd_yyyy_hh_mm_ss_")+_fileOutNumber.ToString()+".xyz");
+                    _fileOutNumber++;
+                    StreamWriter s = new StreamWriter(File.Open(debugOut, FileMode.Create));
+                    
+                    for (int i = 0; i < pointCloudLength; i+=6)
+                    {
+                        //pointCloudVector3[i] = new Vector3(pointCloudBuffer[3 * i], pointCloudBuffer[3 * i + 1], pointCloudBuffer[3 * i + 2]);
+                        s.Write(i.ToString() + ": " + pointCloudBuffer[i*6].x.ToString("F4") + " " + pointCloudBuffer[i*6+1].y.ToString("F4")+ " " + pointCloudBuffer[i].z.ToString("F4") + "\n");
+                    }
+                    s.Close();
+                }
+
                 /*byte[] colorTextureBuffer = researchMode.GetPVColorBuffer();
                 
                 ushort[] frameTextureFiltered = researchMode.GetDepthMapBufferFiltered();
