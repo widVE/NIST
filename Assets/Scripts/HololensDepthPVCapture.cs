@@ -211,9 +211,9 @@ public class HololensDepthPVCapture : MonoBehaviour
 	{
 		Debug.Log("Initializing TSDF");
 		
-		_depthTexFromHololensX = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RFloat, false);
-		_depthTexFromHololensY = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RFloat, false);
-		_depthTexFromHololensZ = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RFloat, false);
+		//_depthTexFromHololensX = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RFloat, false);
+		//_depthTexFromHololensY = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RFloat, false);
+		//_depthTexFromHololensZ = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RFloat, false);
 		
 		if(_tsdfShader != null)
 		{
@@ -317,9 +317,9 @@ public class HololensDepthPVCapture : MonoBehaviour
 		_tsdfShader.SetInt("computeMaxEdgeSize", 256);
 
 		_tsdfShader.SetBuffer(octantComputeID, "octantBuffer", octantBuffer);
-		_tsdfShader.SetTexture(octantComputeID, "depthTextureX", _depthTexFromHololensX);
-		_tsdfShader.SetTexture(octantComputeID, "depthTextureY", _depthTexFromHololensY);
-		_tsdfShader.SetTexture(octantComputeID, "depthTextureZ", _depthTexFromHololensZ);
+		//_tsdfShader.SetTexture(octantComputeID, "depthTextureX", _depthTexFromHololensX);
+		//_tsdfShader.SetTexture(octantComputeID, "depthTextureY", _depthTexFromHololensY);
+		//_tsdfShader.SetTexture(octantComputeID, "depthTextureZ", _depthTexFromHololensZ);
 		
 #if ONLY_UNPROJECT
 		_tsdfShader.SetBuffer(octantComputeID, "pointBuffer", _ourPoints);
@@ -414,7 +414,7 @@ public class HololensDepthPVCapture : MonoBehaviour
             
             if (frameTexture.Length > 0)
             {
-                byte[] colorTextureBuffer = researchMode.GetPVColorBuffer();
+                /*byte[] colorTextureBuffer = researchMode.GetPVColorBuffer();
                 
                 ushort[] frameTextureFiltered = researchMode.GetDepthMapBufferFiltered();
                 float[] pointCloudBuffer = researchMode.GetPointCloudBuffer();
@@ -553,7 +553,7 @@ public class HololensDepthPVCapture : MonoBehaviour
                 cameraToWorld[13] = -cameraToWorld[13];
                 cameraToWorld[14] = cameraToWorld[14];*/
                 
-                Matrix4x4 worldToCamera = scanTransPV.inverse;
+                /*Matrix4x4 worldToCamera = scanTransPV.inverse;
                 
                 worldToCamera[3] = -worldToCamera[12];
                 worldToCamera[7] = -worldToCamera[13];
@@ -625,7 +625,7 @@ public class HololensDepthPVCapture : MonoBehaviour
                 }
 
                 //instead let's just project out the points in compute shader, read back and write out....	
-                FindSuboctants();
+                //FindSuboctants();
                 
                 if(WriteImagesToDisk)
                 {
@@ -649,30 +649,30 @@ public class HololensDepthPVCapture : MonoBehaviour
                 if(WriteImagesToDisk)
                 {
                     string filename = string.Format(@"CapturedImageDepth{0}_n.png", currTime);
-                    File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(depthTextureFilteredBytes, UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm, DEPTH_WIDTH, DEPTH_HEIGHT));
+                    File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filename), ImageConversion.EncodeArrayToPNG(depthTextureFilteredBytes, UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm, DEPTH_WIDTH, DEPTH_HEIGHT));*/
                     /*string filenameR = string.Format(@"CapturedImageRDepth{0}_n.exr", currTime);
                     string filenameG = string.Format(@"CapturedImageGDepth{0}_n.exr", currTime);
                     string filenameB = string.Format(@"CapturedImageBDepth{0}_n.exr", currTime);
                     File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameR), ImageConversion.EncodeArrayToEXR(_depthTexFromHololensX.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R32_SFloat, DEPTH_WIDTH, DEPTH_HEIGHT));
                     File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameG), ImageConversion.EncodeArrayToEXR(_depthTexFromHololensY.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R32_SFloat, DEPTH_WIDTH, DEPTH_HEIGHT));
                     File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameB), ImageConversion.EncodeArrayToEXR(_depthTexFromHololensZ.GetRawTextureData(), UnityEngine.Experimental.Rendering.GraphicsFormat.R32_SFloat, DEPTH_WIDTH, DEPTH_HEIGHT));*/
-                }
+                /*}
                 
                 if(WriteImagesToDisk)
                 {
                     string depthString = scanTrans[0].ToString("F4") + " " + scanTrans[1].ToString("F4") + " " + scanTrans[2].ToString("F4") + " " + scanTrans[3].ToString("F4") + "\n";
                     depthString = depthString + (scanTrans[4].ToString("F4") + " " + scanTrans[5].ToString("F4") + " " + scanTrans[6].ToString("F4") + " " + scanTrans[7].ToString("F4") + "\n");
                     depthString = depthString + (scanTrans[8].ToString("F4") + " " + scanTrans[9].ToString("F4") + " " + scanTrans[10].ToString("F4") + " " + scanTrans[11].ToString("F4") + "\n");
-                    depthString = depthString + (scanTrans[12].ToString("F4") + " " + scanTrans[13].ToString("F4") + " " + scanTrans[14].ToString("F4") + " " + scanTrans[15].ToString("F4") + "\n");
+                    depthString = depthString + (scanTrans[12].ToString("F4") + " " + scanTrans[13].ToString("F4") + " " + scanTrans[14].ToString("F4") + " " + scanTrans[15].ToString("F4") + "\n");*/
                     
                     /*string depthString = cameraToWorldMatrix[0].ToString("F4") + " " + cameraToWorldMatrix[1].ToString("F4") + " " + cameraToWorldMatrix[2].ToString("F4") + " " + cameraToWorldMatrix[3].ToString("F4") + "\n";
                     depthString = depthString + (cameraToWorldMatrix[4].ToString("F4") + " " + cameraToWorldMatrix[5].ToString("F4") + " " + cameraToWorldMatrix[6].ToString("F4") + " " + projectionMatrix[0].ToString("F4") + "\n");
                     depthString = depthString + (cameraToWorldMatrix[8].ToString("F4") + " " + cameraToWorldMatrix[9].ToString("F4") + " " + cameraToWorldMatrix[10].ToString("F4") + " " + projectionMatrix[5].ToString("F4") + "\n");
                     depthString = depthString + (cameraToWorldMatrix[12].ToString("F4") + " " + cameraToWorldMatrix[13].ToString("F4") + " " + cameraToWorldMatrix[14].ToString("F4") + " " + cameraToWorldMatrix[15].ToString("F4") + "\n");*/
                     
-                    string filenameTxt = string.Format(@"DepthToWorldMatrix{0}_n.txt", currTime);
+                /*    string filenameTxt = string.Format(@"DepthToWorldMatrix{0}_n.txt", currTime);
                     System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxt), depthString);
-                }
+                }*/
 #endif
 			}
         }
@@ -708,7 +708,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 	IEnumerator StartNewSubgridFind()
 	{
 		_waitingForGrids = true;
-		_updateImages = false;
+		//_updateImages = false;
 		
 		//Debug.Log("Starting new grid find");
 

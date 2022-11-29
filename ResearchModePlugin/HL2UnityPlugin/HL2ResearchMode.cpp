@@ -352,7 +352,7 @@ namespace winrt::HL2UnityPlugin::implementation
                 //float fy = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().y;
 
                 winrt::Windows::Foundation::Numerics::float4x4 PVtoWorldtransform;
-                winrt::Windows::Foundation::Numerics::Matrix4x4 PVtoWorld =
+                auto PVtoWorld =
                     frame.CoordinateSystem().TryGetTransformTo(pHL2ResearchMode->m_refFrame);
                 //winrt::Windows::Foundation::Numerics::Matrix4x4 worldToPV = winrt::Windows::Foundation::Numerics::Matrix4x4.Identity;
                 //winrt::Windows::Foundation::Numerics::Matrix4x4.Invert(PVToWorld, &worldToPV);
@@ -381,8 +381,8 @@ namespace winrt::HL2UnityPlugin::implementation
                     pHL2ResearchMode->m_PVToWorld[14] = PVtoWorldtransform.m43;
                     pHL2ResearchMode->m_PVToWorld[15] = PVtoWorldtransform.m44;
 
-                    pHL2ResearchMode->m_PVfov[0] = fx;
-                    pHL2ResearchMode->m_PVfov[1] = fy;
+                    //pHL2ResearchMode->m_PVfov[0] = fx;
+                    //pHL2ResearchMode->m_PVfov[1] = fy;
                     //_PVtoWorldtransform = PVtoWorldtransform;
                 }
                 else
@@ -802,8 +802,8 @@ namespace winrt::HL2UnityPlugin::implementation
 
                 XMVECTOR roiCenter = XMLoadFloat3(&roiCenterFloat);
                 XMVECTOR roiBound = XMLoadFloat3(&roiBoundFloat);
-#if COLOR_FROM_PLUGIN
-                VECTOR[] depthPts = new VECTOR[resolution.Height*resolution.Width]
+#ifdef COLOR_FROM_PLUGIN
+                winrt::Windows::Foundation::Numerics::float4* depthPts = new winrt::Windows::Foundation::Numerics::float4[resolution.Height * resolution.Width];
 #endif
                 for (UINT i = 0; i < resolution.Height; i++)
                 {
@@ -830,9 +830,9 @@ namespace winrt::HL2UnityPlugin::implementation
                             if (FAILED(hr))
                             {
                                 z = 0.0f;
-                                depthPts[idx].x = 0f;
-                                depthPts[idx].y = 0f;
-                                depthPts[idx].z = 0f;
+                                depthPts[idx].x = 0.0f;
+                                depthPts[idx].y = 0.0f;
+                                depthPts[idx].z = 0.0f;
                                 pointCloud.push_back(xy[0]);// XMVectorGetX(pointInWorld));
                                 pointCloud.push_back(xy[1]);// XMVectorGetY(pointInWorld));
                                 pointCloud.push_back(z);
@@ -861,7 +861,7 @@ namespace winrt::HL2UnityPlugin::implementation
                             /*if (!pHL2ResearchMode->m_useRoiFilter ||
                                 (pHL2ResearchMode->m_useRoiFilter && XMVector3InBounds(pointInWorld - roiCenter, roiBound)))
                             {*/
-                            float d = (float)depth/1000f;
+                            float d = (float)depth/1000.0f;
                             depthPts[idx].x = xy[0]*d;
                             depthPts[idx].y = xy[1]*d;
                             depthPts[idx].z = z*d;
@@ -898,11 +898,11 @@ namespace winrt::HL2UnityPlugin::implementation
                     }
                 }
                 
-#if COLOR_FROM_PLUGIN
+#ifdef COLOR_FROM_PLUGIN
                
                 pHL2ResearchMode->mu.lock();
 
-                winrt::Windows::Foundation::Numerics::Matrix4x4 worldToPV = winrt::Windows::Foundation::Numerics::Matrix4x4.Identity;
+                winrt::Windows::Foundation::Numerics::float4x4 worldToPV = winrt::Windows::Foundation::Numerics::float4x4::identity();
 
                 if (pHL2ResearchMode->m_latestFrame != nullptr)
                 {
@@ -912,20 +912,22 @@ namespace winrt::HL2UnityPlugin::implementation
                     //float fy = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().y;
 
                     winrt::Windows::Foundation::Numerics::float4x4 PVtoWorldtransform;
-                    winrt::Windows::Foundation::Numerics::Matrix4x4 PVtoWorld =
+                    auto PVtoWorld =
                         frame.CoordinateSystem().TryGetTransformTo(pHL2ResearchMode->m_refFrame);
                     
-                    winrt::Windows::Foundation::Numerics::Matrix4x4.Invert(PVToWorld, &worldToPV);
+                    //winrt::Windows::Foundation::Numerics::float4x4::invert(PVToWorld, &worldToPV);
+                    //frame.VideoMediaFrame().CameraIntrinsics().ProjectManyOntoFrame();
 
                     if (PVtoWorld)
                     {
                         PVtoWorldtransform = PVtoWorld.Value();
-                        std::lock_guard<std::mutex> l(pHL2ResearchMode->mu);
+                        //std::lock_guard<std::mutex> l(pHL2ResearchMode->mu);
                         pHL2ResearchMode->m_PVToWorld[0] = PVtoWorldtransform.m11;
                         pHL2ResearchMode->m_PVToWorld[1] = PVtoWorldtransform.m12;
                         pHL2ResearchMode->m_PVToWorld[2] = PVtoWorldtransform.m13;
                         pHL2ResearchMode->m_PVToWorld[3] = PVtoWorldtransform.m14;
 
+                        
                         pHL2ResearchMode->m_PVToWorld[4] = PVtoWorldtransform.m21;
                         pHL2ResearchMode->m_PVToWorld[5] = PVtoWorldtransform.m22;
                         pHL2ResearchMode->m_PVToWorld[6] = PVtoWorldtransform.m23;
@@ -941,6 +943,24 @@ namespace winrt::HL2UnityPlugin::implementation
                         pHL2ResearchMode->m_PVToWorld[14] = PVtoWorldtransform.m43;
                         pHL2ResearchMode->m_PVToWorld[15] = PVtoWorldtransform.m44;
 
+                        pHL2ResearchMode->m_PVCameraPose._11 = PVtoWorldtransform.m11;
+                        pHL2ResearchMode->m_PVCameraPose._12 = PVtoWorldtransform.m12;
+                        pHL2ResearchMode->m_PVCameraPose._13 = PVtoWorldtransform.m13;
+                        pHL2ResearchMode->m_PVCameraPose._14 = PVtoWorldtransform.m14;
+                        pHL2ResearchMode->m_PVCameraPose._21 = PVtoWorldtransform.m21;
+                        pHL2ResearchMode->m_PVCameraPose._22 = PVtoWorldtransform.m22;
+                        pHL2ResearchMode->m_PVCameraPose._23 = PVtoWorldtransform.m23;
+                        pHL2ResearchMode->m_PVCameraPose._24 = PVtoWorldtransform.m24;
+                        pHL2ResearchMode->m_PVCameraPose._31 = PVtoWorldtransform.m31;
+                        pHL2ResearchMode->m_PVCameraPose._32 = PVtoWorldtransform.m32;
+                        pHL2ResearchMode->m_PVCameraPose._33 = PVtoWorldtransform.m33;
+                        pHL2ResearchMode->m_PVCameraPose._34 = PVtoWorldtransform.m34;
+                        pHL2ResearchMode->m_PVCameraPose._41 = PVtoWorldtransform.m41;
+                        pHL2ResearchMode->m_PVCameraPose._42 = PVtoWorldtransform.m42;
+                        pHL2ResearchMode->m_PVCameraPose._43 = PVtoWorldtransform.m43;
+                        pHL2ResearchMode->m_PVCameraPose._44 = PVtoWorldtransform.m44;
+
+                        pHL2ResearchMode->m_PVCameraPoseInvMatrix = XMMatrixInverse(nullptr, XMLoadFloat4x4(&pHL2ResearchMode->m_PVCameraPose));
                         //pHL2ResearchMode->m_PVfov[0] = fx;
                         //pHL2ResearchMode->m_PVfov[1] = fy;
                         //_PVtoWorldtransform = PVtoWorldtransform;
@@ -962,7 +982,7 @@ namespace winrt::HL2UnityPlugin::implementation
 
                     CreateLocalFile(fName, softwareBitmap);*/
 
-                    frameCount++;
+                    //frameCount++;
 
                     int imageWidth = softwareBitmap.PixelWidth();
                     int imageHeight = softwareBitmap.PixelHeight();
@@ -996,7 +1016,7 @@ namespace winrt::HL2UnityPlugin::implementation
                         OutputDebugStringW(L"\n");
                     }
 
-                    pHL2ResearchMode->mu.lock();
+                    //pHL2ResearchMode->mu.lock();
                     if (pHL2ResearchMode->m_pixelBufferData == 0)
                     {
                         pHL2ResearchMode->m_pixelBufferData = new UINT8[pixelBufferDataLength];
@@ -1019,16 +1039,53 @@ namespace winrt::HL2UnityPlugin::implementation
 
                     memcpy(pHL2ResearchMode->m_pixelBufferData, pixelBufferData, pHL2ResearchMode->m_colorBufferSize); 
 
+                    //
+                    //
+                    std::vector<winrt::Windows::Foundation::Numerics::float3> camPoints;
+                    std::vector< winrt::Windows::Foundation::Point> screenPoints;
+
                     for (UINT i = 0; i < resolution.Height; i++)
                     {
                         for (UINT j = 0; j < resolution.Width; j++)
                         {
                             UINT idx = resolution.Width * i + j;
-
-                            
+                            XMFLOAT3 depthVec;
+                            depthVec.x = depthPts[idx].x;
+                            depthVec.y = depthPts[idx].y;
+                            depthVec.z = depthPts[idx].z;
+                            //depthVec.w = depthPts[idx].w;
+                            XMVECTOR pointInPVCam = XMVector3Transform(XMLoadFloat3(&depthVec), pHL2ResearchMode->m_PVCameraPoseInvMatrix);
+                            camPoints[idx].x = pointInPVCam.n128_f32[0];
+                            camPoints[idx].y = pointInPVCam.n128_f32[1];
+                            camPoints[idx].z = pointInPVCam.n128_f32[2];
+                            screenPoints[idx].X = 0;
+                            screenPoints[idx].Y = 0;
+                            //depthVec = depthVec * pHL2ResearchMode->m_PVCameraPoseInvMatrix;
                         }
                     }
 
+                    winrt::array_view<winrt::Windows::Foundation::Numerics::float3> camPointsView{ camPoints };
+
+                    winrt::array_view<winrt::Windows::Foundation::Point> screenPointsView{ screenPoints };
+
+                    frame.VideoMediaFrame().CameraIntrinsics().ProjectManyOntoFrame(camPointsView, screenPointsView);
+
+                    //iterate through screenpointsview and lookup colors...
+                    for (UINT i = 0; i < resolution.Height; i++)
+                    {
+                        for (UINT j = 0; j < resolution.Width; j++)
+                        {
+                            UINT idx = resolution.Width * i + j;
+                            UINT cIdx = resolution.Width * screenPointsView[idx].Y + screenPointsView[idx].X;
+                            if (cIdx < (resolution.Width * resolution.Height))
+                            {
+                                UINT8 r = pHL2ResearchMode->m_pixelBufferData[cIdx * 4];
+                                UINT8 g = pHL2ResearchMode->m_pixelBufferData[cIdx * 4 + 1];
+                                UINT8 b = pHL2ResearchMode->m_pixelBufferData[cIdx * 4 + 2];
+                                UINT8 a = pHL2ResearchMode->m_pixelBufferData[cIdx * 4 + 3];
+                            }
+                        }
+                    }
                 }
                 
                 pHL2ResearchMode->mu.unlock();
