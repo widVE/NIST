@@ -371,11 +371,12 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		d_s.mapParent = map_parent;
 		d_s.headset_name = remoteHeadset.name;
 		hs.map_parent = map_parent;
+		hs.headset_parent = headsetManager;
 
 		if (hs != null)
         {
             s.name = remoteHeadset.id;
-            hs.AssignValuesFromJson(remoteHeadset);
+			hs.AssignValuesFromJson(remoteHeadset);
             _activeHeadsets.Add(hs);
 
         }
