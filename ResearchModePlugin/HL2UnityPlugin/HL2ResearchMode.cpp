@@ -1159,7 +1159,7 @@ namespace winrt::HL2UnityPlugin::implementation
 #ifdef USE_MVP
                                 UINT cIdx = (UINT)((imageWidth * 4) * (imageHeight - (imageHeight * fY)) + (fX * (imageWidth * 4)));
 #else
-                                INT cIdx = (INT)((imageWidth*4) * (INT)(imageHeight-fY)) + (INT)fX*4;
+                                INT cIdx = (INT)((imageWidth*4) * (INT)(imageHeight-fY)) + (INT)(imageWidth-fX)*4;
 #endif
                                 if (cIdx > 0 && cIdx < (INT)(imageWidth * 4 * imageHeight))
                                 {
@@ -1181,22 +1181,22 @@ namespace winrt::HL2UnityPlugin::implementation
                                 }
                                 else
                                 {
-                                    pointCloud.push_back(depthPts[idx].x);
+                                    /*pointCloud.push_back(depthPts[idx].x);
                                     pointCloud.push_back(depthPts[idx].y);
                                     pointCloud.push_back(depthPts[idx].z);
                                     pointCloud.push_back(0.0f);
                                     pointCloud.push_back(1.0f);
-                                    pointCloud.push_back(0.0f);
+                                    pointCloud.push_back(0.0f);*/
                                 }
                             }
                             else
                             {
-                                pointCloud.push_back(depthPts[idx].x);
+                               /*pointCloud.push_back(depthPts[idx].x);
                                 pointCloud.push_back(depthPts[idx].y);
                                 pointCloud.push_back(depthPts[idx].z);
                                 pointCloud.push_back(1.0f);
                                 pointCloud.push_back(0.0f);
-                                pointCloud.push_back(0.0f);
+                                pointCloud.push_back(0.0f);*/
                             }
                         }
                     }
