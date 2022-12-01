@@ -12,16 +12,12 @@
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
-    <ClCompile Include="VideoCameraFrameProcessor.cpp" />
     <ClCompile Include="TimeConverter.cpp" />
-    <ClCompile Include="VideoCameraStreamer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="ResearchModeApi.h" />
-    <ClInclude Include="VideoCameraFrameProcessor.h" />
     <ClInclude Include="TimeConverter.h" />
-    <ClInclude Include="VideoCameraStreamer.h" />
     <ClInclude Include="IVideoFrameSink.h" />
   </ItemGroup>
   <ItemGroup>
