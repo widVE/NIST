@@ -412,7 +412,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 
             byte[] frameTexture = researchMode.GetLongDepthMapTextureBuffer();
             
-            if (frameTexture.Length > 0)
+            //if (frameTexture.Length > 0)
             {
 				float[] pointCloudBuffer = researchMode.GetPointCloudBuffer();
 
@@ -422,10 +422,10 @@ public class HololensDepthPVCapture : MonoBehaviour
                     _fileOutNumber++;
                     StreamWriter s = new StreamWriter(File.Open(debugOut, FileMode.Create));
                     
-                    for (int i = 0; i < pointCloudLength; i+=6)
+                    for (int i = 0; i < pointCloudBuffer.Length; i+=6)
                     {
                         //pointCloudVector3[i] = new Vector3(pointCloudBuffer[3 * i], pointCloudBuffer[3 * i + 1], pointCloudBuffer[3 * i + 2]);
-                        s.Write(i.ToString() + ": " + pointCloudBuffer[i*6].x.ToString("F4") + " " + pointCloudBuffer[i*6+1].y.ToString("F4")+ " " + pointCloudBuffer[i].z.ToString("F4") + "\n");
+                        s.Write(pointCloudBuffer[i*6].ToString("F4") + " " + pointCloudBuffer[i*6+1].ToString("F4")+ " " + pointCloudBuffer[i*6+2].ToString("F4") + " " + pointCloudBuffer[i*6+3].ToString("F4") + " " + pointCloudBuffer[i*6+4].ToString("F4")+ " " + pointCloudBuffer[i*6+5].ToString("F4")+ "\n");
                     }
                     s.Close();
                 }

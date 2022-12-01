@@ -15,8 +15,9 @@
 #include <winrt/Windows.Foundation.h>
 #include<winrt/Windows.Perception.Spatial.h>
 #include<winrt/Windows.Perception.Spatial.Preview.h>
-#include "VideoCameraFrameProcessor.h"
-#include "VideoCameraStreamer.h"
+#include <shared_mutex>
+//#include "VideoCameraFrameProcessor.h"
+//#include "VideoCameraStreamer.h"
 
 
 namespace winrt::HL2UnityPlugin::implementation
@@ -191,6 +192,7 @@ namespace winrt::HL2UnityPlugin::implementation
         DirectX::XMMATRIX m_RFCameraPoseInvMatrixSide;
         DirectX::XMFLOAT4X4 m_PVCameraPose;
         DirectX::XMMATRIX m_PVCameraPoseInvMatrix;
+        DirectX::XMFLOAT4X4 m_PV_MVP;
         std::thread* m_pDepthUpdateThread;
         std::thread* m_pLongDepthUpdateThread;
         std::thread* m_pSpatialCamerasFrontUpdateThread;
