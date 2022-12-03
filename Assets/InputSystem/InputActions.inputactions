@@ -1,0 +1,34 @@
+{
+    "name": "InputActions",
+    "maps": [
+        {
+            "name": "Markers",
+            "id": "041cd856-59ca-48eb-b105-4529e474f7dc",
+            "actions": [
+                {
+                    "name": "PlaceMarker",
+                    "type": "Button",
+                    "id": "bc5bebb5-1eed-403a-8cec-d0cc1737eb7f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "cddc7853-12ff-414b-9554-1982ab192060",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PlaceMarker",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
