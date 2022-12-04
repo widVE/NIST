@@ -487,6 +487,15 @@ public class FeatureManager : MonoBehaviour
         CreateNewFeature(feature_type, cloned_feature);
 
     }
+    /*
+    public void InputSpawn(string feature_type)
+    {
+        Debug.Log("spawned markers");
+        GameObject inputFeature = Instantiate(marker, spawnRoot.transform.position, spawnRoot.transform.rotation, spawnParent.transform);
+        inputFeature.name = "input_feature";
+
+    }
+    */
 
     // this is simply for convenience used if you want all the markers in the scene to disappear 
     [ContextMenu("DeleteAll")]
