@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System;
+using UnityEngine.InputSystem;
 //using Color = UnityEngine.Color;
 
 
@@ -487,15 +488,39 @@ public class FeatureManager : MonoBehaviour
         CreateNewFeature(feature_type, cloned_feature);
 
     }
-    /*
-    public void InputSpawn(string feature_type)
+
+    public void InputSpawnObjectAtIndex(InputAction.CallbackContext context)
     {
-        Debug.Log("spawned markers");
-        GameObject inputFeature = Instantiate(marker, spawnRoot.transform.position, spawnRoot.transform.rotation, spawnParent.transform);
-        inputFeature.name = "input_feature";
+        //GameObject feature_to_spawn = feature_type_dictionary[feature_type];
+        // billboarding effect
+        Debug.Log(context);
+        Debug.Log("spawned using input phase: " + context.phase); 
+        if (context.performed) // there are 3 phases started, performed, and canceled 
+        {
+            string feature_type = "biohazard"; // initialize to biohazard
+            GameObject cloned_feature = Instantiate(biohazard_icon, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
+
+            cloned_feature.name = "feature-local";
+            CreateNewFeature(feature_type, cloned_feature);
+
+        }
 
     }
-    */
+
+/*
+//Added from SpawnListIndex
+public void InputSpawnObjectAtIndex(string feature_type, InputAction.CallbackContext context)
+{
+    GameObject feature_to_spawn = feature_type_dictionary[feature_type];
+    // billboarding effect
+    GameObject cloned_feature = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
+
+    cloned_feature.name = "feature-local";
+    CreateNewFeature(feature_type, cloned_feature);
+
+}
+*/
+
 
     // this is simply for convenience used if you want all the markers in the scene to disappear 
     [ContextMenu("DeleteAll")]
