@@ -71,6 +71,11 @@ namespace EasyVizAR
 		
 		public int width;
 		public int height;
+
+		public string created_by;
+		public string camera_location_id;
+		public Position camera_position;
+		public Orientation camera_orientation;
 	}
 
 	[System.Serializable]

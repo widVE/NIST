@@ -30,6 +30,11 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	public string LocalHeadsetName => _localHeadsetName;
 	GameObject _localHeadset;
 
+	public GameObject LocalHeadset
+    {
+		get { return _localHeadset; }
+    }
+
 	[SerializeField]
 	bool _shouldCreateHeadsets = false;
 	public bool ShouldCreateHeadsets => _shouldCreateHeadsets;
