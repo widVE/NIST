@@ -49,6 +49,25 @@ namespace EasyVizAR
 	};
 
 	/*
+	 * RegisteredHeadset is only received when creating a new headset.
+	 * It contains the authentication token that we need to save for future API calls.
+	 */
+	[System.Serializable]
+	public class RegisteredHeadset
+	{
+		public string color;
+		public int created;
+		public string id;
+		public string location_id;
+		public string mapId;
+		public string name;
+		public Orientation orientation;
+		public Position position;
+		public int updated;
+		public string token;
+	};
+
+	/*
 	 * HeadsetPositionUpdate contains a subset of the Headset class attributes
 	 * that we send with position updates. Sending this instead of the full
 	 * Headset object can avoid clobbering other fields such as color.
@@ -176,17 +195,57 @@ namespace EasyVizAR
 		public float topOffset;
     }
 
-
+	[System.Serializable]
+	public class Registration
+    {
+		public string headset_id;
+		public string auth_token;
+    }
 
 }
 
 public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 {
-	public string _baseURL = "http://halo05.wings.cs.wisc.edu:5000/";
-	
+	private string _authority = "halo05.wings.cs.wisc.edu:5000";
+	private string _baseURL = "http://halo05.wings.cs.wisc.edu:5000/";
+	private bool _hasRegistration = false;
+	private EasyVizAR.Registration _registration;
+
 	public const string JSON_TYPE = "application/json";
 	public const string JPEG_TYPE = "image/jpeg";
 	public const string PNG_TYPE = "image/png";
+
+	void Start()
+    {
+		_hasRegistration = TryLoadRegistration(out _registration);
+    }
+
+	// Change the server base URL, which will affect all future API calls, e.g. "http://halo05.wing.cs.wisc.edu:5000/".
+	public void SetBaseURL(string url)
+    {
+		if (Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
+		{
+			_authority = uri.Authority;
+			_baseURL = url;
+
+			_hasRegistration = TryLoadRegistration(out _registration);
+		}
+	}
+
+	// Check if we have a previously registered headset ID.
+	public bool TryGetHeadsetID(out string headset_id)
+    {
+		if (_hasRegistration)
+        {
+			headset_id = _registration.headset_id;
+			return true;
+        }
+        else
+        {
+			headset_id = "invalid";
+			return false;
+        }
+    }
 	
 	//pass the callBack function in from whatever script is calling this...
 	public void Get(string url, string contentType, System.Action<string> callBack)
@@ -228,7 +287,13 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	IEnumerator DoGET(string url, string contentType, System.Action<string> callBack)
 	{
 		UnityWebRequest www = UnityWebRequest.Get(url);
+
 		www.SetRequestHeader("Content-Type", contentType);
+		if (_hasRegistration)
+        {
+			www.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+        }
+
 		www.downloadHandler = new DownloadHandlerBuffer();
 		
 		yield return www.SendWebRequest();
@@ -252,8 +317,13 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	IEnumerator DoPOST(string url, string contentType, string jsonData, System.Action<string> callBack)
 	{
 		UnityWebRequest www = new UnityWebRequest(url, "POST");
+
 		www.SetRequestHeader("Content-Type", contentType);
-		
+		if (_hasRegistration)
+		{
+			www.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+
 		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(jsonData);
 		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
         www.downloadHandler = new DownloadHandlerBuffer();
@@ -279,8 +349,13 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	IEnumerator DoPATCH(string url, string contentType, string jsonData, System.Action<string> callBack)
 	{
 		UnityWebRequest www = new UnityWebRequest(url, "PATCH");
+
 		www.SetRequestHeader("Content-Type", contentType);
-		
+		if (_hasRegistration)
+		{
+			www.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+
 		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(jsonData);
 		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
         www.downloadHandler = new DownloadHandlerBuffer();
@@ -306,7 +381,12 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	IEnumerator DoDELETE(string url, string contentType, string jsonData, System.Action<string> callBack)
 	{
 		UnityWebRequest www = new UnityWebRequest(url, "DELETE");
+
 		www.SetRequestHeader("Content-Type", contentType);
+		if (_hasRegistration)
+		{
+			www.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
 
 		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(jsonData);
 		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
@@ -337,6 +417,11 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 
 		www.SetRequestHeader("Accept", contentType);
 		www.SetRequestHeader("Width", width);
+		if (_hasRegistration)
+		{
+			www.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+
 		//Debug.Log(www);
 		yield return www.SendWebRequest();
 		
@@ -372,6 +457,53 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			//current_layer_prefab.GetComponent<Renderer>().material.mainTexture = myTexture;
 			//current_layer_prefab.GetComponent<Renderer>().material.SetTexture("_BaseMap", my_text);
 		}
+	}
+
+	// Try to load a previous registration (headset ID, auth token) from file.
+	public bool TryLoadRegistration(out EasyVizAR.Registration registration)
+    {
+		// Extract just the host and port from the baseUrl, e.g. "halo05.wings.cs.wisc.edu:5000"
+		// Colon is not allowed in filenames, so we replace with a hash sign.
+		string filename = _authority.Replace(":", "#") + ".json";
+		string filePath = System.IO.Path.Combine(Application.persistentDataPath, "registrations", filename);
+
+		if (!File.Exists(filePath))
+        {
+			registration = new EasyVizAR.Registration();
+			return false;
+        }
+
+		var reader = new StreamReader(filePath);
+		var data = reader.ReadToEnd();
+		reader.Close();
+
+		registration = JsonUtility.FromJson<EasyVizAR.Registration>(data);
+		return true;
+	}
+
+	// Save a new registration (headset ID, auth token) to file.
+	public void SaveRegistration(string headset_id, string auth_token)
+    {
+		// Extract just the host and port from the baseUrl, e.g. "halo05.wings.cs.wisc.edu:5000"
+		// Colon is not allowed in filenames, so we replace with a hash sign.
+		string filename = _authority.Replace(":", "#") + ".json";
+		string parentDir = System.IO.Path.Combine(Application.persistentDataPath, "registrations");
+		string filePath = System.IO.Path.Combine(parentDir, filename);
+
+		Directory.CreateDirectory(parentDir);
+
+		var reg = new EasyVizAR.Registration();
+		reg.headset_id = headset_id;
+		reg.auth_token = auth_token;
+
+		var data = JsonUtility.ToJson(reg);
+
+		var writer = new StreamWriter(filePath);
+		writer.Write(data);
+		writer.Close();
+
+		_registration = reg;
+		_hasRegistration = true;
 	}
 
 }

@@ -203,7 +203,7 @@ public class QRScanner : MonoBehaviour
 				// Example: http://halo05.wings.cs.wisc.edu:5000/
 				string base_url = "http://" + uri.Authority + "/";
 				Debug.Log("Detected URL from QR code: " + base_url);
-				EasyVizARServer.Instance._baseURL = base_url;
+				EasyVizARServer.Instance.SetBaseURL(base_url);
 				_updatedServerFromQR = true;
 			}
 			else
