@@ -37,21 +37,21 @@ public class TakeColorPhoto : MonoBehaviour
     {
 		if (triggerCapture)
         {
-			TakeAColorPhoto();
+			//TakeAColorPhoto(); // commented this out for compiling
 			triggerCapture = false;
         }
     }
 	
-	public void TakeAColorPhoto()
+	public void TakeAColorPhoto(InputAction.CallbackContext context)
 	{
-		//if (context.performed)
-		//{
+		if (context.performed)
+		{
             if (!_isCapturing)
             {
                 _isCapturing = true;
                 PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
             }
-        //}
+        }
 		
 	}
 	
