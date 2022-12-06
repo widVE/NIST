@@ -41,11 +41,39 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""cddc7853-12ff-414b-9554-1982ab192060"",
-                    ""path"": ""<Keyboard>/space"",
+                    ""path"": ""<Keyboard>/p"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""PlaceMarker"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Photo"",
+            ""id"": ""1c6f3349-506a-4d31-801e-4faa8496d189"",
+            ""actions"": [
+                {
+                    ""name"": ""TakePhoto"",
+                    ""type"": ""Button"",
+                    ""id"": ""59ae0182-a4f4-4065-a3ac-e0f4ecf8870a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""883119c3-8ee7-4283-b4f4-e3bb313342ff"",
+                    ""path"": ""<Keyboard>/t"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TakePhoto"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -57,6 +85,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         // Markers
         m_Markers = asset.FindActionMap("Markers", throwIfNotFound: true);
         m_Markers_PlaceMarker = m_Markers.FindAction("PlaceMarker", throwIfNotFound: true);
+        // Photo
+        m_Photo = asset.FindActionMap("Photo", throwIfNotFound: true);
+        m_Photo_TakePhoto = m_Photo.FindAction("TakePhoto", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -145,8 +176,45 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         }
     }
     public MarkersActions @Markers => new MarkersActions(this);
+
+    // Photo
+    private readonly InputActionMap m_Photo;
+    private IPhotoActions m_PhotoActionsCallbackInterface;
+    private readonly InputAction m_Photo_TakePhoto;
+    public struct PhotoActions
+    {
+        private @InputActions m_Wrapper;
+        public PhotoActions(@InputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @TakePhoto => m_Wrapper.m_Photo_TakePhoto;
+        public InputActionMap Get() { return m_Wrapper.m_Photo; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(PhotoActions set) { return set.Get(); }
+        public void SetCallbacks(IPhotoActions instance)
+        {
+            if (m_Wrapper.m_PhotoActionsCallbackInterface != null)
+            {
+                @TakePhoto.started -= m_Wrapper.m_PhotoActionsCallbackInterface.OnTakePhoto;
+                @TakePhoto.performed -= m_Wrapper.m_PhotoActionsCallbackInterface.OnTakePhoto;
+                @TakePhoto.canceled -= m_Wrapper.m_PhotoActionsCallbackInterface.OnTakePhoto;
+            }
+            m_Wrapper.m_PhotoActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @TakePhoto.started += instance.OnTakePhoto;
+                @TakePhoto.performed += instance.OnTakePhoto;
+                @TakePhoto.canceled += instance.OnTakePhoto;
+            }
+        }
+    }
+    public PhotoActions @Photo => new PhotoActions(this);
     public interface IMarkersActions
     {
         void OnPlaceMarker(InputAction.CallbackContext context);
+    }
+    public interface IPhotoActions
+    {
+        void OnTakePhoto(InputAction.CallbackContext context);
     }
 }

@@ -19,11 +19,39 @@
                 {
                     "name": "",
                     "id": "cddc7853-12ff-414b-9554-1982ab192060",
-                    "path": "<Keyboard>/space",
+                    "path": "<Keyboard>/p",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "PlaceMarker",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Photo",
+            "id": "1c6f3349-506a-4d31-801e-4faa8496d189",
+            "actions": [
+                {
+                    "name": "TakePhoto",
+                    "type": "Button",
+                    "id": "59ae0182-a4f4-4065-a3ac-e0f4ecf8870a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "883119c3-8ee7-4283-b4f4-e3bb313342ff",
+                    "path": "<Keyboard>/t",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TakePhoto",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

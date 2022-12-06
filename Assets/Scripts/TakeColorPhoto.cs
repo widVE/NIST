@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Windows.WebCam;
 using System.Linq;
+using UnityEngine.InputSystem;
 
 public class TakeColorPhoto : MonoBehaviour
 {
@@ -43,11 +44,15 @@ public class TakeColorPhoto : MonoBehaviour
 	
 	public void TakeAColorPhoto()
 	{
-		if(!_isCapturing)
-		{
-			_isCapturing = true;
-			PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
-		}
+		//if (context.performed)
+		//{
+            if (!_isCapturing)
+            {
+                _isCapturing = true;
+                PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
+            }
+        //}
+		
 	}
 	
 	void OnPhotoCaptureCreated(UnityEngine.Windows.WebCam.PhotoCapture captureObject)
