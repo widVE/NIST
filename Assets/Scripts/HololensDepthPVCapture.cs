@@ -46,9 +46,9 @@ public class HololensDepthPVCapture : MonoBehaviour
 	[SerializeField]
 	bool _captureVideo = false;
 	
-	//Texture2D colorTexture = null;
+	Texture2D colorTexture = null;
 
-	//Texture2D colorTextureRect = null;
+	Texture2D colorTextureRect = null;
 
 	bool _isCapturing = false;
 	
@@ -75,9 +75,9 @@ public class HololensDepthPVCapture : MonoBehaviour
     void Start()
     {
 		// Depth sensor should be initialized in only one mode
-        //colorTexture = new Texture2D(COLOR_WIDTH, COLOR_HEIGHT, TextureFormat.RGBA32, false);
+        colorTexture = new Texture2D(COLOR_WIDTH, COLOR_HEIGHT, TextureFormat.RGBA32, false);
 
-		//colorTextureRect = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RGBA32, false);
+		colorTextureRect = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RGBA32, false);
 
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
@@ -137,36 +137,6 @@ public class HololensDepthPVCapture : MonoBehaviour
 
 			string debugOut = Path.Combine(Application.persistentDataPath, DateTime.Now.ToString("M_dd_yyyy_hh_mm_ss_")+_fileOutNumber.ToString());//+".xyz");
 			_fileOutNumber++;
-					
-			if(_captureColorPointCloud)
-			{
-				float[] pointCloudBuffer = researchMode.GetPointCloudBuffer();
-				
-				int pcLen = pointCloudBuffer.Length;
-				
-				if (pcLen > 0)
-				{	
-					for(int i = 0; i < pcLen; ++i)
-					{
-						_pcTest[i] = pointCloudBuffer[i];	
-					}
-					
-
-					StreamWriter s = new StreamWriter(File.Open(debugOut+".txt", FileMode.Create));
-					
-					for (int i = 0; i < pcLen; i+=6)
-					{
-						//pointCloudVector3[i] = new Vector3(pointCloudBuffer[3 * i], pointCloudBuffer[3 * i + 1], pointCloudBuffer[3 * i + 2]);
-						if(_pcTest[i*6] != 0f && _pcTest[i*6+1] != 0f && _pcTest[i*6+2] != 0f)
-						{
-							s.Write(_pcTest[i*6].ToString("F4") + " " + _pcTest[i*6+1].ToString("F4")+ " " + _pcTest[i*6+2].ToString("F4") + " " + _pcTest[i*6+3].ToString("F4") + " " + _pcTest[i*6+4].ToString("F4")+ " " + _pcTest[i*6+5].ToString("F4")+ "\n");
-						}
-					}
-					
-					s.Flush();
-					s.Close();
-				}
-			}
 			
 			if(_captureDepthImages)
 			{
@@ -205,7 +175,10 @@ public class HololensDepthPVCapture : MonoBehaviour
 					colorArray.Add(new Color(r, g, b, a));
 				}
 				
-				File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, debugOut+"_color.png"), ImageConversion.EncodeArrayToPNG(colorArray.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, COLOR_WIDTH, COLOR_HEIGHT));
+				colorTexture.SetPixels(colorArray.ToArray());
+				colorTexture.Apply();
+				
+				File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, debugOut+"_color.png"), colorTexture.EncodeToPNG());
 			}
 			
 			if(_captureRectifiedColorImages)
@@ -235,7 +208,40 @@ public class HololensDepthPVCapture : MonoBehaviour
 						colorArray.Add(new Color(r, g, b, 1.0f));
 					}
 					
-					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, debugOut+"_color_rect.png"), ImageConversion.EncodeArrayToPNG(colorArray.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, DEPTH_WIDTH, DEPTH_HEIGHT));
+					colorTextureRect.SetPixels(colorArray.ToArray());
+					colorTextureRect.Apply();
+				
+					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, debugOut+"_color_rect.png"), colorTextureRect.EncodeToPNG());
+				}
+			}
+						
+			if(_captureColorPointCloud)
+			{
+				float[] pointCloudBuffer = researchMode.GetPointCloudBuffer();
+				
+				int pcLen = pointCloudBuffer.Length;
+				
+				if (pcLen > 0)
+				{	
+					for(int i = 0; i < pcLen; ++i)
+					{
+						_pcTest[i] = pointCloudBuffer[i];	
+					}
+					
+
+					StreamWriter s = new StreamWriter(File.Open(debugOut+".txt", FileMode.Create));
+					
+					for (int i = 0; i < pcLen; i+=6)
+					{
+						//pointCloudVector3[i] = new Vector3(pointCloudBuffer[3 * i], pointCloudBuffer[3 * i + 1], pointCloudBuffer[3 * i + 2]);
+						if(_pcTest[i*6] != 0f && _pcTest[i*6+1] != 0f && _pcTest[i*6+2] != 0f)
+						{
+							s.Write(_pcTest[i*6].ToString("F4") + " " + _pcTest[i*6+1].ToString("F4")+ " " + _pcTest[i*6+2].ToString("F4") + " " + _pcTest[i*6+3].ToString("F4") + " " + _pcTest[i*6+4].ToString("F4")+ " " + _pcTest[i*6+5].ToString("F4")+ "\n");
+						}
+					}
+					
+					s.Flush();
+					s.Close();
 				}
 			}
 			
@@ -394,7 +400,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 				//TODO - use above matrices to project color onto depth, write color image that matches depth image size and that have pixels with valid depth..
 				string filenameC = string.Format(@"CapturedImage{0}_n.png", currTime);
 				string filenameC2 = string.Format(@"TargetImage{0}_n.png", currTime);
-				File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC2), targetTexture.EncodeToPNG());
+				File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC2), colorTexture.EncodeToPNG());
 				
 				//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC2), ImageConversion.EncodeArrayToPNG(colorArray.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, COLOR_WIDTH, COLOR_HEIGHT));
 				//File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, filenameC), ImageConversion.EncodeArrayToPNG(imageBufferList.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, 760, 428));

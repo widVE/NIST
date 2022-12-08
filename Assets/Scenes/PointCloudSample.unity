@@ -1200,11 +1200,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _captureTime: 1
   _captureColorPointCloud: 1
-  _captureColorImages: 0
-  _captureDepthImages: 0
-  _captureHiResColorImages: 0
+  _captureHiResColorImages: 1
+  _captureRectifiedColorImages: 1
+  _captureDepthImages: 1
   _captureTransforms: 0
-  _writeImagesToDisk: 0
+  _captureVideo: 0
 --- !u!1 &891683166
 GameObject:
   m_ObjectHideFlags: 0
