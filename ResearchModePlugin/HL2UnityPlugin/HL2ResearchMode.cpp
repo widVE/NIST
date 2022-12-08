@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "HL2ResearchMode.h"
 #include "HL2ResearchMode.g.cpp"
-//#include "VideoCameraStreamer.h"
-//#include "IVideoFrameSink.h"
 #include <codecvt>
 
 #define COLOR_FROM_PLUGIN
@@ -246,6 +244,7 @@ namespace winrt::HL2UnityPlugin::implementation
         winrt::Windows::Media::Capture::Frames::MediaFrameReaderStartStatus status = co_await m_mediaFrameReader.StartAsync();
         winrt::check_bool(status == winrt::Windows::Media::Capture::Frames::MediaFrameReaderStartStatus::Success);
 #ifdef COLOR_FROM_PLUGIN
+		m_PVLoopStarted = true;
 #else
         m_pColorUpdateThread = new std::thread(HL2ResearchMode::ColorSensorLoop, this);
 #endif
@@ -382,8 +381,6 @@ namespace winrt::HL2UnityPlugin::implementation
                     pHL2ResearchMode->m_PVToWorld[14] = PVtoWorldtransform.m43;
                     pHL2ResearchMode->m_PVToWorld[15] = PVtoWorldtransform.m44;
 
-                    //pHL2ResearchMode->m_PVfov[0] = fx;
-                    //pHL2ResearchMode->m_PVfov[1] = fy;
                     //_PVtoWorldtransform = PVtoWorldtransform;
                 }
                 else
@@ -493,7 +490,7 @@ namespace winrt::HL2UnityPlugin::implementation
                 // process sensor frame
                 pDepthSensorFrame->GetResolution(&resolution);
                 pHL2ResearchMode->m_depthResolution = resolution;
-                
+
                 IResearchModeSensorDepthFrame* pDepthFrame = nullptr;
                 winrt::check_hresult(pDepthSensorFrame->QueryInterface(IID_PPV_ARGS(&pDepthFrame)));
 
@@ -709,12 +706,25 @@ namespace winrt::HL2UnityPlugin::implementation
 
         while (pHL2ResearchMode->m_longDepthSensorLoopStarted)
         {
+			//wait for color sensor loop to have also started...
+			if(!pHL2ResearchMode->m_PVLoopStarted)
+			{
+				continue;
+			}
+			
+            pHL2ResearchMode->mu.lock();
+
             IResearchModeSensorFrame* pDepthSensorFrame = nullptr;
             ResearchModeSensorResolution resolution;
             pHL2ResearchMode->m_longDepthSensor->GetNextBuffer(&pDepthSensorFrame);
                 
             pDepthSensorFrame->GetResolution(&resolution);
             pHL2ResearchMode->m_longDepthResolution = resolution;
+
+            if (pHL2ResearchMode->_depthPts == 0)
+            {
+                pHL2ResearchMode->_depthPts = new winrt::Windows::Foundation::Numerics::float3[resolution.Height * resolution.Width];
+            }
 
             IResearchModeSensorDepthFrame* pDepthFrame = nullptr;
             winrt::check_hresult(pDepthSensorFrame->QueryInterface(IID_PPV_ARGS(&pDepthFrame)));
@@ -729,16 +739,6 @@ namespace winrt::HL2UnityPlugin::implementation
             ResearchModeSensorTimestamp timestamp;
             pDepthSensorFrame->GetTimeStamp(&timestamp);
 
-            /*bool shouldGetDepth;
-            pHL2ResearchMode->mu.lock();
-            shouldGetDepth = pHL2ResearchMode->m_shouldGetDepth;
-            pHL2ResearchMode->mu.unlock();*/
-            //if (shouldGetDepth)
-            //{
-                //OutputDebugString(L"Getting depth...\n");
-                /*pHL2ResearchMode->mu.lock();
-                pHL2ResearchMode->m_shouldGetDepth = false;
-                pHL2ResearchMode->mu.unlock();*/
 
                 // process sensor frame
                     
@@ -760,9 +760,6 @@ namespace winrt::HL2UnityPlugin::implementation
                 auto transToWorld = pHL2ResearchMode->m_locator.TryLocateAtTimestamp(ts, pHL2ResearchMode->m_refFrame);
                 if (transToWorld == nullptr)
                 {
-                    OutputDebugString(L"Null trans...\n");
-                    pHL2ResearchMode->mu.lock();
-                    pHL2ResearchMode->m_longDepthMapTextureUpdated = true;
                     pHL2ResearchMode->mu.unlock();
                     continue;
                 }
@@ -781,11 +778,11 @@ namespace winrt::HL2UnityPlugin::implementation
                 auto posMat = XMMatrixTranslation(pos.x, pos.y, pos.z);
                 auto depthToWorld = pHL2ResearchMode->m_longDepthCameraPoseInvMatrix * rotMat * posMat;
 
-                pHL2ResearchMode->mu.lock();
 
                 pHL2ResearchMode->m_depthSensorPosition[0] = pos.x;
                 pHL2ResearchMode->m_depthSensorPosition[1] = pos.y;
                 pHL2ResearchMode->m_depthSensorPosition[2] = pos.z;
+
                 for (int p = 0; p < 4; ++p)
                 {
                     for (int q = 0; q < 4; ++q)
@@ -796,16 +793,6 @@ namespace winrt::HL2UnityPlugin::implementation
                     }
                 }
 
-                auto roiCenterFloat = XMFLOAT3(pHL2ResearchMode->m_roiCenter[0], pHL2ResearchMode->m_roiCenter[1], pHL2ResearchMode->m_roiCenter[2]);
-                auto roiBoundFloat = XMFLOAT3(pHL2ResearchMode->m_roiBound[0], pHL2ResearchMode->m_roiBound[1], pHL2ResearchMode->m_roiBound[2]);
-
-                pHL2ResearchMode->mu.unlock();
-
-                XMVECTOR roiCenter = XMLoadFloat3(&roiCenterFloat);
-                XMVECTOR roiBound = XMLoadFloat3(&roiBoundFloat);
-#ifdef COLOR_FROM_PLUGIN
-                winrt::Windows::Foundation::Numerics::float3* depthPts = new winrt::Windows::Foundation::Numerics::float3[resolution.Height * resolution.Width];
-#endif
                 for (UINT i = 0; i < resolution.Height; i++)
                 {
                     for (UINT j = 0; j < resolution.Width; j++)
@@ -814,66 +801,42 @@ namespace winrt::HL2UnityPlugin::implementation
                         UINT16 depth = pDepth[idx];
                         depth = (pSigma[idx] & 0x80) ? 0 : depth - pHL2ResearchMode->m_depthOffset;
 
-                        /*auto idx = resolution.Width * i + j;
-                        UINT16 depth = pDepth[idx];
-                        depth = (depth > 4090) ? 0 : depth - pHL2ResearchMode->m_depthOffset;*/
 
-                        // back-project point cloud within Roi
-                        //if (i > pHL2ResearchMode->depthCamRoi.kRowLower * resolution.Height && i < pHL2ResearchMode->depthCamRoi.kRowUpper * resolution.Height &&
-                        //    j > pHL2ResearchMode->depthCamRoi.kColLower * resolution.Width && j < pHL2ResearchMode->depthCamRoi.kColUpper * resolution.Width)// &&
-                            //depth > pHL2ResearchMode->depthCamRoi.depthNearClip && depth < pHL2ResearchMode->depthCamRoi.depthFarClip)
+                        float xy[2] = { 0, 0 };
+                        float uv[2] = { ((float)j) + 0.5f, ((float)i) + 0.5f };
+                        float z = 1.0f;
+                        HRESULT hr = pHL2ResearchMode->m_pLongDepthCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
+                        //auto pointOnUnitPlane = XMFLOAT3(xy[0], xy[1], 1);
+                        if (FAILED(hr))
                         {
-                            float xy[2] = { 0, 0 };
-                            float uv[2] = { ((float)j) + 0.5f, ((float)i) + 0.5f };
-                            float z = 1.0f;
-                            HRESULT hr = pHL2ResearchMode->m_pLongDepthCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
-                            //auto pointOnUnitPlane = XMFLOAT3(xy[0], xy[1], 1);
-                            if (FAILED(hr))
-                            {
-                                z = 0.0f;
-                                depthPts[idx].x = 0.0f;
-                                depthPts[idx].y = 0.0f;
-                                depthPts[idx].z = 0.0f;
-                                //pointCloud.push_back(xy[0]);// XMVectorGetX(pointInWorld));
-                                //pointCloud.push_back(xy[1]);// XMVectorGetY(pointInWorld));
-                                //pointCloud.push_back(z);
-                                continue;
-                            }
-
-                            const float norm = sqrtf(xy[0] * xy[0] + xy[1] * xy[1] + z * z);
-                            if (norm > 0.0f)
-                            {
-                                const float invNorm = 1.0f / norm;
-                                xy[0] *= invNorm;
-                                xy[1] *= invNorm;
-                                z *= invNorm;
-                            }
-                            else
-                            {
-                                z = 0.0f;
-                            }
-                            //auto tempPoint = (float)depth / 4000 * XMVector3Normalize(XMLoadFloat3(&pointOnUnitPlane));
-                            // apply transformation
-                            //auto pointInWorld = XMVector3Transform(tempPoint, depthToWorld);
-                            //pointInWorld.n128_f32[0] /= pointInWorld.n128_f32[3];
-                            //pointInWorld.n128_f32[1] /= pointInWorld.n128_f32[3];
-                            //pointInWorld.n128_f32[2] /= pointInWorld.n128_f32[3];
-                            // filter point cloud based on region of interest
-                            /*if (!pHL2ResearchMode->m_useRoiFilter ||
-                                (pHL2ResearchMode->m_useRoiFilter && XMVector3InBounds(pointInWorld - roiCenter, roiBound)))
-                            {*/
-                            float d = (float)depth/1000.0f;
-                            XMFLOAT3 tempPoint = XMFLOAT3(xy[0] * d, xy[1] * d, z*d);
-                            auto pointInWorld = XMVector3Transform(XMLoadFloat3(&tempPoint), depthToWorld);
-
-                            depthPts[idx].x = pointInWorld.n128_f32[0];// /= pointInWorld.n128_f32[3];
-                            depthPts[idx].y = pointInWorld.n128_f32[1];// /= pointInWorld.n128_f32[3];
-                            depthPts[idx].z = pointInWorld.n128_f32[2];// /= pointInWorld.n128_f32[3];
-                            //pointCloud.push_back(xy[0]);// XMVectorGetX(pointInWorld));
-                            //pointCloud.push_back(xy[1]);// XMVectorGetY(pointInWorld));
-                            //pointCloud.push_back(z);// -XMVectorGetZ(pointInWorld));
-                        //}
+                            z = 0.0f;
+                            pHL2ResearchMode->_depthPts[idx].x = 0.0f;
+                            pHL2ResearchMode->_depthPts[idx].y = 0.0f;
+                            pHL2ResearchMode->_depthPts[idx].z = 0.0f;
+                            continue;
                         }
+
+                        const float norm = sqrtf(xy[0] * xy[0] + xy[1] * xy[1] + z * z);
+                        if (norm > 0.0f)
+                        {
+                            const float invNorm = 1.0f / norm;
+                            xy[0] *= invNorm;
+                            xy[1] *= invNorm;
+                            z *= invNorm;
+                        }
+                        else
+                        {
+                            z = 0.0f;
+                        }
+
+                        float d = (float)depth/1000.0f;
+                        XMFLOAT3 tempPoint = XMFLOAT3(xy[0] * d, xy[1] * d, z*d);
+                        auto pointInWorld = XMVector3Transform(XMLoadFloat3(&tempPoint), depthToWorld);
+
+                        pHL2ResearchMode->_depthPts[idx].x = pointInWorld.n128_f32[0];// /= pointInWorld.n128_f32[3];
+                        pHL2ResearchMode->_depthPts[idx].y = pointInWorld.n128_f32[1];// /= pointInWorld.n128_f32[3];
+                        pHL2ResearchMode->_depthPts[idx].z = pointInWorld.n128_f32[2];// /= pointInWorld.n128_f32[3];
+
 
                         // save as grayscale texture pixel into temp buffer
                         if (depth == 0) {
@@ -885,35 +848,16 @@ namespace winrt::HL2UnityPlugin::implementation
                             pDepthTexture.get()[idx] = (uint8_t)((float)depth / 4000 * 255);
                             pDepthTextureFiltered.get()[idx] = depth;
                         }
-
-                        // save the depth of center pixel
-                        /*if (i == (UINT)(0.35 * resolution.Height) && j == (UINT)(0.5 * resolution.Width)
-                            && pointCloud.size() >= 3)
-                        {
-                            pHL2ResearchMode->m_centerDepth = depth;
-                            if (depth > pHL2ResearchMode->depthCamRoi.depthNearClip && depth < pHL2ResearchMode->depthCamRoi.depthFarClip)
-                            {
-                                std::lock_guard<std::mutex> l(pHL2ResearchMode->mu);
-                                pHL2ResearchMode->m_centerPoint[0] = *(pointCloud.end() - 3);
-                                pHL2ResearchMode->m_centerPoint[1] = *(pointCloud.end() - 2);
-                                pHL2ResearchMode->m_centerPoint[2] = *(pointCloud.end() - 1);
-                            }
-                        }*/
                     }
                 }
                 
 #ifdef COLOR_FROM_PLUGIN
                
-                pHL2ResearchMode->mu.lock();
-
                 winrt::Windows::Foundation::Numerics::float4x4 worldToPV = winrt::Windows::Foundation::Numerics::float4x4::identity();
 
                 if (pHL2ResearchMode->m_latestFrame != nullptr)
                 {
                     winrt::Windows::Media::Capture::Frames::MediaFrameReference frame = pHL2ResearchMode->m_latestFrame;
-
-                    //float fx = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().x;
-                    //float fy = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().y;
 
                     winrt::Windows::Foundation::Numerics::float4x4 PVtoWorldtransform;
                     winrt::Windows::Foundation::Numerics::float4x4 worldToPVtransform;
@@ -921,9 +865,6 @@ namespace winrt::HL2UnityPlugin::implementation
                     auto PVtoWorld =
                         frame.CoordinateSystem().TryGetTransformTo(pHL2ResearchMode->m_refFrame);
                     
-                    //winrt::Windows::Foundation::Numerics::float4x4::invert(PVToWorld, &worldToPV);
-                    //frame.VideoMediaFrame().CameraIntrinsics().ProjectManyOntoFrame();
-
                     if (PVtoWorld)
                     {
                         PVtoWorldtransform = PVtoWorld.Value();
@@ -987,15 +928,12 @@ namespace winrt::HL2UnityPlugin::implementation
                         worldToPVtransform.m43 = pvCamToWorld._43;
                         worldToPVtransform.m44 = pvCamToWorld._44;
 
-                        //pHL2ResearchMode->m_PVfov[0] = fx;
-                        //pHL2ResearchMode->m_PVfov[1] = fy;
                         //_PVtoWorldtransform = PVtoWorldtransform;
                     }
                     else
                     {
-    #if DBG_ENABLE_VERBOSE_LOGGING
                         OutputDebugStringW(L"Streamer::SendFrame: Could not locate frame.\n");
-    #endif
+                        pHL2ResearchMode->mu.unlock();
                         return;
                     }
 
@@ -1005,7 +943,6 @@ namespace winrt::HL2UnityPlugin::implementation
                     
                     /*wchar_t fName[50];
                     wprintf(fName, "test%u.jpg", frameCount);
-
                     CreateLocalFile(fName, softwareBitmap);*/
 
                     //frameCount++;
@@ -1049,7 +986,7 @@ namespace winrt::HL2UnityPlugin::implementation
                         pHL2ResearchMode->m_colorBufferSize = pixelBufferDataLength;
                     }
 
-                    std::vector<uint8_t> imageBufferAsVector;
+                    /*std::vector<uint8_t> imageBufferAsVector;
                     for (int row = 0; row < imageHeight; row += scaleFactor)
                     {
                         for (int col = 0; col < rowStride; col += scaleFactor * pixelStride)
@@ -1060,10 +997,12 @@ namespace winrt::HL2UnityPlugin::implementation
                                 //pHL2ResearchMode->m_pixelBufferData[row * rowStride + col + j] = pixelBufferData[row * rowStride + col + j];
                             }
                         }
-                    }
+                    }*/
 
-                    //memcpy(pHL2ResearchMode->m_pixelBufferData, pixelBufferData, pHL2ResearchMode->m_colorBufferSize); 
+                    memcpy(pHL2ResearchMode->m_pixelBufferData, pixelBufferData, pHL2ResearchMode->m_colorBufferSize); 
 
+
+#ifdef USE_MVP
                     winrt::Windows::Foundation::Numerics::float4x4 projMat = frame.VideoMediaFrame().CameraIntrinsics().UndistortedProjectionTransform();
 
                     winrt::Windows::Foundation::Numerics::float4x4 mvpColor = projMat * worldToPVtransform;
@@ -1084,9 +1023,8 @@ namespace winrt::HL2UnityPlugin::implementation
                     pHL2ResearchMode->m_PV_MVP._42 = mvpColor.m42;
                     pHL2ResearchMode->m_PV_MVP._43 = mvpColor.m43;
                     pHL2ResearchMode->m_PV_MVP._44 = mvpColor.m44;
-                    //
-                    //
-#ifdef USE_MVP
+                    
+                    DirectX::XMMATRIX pMVP = XMLoadFloat4x4(&pHL2ResearchMode->m_PV_MVP);
 
 #else
                     std::vector<winrt::Windows::Foundation::Numerics::float3> camPoints;
@@ -1098,10 +1036,10 @@ namespace winrt::HL2UnityPlugin::implementation
                         {
                             UINT idx = resolution.Width * i + j;
                             XMFLOAT3 depthVec;
-                            depthVec.x = depthPts[idx].x;
-                            depthVec.y = depthPts[idx].y;
-                            depthVec.z = depthPts[idx].z;
-                            //depthVec.w = depthPts[idx].w;
+                            depthVec.x = pHL2ResearchMode->_depthPts[idx].x;
+                            depthVec.y = pHL2ResearchMode->_depthPts[idx].y;
+                            depthVec.z = pHL2ResearchMode->_depthPts[idx].z;
+                            //depthVec.w = pHL2ResearchMode->_depthPts[idx].w;
                             XMVECTOR pointInPVCam = XMVector3Transform(XMLoadFloat3(&depthVec), pHL2ResearchMode->m_PVCameraPoseInvMatrix);
                             winrt::Windows::Foundation::Numerics::float3 cp;
                             cp.x = pointInPVCam.n128_f32[0];
@@ -1112,7 +1050,6 @@ namespace winrt::HL2UnityPlugin::implementation
                             p.X = 0;
                             p.Y = 0;
                             screenPoints.push_back(p);
-                            //depthVec = depthVec * pHL2ResearchMode->m_PVCameraPoseInvMatrix;
                         }
                     }
 
@@ -1122,22 +1059,21 @@ namespace winrt::HL2UnityPlugin::implementation
 
                     frame.VideoMediaFrame().CameraIntrinsics().ProjectManyOntoFrame(camPointsView, screenPointsView);
 #endif
-                    DirectX::XMMATRIX pMVP = XMLoadFloat4x4(&pHL2ResearchMode->m_PV_MVP);
-
-                    const int COLOR_WIDTH = 760;
+                    
                     //iterate through screenpointsview and lookup colors...
                     for (UINT i = 0; i < resolution.Height; i++)
                     {
+                        UINT wIdx = resolution.Width * i;
                         for (UINT j = 0; j < resolution.Width; j++)
                         {
-                            UINT idx = resolution.Width * i + j;
+                            UINT idx = wIdx + j;
 #ifdef USE_MVP
                             XMFLOAT4 depthVec;
-                            depthVec.x = depthPts[idx].x;
-                            depthVec.y = depthPts[idx].y;
-                            depthVec.z = depthPts[idx].z;
+                            depthVec.x = pHL2ResearchMode->_depthPts[idx].x;
+                            depthVec.y = pHL2ResearchMode->_depthPts[idx].y;
+                            depthVec.z = pHL2ResearchMode->_depthPts[idx].z;
                             depthVec.w = 1.0f;
-                            //depthVec.w = depthPts[idx].w;
+                            //depthVec.w = pHL2ResearchMode->_depthPts[idx].w;
                             
                             XMVECTOR pointInPVCam = XMVector4Transform(XMLoadFloat4(&depthVec), pMVP);
                             float fX = pointInPVCam.n128_f32[0] / pointInPVCam.n128_f32[3];
@@ -1150,7 +1086,7 @@ namespace winrt::HL2UnityPlugin::implementation
 #else
                             float fX = screenPointsView[idx].X; // imageWidth;
                             float fY = screenPointsView[idx].Y; // imageHeight;
-                            float fZ = 0.0f;
+                            
                             if(fX > 0.0f && fX < imageWidth && fY > 0.0f && fY < imageHeight)
 #endif
                             
@@ -1159,31 +1095,29 @@ namespace winrt::HL2UnityPlugin::implementation
 #ifdef USE_MVP
                                 UINT cIdx = (UINT)((imageWidth * 4) * (imageHeight - (imageHeight * fY)) + (fX * (imageWidth * 4)));
 #else
-                                INT cIdx = (INT)((imageWidth*4) * (INT)(imageHeight-fY)) + (INT)(imageWidth-fX)*4;
+                                INT cIdx = (INT)((imageWidth*4) * (INT)(imageHeight-fY)) + (INT)(imageWidth-1-fX)*4;
 #endif
                                 if (cIdx > 0 && cIdx < (INT)(imageWidth * 4 * imageHeight))
                                 {
                                 
-                                    UINT8 r = imageBufferAsVector[cIdx + 2];// pHL2ResearchMode->m_pixelBufferData[cIdx + 2];
-                                    UINT8 g = imageBufferAsVector[cIdx + 1]; //pHL2ResearchMode->m_pixelBufferData[cIdx + 1];
-                                    UINT8 b = imageBufferAsVector[cIdx]; //pHL2ResearchMode->m_pixelBufferData[cIdx];
-                                    UINT8 a = imageBufferAsVector[cIdx + 3]; //pHL2ResearchMode->m_pixelBufferData[cIdx + 3];
+                                    UINT8 r = pHL2ResearchMode->m_pixelBufferData[cIdx + 2];// imageBufferAsVector[cIdx + 2];// ;
+                                    UINT8 g = pHL2ResearchMode->m_pixelBufferData[cIdx + 1]; //imageBufferAsVector[cIdx + 1]; //
+                                    UINT8 b = pHL2ResearchMode->m_pixelBufferData[cIdx];//imageBufferAsVector[cIdx]; //
+                                    UINT8 a = pHL2ResearchMode->m_pixelBufferData[cIdx + 3]; //imageBufferAsVector[cIdx + 3]; //
 
-                                    pointCloud.push_back(depthPts[idx].x);
-                                    pointCloud.push_back(depthPts[idx].y);
-                                    pointCloud.push_back(depthPts[idx].z);
+                                    pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].x);
+                                    pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].y);
+                                    pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].z);
                                     pointCloud.push_back((float)r/255.0f);
                                     pointCloud.push_back((float)g/255.0f);
                                     pointCloud.push_back((float)b/255.0f);
-                                    //pointCloud.push_back((float)screenPointsView[idx].X);
-                                    //pointCloud.push_back((float)screenPointsView[idx].Y);
-                                    //pointCloud.push_back((float)cIdx);
+
                                 }
                                 else
                                 {
-                                    /*pointCloud.push_back(depthPts[idx].x);
-                                    pointCloud.push_back(depthPts[idx].y);
-                                    pointCloud.push_back(depthPts[idx].z);
+                                    /*pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].x);
+                                    pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].y);
+                                    pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].z);
                                     pointCloud.push_back(0.0f);
                                     pointCloud.push_back(1.0f);
                                     pointCloud.push_back(0.0f);*/
@@ -1191,9 +1125,9 @@ namespace winrt::HL2UnityPlugin::implementation
                             }
                             else
                             {
-                               /*pointCloud.push_back(depthPts[idx].x);
-                                pointCloud.push_back(depthPts[idx].y);
-                                pointCloud.push_back(depthPts[idx].z);
+                               /*pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].x);
+                                pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].y);
+                                pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].z);
                                 pointCloud.push_back(1.0f);
                                 pointCloud.push_back(0.0f);
                                 pointCloud.push_back(0.0f);*/
@@ -1203,7 +1137,6 @@ namespace winrt::HL2UnityPlugin::implementation
                 }
                 
 #endif 
-                //std::lock_guard<std::mutex> l(pHL2ResearchMode->mu);
                 // save point cloud
                 if (!pHL2ResearchMode->m_pointCloud)
                 {
@@ -1493,22 +1426,6 @@ namespace winrt::HL2UnityPlugin::implementation
             OutputDebugString(L"Long depth not updated...\n");
         }*/
         return updated;
-    }
-       
-    void HL2ResearchMode::SetLongDepthMapTextureUpdatedOff() 
-    {
-        mu.lock();
-        m_longDepthMapTextureUpdated = false; 
-        mu.unlock();
-        //OutputDebugString(L"Setting long depth off...\n");
-    }
-
-    void HL2ResearchMode::SetShouldGetDepth() 
-    { 
-        mu.lock();
-        m_shouldGetDepth = true;
-        mu.unlock();
-        //OutputDebugString(L"Setting should get depth...\n");
     }
 
 	inline bool HL2ResearchMode::LFImageUpdated() { return m_LFImageUpdated; }
@@ -1857,14 +1774,6 @@ namespace winrt::HL2UnityPlugin::implementation
         com_array<float> colorToWorld = com_array<float>(std::move_iterator(m_PVToWorld), std::move_iterator(m_PVToWorld + 16));
 
         return colorToWorld;
-    }
-
-    com_array<float> HL2ResearchMode::GetPVFOV()
-    {
-        std::lock_guard<std::mutex> l(mu);
-        com_array<float> fov = com_array<float>(std::move_iterator(m_PVfov), std::move_iterator(m_PVfov + 2));
-
-        return fov;
     }
 
     // Set the reference coordinate system. Need to be set before the sensor loop starts; otherwise, default coordinate will be used.

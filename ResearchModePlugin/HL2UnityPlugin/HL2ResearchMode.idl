@@ -27,7 +27,6 @@ namespace HL2UnityPlugin
         Single[] GetCurrRotation();
         Single[] GetCurrPosition();
         Single[] GetPVMatrix();
-        Single[] GetPVFOV();
 
         Int32 GetDepthBufferSize();
         Int32 GetLongDepthBufferSize();
@@ -42,8 +41,7 @@ namespace HL2UnityPlugin
         Boolean ShortAbImageTextureUpdated();
         Boolean PointCloudUpdated();
         Boolean LongDepthMapTextureUpdated();
-        void SetLongDepthMapTextureUpdatedOff();
-        void SetShouldGetDepth();
+
 		Boolean LFImageUpdated();
 		Boolean RFImageUpdated();
         Boolean LRImageUpdated();

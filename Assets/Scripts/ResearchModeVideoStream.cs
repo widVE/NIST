@@ -318,7 +318,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 			//researchMode.InitializePVCamera();
 			
 			researchMode.StartLongDepthSensorLoop();
-			researchMode.SetShouldGetDepth();
+			//researchMode.SetShouldGetDepth();
 #if COLOR_FROM_PLUGIN
 			researchMode.StartPVCameraLoop();
 #endif
@@ -1280,12 +1280,12 @@ public class ResearchModeVideoStream : MonoBehaviour
 			
 			Debug.Log("Stopping photo mode async");
 			photoCaptureObject.StopPhotoModeAsync(OnStoppedPhotoMode);
-			researchMode.SetShouldGetDepth();
+			//researchMode.SetShouldGetDepth();
 		}
 		else
 		{
 			Debug.Log("Stopping photo mode async 2");
-			researchMode.SetShouldGetDepth();
+			//researchMode.SetShouldGetDepth();
 		}
 #endif
 #endif	
@@ -1719,7 +1719,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 #else
 		if(_firstLoop)
 		{
-			researchMode.SetShouldGetDepth();
+			//researchMode.SetShouldGetDepth();
 			_firstLoop = false;
 		}
 		
@@ -1898,7 +1898,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 				//scanTransPV is now the MVP matrix of the color camera, this is used to project back unprojected depth image data to the color image
 				//to look up what corresponding color matches the depth, if any
 				Matrix4x4 projectionMatrix = Matrix4x4.identity;
-				float[] fovVals = researchMode.GetPVFOV();
+				/*float[] fovVals = researchMode.GetPVFOV();
 				
 				//Debug.Log(fovVals[0] + " " + fovVals[1]);
 				
@@ -1911,7 +1911,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 				projectionMatrix[10] = 1f;//-(c.farClipPlane + c.nearClipPlane)/(c.farClipPlane - c.nearClipPlane);
 				projectionMatrix[11] = 0f;//1f;
 				projectionMatrix[14] = 0f;//-2f * (c.farClipPlane * c.nearClipPlane)/(c.farClipPlane - c.nearClipPlane);
-				projectionMatrix[15] = 0f;
+				projectionMatrix[15] = 0f;*/
 				
 				
 				scanTransPV = projectionMatrix * worldToCamera;

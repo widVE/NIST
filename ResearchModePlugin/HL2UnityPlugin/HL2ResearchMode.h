@@ -16,8 +16,6 @@
 #include<winrt/Windows.Perception.Spatial.h>
 #include<winrt/Windows.Perception.Spatial.Preview.h>
 #include <shared_mutex>
-//#include "VideoCameraFrameProcessor.h"
-//#include "VideoCameraStreamer.h"
 
 
 namespace winrt::HL2UnityPlugin::implementation
@@ -52,8 +50,7 @@ namespace winrt::HL2UnityPlugin::implementation
         bool ShortAbImageTextureUpdated();
         bool PointCloudUpdated();
         bool LongDepthMapTextureUpdated();
-        void SetLongDepthMapTextureUpdatedOff();
-        void SetShouldGetDepth();
+
 		bool LFImageUpdated();
 		bool RFImageUpdated();
         bool LRImageUpdated();
@@ -83,7 +80,6 @@ namespace winrt::HL2UnityPlugin::implementation
         com_array<float> GetCurrRotation();
         com_array<float> GetCurrPosition();
         com_array<float> GetPVMatrix();
-        com_array<float> GetPVFOV();
 
         std::mutex mu;
         std::shared_mutex m_frameMutex;
@@ -96,9 +92,6 @@ namespace winrt::HL2UnityPlugin::implementation
 
         winrt::Windows::Foundation::IAsyncAction StartColorAsync();
         winrt::event_token m_OnFrameArrivedRegistration;
-
-        //std::unique_ptr<VideoCameraFrameProcessor> m_pVideoFrameProcessor = nullptr;
-        //std::shared_ptr<VideoCameraStreamer> m_pVideoFrameStreamer = nullptr;
         
         winrt::Windows::Media::Capture::Frames::MediaFrameReference m_latestFrame = nullptr;
         winrt::Windows::Media::Capture::Frames::MediaFrameReader m_mediaFrameReader = nullptr;
@@ -117,6 +110,7 @@ namespace winrt::HL2UnityPlugin::implementation
         UINT8* m_LRImage = nullptr;
         UINT8* m_RRImage = nullptr;
         UINT8* m_pixelBufferData = nullptr;
+
         IResearchModeSensor* m_depthSensor = nullptr;
         IResearchModeCameraSensor* m_pDepthCameraSensor = nullptr;
         IResearchModeSensor* m_longDepthSensor = nullptr;
@@ -140,6 +134,7 @@ namespace winrt::HL2UnityPlugin::implementation
         IResearchModeSensorDeviceConsent* m_pSensorDeviceConsent = nullptr;
         Windows::Perception::Spatial::SpatialLocator m_locator = 0;
         Windows::Perception::Spatial::SpatialCoordinateSystem m_refFrame = nullptr;
+
         std::atomic_int m_depthBufferSize = 0;
         std::atomic_int m_longDepthBufferSize = 0;
         std::atomic_int m_colorBufferSize = 0;
@@ -147,14 +142,16 @@ namespace winrt::HL2UnityPlugin::implementation
         std::atomic_int m_RFbufferSize = 0;
         std::atomic_int m_LRbufferSize = 0;
         std::atomic_int m_RRbufferSize = 0;
+
         std::atomic_uint16_t m_centerDepth = 0;
+
         float m_centerPoint[3]{ 0,0,0 };
         float m_depthSensorPosition[3]{ 0,0,0 };
         float m_depthToWorld[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
         float m_currRotation[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
         float m_currPosition[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
         float m_PVToWorld[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
-        float m_PVfov[2]{ 0,0 };
+
         std::atomic_bool m_depthSensorLoopStarted = false;
         std::atomic_bool m_PVLoopStarted = false;
         std::atomic_bool m_longDepthSensorLoopStarted = false;
@@ -168,16 +165,18 @@ namespace winrt::HL2UnityPlugin::implementation
 		std::atomic_bool m_RFImageUpdated = false;
         std::atomic_bool m_LRImageUpdated = false;
         std::atomic_bool m_RRImageUpdated = false;
-        std::atomic_bool m_shouldGetDepth = false;
 
         float m_roiBound[3]{ 0,0,0 };
         float m_roiCenter[3]{ 0,0,0 };
+
         static void DepthSensorLoop(HL2ResearchMode* pHL2ResearchMode);
         static void LongDepthSensorLoop(HL2ResearchMode* pHL2ResearchMode);
         static void SpatialCamerasFrontLoop(HL2ResearchMode* pHL2ResearchMode);
         static void CamAccessOnComplete(ResearchModeSensorConsent consent);
         static void ColorSensorLoop(HL2ResearchMode* pHL2ResearchMode);
+
         std::string MatrixToString(DirectX::XMFLOAT4X4 mat);
+
         DirectX::XMFLOAT4X4 m_depthCameraPose;
         DirectX::XMMATRIX m_depthCameraPoseInvMatrix;
         DirectX::XMFLOAT4X4 m_longDepthCameraPose;
@@ -193,11 +192,17 @@ namespace winrt::HL2UnityPlugin::implementation
         DirectX::XMFLOAT4X4 m_PVCameraPose;
         DirectX::XMMATRIX m_PVCameraPoseInvMatrix;
         DirectX::XMFLOAT4X4 m_PV_MVP;
+
         std::thread* m_pDepthUpdateThread;
         std::thread* m_pLongDepthUpdateThread;
         std::thread* m_pSpatialCamerasFrontUpdateThread;
         std::thread *m_pColorUpdateThread;
+
+        winrt::Windows::Foundation::Numerics::float3* _depthPts = 0;
+
         static long long checkAndConvertUnsigned(UINT64 val);
+
+        //this is for short throw depth camera...
         struct DepthCamRoi {
             float kRowLower = 0.2;
             float kRowUpper = 0.5;

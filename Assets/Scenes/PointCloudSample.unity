@@ -1199,10 +1199,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _captureTime: 1
-  _colorRT: {fileID: 8400000, guid: 5a7ecc7d9f6de6843b3778389dad01ce, type: 2}
-  _colorCopyMaterial: {fileID: 2100000, guid: 748aaa792b540014dab1d631cface284, type: 2}
-  _depthCopyMaterial: {fileID: 2100000, guid: e2751f21b4f612748b9979193f5a11ad, type: 2}
-  _tsdfShader: {fileID: 7200000, guid: 2940ca67a277a8c4998cf58e1466cf16, type: 3}
+  _captureColorPointCloud: 1
+  _captureColorImages: 0
+  _captureDepthImages: 0
+  _captureHiResColorImages: 0
+  _captureTransforms: 0
   _writeImagesToDisk: 0
 --- !u!1 &891683166
 GameObject:
