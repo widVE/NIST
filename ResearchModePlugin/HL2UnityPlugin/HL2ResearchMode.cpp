@@ -1117,20 +1117,26 @@ namespace winrt::HL2UnityPlugin::implementation
                                 {
                                     /*pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].x);
                                     pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].y);
-                                    pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].z);
+                                    pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].z);*/
                                     pointCloud.push_back(0.0f);
-                                    pointCloud.push_back(1.0f);
-                                    pointCloud.push_back(0.0f);*/
+                                    pointCloud.push_back(0.0f);
+                                    pointCloud.push_back(0.0f);
+                                    pointCloud.push_back(0.0f);
+                                    pointCloud.push_back(0.0f);
+                                    pointCloud.push_back(0.0f);
                                 }
                             }
                             else
                             {
                                /*pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].x);
                                 pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].y);
-                                pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].z);
-                                pointCloud.push_back(1.0f);
+                                pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].z);*/
                                 pointCloud.push_back(0.0f);
-                                pointCloud.push_back(0.0f);*/
+                                pointCloud.push_back(0.0f);
+                                pointCloud.push_back(0.0f);
+                                pointCloud.push_back(0.0f);
+                                pointCloud.push_back(0.0f);
+                                pointCloud.push_back(0.0f);
                             }
                         }
                     }

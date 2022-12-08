@@ -135,7 +135,7 @@ public class HololensDepthPVCapture : MonoBehaviour
         {
             _lastCaptureTime = currTime;
 
-			string debugOut = Path.Combine(Application.persistentDataPath, DateTime.Now.ToString("M_dd_yyyy_hh_mm_ss_")+_fileOutNumber.ToString();//+".xyz");
+			string debugOut = Path.Combine(Application.persistentDataPath, DateTime.Now.ToString("M_dd_yyyy_hh_mm_ss_")+_fileOutNumber.ToString());//+".xyz");
 			_fileOutNumber++;
 					
 			if(_captureColorPointCloud)
@@ -157,7 +157,10 @@ public class HololensDepthPVCapture : MonoBehaviour
 					for (int i = 0; i < pcLen; i+=6)
 					{
 						//pointCloudVector3[i] = new Vector3(pointCloudBuffer[3 * i], pointCloudBuffer[3 * i + 1], pointCloudBuffer[3 * i + 2]);
-						s.Write(_pcTest[i*6].ToString("F4") + " " + _pcTest[i*6+1].ToString("F4")+ " " + _pcTest[i*6+2].ToString("F4") + " " + _pcTest[i*6+3].ToString("F4") + " " + _pcTest[i*6+4].ToString("F4")+ " " + _pcTest[i*6+5].ToString("F4")+ "\n");
+						if(_pcTest[i*6] != 0f && _pcTest[i*6+1] != 0f && _pcTest[i*6+2] != 0f)
+						{
+							s.Write(_pcTest[i*6].ToString("F4") + " " + _pcTest[i*6+1].ToString("F4")+ " " + _pcTest[i*6+2].ToString("F4") + " " + _pcTest[i*6+3].ToString("F4") + " " + _pcTest[i*6+4].ToString("F4")+ " " + _pcTest[i*6+5].ToString("F4")+ "\n");
+						}
 					}
 					
 					s.Flush();
@@ -229,7 +232,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 						float g = (_pcTest[i + 4]);
 						float b = (_pcTest[i + 5]);
 
-						colorArray.Add(new Color(r, g, b, 1.0));
+						colorArray.Add(new Color(r, g, b, 1.0f));
 					}
 					
 					File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, debugOut+"_color_rect.png"), ImageConversion.EncodeArrayToPNG(colorArray.ToArray(), UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, DEPTH_WIDTH, DEPTH_HEIGHT));
