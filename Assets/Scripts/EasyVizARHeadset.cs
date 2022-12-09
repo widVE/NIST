@@ -277,7 +277,6 @@ public class EasyVizARHeadset : MonoBehaviour
 		h.orientation.y = transform.rotation[1];
 		h.orientation.z = transform.rotation[2];
 		h.orientation.w = transform.rotation[3];
-		h.name = _headsetName;
 		h.location_id = _locationID;
 		
 		EasyVizARServer.Instance.Patch("headsets/"+_headsetID, EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), PostPositionCallback);

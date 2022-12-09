@@ -75,7 +75,6 @@ namespace EasyVizAR
 	[System.Serializable]
 	public class HeadsetPositionUpdate
     {
-		public string name;
 		public string location_id;
 		public Orientation orientation;
 		public Position position;
