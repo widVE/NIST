@@ -41,6 +41,9 @@ public class HololensDepthPVCapture : MonoBehaviour
 	bool _captureDepthImages = false;
 	
 	[SerializeField]
+	bool _captureBinaryDepth = false;
+	
+	[SerializeField]
 	bool _captureTransforms = false;
 	
 	[SerializeField]
@@ -148,7 +151,8 @@ public class HololensDepthPVCapture : MonoBehaviour
 					for(int j = 0; j < DEPTH_WIDTH; ++j)
 					{
 						int idx = i * DEPTH_WIDTH + j;
-						byte[] bd = BitConverter.GetBytes(frameTextureFiltered[idx]);
+						int otherIndex = (DEPTH_HEIGHT - i - 1) * (DEPTH_WIDTH) + j;
+						byte[] bd = BitConverter.GetBytes(frameTextureFiltered[otherIndex]);
 						depthTextureFilteredBytes[b2Row + j * 2] = bd[0];
 						depthTextureFilteredBytes[b2Row + j * 2 + 1] = bd[1];
 					}
@@ -164,13 +168,18 @@ public class HololensDepthPVCapture : MonoBehaviour
 				int stride = 4;
 				float denominator = 1.0f / 255.0f;
 				List<Color> colorArray = new List<Color>();
+				int rowStride = stride * COLOR_WIDTH;
+				
 				for (int i = 0; i < colorTextureBuffer.Length; i += stride)
 				{
-					//int idx = colorTextureBuffer.Length-stride-i;
-					float a = (int)(colorTextureBuffer[i + 3]) * denominator;
-					float r = (int)(colorTextureBuffer[i + 2]) * denominator;
-					float g = (int)(colorTextureBuffer[i + 1]) * denominator;
-					float b = (int)(colorTextureBuffer[i]) * denominator;
+					int colIdx = (i % rowStride) / stride;
+					int rowIdx = i / rowStride;
+					
+					int idx = (rowStride * (COLOR_HEIGHT - rowIdx - 1)) + (colIdx*stride);//((rowStride - stride) - (colIdx*stride));// colorTextureBuffer.Length-stride-i;
+					float a = (int)(colorTextureBuffer[idx + 3]) * denominator;
+					float r = (int)(colorTextureBuffer[idx + 2]) * denominator;
+					float g = (int)(colorTextureBuffer[idx + 1]) * denominator;
+					float b = (int)(colorTextureBuffer[idx]) * denominator;
 
 					colorArray.Add(new Color(r, g, b, a));
 				}
@@ -195,15 +204,19 @@ public class HololensDepthPVCapture : MonoBehaviour
 					}
 					
 					int stride = 6;
-
+					int rowStride = stride * DEPTH_WIDTH;
+					
 					List<Color> colorArray = new List<Color>();
 					for (int i = 0; i < pcLen; i += stride)
 					{
-						//int idx = colorTextureBuffer.Length-stride-i;
+						int colIdx = (i % rowStride) / stride;
+						int rowIdx = i / rowStride;
+						
+						int idx = (rowStride * (DEPTH_HEIGHT - rowIdx - 1)) + (colIdx*stride);//pcLen-stride-i;
 						//float a = (int)(_pcTest[i + 3]);
-						float r = (_pcTest[i + 3]);
-						float g = (_pcTest[i + 4]);
-						float b = (_pcTest[i + 5]);
+						float r = (_pcTest[idx + 3]);
+						float g = (_pcTest[idx + 4]);
+						float b = (_pcTest[idx + 5]);
 
 						colorArray.Add(new Color(r, g, b, 1.0f));
 					}
@@ -234,15 +247,33 @@ public class HololensDepthPVCapture : MonoBehaviour
 					for (int i = 0; i < pcLen; i+=6)
 					{
 						//pointCloudVector3[i] = new Vector3(pointCloudBuffer[3 * i], pointCloudBuffer[3 * i + 1], pointCloudBuffer[3 * i + 2]);
-						if(_pcTest[i*6] != 0f && _pcTest[i*6+1] != 0f && _pcTest[i*6+2] != 0f)
+						if(_pcTest[i] != 0f && _pcTest[i+1] != 0f && _pcTest[i+2] != 0f)
 						{
-							s.Write(_pcTest[i*6].ToString("F4") + " " + _pcTest[i*6+1].ToString("F4")+ " " + _pcTest[i*6+2].ToString("F4") + " " + _pcTest[i*6+3].ToString("F4") + " " + _pcTest[i*6+4].ToString("F4")+ " " + _pcTest[i*6+5].ToString("F4")+ "\n");
+							s.Write(_pcTest[i].ToString("F4") + " " + _pcTest[i+1].ToString("F4")+ " " + _pcTest[i+2].ToString("F4") + " " + _pcTest[i+3].ToString("F4") + " " + _pcTest[i+4].ToString("F4")+ " " + _pcTest[i+5].ToString("F4")+ "\n");
 						}
 					}
 					
 					s.Flush();
 					s.Close();
 				}
+			}
+			
+			if(_captureTransforms)
+			{
+				float[] depthPos = researchMode.GetDepthToWorld();
+				
+				string depthString = depthPos[0].ToString("F4") + " " + depthPos[1].ToString("F4") + " " + depthPos[2].ToString("F4") + " " + depthPos[3].ToString("F4") + "\n";
+				depthString = depthString + (depthPos[4].ToString("F4") + " " + depthPos[5].ToString("F4") + " " + depthPos[6].ToString("F4") + " " + depthPos[7].ToString("F4") + "\n");
+				depthString = depthString + (depthPos[8].ToString("F4") + " " + depthPos[9].ToString("F4") + " " + depthPos[10].ToString("F4") + " " + depthPos[11].ToString("F4") + "\n");
+				depthString = depthString + (depthPos[12].ToString("F4") + " " + depthPos[13].ToString("F4") + " " + depthPos[14].ToString("F4") + " " + depthPos[15].ToString("F4") + "\n");
+				
+				/*string depthString = cameraToWorldMatrix[0].ToString("F4") + " " + cameraToWorldMatrix[1].ToString("F4") + " " + cameraToWorldMatrix[2].ToString("F4") + " " + cameraToWorldMatrix[3].ToString("F4") + "\n";
+				depthString = depthString + (cameraToWorldMatrix[4].ToString("F4") + " " + cameraToWorldMatrix[5].ToString("F4") + " " + cameraToWorldMatrix[6].ToString("F4") + " " + projectionMatrix[0].ToString("F4") + "\n");
+				depthString = depthString + (cameraToWorldMatrix[8].ToString("F4") + " " + cameraToWorldMatrix[9].ToString("F4") + " " + cameraToWorldMatrix[10].ToString("F4") + " " + projectionMatrix[5].ToString("F4") + "\n");
+				depthString = depthString + (cameraToWorldMatrix[12].ToString("F4") + " " + cameraToWorldMatrix[13].ToString("F4") + " " + cameraToWorldMatrix[14].ToString("F4") + " " + cameraToWorldMatrix[15].ToString("F4") + "\n");*/
+				
+			    string filenameTxt = debugOut+"_trans.txt";
+				System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxt), depthString);	
 			}
 			
 			/*byte[] colorTextureBuffer = researchMode.GetPVColorBuffer();

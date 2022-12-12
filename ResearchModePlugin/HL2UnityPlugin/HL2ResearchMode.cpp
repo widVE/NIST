@@ -268,10 +268,12 @@ namespace winrt::HL2UnityPlugin::implementation
         const winrt::Windows::Media::Capture::Frames::MediaFrameReader& sender,
         const winrt::Windows::Media::Capture::Frames::MediaFrameArrivedEventArgs& args)
     {
+        std::lock_guard<std::mutex> l(mu);
+
         if (winrt::Windows::Media::Capture::Frames::MediaFrameReference frame = sender.TryAcquireLatestFrame())
         {
 #ifdef COLOR_FROM_PLUGIN
-            std::lock_guard<std::mutex> l(mu);
+            
             m_latestFrame = frame;
             /*
             winrt::Windows::Foundation::Numerics::float4x4 PVtoWorldtransform;
@@ -712,12 +714,12 @@ namespace winrt::HL2UnityPlugin::implementation
 				continue;
 			}
 			
-            pHL2ResearchMode->mu.lock();
-
             IResearchModeSensorFrame* pDepthSensorFrame = nullptr;
             ResearchModeSensorResolution resolution;
+
+            pHL2ResearchMode->mu.lock();
             pHL2ResearchMode->m_longDepthSensor->GetNextBuffer(&pDepthSensorFrame);
-                
+
             pDepthSensorFrame->GetResolution(&resolution);
             pHL2ResearchMode->m_longDepthResolution = resolution;
 
@@ -803,7 +805,7 @@ namespace winrt::HL2UnityPlugin::implementation
 
 
                         float xy[2] = { 0, 0 };
-                        float uv[2] = { ((float)j) + 0.5f, ((float)i) + 0.5f };
+                        float uv[2] = { ((float)j) /* + 0.5f*/, ((float)i) /* + 0.5f*/};
                         float z = 1.0f;
                         HRESULT hr = pHL2ResearchMode->m_pLongDepthCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
                         //auto pointOnUnitPlane = XMFLOAT3(xy[0], xy[1], 1);
@@ -1523,6 +1525,12 @@ namespace winrt::HL2UnityPlugin::implementation
             m_depthMapFiltered = nullptr;
         }
 
+        if (_depthPts)
+        {
+            delete[] _depthPts;
+            _depthPts = nullptr;
+        }
+
         if (m_depthMapTexture) 
         {
             delete[] m_depthMapTexture;
@@ -1547,10 +1555,7 @@ namespace winrt::HL2UnityPlugin::implementation
             m_longDepthMapTexture = nullptr;
         }
 
-        /*if (m_pVideoFrameProcessor)
-        {
-            m_pVideoFrameProcessor->Stop();
-        }*/
+        m_mediaFrameReader.FrameArrived(m_OnFrameArrivedRegistration);
 
         if (m_pSensorDevice != nullptr)
         {

@@ -1203,6 +1203,7 @@ MonoBehaviour:
   _captureHiResColorImages: 1
   _captureRectifiedColorImages: 1
   _captureDepthImages: 1
+  _captureBinaryDepth: 0
   _captureTransforms: 0
   _captureVideo: 0
 --- !u!1 &891683166
