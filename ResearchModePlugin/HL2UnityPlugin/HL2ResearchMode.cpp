@@ -726,6 +726,8 @@ namespace winrt::HL2UnityPlugin::implementation
             if (pHL2ResearchMode->_depthPts == 0)
             {
                 pHL2ResearchMode->_depthPts = new winrt::Windows::Foundation::Numerics::float3[resolution.Height * resolution.Width];
+                pHL2ResearchMode->m_localDepth = new float[resolution.Height * resolution.Width * 3];
+                pHL2ResearchMode->m_localDepthLength = resolution.Height * resolution.Width * 3;
             }
 
             IResearchModeSensorDepthFrame* pDepthFrame = nullptr;
@@ -815,6 +817,9 @@ namespace winrt::HL2UnityPlugin::implementation
                             pHL2ResearchMode->_depthPts[idx].x = 0.0f;
                             pHL2ResearchMode->_depthPts[idx].y = 0.0f;
                             pHL2ResearchMode->_depthPts[idx].z = 0.0f;
+                            pHL2ResearchMode->m_localDepth[idx] = 0.0f;
+                            pHL2ResearchMode->m_localDepth[idx+1] = 0.0f;
+                            pHL2ResearchMode->m_localDepth[idx+2] = 0.0f;
                             continue;
                         }
 
@@ -833,6 +838,9 @@ namespace winrt::HL2UnityPlugin::implementation
 
                         float d = (float)depth/1000.0f;
                         XMFLOAT3 tempPoint = XMFLOAT3(xy[0] * d, xy[1] * d, z*d);
+                        pHL2ResearchMode->m_localDepth[idx] = tempPoint.x;
+                        pHL2ResearchMode->m_localDepth[idx + 1] = tempPoint.y;
+                        pHL2ResearchMode->m_localDepth[idx + 2] = tempPoint.z;
                         auto pointInWorld = XMVector3Transform(XMLoadFloat3(&tempPoint), depthToWorld);
 
                         pHL2ResearchMode->_depthPts[idx].x = pointInWorld.n128_f32[0];// /= pointInWorld.n128_f32[3];
@@ -1154,6 +1162,12 @@ namespace winrt::HL2UnityPlugin::implementation
 
                 memcpy(pHL2ResearchMode->m_pointCloud, pointCloud.data(), pointCloud.size() * sizeof(float));
                 pHL2ResearchMode->m_pointcloudLength = pointCloud.size();
+                
+                if (!pHL2ResearchMode->m_localDepth)
+                {
+                    OutputDebugString(L"Create Space for local depth...\n");
+                    pHL2ResearchMode->m_localDepth = new float[outBufferCount * 3];
+                }
 
                 // save raw depth map
                 if (!pHL2ResearchMode->m_longDepthMap)
@@ -1735,6 +1749,17 @@ namespace winrt::HL2UnityPlugin::implementation
         }
         com_array<float> tempBuffer = com_array<float>(std::move_iterator(m_pointCloud), std::move_iterator(m_pointCloud + m_pointcloudLength));
         m_pointCloudUpdated = false;
+        return tempBuffer;
+    }
+
+    com_array<float> HL2ResearchMode::GetLocalDepthBuffer()
+    {
+        std::lock_guard<std::mutex> l(mu);
+        if (m_localDepthLength == 0)
+        {
+            return com_array<float>();
+        }
+        com_array<float> tempBuffer = com_array<float>(std::move_iterator(m_localDepth), std::move_iterator(m_localDepth + m_localDepthLength));
         return tempBuffer;
     }
 

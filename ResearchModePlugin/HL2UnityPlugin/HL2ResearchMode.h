@@ -80,6 +80,7 @@ namespace winrt::HL2UnityPlugin::implementation
         com_array<float> GetCurrRotation();
         com_array<float> GetCurrPosition();
         com_array<float> GetPVMatrix();
+        com_array<float> GetLocalDepthBuffer();
 
         std::mutex mu;
         std::shared_mutex m_frameMutex;
@@ -97,7 +98,9 @@ namespace winrt::HL2UnityPlugin::implementation
         winrt::Windows::Media::Capture::Frames::MediaFrameReader m_mediaFrameReader = nullptr;
 
         float* m_pointCloud = nullptr;
+        float* m_localDepth = nullptr;
         int m_pointcloudLength = 0;
+        int m_localDepthLength = 0;
         UINT16* m_depthMapFiltered = nullptr;
         UINT16* m_depthMap = nullptr;
         UINT8* m_depthMapTexture = nullptr;

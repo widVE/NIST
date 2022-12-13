@@ -161,6 +161,32 @@ public class HololensDepthPVCapture : MonoBehaviour
 				File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, debugOut+"_depth.png"), ImageConversion.EncodeArrayToPNG(depthTextureFilteredBytes, UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm, DEPTH_WIDTH, DEPTH_HEIGHT));
 			}
 			
+			if(_captureBinaryDepth)
+			{
+				float[] localDepth = researchMode.GetLocalDeputBuffer();
+				
+				int pcLen = localDepth.Length;
+				
+				if (pcLen > 0)
+				{	
+					BinaryWriter s = new BinaryWriter(File.Open(debugOut+".bin", FileMode.Create));
+					
+					for (int i = 0; i < pcLen; i+=3)
+					{
+						//pointCloudVector3[i] = new Vector3(pointCloudBuffer[3 * i], pointCloudBuffer[3 * i + 1], pointCloudBuffer[3 * i + 2]);
+						if(localDepth[i] != 0f && localDepth[i+1] != 0f && localDepth[i+2] != 0f)
+						{
+							s.Write(localDepth[i]);
+							s.Write(localDepth[i+1]);
+							s.Write(localDepth[i+2]);
+						}
+					}
+					
+					s.Flush();
+					s.Close();
+				}
+			}
+			
 			if(_captureHiResColorImages)
 			{
 				byte[] colorTextureBuffer = researchMode.GetPVColorBuffer();
