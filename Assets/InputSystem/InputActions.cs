@@ -84,7 +84,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
             ""id"": ""1d16105a-d490-46d0-b575-ba910e8dfe5b"",
             ""actions"": [
                 {
-                    ""name"": ""New action"",
+                    ""name"": ""Toggle"",
                     ""type"": ""Button"",
                     ""id"": ""a216017b-0acd-42c0-80ab-bc7a6b1cd72f"",
                     ""expectedControlType"": ""Button"",
@@ -97,11 +97,11 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""3fdf7fd9-db6d-4f75-9877-082620913334"",
-                    ""path"": """",
+                    ""path"": ""<Keyboard>/l"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""New action"",
+                    ""action"": ""Toggle"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -118,7 +118,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         m_Photo_TakePhoto = m_Photo.FindAction("TakePhoto", throwIfNotFound: true);
         // Map
         m_Map = asset.FindActionMap("Map", throwIfNotFound: true);
-        m_Map_Newaction = m_Map.FindAction("New action", throwIfNotFound: true);
+        m_Map_Toggle = m_Map.FindAction("Toggle", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -244,12 +244,12 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     // Map
     private readonly InputActionMap m_Map;
     private IMapActions m_MapActionsCallbackInterface;
-    private readonly InputAction m_Map_Newaction;
+    private readonly InputAction m_Map_Toggle;
     public struct MapActions
     {
         private @InputActions m_Wrapper;
         public MapActions(@InputActions wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Newaction => m_Wrapper.m_Map_Newaction;
+        public InputAction @Toggle => m_Wrapper.m_Map_Toggle;
         public InputActionMap Get() { return m_Wrapper.m_Map; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -259,16 +259,16 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         {
             if (m_Wrapper.m_MapActionsCallbackInterface != null)
             {
-                @Newaction.started -= m_Wrapper.m_MapActionsCallbackInterface.OnNewaction;
-                @Newaction.performed -= m_Wrapper.m_MapActionsCallbackInterface.OnNewaction;
-                @Newaction.canceled -= m_Wrapper.m_MapActionsCallbackInterface.OnNewaction;
+                @Toggle.started -= m_Wrapper.m_MapActionsCallbackInterface.OnToggle;
+                @Toggle.performed -= m_Wrapper.m_MapActionsCallbackInterface.OnToggle;
+                @Toggle.canceled -= m_Wrapper.m_MapActionsCallbackInterface.OnToggle;
             }
             m_Wrapper.m_MapActionsCallbackInterface = instance;
             if (instance != null)
             {
-                @Newaction.started += instance.OnNewaction;
-                @Newaction.performed += instance.OnNewaction;
-                @Newaction.canceled += instance.OnNewaction;
+                @Toggle.started += instance.OnToggle;
+                @Toggle.performed += instance.OnToggle;
+                @Toggle.canceled += instance.OnToggle;
             }
         }
     }
@@ -283,6 +283,6 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     }
     public interface IMapActions
     {
-        void OnNewaction(InputAction.CallbackContext context);
+        void OnToggle(InputAction.CallbackContext context);
     }
 }
