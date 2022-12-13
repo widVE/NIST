@@ -3475,7 +3475,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2983597057792761059, guid: 2a81227bab684c8499d2dcc03a5dd478, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2983597057792761059, guid: 2a81227bab684c8499d2dcc03a5dd478, type: 3}
       propertyPath: updateLinkedTransform
@@ -3516,6 +3516,10 @@ PrefabInstance:
     - target: {fileID: 3439373402471772018, guid: 2a81227bab684c8499d2dcc03a5dd478, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3439373402471772019, guid: 2a81227bab684c8499d2dcc03a5dd478, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3439373402471772019, guid: 2a81227bab684c8499d2dcc03a5dd478, type: 3}
       propertyPath: offsetBehavior
@@ -3787,7 +3791,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7380769797925182298, guid: 2a81227bab684c8499d2dcc03a5dd478, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7380769797925182298, guid: 2a81227bab684c8499d2dcc03a5dd478, type: 3}
       propertyPath: updateSolvers
@@ -3799,7 +3803,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7380769797925182298, guid: 2a81227bab684c8499d2dcc03a5dd478, type: 3}
       propertyPath: trackedTargetType
-      value: 6
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 7380769797925182298, guid: 2a81227bab684c8499d2dcc03a5dd478, type: 3}
       propertyPath: transformOverride
@@ -6096,6 +6100,8 @@ GameObject:
   - component: {fileID: 2963377225578367663}
   - component: {fileID: 1862267801996902113}
   - component: {fileID: 8583045891147369658}
+  - component: {fileID: 8583045891147369659}
+  - component: {fileID: 8583045891147369660}
   m_Layer: 0
   m_Name: Solver
   m_TagString: Untagged
@@ -6216,8 +6222,8 @@ MonoBehaviour:
   trackedHandness: 1
   trackedHandJoint: 2
   transformOverride: {fileID: 0}
-  additionalOffset: {x: 0, y: 0, z: 0}
-  additionalRotation: {x: 0, y: 0, z: 0}
+  additionalOffset: {x: 0, y: 0, z: 0.5}
+  additionalRotation: {x: 0, y: 15, z: 0}
   updateSolvers: 1
 --- !u!4 &1971365327035093719
 Transform:
@@ -6266,7 +6272,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   toggle_objects:
   - {fileID: 1574207654360142099}
-  - {fileID: 1974180276203165021}
 --- !u!4 &1974180276043707184
 Transform:
   m_ObjectHideFlags: 0
@@ -6280,7 +6285,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7080271070860103437}
-  - {fileID: 1974180276203165020}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6395,8 +6399,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6749062270694808274}
-  m_Father: {fileID: 1974180276043707184}
-  m_RootOrder: 1
+  m_Father: {fileID: 7080271070860103437}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1974180276203165021
 GameObject:
@@ -6413,7 +6417,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!33 &2020705433559648963
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -12638,7 +12642,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1607551890107705695}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b55691ad5b034fe6966763a6e23818d2, type: 3}
   m_Name: 
@@ -13463,7 +13467,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1974180276203165020}
   m_Father: {fileID: 1974180276043707184}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -14281,6 +14286,75 @@ MonoBehaviour:
   useGazeActivation: 0
   eyeGazeProximityThreshold: 0.01
   headGazeProximityThreshold: 0.04
+--- !u!114 &8583045891147369659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574207654360142099}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4684083f6dff4a1d8a790bccc354fcf4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  updateLinkedTransform: 0
+  moveLerpTime: 0.1
+  rotateLerpTime: 0.1
+  scaleLerpTime: 0
+  maintainScaleOnInitialization: 1
+  smoothing: 1
+  lifetime: 0
+  referenceDirection: 1
+  minDistance: 0.2
+  maxDistance: 2
+  minViewDegrees: 15
+  maxViewDegrees: 60
+  aspectV: 1
+  ignoreAngleClamp: 0
+  ignoreDistanceClamp: 0
+  useFixedVerticalPosition: 0
+  fixedVerticalPosition: -0.4
+  orientToReferenceDirection: 0
+--- !u!114 &8583045891147369660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574207654360142099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4479a0bd44d822241a4c5f4890c481c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  updateLinkedTransform: 0
+  moveLerpTime: 0.1
+  rotateLerpTime: 0.1
+  scaleLerpTime: 0
+  maintainScaleOnInitialization: 1
+  smoothing: 1
+  lifetime: 0
+  orientationType: 1
+  faceTrackedObjectWhileClamped: 1
+  faceUserDefinedTargetTransform: 0
+  targetToFace: {fileID: 0}
+  pivotAxis: 7
+  minDistance: 0.3
+  maxDistance: 0.9
+  defaultDistance: 0.7
+  maxViewHorizontalDegrees: 40
+  maxViewVerticalDegrees: 20
+  reorientWhenOutsideParameters: 1
+  orientToControllerDeadzoneDegrees: 60
+  ignoreAngleClamp: 0
+  ignoreDistanceClamp: 0
+  ignoreReferencePitchAndRoll: 0
+  pitchOffset: 0
+  verticalMaxDistance: 0
+  angularClampMode: 0
+  tetherAngleSteps: 6
+  boundsScaler: 1
 --- !u!1 &8735677176477090070
 GameObject:
   m_ObjectHideFlags: 0
