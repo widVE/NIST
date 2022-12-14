@@ -1308,6 +1308,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7137453166730415838, guid: 926fb805b03eb2040a9c62b0166977e5, type: 3}
   m_PrefabInstance: {fileID: 1437197732}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &445203804 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4933662566357066782, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
+  m_PrefabInstance: {fileID: 1008741270}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &446940270
 GameObject:
   m_ObjectHideFlags: 0
@@ -2803,6 +2808,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3f1f46cbecbe08e46a303ccfdb5b498a, type: 3}
+--- !u!1 &792694391 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4933662565604359796, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
+  m_PrefabInstance: {fileID: 1008741270}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &812520005 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4933662565624524877, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
+  m_PrefabInstance: {fileID: 1008741270}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &815037371
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3292,6 +3307,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4851043542235195095, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
+      propertyPath: manager
+      value: 
+      objectReference: {fileID: 561901448}
     - target: {fileID: 5095164762604914087, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
       propertyPath: mainMap
       value: 
@@ -6477,7 +6496,7 @@ PrefabInstance:
       objectReference: {fileID: 4402188086708784334, guid: d8bfdd92541e05d438e4d0d1945df5aa, type: 3}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: _mapObjects.Array.size
-      value: 3
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: vertical_offset_slider
@@ -6507,6 +6526,18 @@ PrefabInstance:
       propertyPath: _mapObjects.Array.data[2]
       value: 
       objectReference: {fileID: 1810665665}
+    - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
+      propertyPath: _mapObjects.Array.data[3]
+      value: 
+      objectReference: {fileID: 792694391}
+    - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
+      propertyPath: _mapObjects.Array.data[4]
+      value: 
+      objectReference: {fileID: 812520005}
+    - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
+      propertyPath: _mapObjects.Array.data[5]
+      value: 
+      objectReference: {fileID: 445203804}
     - target: {fileID: 1556404472619698932, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: m_Name
       value: EasyVizARHeadsetManager
