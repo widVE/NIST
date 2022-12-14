@@ -2230,6 +2230,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc31408098dca8444bea734192206982, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &717441939
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 717441940}
+  m_Layer: 0
+  m_Name: Marker Spawn Parent Floating Map
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &717441940
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 717441939}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &732553904
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3326,7 +3357,7 @@ PrefabInstance:
     - target: {fileID: 5095164762604914087, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
       propertyPath: feature_parent
       value: 
-      objectReference: {fileID: 1968206798}
+      objectReference: {fileID: 717441939}
     - target: {fileID: 7043154617577782632, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
       propertyPath: m_Name
       value: Button Map
@@ -3732,7 +3763,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1402857988
 PrefabInstance:
@@ -4460,7 +4491,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1426975337 stripped
 GameObject:
@@ -4888,7 +4919,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1747124927
 PrefabInstance:
@@ -5929,6 +5960,14 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: bc5bebb5-1eed-403a-8cec-d0cc1737eb7f
     m_ActionName: Markers/PlaceMarker[/Keyboard/space]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 59ae0182-a4f4-4065-a3ac-e0f4ecf8870a
+    m_ActionName: Photo/TakePhoto[/Keyboard/p]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: a216017b-0acd-42c0-80ab-bc7a6b1cd72f
+    m_ActionName: Map/Toggle[/Keyboard/l]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Markers
@@ -5963,7 +6002,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &9784882876259532
 GameObject:

@@ -27,7 +27,8 @@ public class FeatureManager : MonoBehaviour
     public string name = "";
     public EasyVizAR.Position new_position;
     // For displaying map 
-    public GameObject mapParent;
+    public GameObject palm_map_spawn_target;
+    public GameObject floating_map_spawn_target;
     public GameObject PalmMap;
     public Dictionary<string, GameObject> map_icon_dictionary = new Dictionary<string, GameObject>(); // contains all possible marker objects
     //map icon
@@ -202,14 +203,14 @@ public class FeatureManager : MonoBehaviour
     {
         if (!PalmMap.activeSelf)
         {
-            mapParent.SetActive(false);
+            palm_map_spawn_target.SetActive(false);
         }
         else
         {
-            mapParent.SetActive(true);
+            palm_map_spawn_target.SetActive(true);
         }
 
-        foreach (Transform child in mapParent.transform)
+        foreach (Transform child in palm_map_spawn_target.transform)
         {
             if (spawn_parent.transform.Find(child.name))
             {
@@ -561,12 +562,14 @@ public void InputSpawnObjectAtIndex(string feature_type, InputAction.CallbackCon
         
         Debug.Log("Palm is active?: " + PalmMap.activeSelf);
 
-        GameObject mapMarker = Instantiate(map_icon_to_spawn, mapParent.transform, false);
-        float y_offset = -1f*(feature.id / 100f);
-        mapMarker.transform.localPosition = new Vector3(pos.x, y_offset, pos.z);
-       //mapMarker.transform.localPosition = new Vector3(pos.x, 0, pos.z);
+        float y_offset = -1f * (feature.id / 100f);
 
-        mapMarker.name = string.Format("feature-{0}", feature.id);
+        //I'm trying to add in the marker icon spawning to the floating map. I think this is where it happens!
+
+        GameObject palm_map_marker = Instantiate(map_icon_to_spawn, palm_map_spawn_target.transform, false);        
+        palm_map_marker.transform.localPosition = new Vector3(pos.x, y_offset, pos.z);
+       //mapMarker.transform.localPosition = new Vector3(pos.x, 0, pos.z);
+        palm_map_marker.name = string.Format("feature-{0}", feature.id);
 
 
         //GameObject mapMarker = Instantiate(feature_to_spawn, mapParent.transform, false);
@@ -577,7 +580,7 @@ public void InputSpawnObjectAtIndex(string feature_type, InputAction.CallbackCon
         {
             marker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
             //marker.transform.Find("Quad").GetComponent<Renderer>().material.color = myColor;
-            mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+            palm_map_marker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
         }
 
 
@@ -611,7 +614,7 @@ public void InputSpawnObjectAtIndex(string feature_type, InputAction.CallbackCon
         }
 
         Transform feature_object = spawn_parent.transform.Find(string.Format("feature-{0}", id));
-        Transform map_icon = mapParent.transform.Find(string.Format("feature-{0}", id));
+        Transform map_icon = palm_map_spawn_target.transform.Find(string.Format("feature-{0}", id));
         Debug.Log("Got into the delete method");
         Debug.Log("deleting feature-"+id);
         if (feature_object)
