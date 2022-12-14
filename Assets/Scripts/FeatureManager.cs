@@ -557,8 +557,10 @@ public void InputSpawnObjectAtIndex(string feature_type, InputAction.CallbackCon
         pos.y = feature.position.y;
         pos.z = feature.position.z;
 
-        GameObject marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
-        marker.name = string.Format("feature-{0}", feature.id);
+
+        //This is where the world markers happen I think.
+        GameObject world_marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
+        world_marker.name = string.Format("feature-{0}", feature.id);
         
         Debug.Log("Palm is active?: " + PalmMap.activeSelf);
 
@@ -572,19 +574,24 @@ public void InputSpawnObjectAtIndex(string feature_type, InputAction.CallbackCon
         palm_map_marker.name = string.Format("feature-{0}", feature.id);
 
 
+        GameObject floating_map_marker = Instantiate(map_icon_to_spawn, floating_map_spawn_target.transform, false);
+        floating_map_marker.transform.localPosition = new Vector3(pos.x, y_offset, pos.z);
+        floating_map_marker.name = string.Format("feature-{0}", feature.id);
+
+
         //GameObject mapMarker = Instantiate(feature_to_spawn, mapParent.transform, false);
 
 
         Color myColor;
         if (ColorUtility.TryParseHtmlString(feature.color, out myColor))
         {
-            marker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+            world_marker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
             //marker.transform.Find("Quad").GetComponent<Renderer>().material.color = myColor;
             palm_map_marker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
         }
 
 
-        MarkerObject new_marker_object = marker.GetComponent<MarkerObject>();
+        MarkerObject new_marker_object = world_marker.GetComponent<MarkerObject>();
         if (new_marker_object is not null)
         {
             new_marker_object.feature_ID = feature.id;

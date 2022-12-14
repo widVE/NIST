@@ -951,7 +951,8 @@ MonoBehaviour:
     x: 0
     y: 0
     z: 0
-  mapParent: {fileID: 0}
+  palm_map_spawn_target: {fileID: 0}
+  floating_map_spawn_target: {fileID: 0}
   PalmMap: {fileID: 0}
   map_ambulance_icon: {fileID: 0}
   map_audio_icon: {fileID: 0}
@@ -2491,7 +2492,8 @@ MonoBehaviour:
     x: 0
     y: 0
     z: 0
-  mapParent: {fileID: 335883421}
+  palm_map_spawn_target: {fileID: 335883421}
+  floating_map_spawn_target: {fileID: 1467670412}
   PalmMap: {fileID: 873797678}
   map_ambulance_icon: {fileID: 290209382182822209, guid: 2e0cbd28fded53e4580ae7524b008bd3, type: 3}
   map_audio_icon: {fileID: 1842730812392890949, guid: 007f6ed56c35b18429f1a59159f5b338, type: 3}
@@ -2604,6 +2606,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 59ae0182-a4f4-4065-a3ac-e0f4ecf8870a
     m_ActionName: Photo/TakePhoto[/Keyboard/t]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: a216017b-0acd-42c0-80ab-bc7a6b1cd72f
+    m_ActionName: Map/Toggle[/Keyboard/l]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Markers
@@ -3358,6 +3364,18 @@ PrefabInstance:
       propertyPath: feature_parent
       value: 
       objectReference: {fileID: 717441939}
+    - target: {fileID: 5095164762604914087, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
+      propertyPath: map_objects.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5095164762604914087, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
+      propertyPath: map_objects.Array.data[0]
+      value: 
+      objectReference: {fileID: 1208726034}
+    - target: {fileID: 5095164762604914087, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
+      propertyPath: map_objects.Array.data[1]
+      value: 
+      objectReference: {fileID: 1810665668}
     - target: {fileID: 7043154617577782632, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
       propertyPath: m_Name
       value: Button Map
@@ -3368,15 +3386,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7043154617577782646, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.003
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7043154617577782646, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.003
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7043154617577782646, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.003
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7043154617577782646, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4609,6 +4627,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 926fb805b03eb2040a9c62b0166977e5, type: 3}
+--- !u!1 &1467670412 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2451074764637630438, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
+  m_PrefabInstance: {fileID: 1008741270}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1517424691
 GameObject:
   m_ObjectHideFlags: 0
@@ -5326,6 +5349,18 @@ PrefabInstance:
       propertyPath: feature_parent
       value: 
       objectReference: {fileID: 1968206798}
+    - target: {fileID: 3728181045455103163, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: map_objects.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3728181045455103163, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: map_objects.Array.data[0]
+      value: 
+      objectReference: {fileID: 1810665668}
+    - target: {fileID: 3728181045455103163, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: map_objects.Array.data[1]
+      value: 
+      objectReference: {fileID: 1208726034}
     - target: {fileID: 6710163434822126697, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: m_Mesh
       value: 

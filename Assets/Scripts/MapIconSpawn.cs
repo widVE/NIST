@@ -7,7 +7,7 @@ public class MapIconSpawn : MonoBehaviour
 {
     public GameObject currHeadset;
     public GameObject iconParent;
-    public GameObject map;
+    public List <GameObject> map_objects;
     public GameObject mainMap;
     public GameObject mapCollection;
     public GameObject feature_parent;
@@ -45,7 +45,7 @@ public class MapIconSpawn : MonoBehaviour
             float mapWidth = resultJSON.viewBox.width;
 
             //enlarging the map to the scale listed from the server (width and height)
-            map.transform.localScale = new Vector3(mapWidth/10, mapHeight/10, 1);
+            foreach (GameObject map in map_objects) map.transform.localScale = new Vector3(mapWidth / 10, mapHeight / 10, 1);
             float icon_origin_x = -1*(mapWidth / 2.0f + mapLeft);
             float icon_origin_y = mapHeight / 2.0f + mapTop;
             Debug.Log("origin x and y: " + icon_origin_x + ", " + icon_origin_y);
