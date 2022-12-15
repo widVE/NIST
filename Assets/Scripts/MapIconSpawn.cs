@@ -8,7 +8,6 @@ public class MapIconSpawn : MonoBehaviour
     public GameObject currHeadset;
     public GameObject iconParent;
     public List <GameObject> map_objects;
-    public GameObject mainMap;
     public GameObject mapCollection;
     public GameObject feature_parent;
     // Start is called before the first frame update
@@ -29,7 +28,7 @@ public class MapIconSpawn : MonoBehaviour
     public void DisplayPNGMap()
     {
         EasyVizARServer.Instance.Get("locations/" + currHeadset.GetComponent<EasyVizARHeadsetManager>().LocationID + "/layers/1/", EasyVizARServer.JSON_TYPE, DisplayPNGMapCallback);
-
+        Debug.Log("Got into DisplayPNGMap()");
     }
 
     public void DisplayPNGMapCallback(string results)

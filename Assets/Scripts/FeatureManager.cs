@@ -50,6 +50,8 @@ public class FeatureManager : MonoBehaviour
     public GameObject map_stairs_icon;
     public GameObject map_user_icon;
     public GameObject map_warning_icon;
+    // added for input system
+    public GameObject map_danger_icon; //--> could be used in the future, but the scale is not quite right currently...
 
     public GameObject headset_parent;
 
@@ -78,6 +80,8 @@ public class FeatureManager : MonoBehaviour
     public GameObject stairs_icon;
     public GameObject user_icon;
     public GameObject warning_icon;
+    //added for input
+    public GameObject danger_icon;
 
     //distance 
     [SerializeField]
@@ -124,6 +128,8 @@ public class FeatureManager : MonoBehaviour
         feature_type_dictionary.Add("stairs", stairs_icon);
         feature_type_dictionary.Add("user", user_icon);
         feature_type_dictionary.Add("warning", warning_icon);
+        // added for input 
+        feature_type_dictionary.Add("danger", danger_icon);
 
         //for map 
         map_icon_dictionary.Add("ambulance", map_ambulance_icon);
@@ -144,6 +150,10 @@ public class FeatureManager : MonoBehaviour
         map_icon_dictionary.Add("stairs", map_stairs_icon);
         map_icon_dictionary.Add("user", map_user_icon);
         map_icon_dictionary.Add("warning", map_warning_icon);
+        // for displaying the input marker key 'm'
+        map_icon_dictionary.Add("danger", map_danger_icon);
+
+
         // distance 
         isFeet = true;  // should change in the future, but by default it's shown in ft.
 
@@ -489,7 +499,7 @@ public class FeatureManager : MonoBehaviour
         CreateNewFeature(feature_type, cloned_feature);
 
     }
-
+    
     public void InputSpawnObjectAtIndex(InputAction.CallbackContext context)
     {
         //GameObject feature_to_spawn = feature_type_dictionary[feature_type];
@@ -508,19 +518,21 @@ public class FeatureManager : MonoBehaviour
 
     }
 
-/*
-//Added from SpawnListIndex
-public void InputSpawnObjectAtIndex(string feature_type, InputAction.CallbackContext context)
-{
-    GameObject feature_to_spawn = feature_type_dictionary[feature_type];
-    // billboarding effect
-    GameObject cloned_feature = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
 
-    cloned_feature.name = "feature-local";
-    CreateNewFeature(feature_type, cloned_feature);
 
-}
-*/
+    /*
+    //Added from SpawnListIndex
+    public void InputSpawnObjectAtIndex(string feature_type, InputAction.CallbackContext context)
+    {
+        GameObject feature_to_spawn = feature_type_dictionary[feature_type];
+        // billboarding effect
+        GameObject cloned_feature = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
+
+        cloned_feature.name = "feature-local";
+        CreateNewFeature(feature_type, cloned_feature);
+
+    }
+    */
 
 
     // this is simply for convenience used if you want all the markers in the scene to disappear 
@@ -588,6 +600,8 @@ public void InputSpawnObjectAtIndex(string feature_type, InputAction.CallbackCon
             world_marker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
             //marker.transform.Find("Quad").GetComponent<Renderer>().material.color = myColor;
             palm_map_marker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+            floating_map_marker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+
         }
 
 

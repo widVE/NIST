@@ -972,6 +972,7 @@ MonoBehaviour:
   map_stairs_icon: {fileID: 0}
   map_user_icon: {fileID: 0}
   map_warning_icon: {fileID: 0}
+  map_danger_icon: {fileID: 0}
   headset_parent: {fileID: 0}
   spawn_root: {fileID: 0}
   spawn_parent: {fileID: 0}
@@ -995,6 +996,7 @@ MonoBehaviour:
   stairs_icon: {fileID: 0}
   user_icon: {fileID: 0}
   warning_icon: {fileID: 0}
+  danger_icon: {fileID: 0}
   distance_text: {fileID: 0}
   x_distance: 0
   z_distance: 0
@@ -2513,6 +2515,7 @@ MonoBehaviour:
   map_stairs_icon: {fileID: 848803944910143869, guid: 9655769b4642b974eb77ad4d47b2be60, type: 3}
   map_user_icon: {fileID: 7768351483811375682, guid: e3c7207a7f381ba4cb586ef01b2ae0c0, type: 3}
   map_warning_icon: {fileID: 2430657643644576839, guid: 34552eacdb62c7445b8531a16e496022, type: 3}
+  map_danger_icon: {fileID: 8008323707865364207, guid: 0499aebbed8cf224985a42ac87bbaf9d, type: 3}
   headset_parent: {fileID: 0}
   spawn_root: {fileID: 1208393620}
   spawn_parent: {fileID: 1968206798}
@@ -2536,6 +2539,7 @@ MonoBehaviour:
   stairs_icon: {fileID: 2788638943498824565, guid: 4aa41690d1cbbb74c995d283a1b9d7cc, type: 3}
   user_icon: {fileID: 345927283592416211, guid: 243609eb198ce2241b9e19f980dbe7d4, type: 3}
   warning_icon: {fileID: 5065242801546265607, guid: 413996b3d03ac3c4e8b1b84f725dd034, type: 3}
+  danger_icon: {fileID: 4815252816942109241, guid: 1852a5944cf310340baa2cdc649aa6c9, type: 3}
   distance_text: {fileID: 415639110}
   x_distance: 0
   z_distance: 0
