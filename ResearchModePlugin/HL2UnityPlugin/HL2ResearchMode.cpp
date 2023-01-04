@@ -717,9 +717,9 @@ namespace winrt::HL2UnityPlugin::implementation
             IResearchModeSensorFrame* pDepthSensorFrame = nullptr;
             ResearchModeSensorResolution resolution;
 
-            pHL2ResearchMode->mu.lock();
             pHL2ResearchMode->m_longDepthSensor->GetNextBuffer(&pDepthSensorFrame);
 
+            pHL2ResearchMode->mu.lock();
             pDepthSensorFrame->GetResolution(&resolution);
             pHL2ResearchMode->m_longDepthResolution = resolution;
 
@@ -817,9 +817,9 @@ namespace winrt::HL2UnityPlugin::implementation
                             pHL2ResearchMode->_depthPts[idx].x = 0.0f;
                             pHL2ResearchMode->_depthPts[idx].y = 0.0f;
                             pHL2ResearchMode->_depthPts[idx].z = 0.0f;
-                            pHL2ResearchMode->m_localDepth[idx] = 0.0f;
-                            pHL2ResearchMode->m_localDepth[idx+1] = 0.0f;
-                            pHL2ResearchMode->m_localDepth[idx+2] = 0.0f;
+                            pHL2ResearchMode->m_localDepth[idx*3] = 0.0f;
+                            pHL2ResearchMode->m_localDepth[idx*3+1] = 0.0f;
+                            pHL2ResearchMode->m_localDepth[idx*3+2] = 0.0f;
                             continue;
                         }
 
@@ -838,9 +838,9 @@ namespace winrt::HL2UnityPlugin::implementation
 
                         float d = (float)depth/1000.0f;
                         XMFLOAT3 tempPoint = XMFLOAT3(xy[0] * d, xy[1] * d, z*d);
-                        pHL2ResearchMode->m_localDepth[idx] = tempPoint.x;
-                        pHL2ResearchMode->m_localDepth[idx + 1] = tempPoint.y;
-                        pHL2ResearchMode->m_localDepth[idx + 2] = tempPoint.z;
+                        pHL2ResearchMode->m_localDepth[idx*3] = tempPoint.x;
+                        pHL2ResearchMode->m_localDepth[idx*3 + 1] = tempPoint.y;
+                        pHL2ResearchMode->m_localDepth[idx*3 + 2] = tempPoint.z;
                         auto pointInWorld = XMVector3Transform(XMLoadFloat3(&tempPoint), depthToWorld);
 
                         pHL2ResearchMode->_depthPts[idx].x = pointInWorld.n128_f32[0];// /= pointInWorld.n128_f32[3];
@@ -1069,7 +1069,7 @@ namespace winrt::HL2UnityPlugin::implementation
 
                     frame.VideoMediaFrame().CameraIntrinsics().ProjectManyOntoFrame(camPointsView, screenPointsView);
 #endif
-                    
+                    INT totalImageSize = imageWidth * 4 * imageHeight;
                     //iterate through screenpointsview and lookup colors...
                     for (UINT i = 0; i < resolution.Height; i++)
                     {
@@ -1097,7 +1097,7 @@ namespace winrt::HL2UnityPlugin::implementation
                             float fX = screenPointsView[idx].X; // imageWidth;
                             float fY = screenPointsView[idx].Y; // imageHeight;
                             
-                            if(fX > 0.0f && fX < imageWidth && fY > 0.0f && fY < imageHeight)
+                            if(fX >= 0.0f && fX < imageWidth && fY >= 0.0f && fY < imageHeight)
 #endif
                             
                             {
@@ -1105,9 +1105,9 @@ namespace winrt::HL2UnityPlugin::implementation
 #ifdef USE_MVP
                                 UINT cIdx = (UINT)((imageWidth * 4) * (imageHeight - (imageHeight * fY)) + (fX * (imageWidth * 4)));
 #else
-                                INT cIdx = (INT)((imageWidth*4) * (INT)(imageHeight-fY)) + (INT)(imageWidth-1-fX)*4;
+                                INT cIdx = (INT)(((float)imageWidth*4.0f) * ((float)imageHeight-fY)) + ((INT)(imageWidth-1.0f-fX))*4;
 #endif
-                                if (cIdx > 0 && cIdx < (INT)(imageWidth * 4 * imageHeight))
+                                if (cIdx >= 0 && cIdx < (INT)totalImageSize)
                                 {
                                 
                                     UINT8 r = pHL2ResearchMode->m_pixelBufferData[cIdx + 2];// imageBufferAsVector[cIdx + 2];// ;

@@ -163,7 +163,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 			
 			if(_captureBinaryDepth)
 			{
-				float[] localDepth = researchMode.GetLocalDeputBuffer();
+				float[] localDepth = researchMode.GetLocalDepthBuffer();
 				
 				int pcLen = localDepth.Length;
 				
