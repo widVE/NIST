@@ -171,14 +171,22 @@ public class HololensDepthPVCapture : MonoBehaviour
 				{	
 					BinaryWriter s = new BinaryWriter(File.Open(debugOut+".bin", FileMode.Create));
 					
-					for (int i = 0; i < pcLen; i+=3)
+					int stride = 4;
+					int rowStride = stride * DEPTH_WIDTH;
+					
+					for (int i = 0; i < pcLen; i+=4)
 					{
+						int colIdx = (i % rowStride) / stride;
+						int rowIdx = i / rowStride;
+						
+						int idx = (rowStride * (DEPTH_HEIGHT - rowIdx - 1)) + (colIdx*stride);
 						//pointCloudVector3[i] = new Vector3(pointCloudBuffer[3 * i], pointCloudBuffer[3 * i + 1], pointCloudBuffer[3 * i + 2]);
-						if(localDepth[i] != 0f && localDepth[i+1] != 0f && localDepth[i+2] != 0f)
+						//if(localDepth[i] != 0f && localDepth[i+1] != 0f && localDepth[i+2] != 0f && localDepth[i+3] != 0f)
 						{
-							s.Write(localDepth[i]);
-							s.Write(localDepth[i+1]);
-							s.Write(localDepth[i+2]);
+							s.Write(localDepth[idx]);
+							s.Write(localDepth[idx+1]);
+							s.Write(localDepth[idx+2]);
+							s.Write(localDepth[idx+3]);
 						}
 					}
 					
