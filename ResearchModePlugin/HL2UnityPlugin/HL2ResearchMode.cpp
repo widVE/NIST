@@ -4,7 +4,6 @@
 #include <codecvt>
 
 #define COLOR_FROM_PLUGIN
-//#define USE_MVP
 
 extern "C"
 HMODULE LoadLibraryA(
@@ -275,42 +274,9 @@ namespace winrt::HL2UnityPlugin::implementation
 #ifdef COLOR_FROM_PLUGIN
             
             m_latestFrame = frame;
-            /*
-            winrt::Windows::Foundation::Numerics::float4x4 PVtoWorldtransform;
-            auto PVtoWorld =
-                frame.CoordinateSystem().TryGetTransformTo(m_refFrame);
-
-            if (PVtoWorld)
-            {
-                PVtoWorldtransform = PVtoWorld.Value();
-                std::lock_guard<std::mutex> l(mu);
-                m_PVToWorld[0] = PVtoWorldtransform.m11;
-                m_PVToWorld[1] = PVtoWorldtransform.m12;
-                m_PVToWorld[2] = PVtoWorldtransform.m13;
-                m_PVToWorld[3] = PVtoWorldtransform.m14;
-
-                m_PVToWorld[4] = PVtoWorldtransform.m21;
-                m_PVToWorld[5] = PVtoWorldtransform.m22;
-                m_PVToWorld[6] = PVtoWorldtransform.m23;
-                m_PVToWorld[7] = PVtoWorldtransform.m24;
-
-                m_PVToWorld[8] = PVtoWorldtransform.m31;
-                m_PVToWorld[9] = PVtoWorldtransform.m32;
-                m_PVToWorld[10] = PVtoWorldtransform.m33;
-                m_PVToWorld[11] = PVtoWorldtransform.m34;
-
-                m_PVToWorld[12] = PVtoWorldtransform.m41;
-                m_PVToWorld[13] = PVtoWorldtransform.m42;
-                m_PVToWorld[14] = PVtoWorldtransform.m43;
-                m_PVToWorld[15] = PVtoWorldtransform.m44;
-
-                //_PVtoWorldtransform = PVtoWorldtransform;
-            }*/
 #else
             std::lock_guard<std::shared_mutex> lock(m_frameMutex);
             m_latestFrame = frame;
-
-           
 #endif
         }
     }
@@ -327,8 +293,6 @@ namespace winrt::HL2UnityPlugin::implementation
         be.SetSoftwareBitmap(softwareBitmap);
 
         co_await be.FlushAsync();
-
-        
     }
 
     void HL2ResearchMode::ColorSensorLoop(HL2ResearchMode* pHL2ResearchMode)
@@ -346,6 +310,7 @@ namespace winrt::HL2UnityPlugin::implementation
         while (pHL2ResearchMode->m_PVLoopStarted)
         {
             std::lock_guard<std::shared_mutex> reader_guard(pHL2ResearchMode->m_frameMutex);
+
             if (pHL2ResearchMode->m_latestFrame != nullptr)
             {
                 winrt::Windows::Media::Capture::Frames::MediaFrameReference frame = pHL2ResearchMode->m_latestFrame;
@@ -434,10 +399,6 @@ namespace winrt::HL2UnityPlugin::implementation
                     OutputDebugStringW(L"VideoCameraStreamer::SendFrame: Failed to get buffer with ");
                     OutputDebugStringW(message.c_str());
                     OutputDebugStringW(L"\n");
-#if DBG_ENABLE_ERROR_LOGGING
-                   
-
-#endif
                 }
 
                 pHL2ResearchMode->mu.lock();
@@ -446,20 +407,6 @@ namespace winrt::HL2UnityPlugin::implementation
                     pHL2ResearchMode->m_pixelBufferData = new UINT8[pixelBufferDataLength];
                     pHL2ResearchMode->m_colorBufferSize = pixelBufferDataLength;
                 }
-
-                //std::vector<uint8_t> imageBufferAsVector;
-                /*for (int row = 0; row < imageHeight; row += scaleFactor)
-                {
-                    for (int col = 0; col < rowStride; col += scaleFactor * pixelStride)
-                    {
-                        for (int j = 0; j < pixelStride - 1; j++)
-                        {
-                            //imageBufferAsVector.emplace_back(
-                                //pixelBufferData[row * rowStride + col + j]);
-                            pHL2ResearchMode->m_pixelBufferData[row * rowStride + col + j] = pixelBufferData[row * rowStride + col + j];
-                        }
-                    }
-                }*/
 
                 memcpy(pHL2ResearchMode->m_pixelBufferData, pixelBufferData, pHL2ResearchMode->m_colorBufferSize);
 
@@ -1051,47 +998,8 @@ namespace winrt::HL2UnityPlugin::implementation
                     pHL2ResearchMode->m_colorBufferSize = pixelBufferDataLength;
                 }
 
-                /*std::vector<uint8_t> imageBufferAsVector;
-                for (int row = 0; row < imageHeight; row += scaleFactor)
-                {
-                    for (int col = 0; col < rowStride; col += scaleFactor * pixelStride)
-                    {
-                        for (int j = 0; j < pixelStride; j++)
-                        {
-                            imageBufferAsVector.emplace_back(pixelBufferData[row * rowStride + col + j]);
-                            //pHL2ResearchMode->m_pixelBufferData[row * rowStride + col + j] = pixelBufferData[row * rowStride + col + j];
-                        }
-                    }
-                }*/
-
                 memcpy(pHL2ResearchMode->m_pixelBufferData, pixelBufferData, pHL2ResearchMode->m_colorBufferSize); 
 
-
-#ifdef USE_MVP
-                winrt::Windows::Foundation::Numerics::float4x4 projMat = frame.VideoMediaFrame().CameraIntrinsics().UndistortedProjectionTransform();
-
-                winrt::Windows::Foundation::Numerics::float4x4 mvpColor = projMat * worldToPVtransform;
-
-                pHL2ResearchMode->m_PV_MVP._11 = mvpColor.m11;
-                pHL2ResearchMode->m_PV_MVP._12 = mvpColor.m12;
-                pHL2ResearchMode->m_PV_MVP._13 = mvpColor.m13;
-                pHL2ResearchMode->m_PV_MVP._14 = mvpColor.m14;
-                pHL2ResearchMode->m_PV_MVP._21 = mvpColor.m21;
-                pHL2ResearchMode->m_PV_MVP._22 = mvpColor.m22;
-                pHL2ResearchMode->m_PV_MVP._23 = mvpColor.m23;
-                pHL2ResearchMode->m_PV_MVP._24 = mvpColor.m24;
-                pHL2ResearchMode->m_PV_MVP._31 = mvpColor.m31;
-                pHL2ResearchMode->m_PV_MVP._32 = mvpColor.m32;
-                pHL2ResearchMode->m_PV_MVP._33 = mvpColor.m33;
-                pHL2ResearchMode->m_PV_MVP._34 = mvpColor.m34;
-                pHL2ResearchMode->m_PV_MVP._41 = mvpColor.m41;
-                pHL2ResearchMode->m_PV_MVP._42 = mvpColor.m42;
-                pHL2ResearchMode->m_PV_MVP._43 = mvpColor.m43;
-                pHL2ResearchMode->m_PV_MVP._44 = mvpColor.m44;
-                    
-                DirectX::XMMATRIX pMVP = XMLoadFloat4x4(&pHL2ResearchMode->m_PV_MVP);
-
-#else
                 std::vector<winrt::Windows::Foundation::Numerics::float3> camPoints;
                 std::vector< winrt::Windows::Foundation::Point> screenPoints;
 
@@ -1123,7 +1031,7 @@ namespace winrt::HL2UnityPlugin::implementation
                 winrt::array_view<winrt::Windows::Foundation::Point> screenPointsView{ screenPoints };
 
                 frame.VideoMediaFrame().CameraIntrinsics().ProjectManyOntoFrame(camPointsView, screenPointsView);
-#endif
+
                 //INT totalImageSize = imageWidth * 4 * imageHeight;
                 //iterate through screenpointsview and lookup colors...
                 for (UINT i = 0; i < resolution.Height; i++)
@@ -1132,37 +1040,14 @@ namespace winrt::HL2UnityPlugin::implementation
                     for (UINT j = 0; j < resolution.Width; j++)
                     {
                         UINT idx = wIdx + j;
-#ifdef USE_MVP
-                        XMFLOAT4 depthVec;
-                        depthVec.x = pHL2ResearchMode->_depthPts[idx].x;
-                        depthVec.y = pHL2ResearchMode->_depthPts[idx].y;
-                        depthVec.z = pHL2ResearchMode->_depthPts[idx].z;
-                        depthVec.w = 1.0f;
-                        //depthVec.w = pHL2ResearchMode->_depthPts[idx].w;
-                            
-                        XMVECTOR pointInPVCam = XMVector4Transform(XMLoadFloat4(&depthVec), pMVP);
-                        float fX = pointInPVCam.n128_f32[0] / pointInPVCam.n128_f32[3];
-                        float fY = pointInPVCam.n128_f32[1] / pointInPVCam.n128_f32[3];
-                        float fZ = pointInPVCam.n128_f32[2] / pointInPVCam.n128_f32[3];
-                        fX = fX * 0.5f + 0.5f;
-                        fY = fY * 0.5f + 0.5f;
-                        fZ = fZ * 0.5f + 0.5f;
-                        if (fX > 0.0f && fX < 1.0f && fY > 0.0f && fY < 1.0f)
-#else
+
                         float fX = screenPointsView[idx].X; // imageWidth;
                         float fY = screenPointsView[idx].Y; // imageHeight;
                             
                         if(fX >= 0.0f && fX < imageWidth && fY >= 0.0f && fY < imageHeight)
-#endif
-                            
                         {
-                            //UINT idx = resolution.Width * i + j;
-#ifdef USE_MVP
-                            UINT cIdx = (UINT)((imageWidth * 4) * (imageHeight - (imageHeight * fY)) + (fX * (imageWidth * 4)));
-#else
                             INT cIdx = (INT)((imageWidth * 4) * (INT)(imageHeight - fY)) + (INT)(imageWidth - 1 - fX) * 4;
-                            //INT cIdx = (INT)(((float)imageWidth*4.0f) * ((float)imageHeight-fY)) + ((INT)(imageWidth-1.0f-fX))*4;
-#endif
+
                             if (cIdx > 0 && cIdx < (INT)(imageWidth * 4 * imageHeight))
                             {
                                 
@@ -1181,9 +1066,6 @@ namespace winrt::HL2UnityPlugin::implementation
                             }
                             else
                             {
-                                /*pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].x);
-                                pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].y);
-                                pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].z);*/
                                 pointCloud.push_back(0.0f);
                                 pointCloud.push_back(0.0f);
                                 pointCloud.push_back(0.0f);
@@ -1269,17 +1151,8 @@ namespace winrt::HL2UnityPlugin::implementation
             }
 
             fc++;
-            /*}
-            else
-            {
-                OutputDebugString(L"Shouldn't get depth...\n");
-            }*/
         }
         
-        /*catch (...)
-        {
-            OutputDebugString(L"In catch..\n");
-        }*/
         pHL2ResearchMode->m_longDepthSensor->CloseStream();
         pHL2ResearchMode->m_longDepthSensor->Release();
         pHL2ResearchMode->m_longDepthSensor = nullptr;

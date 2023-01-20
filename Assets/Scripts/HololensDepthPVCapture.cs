@@ -296,10 +296,10 @@ public class HololensDepthPVCapture : MonoBehaviour
 			{
 				float[] depthPos = researchMode.GetDepthToWorld();
 				
-				string depthString = depthPos[0].ToString("F4") + " " + depthPos[1].ToString("F4") + " " + depthPos[2].ToString("F4") + " " + depthPos[3].ToString("F4") + "\n";
-				depthString = depthString + (depthPos[4].ToString("F4") + " " + depthPos[5].ToString("F4") + " " + depthPos[6].ToString("F4") + " " + depthPos[7].ToString("F4") + "\n");
-				depthString = depthString + (depthPos[8].ToString("F4") + " " + depthPos[9].ToString("F4") + " " + depthPos[10].ToString("F4") + " " + depthPos[11].ToString("F4") + "\n");
-				depthString = depthString + (depthPos[12].ToString("F4") + " " + depthPos[13].ToString("F4") + " " + depthPos[14].ToString("F4") + " " + depthPos[15].ToString("F4") + "\n");
+				string depthString = depthPos[0].ToString("F4") + " " + depthPos[4].ToString("F4") + " " + depthPos[8].ToString("F4") + " " + depthPos[12].ToString("F4") + "\n";
+				depthString = depthString + (depthPos[1].ToString("F4") + " " + depthPos[5].ToString("F4") + " " + depthPos[9].ToString("F4") + " " + depthPos[13].ToString("F4") + "\n");
+				depthString = depthString + (depthPos[2].ToString("F4") + " " + depthPos[6].ToString("F4") + " " + depthPos[10].ToString("F4") + " " + depthPos[14].ToString("F4") + "\n");
+				depthString = depthString + (depthPos[3].ToString("F4") + " " + depthPos[7].ToString("F4") + " " + depthPos[11].ToString("F4") + " " + depthPos[15].ToString("F4") + "\n");
 				
 				/*string depthString = cameraToWorldMatrix[0].ToString("F4") + " " + cameraToWorldMatrix[1].ToString("F4") + " " + cameraToWorldMatrix[2].ToString("F4") + " " + cameraToWorldMatrix[3].ToString("F4") + "\n";
 				depthString = depthString + (cameraToWorldMatrix[4].ToString("F4") + " " + cameraToWorldMatrix[5].ToString("F4") + " " + cameraToWorldMatrix[6].ToString("F4") + " " + projectionMatrix[0].ToString("F4") + "\n");
