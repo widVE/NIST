@@ -94,7 +94,17 @@ public class HololensDepthPVCapture : MonoBehaviour
 		researchMode.StartPVCameraLoop();
 
 		researchMode.StartLongDepthSensorLoop();
-
+		
+		if(_captureHiResColorImages)
+		{
+			researchMode.SetCaptureHiResColorImage();
+		}
+		
+		if(_captureColorPointCloud)
+		{
+			
+		}
+		
 		//PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
 		/*}
 		else if(depthPreviewPlane && shortAbImagePreviewPlane)

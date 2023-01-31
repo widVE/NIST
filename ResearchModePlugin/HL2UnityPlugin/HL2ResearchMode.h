@@ -56,6 +56,10 @@ namespace winrt::HL2UnityPlugin::implementation
         bool LRImageUpdated();
         bool RRImageUpdated();
 
+        void SetCaptureHiResColorImage();
+        bool IsCapturingHiResColor() { return m_bCaptureHiResImages; }
+
+
         void SetReferenceCoordinateSystem(Windows::Perception::Spatial::SpatialCoordinateSystem refCoord);
         void SetPointCloudRoiInSpace(float centerX, float centerY, float centerZ, float boundX, float boundY, float boundZ);
         void SetPointCloudDepthOffset(uint16_t offset);
@@ -84,6 +88,7 @@ namespace winrt::HL2UnityPlugin::implementation
 
         std::mutex mu;
         std::shared_mutex m_frameMutex;
+        unsigned int _frameCount = 0;
 
     protected:
         void OnFrameArrived(
@@ -113,6 +118,8 @@ namespace winrt::HL2UnityPlugin::implementation
         UINT8* m_LRImage = nullptr;
         UINT8* m_RRImage = nullptr;
         UINT8* m_pixelBufferData = nullptr;
+
+        
 
         IResearchModeSensor* m_depthSensor = nullptr;
         IResearchModeCameraSensor* m_pDepthCameraSensor = nullptr;
@@ -168,6 +175,12 @@ namespace winrt::HL2UnityPlugin::implementation
 		std::atomic_bool m_RFImageUpdated = false;
         std::atomic_bool m_LRImageUpdated = false;
         std::atomic_bool m_RRImageUpdated = false;
+
+        //interface back from Unity
+
+        std::atomic_bool m_bCaptureHiResImages = false;
+        std::atomic_bool m_bCaptureDepthImages = false;
+        std::atomic_bool m_bCaptureRectColor = false;
 
         float m_roiBound[3]{ 0,0,0 };
         float m_roiCenter[3]{ 0,0,0 };

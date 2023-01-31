@@ -1109,7 +1109,6 @@ GameObject:
   - component: {fileID: 891080481}
   - component: {fileID: 891080482}
   - component: {fileID: 891080483}
-  - component: {fileID: 891080480}
   - component: {fileID: 891080484}
   m_Layer: 0
   m_Name: ResearchModeController
@@ -1118,33 +1117,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &891080480
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 891080479}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46e8290b42159fb4ea720c2937e00a8f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  depthPreviewPlane: {fileID: 0}
-  shortAbImagePreviewPlane: {fileID: 0}
-  longDepthPreviewPlane: {fileID: 0}
-  LFPreviewPlane: {fileID: 0}
-  RFPreviewPlane: {fileID: 0}
-  LRPreviewPlane: {fileID: 0}
-  RRPreviewPlane: {fileID: 0}
-  _captureTime: 1
-  _colorRT: {fileID: 8400000, guid: 5a7ecc7d9f6de6843b3778389dad01ce, type: 2}
-  _colorCopyMaterial: {fileID: 2100000, guid: 748aaa792b540014dab1d631cface284, type: 2}
-  _depthCopyMaterial: {fileID: 2100000, guid: e2751f21b4f612748b9979193f5a11ad, type: 2}
-  _tsdfShader: {fileID: 7200000, guid: 2940ca67a277a8c4998cf58e1466cf16, type: 3}
-  _pointRenderTexture: {fileID: 0}
-  _writeImagesToDisk: 1
-  _showImagesInView: 0
 --- !u!4 &891080481
 Transform:
   m_ObjectHideFlags: 0
@@ -1201,10 +1173,10 @@ MonoBehaviour:
   _captureTime: 1
   _captureColorPointCloud: 0
   _captureHiResColorImages: 0
-  _captureRectifiedColorImages: 1
+  _captureRectifiedColorImages: 0
   _captureDepthImages: 0
-  _captureBinaryDepth: 1
-  _captureTransforms: 1
+  _captureBinaryDepth: 0
+  _captureTransforms: 0
   _captureVideo: 0
 --- !u!1 &891683166
 GameObject:
@@ -7513,7 +7485,7 @@ MonoBehaviour:
   OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 891080480}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ResearchModeVideoStream, Assembly-CSharp
         m_MethodName: TogglePointCloudEvent
         m_Mode: 1
@@ -7715,7 +7687,7 @@ MonoBehaviour:
   OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 891080480}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ResearchModeVideoStream, Assembly-CSharp
         m_MethodName: StopSensorsEvent
         m_Mode: 1
@@ -7917,7 +7889,7 @@ MonoBehaviour:
   OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 891080480}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ResearchModeVideoStream, Assembly-CSharp
         m_MethodName: TogglePreviewEvent
         m_Mode: 1

@@ -48,6 +48,9 @@ namespace HL2UnityPlugin
         Boolean LRImageUpdated();
         Boolean RRImageUpdated();
 
+        void SetCaptureHiResColorImage();
+        Boolean IsCapturingHiResColor();
+
         void InitializeDepthSensor();
         void InitializeLongDepthSensor();
         void InitializeSpatialCamerasFront();

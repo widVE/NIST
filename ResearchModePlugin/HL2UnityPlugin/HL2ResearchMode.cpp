@@ -2,8 +2,7 @@
 #include "HL2ResearchMode.h"
 #include "HL2ResearchMode.g.cpp"
 #include <codecvt>
-
-#define COLOR_FROM_PLUGIN
+#include <fstream>
 
 extern "C"
 HMODULE LoadLibraryA(
@@ -242,12 +241,9 @@ namespace winrt::HL2UnityPlugin::implementation
     {
         winrt::Windows::Media::Capture::Frames::MediaFrameReaderStartStatus status = co_await m_mediaFrameReader.StartAsync();
         winrt::check_bool(status == winrt::Windows::Media::Capture::Frames::MediaFrameReaderStartStatus::Success);
-#ifdef COLOR_FROM_PLUGIN
+
 		m_PVLoopStarted = true;
-#else
-        m_pColorUpdateThread = new std::thread(HL2ResearchMode::ColorSensorLoop, this);
-#endif
-    
+
         m_OnFrameArrivedRegistration = m_mediaFrameReader.FrameArrived(
             { this, &HL2ResearchMode::OnFrameArrived });
     }
@@ -271,149 +267,24 @@ namespace winrt::HL2UnityPlugin::implementation
 
         if (winrt::Windows::Media::Capture::Frames::MediaFrameReference frame = sender.TryAcquireLatestFrame())
         {
-#ifdef COLOR_FROM_PLUGIN
-            
             m_latestFrame = frame;
-#else
-            std::lock_guard<std::shared_mutex> lock(m_frameMutex);
-            m_latestFrame = frame;
-#endif
         }
     }
 
     winrt::Windows::Foundation::IAsyncAction CreateLocalFile(const wchar_t* sName, winrt::Windows::Graphics::Imaging::SoftwareBitmap softwareBitmap)
     {
         winrt::Windows::Storage::StorageFolder storageFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
-        winrt::Windows::Storage::StorageFile saveTest = co_await storageFolder.CreateFileAsync(hstring(sName), winrt::Windows::Storage::CreationCollisionOption::ReplaceExisting);
+        winrt::Windows::Storage::StorageFile saveTest = co_await storageFolder.CreateFileAsync(sName, winrt::Windows::Storage::CreationCollisionOption::ReplaceExisting);
 
         winrt::Windows::Storage::Streams::IRandomAccessStream outputStream = co_await saveTest.OpenAsync(winrt::Windows::Storage::FileAccessMode::ReadWrite);
         
-        winrt::Windows::Graphics::Imaging::BitmapEncoder be = co_await winrt::Windows::Graphics::Imaging::BitmapEncoder::CreateAsync(winrt::Windows::Graphics::Imaging::BitmapEncoder::JpegEncoderId(), outputStream);
+        winrt::Windows::Graphics::Imaging::BitmapEncoder be = co_await winrt::Windows::Graphics::Imaging::BitmapEncoder::CreateAsync(winrt::Windows::Graphics::Imaging::BitmapEncoder::PngEncoderId(), outputStream);
 
         be.SetSoftwareBitmap(softwareBitmap);
 
         co_await be.FlushAsync();
     }
 
-    void HL2ResearchMode::ColorSensorLoop(HL2ResearchMode* pHL2ResearchMode)
-    {
-        if (!pHL2ResearchMode->m_PVLoopStarted)
-        {
-            pHL2ResearchMode->m_PVLoopStarted = true;
-        }
-        else {
-            return;
-        }
-
-        unsigned int frameCount = 0;
-
-        while (pHL2ResearchMode->m_PVLoopStarted)
-        {
-            std::lock_guard<std::shared_mutex> reader_guard(pHL2ResearchMode->m_frameMutex);
-
-            if (pHL2ResearchMode->m_latestFrame != nullptr)
-            {
-                winrt::Windows::Media::Capture::Frames::MediaFrameReference frame = pHL2ResearchMode->m_latestFrame;
-
-                //float fx = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().x;
-                //float fy = frame.VideoMediaFrame().CameraIntrinsics().FocalLength().y;
-
-                winrt::Windows::Foundation::Numerics::float4x4 PVtoWorldtransform;
-                auto PVtoWorld =
-                    frame.CoordinateSystem().TryGetTransformTo(pHL2ResearchMode->m_refFrame);
-                //winrt::Windows::Foundation::Numerics::Matrix4x4 worldToPV = winrt::Windows::Foundation::Numerics::Matrix4x4.Identity;
-                //winrt::Windows::Foundation::Numerics::Matrix4x4.Invert(PVToWorld, &worldToPV);
-
-                if (PVtoWorld)
-                {
-                    PVtoWorldtransform = PVtoWorld.Value();
-                    std::lock_guard<std::mutex> l(pHL2ResearchMode->mu);
-                    pHL2ResearchMode->m_PVToWorld[0] = PVtoWorldtransform.m11;
-                    pHL2ResearchMode->m_PVToWorld[1] = PVtoWorldtransform.m12;
-                    pHL2ResearchMode->m_PVToWorld[2] = PVtoWorldtransform.m13;
-                    pHL2ResearchMode->m_PVToWorld[3] = PVtoWorldtransform.m14;
-
-                    pHL2ResearchMode->m_PVToWorld[4] = PVtoWorldtransform.m21;
-                    pHL2ResearchMode->m_PVToWorld[5] = PVtoWorldtransform.m22;
-                    pHL2ResearchMode->m_PVToWorld[6] = PVtoWorldtransform.m23;
-                    pHL2ResearchMode->m_PVToWorld[7] = PVtoWorldtransform.m24;
-
-                    pHL2ResearchMode->m_PVToWorld[8] = PVtoWorldtransform.m31;
-                    pHL2ResearchMode->m_PVToWorld[9] = PVtoWorldtransform.m32;
-                    pHL2ResearchMode->m_PVToWorld[10] = PVtoWorldtransform.m33;
-                    pHL2ResearchMode->m_PVToWorld[11] = PVtoWorldtransform.m34;
-
-                    pHL2ResearchMode->m_PVToWorld[12] = PVtoWorldtransform.m41;
-                    pHL2ResearchMode->m_PVToWorld[13] = PVtoWorldtransform.m42;
-                    pHL2ResearchMode->m_PVToWorld[14] = PVtoWorldtransform.m43;
-                    pHL2ResearchMode->m_PVToWorld[15] = PVtoWorldtransform.m44;
-
-                    //_PVtoWorldtransform = PVtoWorldtransform;
-                }
-                else
-                {
-#if DBG_ENABLE_VERBOSE_LOGGING
-                    OutputDebugStringW(L"Streamer::SendFrame: Could not locate frame.\n");
-#endif
-                    return;
-                }
-
-                // grab the frame data
-                winrt::Windows::Graphics::Imaging::SoftwareBitmap softwareBitmap = winrt::Windows::Graphics::Imaging::SoftwareBitmap::Convert(
-                    frame.VideoMediaFrame().SoftwareBitmap(), winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Bgra8);
-                
-                /*wchar_t fName[50];
-                wprintf(fName, "test%u.jpg", frameCount);
-
-                CreateLocalFile(fName, softwareBitmap);*/
-
-                frameCount++;
-
-                int imageWidth = softwareBitmap.PixelWidth();
-                int imageHeight = softwareBitmap.PixelHeight();
-
-                int pixelStride = 4;
-                int scaleFactor = 1;
-
-                int rowStride = imageWidth * pixelStride;
-
-                // Get bitmap buffer object of the frame
-                winrt::Windows::Graphics::Imaging::BitmapBuffer bitmapBuffer = softwareBitmap.LockBuffer(winrt::Windows::Graphics::Imaging::BitmapBufferAccessMode::Read);
-
-                // Get raw pointer to the buffer object
-                uint32_t pixelBufferDataLength = 0;
-                uint8_t* pixelBufferData;
-
-                auto spMemoryBufferByteAccess{ bitmapBuffer.CreateReference()
-                    .as<::Windows::Foundation::IMemoryBufferByteAccess>() };
-
-                try
-                {
-                    spMemoryBufferByteAccess->
-                        GetBuffer(&pixelBufferData, &pixelBufferDataLength);
-                }
-                catch (winrt::hresult_error const& ex)
-                {
-                    winrt::hresult hr = ex.code(); // HRESULT_FROM_WIN32
-                    winrt::hstring message = ex.message();
-                    OutputDebugStringW(L"VideoCameraStreamer::SendFrame: Failed to get buffer with ");
-                    OutputDebugStringW(message.c_str());
-                    OutputDebugStringW(L"\n");
-                }
-
-                pHL2ResearchMode->mu.lock();
-                if (pHL2ResearchMode->m_pixelBufferData == 0)
-                {
-                    pHL2ResearchMode->m_pixelBufferData = new UINT8[pixelBufferDataLength];
-                    pHL2ResearchMode->m_colorBufferSize = pixelBufferDataLength;
-                }
-
-                memcpy(pHL2ResearchMode->m_pixelBufferData, pixelBufferData, pHL2ResearchMode->m_colorBufferSize);
-
-                pHL2ResearchMode->mu.unlock();
-            }
-        }
-    }
 
     void HL2ResearchMode::DepthSensorLoop(HL2ResearchMode* pHL2ResearchMode)
     {
@@ -779,8 +650,6 @@ namespace winrt::HL2UnityPlugin::implementation
                         continue;
                     }
 
-                   
-
                     const float norm = sqrtf(xy[0] * xy[0] + xy[1] * xy[1] + z * z);
                     if (norm > 0.0f)
                     {
@@ -799,7 +668,7 @@ namespace winrt::HL2UnityPlugin::implementation
                     pHL2ResearchMode->m_localDepth[idx*4] = tempPoint.x;
                     pHL2ResearchMode->m_localDepth[idx*4 + 1] = tempPoint.y;
                     pHL2ResearchMode->m_localDepth[idx*4 + 2] = tempPoint.z;
-                    pHL2ResearchMode->m_localDepth[idx * 4 + 3] = 0.0f;
+                    pHL2ResearchMode->m_localDepth[idx*4 + 3] = 0.0f;
 
                     HRESULT hrL = pHL2ResearchMode->m_pLongDepthCameraSensor->MapImagePointToCameraUnitPlane(uvL, xyL);
                     HRESULT hrR = pHL2ResearchMode->m_pLongDepthCameraSensor->MapImagePointToCameraUnitPlane(uvR, xyR);
@@ -863,8 +732,7 @@ namespace winrt::HL2UnityPlugin::implementation
                 }
             }
                 
-#ifdef COLOR_FROM_PLUGIN
-               
+       
             winrt::Windows::Foundation::Numerics::float4x4 worldToPV = winrt::Windows::Foundation::Numerics::float4x4::identity();
 
             if (pHL2ResearchMode->m_latestFrame != nullptr)
@@ -953,9 +821,13 @@ namespace winrt::HL2UnityPlugin::implementation
                 winrt::Windows::Graphics::Imaging::SoftwareBitmap softwareBitmap = winrt::Windows::Graphics::Imaging::SoftwareBitmap::Convert(
                     frame.VideoMediaFrame().SoftwareBitmap(), winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Bgra8);
                     
-                /*wchar_t fName[50];
-                wprintf(fName, "test%u.jpg", frameCount);
-                CreateLocalFile(fName, softwareBitmap);*/
+                if (pHL2ResearchMode->IsCapturingHiResColor())
+                {
+                    wchar_t fName[50];
+                    wprintf(fName, L"%u_color.png", pHL2ResearchMode->_frameCount);
+                    CreateLocalFile(fName, softwareBitmap);
+                    pHL2ResearchMode->_frameCount++;
+                }
 
                 //frameCount++;
 
@@ -1032,6 +904,25 @@ namespace winrt::HL2UnityPlugin::implementation
 
                 frame.VideoMediaFrame().CameraIntrinsics().ProjectManyOntoFrame(camPointsView, screenPointsView);
 
+                /*std::wstring m_datetime;
+                wchar_t m_datetime_c[200];
+                const std::time_t now = std::time(nullptr);
+                std::tm tm;
+                localtime_s(&tm, &now);
+                std::wcsftime(m_datetime_c, sizeof(m_datetime_c), L"%F-%H%M%S", &tm);
+
+                m_datetime.assign(m_datetime_c);
+                
+                wchar_t m_ms[64];
+                swprintf_s(m_ms, L"%d", GetTickCount());
+
+                winrt::Windows::Storage::StorageFolder storageFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
+                auto path = storageFolder.Path().data();
+                std::wstring fullName(path);
+                fullName += +L"\\" + m_datetime + L"_"+m_ms+L".txt";
+                std::ofstream file(fullName);*/
+
+
                 //INT totalImageSize = imageWidth * 4 * imageHeight;
                 //iterate through screenpointsview and lookup colors...
                 for (UINT i = 0; i < resolution.Height; i++)
@@ -1055,6 +946,8 @@ namespace winrt::HL2UnityPlugin::implementation
                                 UINT8 g = pHL2ResearchMode->m_pixelBufferData[cIdx + 1]; //imageBufferAsVector[cIdx + 1]; //
                                 UINT8 b = pHL2ResearchMode->m_pixelBufferData[cIdx];//imageBufferAsVector[cIdx]; //
                                 UINT8 a = pHL2ResearchMode->m_pixelBufferData[cIdx + 3]; //imageBufferAsVector[cIdx + 3]; //
+
+                                //file << pHL2ResearchMode->_depthPts[idx].x << " " << pHL2ResearchMode->_depthPts[idx].y << " " << pHL2ResearchMode->_depthPts[idx].z << " " << ((float)r / 255.0f) << " " << (float)g / 255.0f << " " << (float)b / 255.0f << std::endl;
 
                                 pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].x);
                                 pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].y);
@@ -1088,9 +981,10 @@ namespace winrt::HL2UnityPlugin::implementation
                         }
                     }
                 }
+
+                //file.close();
             }
-                
-#endif 
+
             // save point cloud
             if (!pHL2ResearchMode->m_pointCloud)
             {
@@ -1770,6 +1664,11 @@ namespace winrt::HL2UnityPlugin::implementation
     {
         //assert(val <= kMaxLongLong);
         return static_cast<long long>(val);
+    }
+
+    void HL2ResearchMode::SetCaptureHiResColorImage()
+    {
+        m_bCaptureHiResImages = true;
     }
 
 }
