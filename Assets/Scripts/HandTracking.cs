@@ -72,7 +72,10 @@ public class HandTracking : MonoBehaviour
 
     public void PalmAwayRight()
     {
-        right_wrist_label.GetComponent<Renderer>().enabled = true;
+        if (right_wrist_label)
+        {
+            right_wrist_label.GetComponent<Renderer>().enabled = true;
+        }
     }
 
     public void PalmTowardsRight()
@@ -82,7 +85,10 @@ public class HandTracking : MonoBehaviour
 
     public void PalmAwayLeft()
     {
-        left_wrist_label.GetComponent<Renderer>().enabled = true;
+        if (left_wrist_label)
+        {
+            left_wrist_label.GetComponent<Renderer>().enabled = true;
+        }
     }
 
     public void PalmTowardsLeft()

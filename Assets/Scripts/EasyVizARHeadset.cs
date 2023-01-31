@@ -31,9 +31,10 @@ public class EasyVizARHeadset : MonoBehaviour
 	bool _postPositionChanges = false;
 	public bool PostPositionChanges => _postPositionChanges;
 	
-	string _headsetID;
+	public string _headsetID;
+	public Color _color = Color.red;
 	
-	string _locationID;
+	public string _locationID;// will change this back to just string w/o public
 	
 	public string LocationID
 	{
@@ -47,6 +48,8 @@ public class EasyVizARHeadset : MonoBehaviour
 	
 	//if local, we set this to the MainCamera (the Hololens 2's camera)
 	Camera _mainCamera;
+	public GameObject map_parent; // This will get populated by EasyVizARHeadsetManager.cs
+	public GameObject headset_parent;
 	
     // Start is called before the first frame update
     void Start()
@@ -68,8 +71,17 @@ public class EasyVizARHeadset : MonoBehaviour
 		if(postChanges)
 		{
 			_realTimeChanges = true;
-			//create a new headset if not visualizing old local version..
-			CreateHeadset();
+
+			// Either reload our existing headset from the server or create a new one.
+			if (EasyVizARServer.Instance.TryGetHeadsetID(out string headsetId))
+            {
+				Debug.Log("Reloading headset: " + headsetId);
+				LoadHeadset(headsetId);
+            } else
+            {
+				Debug.Log("Creating headset...");
+				CreateHeadset();
+            }
 		}
 		
 		_postPositionChanges = postChanges;
@@ -117,8 +129,24 @@ public class EasyVizARHeadset : MonoBehaviour
 		_headsetID = h.id;
 		_headsetName = h.name;
 		_locationID = h.location_id;
+
+		Color newColor;
+		if (ColorUtility.TryParseHtmlString(h.color, out newColor))
+			_color = newColor;
 		
-		if(_showPositionChanges)
+		Transform headset_icon = map_parent.transform.Find(h.id);
+		Transform cur_headset = headset_parent.transform.Find(h.id);
+		if (headset_icon)
+		{
+			headset_icon.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", newColor);
+		}
+		if (cur_headset)
+        {
+			cur_headset.Find("Capsule").GetComponent<Renderer>().material.color = newColor;
+		}
+
+
+		if (_showPositionChanges)
 		{
 			GetPastPositions();
 		}
@@ -171,7 +199,7 @@ public class EasyVizARHeadset : MonoBehaviour
 		{
 			_isRegisteredWithServer = true;
 			
-			EasyVizAR.Headset h = JsonUtility.FromJson<EasyVizAR.Headset>(resultData);
+			EasyVizAR.RegisteredHeadset h = JsonUtility.FromJson<EasyVizAR.RegisteredHeadset>(resultData);
 			Vector3 newPos = Vector3.zero;
 
 			newPos.x = h.position.x;
@@ -184,7 +212,13 @@ public class EasyVizARHeadset : MonoBehaviour
 			_headsetID = h.id;
 			_headsetName = h.name;
 			_locationID = h.location_id;
-			
+
+			Color newColor;
+			if (ColorUtility.TryParseHtmlString(h.color, out newColor))
+				_color = newColor;
+
+			EasyVizARServer.Instance.SaveRegistration(h.id, h.token);
+
 			Debug.Log("Successfully connected headset: " + h.name);
 		}
 		else
@@ -192,10 +226,48 @@ public class EasyVizARHeadset : MonoBehaviour
 			Debug.Log("Received an error when creating headset");
 		}
 	}
-	
+
+	void LoadHeadset(string headsetId)
+	{
+		EasyVizARServer.Instance.Get("headsets/" + headsetId, EasyVizARServer.JSON_TYPE, LoadHeadsetCallback);
+	}
+
+	void LoadHeadsetCallback(string resultData)
+	{
+		if (resultData != "error")
+		{
+			_isRegisteredWithServer = true;
+
+			EasyVizAR.Headset h = JsonUtility.FromJson<EasyVizAR.Headset>(resultData);
+			Vector3 newPos = Vector3.zero;
+
+			newPos.x = h.position.x;
+			newPos.y = h.position.y;
+			newPos.z = h.position.z;
+
+			transform.position = newPos;
+			transform.rotation = new Quaternion(h.orientation.x, h.orientation.y, h.orientation.z, h.orientation.w);
+
+			_headsetID = h.id;
+			_headsetName = h.name;
+			_locationID = h.location_id;
+
+			Color newColor;
+			if (ColorUtility.TryParseHtmlString(h.color, out newColor))
+				_color = newColor;
+
+			Debug.Log("Successfully connected headset: " + h.name);
+		}
+		else
+		{
+			// If loading fails, make a new headset.
+			CreateHeadset();
+		}
+	}
+
 	void PostPosition()
 	{
-		EasyVizAR.Headset h = new EasyVizAR.Headset();
+		EasyVizAR.HeadsetPositionUpdate h = new EasyVizAR.HeadsetPositionUpdate();
 		h.position = new EasyVizAR.Position();
 		h.position.x = -transform.position.x;
 		h.position.y = transform.position.y;
@@ -205,7 +277,6 @@ public class EasyVizARHeadset : MonoBehaviour
 		h.orientation.y = transform.rotation[1];
 		h.orientation.z = transform.rotation[2];
 		h.orientation.w = transform.rotation[3];
-		h.name = _headsetName;
 		h.location_id = _locationID;
 		
 		EasyVizARServer.Instance.Patch("headsets/"+_headsetID, EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), PostPositionCallback);
