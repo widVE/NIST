@@ -6,6 +6,7 @@ namespace HL2UnityPlugin
 
         UInt16 GetCenterDepth();
         UInt16[] GetDepthMapBuffer();
+        UInt16[] GetDepthMapBufferFiltered();
         UInt8[] GetDepthMapTextureBuffer();
         UInt16[] GetShortAbImageBuffer();
         UInt8[] GetShortAbImageTextureBuffer();
@@ -18,10 +19,16 @@ namespace HL2UnityPlugin
 		UInt8[] GetRFCameraBuffer();
         UInt8[] GetLRCameraBuffer();
         UInt8[] GetRRCameraBuffer();
+        UInt8[] GetPVColorBuffer();
 
         Single[] GetCenterPoint();
         Single[] GetDepthSensorPosition();
         Single[] GetDepthToWorld();
+        Single[] GetCurrRotation();
+        Single[] GetCurrPosition();
+        Single[] GetPVMatrix();
+        Single[] GetLocalDepthBuffer();
+
         Int32 GetDepthBufferSize();
         Int32 GetLongDepthBufferSize();
         String PrintDepthResolution();
@@ -35,10 +42,14 @@ namespace HL2UnityPlugin
         Boolean ShortAbImageTextureUpdated();
         Boolean PointCloudUpdated();
         Boolean LongDepthMapTextureUpdated();
+
 		Boolean LFImageUpdated();
 		Boolean RFImageUpdated();
         Boolean LRImageUpdated();
         Boolean RRImageUpdated();
+
+        void SetCaptureHiResColorImage();
+        Boolean IsCapturingHiResColor();
 
         void InitializeDepthSensor();
         void InitializeLongDepthSensor();
@@ -47,6 +58,7 @@ namespace HL2UnityPlugin
         void StartDepthSensorLoop();
         void StartLongDepthSensorLoop();
 		void StartSpatialCamerasFrontLoop();
+        void StartPVCameraLoop();
 
         void StopAllSensorDevice();
 

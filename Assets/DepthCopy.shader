@@ -36,8 +36,8 @@ Shader "Unlit/CopyDepthShader"
 				UNITY_VERTEX_OUTPUT_STEREO
             };
        
-            //UNITY_DECLARE_SCREENSPACE_TEXTURE(_MainTex);
-			Texture2D _MainTex;
+            sampler2D_float _MainTex;
+			//Texture2D _MainTex;
             float4 _MainTex_ST;
             int _Orientation;
 			
@@ -49,7 +49,7 @@ Shader "Unlit/CopyDepthShader"
                 o.vertex = UnityObjectToClipPos(v.vertex);
            
                 // Flip X
-                o.uv = float2(v.uv.x, 1.0 - v.uv.y);
+                o.uv = float2(v.uv.x, v.uv.y);
                 o.uv = TRANSFORM_TEX(o.uv, _MainTex);
                 return o;
             }
@@ -58,7 +58,7 @@ Shader "Unlit/CopyDepthShader"
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
                 //return (UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, i.uv)/65535.0);
-				float val = (float)(((float)_MainTex.Load(int3(i.uv.x*320, i.uv.y*288, 0)).r*4000.0)/255.0);
+				float val = tex2D(_MainTex, i.uv).r;//(float)(((float)_MainTex.Load(int3(i.uv.x*320, i.uv.y*288, 0)).r;//*4000.0)/255.0);
 				return float4(val, val, val, val);
             }
             ENDHLSL

@@ -16,7 +16,7 @@ public class KeyboardCommand : MonoBehaviour
 #if ENABLE_WINMD_SUPPORT
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            rm.SaveAHATSensorDataEvent();
+           // rm.SaveAHATSensorDataEvent();
         }
 #endif
     }

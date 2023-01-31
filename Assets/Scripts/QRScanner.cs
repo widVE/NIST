@@ -259,7 +259,7 @@ public class QRScanner : MonoBehaviour
 	}
 
 	// For shutdown, we just need to stop the watcher
-	void DestroyObject()
+	void OnDestroy()
 	{
 		Debug.Log("Stopping QR Watcher");
 
