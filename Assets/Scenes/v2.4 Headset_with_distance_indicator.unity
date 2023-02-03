@@ -4834,8 +4834,8 @@ LineRenderer:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.28633678
-        value: 0.02574405
+        time: 0.32201535
+        value: 0.29240716
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -4843,8 +4843,8 @@ LineRenderer:
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 0.5967214
-        value: 0
+        time: 0.6252706
+        value: 0.07499695
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -4889,7 +4889,7 @@ LineRenderer:
     textureMode: 0
     shadowBias: 0.5
     generateLightingData: 0
-  m_UseWorldSpace: 0
+  m_UseWorldSpace: 1
   m_Loop: 0
 --- !u!1001 &1539913614
 PrefabInstance:
