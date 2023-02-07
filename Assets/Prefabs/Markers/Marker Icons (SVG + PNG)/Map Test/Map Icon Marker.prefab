@@ -49,6 +49,7 @@ GameObject:
   - component: {fileID: 7212438549648718525}
   - component: {fileID: 896291391581079368}
   - component: {fileID: 948566107858276302}
+  - component: {fileID: 9114626056154776211}
   - component: {fileID: 3952929929657778918}
   m_Layer: 0
   m_Name: Map Icon Marker
@@ -272,7 +273,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 9114626056154776211}
         m_TargetAssemblyTypeName: MarkerObject, Assembly-CSharp
         m_MethodName: UpdatedWithID
         m_Mode: 1
@@ -463,6 +464,20 @@ MonoBehaviour:
   autoConstraintSelection: 0
   selectedConstraints:
   - {fileID: 896291391581079368}
+--- !u!114 &9114626056154776211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5318789042369293505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01df08ac3a635e14da5c4ae345fc8eae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  feature_ID: -1
+  manager_script: {fileID: 0}
 --- !u!114 &3952929929657778918
 MonoBehaviour:
   m_ObjectHideFlags: 0
