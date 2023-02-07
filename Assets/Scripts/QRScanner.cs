@@ -81,7 +81,7 @@ public class QRScanner : MonoBehaviour
 	 */
 	[Header("Manual Trigger")]
 	[Tooltip("Set the QR code data and click the checkbox to trigger a fake QR code detection.")]
-	public string testQRCodeData = "vizar://halo05.wings.cs.wisc.edu:5000/locations/66a4e9f2-e978-4405-988e-e168a9429030";
+	public string testQRCodeData = "vizar://easyvizar.wings.cs.wisc.edu:5000/locations/66a4e9f2-e978-4405-988e-e168a9429030";
 	public bool triggerQRCodeDetected = false;
 
 	/*
@@ -149,7 +149,7 @@ public class QRScanner : MonoBehaviour
         {
 			if (uri.Scheme == "vizar")
 			{
-				// Example: http://halo05.wings.cs.wisc.edu:5000/
+				// Example: http://easyvizar.wings.cs.wisc.edu:5000/
 				string base_url = "http://" + uri.Authority + "/";
 				Debug.Log("Detected URL from QR code: " + base_url);
 				//EasyVizARServer.Instance._baseURL = base_url;
@@ -167,7 +167,7 @@ public class QRScanner : MonoBehaviour
 			}
 		}
 
-		// Example: vizar://halo05.wings.cs.wisc.edu:5000/locations/69e92dff-7138-4091-89c4-ed073035bfe6
+		// Example: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/69e92dff-7138-4091-89c4-ed073035bfe6
 		// This QR code marks a location origin. Add it to the appropriate dictionary, and we will
 		// take care of the rest on the next Update cycle.
 		if (isVizarScheme && isLocation)
@@ -200,7 +200,7 @@ public class QRScanner : MonoBehaviour
 		{
 			if (uri.Scheme == "vizar")
 			{
-				// Example: http://halo05.wings.cs.wisc.edu:5000/
+				// Example: http://easyvizar.wings.cs.wisc.edu:5000/
 				string base_url = "http://" + uri.Authority + "/";
 				Debug.Log("Detected URL from QR code: " + base_url);
 				EasyVizARServer.Instance.SetBaseURL(base_url);

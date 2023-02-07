@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 
 public class MapText : MonoBehaviour
 {
-    public string baseURL = "http://halo05.wings.cs.wisc.edu:5000/";
+    public string baseURL = "http://easyvizar.wings.cs.wisc.edu:5000/";
     public string location_id = "";
 
     public EasyVizARHeadsetManager manager;
@@ -38,7 +38,7 @@ public class MapText : MonoBehaviour
         //StartCoroutine(GetLocationInfo(baseURL + "/locations/"));//this is the one USED
 
 
-        //StartCoroutine(GetMapName("http://halo05.wings.cs.wisc.edu:5000/locations/66a4e9f2-e978-4405-988e-e168a9429030/"));
+        //StartCoroutine(GetMapName("http://easyvizar.wings.cs.wisc.edu:5000/locations/66a4e9f2-e978-4405-988e-e168a9429030/"));
         Debug.Log("manager ID: " + manager.LocationID);
         StartCoroutine(GetLocationInfo(baseURL + "/locations/" + manager.LocationID));
 

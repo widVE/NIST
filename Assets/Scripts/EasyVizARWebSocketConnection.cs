@@ -21,7 +21,7 @@ public class HeadsetsEvent
 public class EasyVizARWebSocketConnection : MonoBehaviour
 {
     [SerializeField]
-    private string _webSocketURL = "ws://halo05.wings.cs.wisc.edu:5000/ws";
+    private string _webSocketURL = "ws://easyvizar.wings.cs.wisc.edu:5000/ws";
     public string WebSocketURL
     {
         get { return _webSocketURL; }

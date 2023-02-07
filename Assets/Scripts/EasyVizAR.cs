@@ -205,8 +205,8 @@ namespace EasyVizAR
 
 public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 {
-	private string _authority = "halo05.wings.cs.wisc.edu:5000";
-	private string _baseURL = "http://halo05.wings.cs.wisc.edu:5000/";
+	private string _authority = "easyvizar.wings.cs.wisc.edu:5000";
+	private string _baseURL = "http://easyvizar.wings.cs.wisc.edu:5000/";
 	private bool _hasRegistration = false;
 	private EasyVizAR.Registration _registration;
 
@@ -219,7 +219,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		_hasRegistration = TryLoadRegistration(out _registration);
     }
 
-	// Change the server base URL, which will affect all future API calls, e.g. "http://halo05.wing.cs.wisc.edu:5000/".
+	// Change the server base URL, which will affect all future API calls, e.g. "http://easyvizar.wing.cs.wisc.edu:5000/".
 	public void SetBaseURL(string url)
     {
 		if (Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
@@ -461,7 +461,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	// Try to load a previous registration (headset ID, auth token) from file.
 	public bool TryLoadRegistration(out EasyVizAR.Registration registration)
     {
-		// Extract just the host and port from the baseUrl, e.g. "halo05.wings.cs.wisc.edu:5000"
+		// Extract just the host and port from the baseUrl, e.g. "easyvizar.wings.cs.wisc.edu:5000"
 		// Colon is not allowed in filenames, so we replace with a hash sign.
 		string filename = _authority.Replace(":", "#") + ".json";
 		string filePath = System.IO.Path.Combine(Application.persistentDataPath, "registrations", filename);
@@ -483,7 +483,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	// Save a new registration (headset ID, auth token) to file.
 	public void SaveRegistration(string headset_id, string auth_token)
     {
-		// Extract just the host and port from the baseUrl, e.g. "halo05.wings.cs.wisc.edu:5000"
+		// Extract just the host and port from the baseUrl, e.g. "easyvizar.wings.cs.wisc.edu:5000"
 		// Colon is not allowed in filenames, so we replace with a hash sign.
 		string filename = _authority.Replace(":", "#") + ".json";
 		string parentDir = System.IO.Path.Combine(Application.persistentDataPath, "registrations");
