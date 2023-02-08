@@ -26,7 +26,7 @@ public class Navigation : MonoBehaviour
         // initializing the line render
         line = GameObject.Find("Main Camera").GetComponent<LineRenderer>();
         if (line != null) { Debug.Log("found line renderer!"); }
-        line.positionCount = 0; // this is hard coded for now.
+        line.positionCount = 2; // this is hard coded for now.
         points = new Transform[2];
     }
 
@@ -69,22 +69,10 @@ public class Navigation : MonoBehaviour
     {
         //TODO: this is where I should add the line render between the user and the desire landmark/icon
         Debug.Log("Touched the icon!");
-        line.positionCount = 2; // this is hard coded for now.
-
-        //Vector3 camera_pos = Camera.main.transform.position;
         points[0] = Camera.main.transform;
-
-        Transform camera_pos = Camera.main.transform;
-        //float cam_pos_y_offset = -0.25f; //NOTE: in the editor the y value won't be zero (hard-coded for now), so can multiply that by 0.75 --> use below for HoloLens testing
-        float cam_pos_y_offset = camera_pos.position.y*0.75f; //NOTE: in the editor the y value won't be zero, so can multiply that by 0.75 
-
-        Vector3 camera = new Vector3(camera_pos.position.x, cam_pos_y_offset, camera_pos.position.z);
-
-
         points[1] = markerSpawnParent.transform.Find(this.name); // might move this line to elsewhere, but for now, it should work fine
 
-        line.SetPosition(0, camera); // the position of the user (i.e. the main camera's position)
-       // line.SetPosition(0, points[0].position); // the position of the user (i.e. the main camera's position)
+        line.SetPosition(0, points[0].position); // the position of the user (i.e. the main camera's position)
         line.SetPosition(1, points[1].position); // the position of the desire landmark/icon
         // Note: I set the line renderer to be in world space, so it may not render because of this 
     }
