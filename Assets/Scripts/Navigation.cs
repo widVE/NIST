@@ -34,6 +34,7 @@ public class Navigation : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         if (points[1] != null)
         {
             line.enabled = true;
@@ -41,6 +42,7 @@ public class Navigation : MonoBehaviour
             RenderNavigationPath();
 
         }
+        
 
         Debug.Log("Got to Update() from Navigation");
         //update the position of user and landmark 
@@ -51,8 +53,6 @@ public class Navigation : MonoBehaviour
         line.SetPosition(0, points[0].position); // the position of the user (i.e. the main camera's position)
         line.SetPosition(1, points[1].position); // the position of the desire landmark/icon
         */
-       
-
 
     }
 
@@ -72,17 +72,39 @@ public class Navigation : MonoBehaviour
 
         //line.SetPosition(0, points[0].position); // the position of the user (i.e. the main camera's position)
         line.SetPosition(0, camera); // the position of the user (i.e. the main camera's position)
-
-        line.SetPosition(1, points[1].position); // the position of the desire landmark/icon
-        // Note: I set the line renderer to be in world space, so it may not render because of this 
-
-        // when successfully navigated to the target
-        if ((Math.Abs(camera.x - points[1].position.x) < 0.1) || ((Math.Abs(camera.z - points[1].position.z) < 0.1))) //TODO: need to fix it! 
+        if (points[1])
         {
-            Debug.Log("Disabled the line.");
+            line.SetPosition(1, points[1].position); // the position of the desire landmark/icon
+
+            // when successfully navigated to the target --> maybe need these later
+
+            if ((Math.Abs(camera.x - points[1].position.x) < 0.05) || ((Math.Abs(camera.z - points[1].position.z) < 0.05))) //TODO: need to fix it! 
+            {
+                Debug.Log("Disabled the line.");
+                line.enabled = false;
+                points[1] = null;
+                line.positionCount = 0;
+            }
+
+        }
+
+
+    }
+    // This is for the future, if we would want to turn certain marker's line renderer off
+    public void DisableLineRenderer(EasyVizAR.Feature marker, string type)
+    {
+        Vector3 cam_pos = GetComponent<Camera>().transform.position;
+
+        float change_x = (float)Math.Pow((cam_pos.x - marker.position.x), 2);
+        float change_z = (float)Math.Pow((cam_pos.z - marker.position.z), 2);
+        float change_dist = (float)Math.Sqrt(change_x + change_z);
+        if (change_dist < 0.05)
+        {
+            Debug.Log("Disabled the line");
             line.enabled = false;
             points[1] = null;
             line.positionCount = 0;
         }
+
     }
 }
