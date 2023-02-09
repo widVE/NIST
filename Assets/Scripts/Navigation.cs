@@ -76,8 +76,7 @@ public class Navigation : MonoBehaviour
         {
             line.SetPosition(1, points[1].position); // the position of the desire landmark/icon
 
-            // when successfully navigated to the target --> maybe need these later
-
+            // when successfully navigated to the target, disable line renderer --> maybe need these later
             if ((Math.Abs(camera.x - points[1].position.x) < 0.05) || ((Math.Abs(camera.z - points[1].position.z) < 0.05))) //TODO: need to fix it! 
             {
                 Debug.Log("Disabled the line.");
