@@ -24,7 +24,10 @@ public class HololensDepthPVCapture : MonoBehaviour
     HL2ResearchMode researchMode;
 #endif
 #endif
-
+	
+	[SerializeField]
+	QRScanner _qrScanner;
+	
 	[SerializeField]
 	float _captureTime = 1f;
 	

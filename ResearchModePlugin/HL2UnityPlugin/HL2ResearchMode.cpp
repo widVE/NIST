@@ -520,6 +520,9 @@ namespace winrt::HL2UnityPlugin::implementation
             return;
         }
 
+
+        //add option to not collect data until QR code detected...
+
         pHL2ResearchMode->m_longDepthSensor->OpenStream();
         //FILE* f = fopen("test_out.txt", "w");
         int fc = 0;
