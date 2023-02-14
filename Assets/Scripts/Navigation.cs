@@ -9,6 +9,7 @@ public class Navigation : MonoBehaviour
     Collider collider;
     LineRenderer line;
     [SerializeField] Transform[] points; //this contains the position of the landmark/icon
+    string location_id; 
     // Start is called before the first frame update
     void Start()
     {
@@ -29,6 +30,9 @@ public class Navigation : MonoBehaviour
         if (line != null) { Debug.Log("found line renderer!"); }
         line.positionCount = 0; // this is hard coded for now.
         points = new Transform[2];
+
+
+        location_id = GameObject.Find("EasyVizARHeadsetManager").GetComponent<EasyVizARHeadsetManager>().LocationID;
     }
 
     // Update is called once per frame
@@ -103,6 +107,26 @@ public class Navigation : MonoBehaviour
             line.enabled = false;
             points[1] = null;
             line.positionCount = 0;
+        }
+
+    }
+
+    // Querying the server with path between two points
+    public void FindPath()
+    {
+        Vector3 start = new Vector3(1,2,4); // this is hard coded for now --> will add these points later
+        Vector3 target = new Vector3(12,-2, 2); // is the type Position? or Vector3?
+
+        EasyVizARServer.Instance.Get("locations/" + location_id + "/route?/from=" + start.x + "," + start.y + "," + start.z + "&to=" + target.x + "," + target.y + "," + target.z, EasyVizARServer.JSON_TYPE, GetPathCallback);
+    }
+
+    void GetPathCallback(string result)
+    {
+        Debug.Log("initiated querying path");
+        var resultJson = JsonUtility.FromJson<List<EasyVizAR.Position>>(result);
+        if (result != "error")
+        {
+
         }
 
     }
