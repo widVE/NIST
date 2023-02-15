@@ -574,8 +574,6 @@ public class FeatureManager : MonoBehaviour
         GameObject world_marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
         world_marker.name = string.Format("feature-{0}", feature.id);
         
-        Debug.Log("Palm is active?: " + PalmMap.activeSelf);
-
         float y_offset = -1f * (feature.id / 100f);
 
         //I'm trying to add in the marker icon spawning to the floating map. I think this is where it happens!
@@ -636,8 +634,6 @@ public class FeatureManager : MonoBehaviour
 
         Transform feature_object = spawn_parent.transform.Find(string.Format("feature-{0}", id));
         Transform map_icon = palm_map_spawn_target.transform.Find(string.Format("feature-{0}", id));
-        Debug.Log("Got into the delete method");
-        Debug.Log("deleting feature-"+id);
         if (feature_object)
         {
             Debug.Log("deleted feature: " + id);
