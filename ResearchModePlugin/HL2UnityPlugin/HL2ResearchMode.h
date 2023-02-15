@@ -27,12 +27,12 @@ namespace winrt::HL2UnityPlugin::implementation
         UINT16 GetCenterDepth();
         int GetDepthBufferSize();
         int GetLongDepthBufferSize();
-        hstring PrintDepthResolution();
+        /*hstring PrintDepthResolution();
         hstring PrintDepthExtrinsics();
 		hstring PrintLFResolution();
 		hstring PrintLFExtrinsics();
 		hstring PrintRFResolution();
-		hstring PrintRFExtrinsics();
+		hstring PrintRFExtrinsics();*/
 
         void InitializeDepthSensor();
         void InitializeLongDepthSensor();
@@ -56,12 +56,27 @@ namespace winrt::HL2UnityPlugin::implementation
         bool LRImageUpdated();
         bool RRImageUpdated();
 
-        void SetCaptureHiResColorImage();
+        void SetCaptureHiResColorImage() { m_bCaptureHiResImages = true; }
         bool IsCapturingHiResColor() { return m_bCaptureHiResImages; }
 
+        void SetCaptureRectColorImage() { m_bCaptureRectColor = true; }
+        bool IsCapturingRectColor() { return m_bCaptureRectColor; }
+
+        void SetCaptureTransforms() { m_bCaptureTransform = true; }
+        bool IsCapturingTransforms() { return m_bCaptureTransform; }
+
+        void SetCaptureDepthImages() { m_bCaptureDepthImages = true; }
+        bool IsCapturingDepthImages() { return m_bCaptureDepthImages; }
+
+        void SetCaptureColoredPointCloud() { m_bCaptureColoredPointCloud = true; }
+        bool IsCapturingColoredPointCloud() { return m_bCaptureColoredPointCloud; }
+
+        void SetCaptureBinaryDepth() { m_bCaptureBinaryDepth = true; }
+        bool IsCapturingBinaryDepth() { return m_bCaptureBinaryDepth; }
 
         void SetReferenceCoordinateSystem(Windows::Perception::Spatial::SpatialCoordinateSystem refCoord);
         void SetPointCloudRoiInSpace(float centerX, float centerY, float centerZ, float boundX, float boundY, float boundZ);
+        void SetQRTransform(float f00, float f01, float f02, float f03, float f10, float f11, float f12, float f13, float f20, float f21, float f22, float f23, float f30, float f31, float f32, float f33);
         void SetPointCloudDepthOffset(uint16_t offset);
 
         com_array<uint16_t> GetDepthMapBuffer();
@@ -87,7 +102,6 @@ namespace winrt::HL2UnityPlugin::implementation
         com_array<float> GetLocalDepthBuffer();
 
         std::mutex mu;
-        std::shared_mutex m_frameMutex;
         unsigned int _frameCount = 0;
 
     protected:
@@ -118,8 +132,6 @@ namespace winrt::HL2UnityPlugin::implementation
         UINT8* m_LRImage = nullptr;
         UINT8* m_RRImage = nullptr;
         UINT8* m_pixelBufferData = nullptr;
-
-        
 
         IResearchModeSensor* m_depthSensor = nullptr;
         IResearchModeCameraSensor* m_pDepthCameraSensor = nullptr;
@@ -161,6 +173,7 @@ namespace winrt::HL2UnityPlugin::implementation
         float m_currRotation[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
         float m_currPosition[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
         float m_PVToWorld[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
+        float m_QRTransform[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
 
         std::atomic_bool m_depthSensorLoopStarted = false;
         std::atomic_bool m_PVLoopStarted = false;
@@ -181,6 +194,9 @@ namespace winrt::HL2UnityPlugin::implementation
         std::atomic_bool m_bCaptureHiResImages = false;
         std::atomic_bool m_bCaptureDepthImages = false;
         std::atomic_bool m_bCaptureRectColor = false;
+        std::atomic_bool m_bCaptureColoredPointCloud = false;
+        std::atomic_bool m_bCaptureTransform = false;
+        std::atomic_bool m_bCaptureBinaryDepth = false;
 
         float m_roiBound[3]{ 0,0,0 };
         float m_roiCenter[3]{ 0,0,0 };
@@ -208,11 +224,12 @@ namespace winrt::HL2UnityPlugin::implementation
         DirectX::XMFLOAT4X4 m_PVCameraPose;
         DirectX::XMMATRIX m_PVCameraPoseInvMatrix;
         DirectX::XMFLOAT4X4 m_PV_MVP;
+        DirectX::XMMATRIX m_QRMatrix;
+        DirectX::XMFLOAT4X4 m_QR;
 
         std::thread* m_pDepthUpdateThread;
         std::thread* m_pLongDepthUpdateThread;
         std::thread* m_pSpatialCamerasFrontUpdateThread;
-        std::thread *m_pColorUpdateThread;
 
         winrt::Windows::Foundation::Numerics::float3* _depthPts = 0;
 

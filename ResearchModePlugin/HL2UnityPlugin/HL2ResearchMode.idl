@@ -31,12 +31,12 @@ namespace HL2UnityPlugin
 
         Int32 GetDepthBufferSize();
         Int32 GetLongDepthBufferSize();
-        String PrintDepthResolution();
+        /*String PrintDepthResolution();
         String PrintDepthExtrinsics();
 		String PrintLFResolution();
 		String PrintLFExtrinsics();
 		String PrintRFResolution();
-		String PrintRFExtrinsics();
+		String PrintRFExtrinsics();*/
 
         Boolean DepthMapTextureUpdated();
         Boolean ShortAbImageTextureUpdated();
@@ -50,6 +50,16 @@ namespace HL2UnityPlugin
 
         void SetCaptureHiResColorImage();
         Boolean IsCapturingHiResColor();
+        void SetCaptureRectColorImage();
+        Boolean IsCapturingRectColor();
+        void SetCaptureTransforms();
+        Boolean IsCapturingTransforms();
+        void SetCaptureDepthImages();
+        Boolean IsCapturingDepthImages();
+        void SetCaptureColoredPointCloud();
+        Boolean IsCapturingColoredPointCloud();
+        void SetCaptureBinaryDepth();
+        Boolean IsCapturingBinaryDepth();
 
         void InitializeDepthSensor();
         void InitializeLongDepthSensor();
@@ -65,5 +75,6 @@ namespace HL2UnityPlugin
         void SetReferenceCoordinateSystem(Windows.Perception.Spatial.SpatialCoordinateSystem refCoord);
         void SetPointCloudRoiInSpace(Single centerX, Single centerY, Single centerZ, Single boundX, Single boundY, Single boundZ);
         void SetPointCloudDepthOffset(UInt16 offset);
+        void SetQRTransform(Single f00, Single f01, Single f02, Single f03, Single f10, Single f11, Single f12, Single f13, Single f20, Single f21, Single f22, Single f23, Single f30, Single f31, Single f32, Single f33);
     }
 }

@@ -1918,10 +1918,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _qrScanner: {fileID: 291935032}
+  _startOnQRDetection: 1
   _captureTime: 1
   _captureColorPointCloud: 0
   _captureHiResColorImages: 0
-  _captureRectifiedColorImages: 0
+  _captureRectifiedColorImages: 1
   _captureDepthImages: 0
   _captureBinaryDepth: 0
   _captureTransforms: 0

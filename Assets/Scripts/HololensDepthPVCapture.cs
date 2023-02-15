@@ -29,6 +29,9 @@ public class HololensDepthPVCapture : MonoBehaviour
 	QRScanner _qrScanner;
 	
 	[SerializeField]
+	bool _startOnQRDetection = true;
+	
+	[SerializeField]
 	float _captureTime = 1f;
 	
 	[SerializeField]
@@ -93,19 +96,20 @@ public class HololensDepthPVCapture : MonoBehaviour
 		//if(longDepthPreviewPlane != null)
 		//{
 		researchMode.InitializeLongDepthSensor();
+		
 		//researchMode.InitializePVCamera();
-		researchMode.StartPVCameraLoop();
-
-		researchMode.StartLongDepthSensorLoop();
-		
-		if(_captureHiResColorImages)
+		if(!_startOnQRDetection)
 		{
-			researchMode.SetCaptureHiResColorImage();
+			RunSensors();
 		}
-		
-		if(_captureColorPointCloud)
+		else
 		{
-			
+			_qrScanner.QRTransformChanged += (o, ev) =>
+			{
+				Matrix4x4 m = ev.NewTransform;
+				researchMode.SetQRTransform(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
+				RunSensors();
+			};
 		}
 		
 		//PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
@@ -140,7 +144,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 
 		 // update long depth map texture
 
-        float currTime = Time.time;
+         /****float currTime = Time.time;
         
         if(_lastCaptureTime == 0.0)
         {
@@ -149,7 +153,7 @@ public class HololensDepthPVCapture : MonoBehaviour
         
         if(currTime - _lastCaptureTime > _captureTime)
         {
-            _lastCaptureTime = currTime;
+           _lastCaptureTime = currTime;
 
 			string debugOut = Path.Combine(Application.persistentDataPath, DateTime.Now.ToString("M_dd_yyyy_hh_mm_ss_")+_fileOutNumber.ToString());//+".xyz");
 			_fileOutNumber++;
@@ -314,14 +318,14 @@ public class HololensDepthPVCapture : MonoBehaviour
 				depthString = depthString + (depthPos[2].ToString("F4") + " " + depthPos[6].ToString("F4") + " " + depthPos[10].ToString("F4") + " " + depthPos[14].ToString("F4") + "\n");
 				depthString = depthString + (depthPos[3].ToString("F4") + " " + depthPos[7].ToString("F4") + " " + depthPos[11].ToString("F4") + " " + depthPos[15].ToString("F4") + "\n");
 				
-				/*string depthString = cameraToWorldMatrix[0].ToString("F4") + " " + cameraToWorldMatrix[1].ToString("F4") + " " + cameraToWorldMatrix[2].ToString("F4") + " " + cameraToWorldMatrix[3].ToString("F4") + "\n";
-				depthString = depthString + (cameraToWorldMatrix[4].ToString("F4") + " " + cameraToWorldMatrix[5].ToString("F4") + " " + cameraToWorldMatrix[6].ToString("F4") + " " + projectionMatrix[0].ToString("F4") + "\n");
-				depthString = depthString + (cameraToWorldMatrix[8].ToString("F4") + " " + cameraToWorldMatrix[9].ToString("F4") + " " + cameraToWorldMatrix[10].ToString("F4") + " " + projectionMatrix[5].ToString("F4") + "\n");
-				depthString = depthString + (cameraToWorldMatrix[12].ToString("F4") + " " + cameraToWorldMatrix[13].ToString("F4") + " " + cameraToWorldMatrix[14].ToString("F4") + " " + cameraToWorldMatrix[15].ToString("F4") + "\n");*/
+				//string depthString = cameraToWorldMatrix[0].ToString("F4") + " " + cameraToWorldMatrix[1].ToString("F4") + " " + cameraToWorldMatrix[2].ToString("F4") + " " + cameraToWorldMatrix[3].ToString("F4") + "\n";
+				//depthString = depthString + (cameraToWorldMatrix[4].ToString("F4") + " " + cameraToWorldMatrix[5].ToString("F4") + " " + cameraToWorldMatrix[6].ToString("F4") + " " + projectionMatrix[0].ToString("F4") + "\n");
+				//depthString = depthString + (cameraToWorldMatrix[8].ToString("F4") + " " + cameraToWorldMatrix[9].ToString("F4") + " " + cameraToWorldMatrix[10].ToString("F4") + " " + projectionMatrix[5].ToString("F4") + "\n");
+				//depthString = depthString + (cameraToWorldMatrix[12].ToString("F4") + " " + cameraToWorldMatrix[13].ToString("F4") + " " + cameraToWorldMatrix[14].ToString("F4") + " " + cameraToWorldMatrix[15].ToString("F4") + "\n");
 				
 			    string filenameTxt = debugOut+"_trans.txt";
 				System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxt), depthString);	
-			}
+			}***/
 			
 			/*byte[] colorTextureBuffer = researchMode.GetPVColorBuffer();
 			
@@ -519,7 +523,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 			/*    string filenameTxt = string.Format(@"DepthToWorldMatrix{0}_n.txt", currTime);
 				System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, filenameTxt), depthString);
 			}*/
-        }
+        //}
 		
 #endif
 #endif
@@ -536,7 +540,50 @@ public class HololensDepthPVCapture : MonoBehaviour
 #endif
 #endif
     }
+	
+	void RunSensors()
+	{
+#if ENABLE_WINMD_SUPPORT
+#if UNITY_EDITOR
+#else
+		if(_captureHiResColorImages)
+		{
+			researchMode.SetCaptureHiResColorImage();
+		}
+		
+		if(_captureColorPointCloud)
+		{
+			researchMode.SetCaptureColoredPointCloud();
+		}
 
+		if(_captureRectifiedColorImages)
+		{
+			researchMode.SetCaptureRectColorImage();
+		}
+
+		if(_captureDepthImages)
+		{
+			researchMode.SetCaptureDepthImages();
+		}
+		
+		if(_captureBinaryDepth)
+		{
+			researchMode.SetCaptureBinaryDepth();
+		}
+		
+		if(_captureTransforms)
+		{
+			researchMode.SetCaptureTransforms();
+		}
+		
+       	researchMode.StartPVCameraLoop();
+
+		researchMode.StartLongDepthSensorLoop();
+		
+#endif
+#endif
+	}
+	
     #endregion
     private void OnApplicationFocus(bool focus)
     {

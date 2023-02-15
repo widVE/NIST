@@ -14,6 +14,11 @@ public class LocationChangedEventArgs
 	public string LocationID;
 }
 
+public class QRTransformChangedEventArgs
+{
+	public Matrix4x4 NewTransform;
+}
+
 [RequireComponent(typeof(AudioSource))]
 public class QRScanner : MonoBehaviour
 {
@@ -249,12 +254,21 @@ public class QRScanner : MonoBehaviour
 
 			Matrix4x4 m = Matrix4x4.TRS(d.pose.position, d.pose.rotation, Vector3.one);
 			Matrix4x4 mInv = m.inverse;
+			
+			QRTransformChangedEventArgs args = new QRTransformChangedEventArgs();
+			//args.NewTransform = new Matrix4x4();
+			args.NewTransform = mInv;
+			if(QRTransformChanged is not null)
+			{
+				QRTransformChanged(this, args);
+			}
+			
 			_qrPrefabParent.transform.SetPositionAndRotation(mInv.GetPosition(), mInv.rotation);
 
 			_qrPrefab.transform.localPosition = d.pose.position;
 			_qrPrefab.transform.localRotation = d.pose.rotation;
 
-			int cc = _qrPrefab.transform.childCount;
+			//int cc = _qrPrefab.transform.childCount;
 		}
 	}
 
@@ -324,4 +338,6 @@ public class QRScanner : MonoBehaviour
     }
 
 	public event EventHandler<LocationChangedEventArgs> LocationChanged;
+	
+	public event EventHandler<QRTransformChangedEventArgs> QRTransformChanged;
 }

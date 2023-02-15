@@ -274,7 +274,7 @@ namespace winrt::HL2UnityPlugin::implementation
     winrt::Windows::Foundation::IAsyncAction CreateLocalFile(const wchar_t* sName, winrt::Windows::Graphics::Imaging::SoftwareBitmap softwareBitmap)
     {
         winrt::Windows::Storage::StorageFolder storageFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
-        winrt::Windows::Storage::StorageFile saveTest = co_await storageFolder.CreateFileAsync(sName, winrt::Windows::Storage::CreationCollisionOption::ReplaceExisting);
+        winrt::Windows::Storage::StorageFile saveTest = co_await storageFolder.CreateFileAsync(hstring(sName), winrt::Windows::Storage::CreationCollisionOption::ReplaceExisting);
 
         winrt::Windows::Storage::Streams::IRandomAccessStream outputStream = co_await saveTest.OpenAsync(winrt::Windows::Storage::FileAccessMode::ReadWrite);
         
@@ -509,6 +509,11 @@ namespace winrt::HL2UnityPlugin::implementation
         m_pLongDepthUpdateThread = new std::thread(HL2ResearchMode::LongDepthSensorLoop, this);
     }
 
+    struct __declspec(uuid("5b0d3235-4dba-4d44-865e-8f1d0e4fd04d")) __declspec(novtable) IMemoryBufferByteAccess : ::IUnknown
+    {
+        virtual HRESULT __stdcall GetBuffer(uint8_t** value, uint32_t* capacity) = 0;
+    };
+
     void HL2ResearchMode::LongDepthSensorLoop(HL2ResearchMode* pHL2ResearchMode)
     {
         // prevent starting loop for multiple times
@@ -529,12 +534,12 @@ namespace winrt::HL2UnityPlugin::implementation
 
         while (pHL2ResearchMode->m_longDepthSensorLoopStarted)
         {
-			//wait for color sensor loop to have also started...
-			if(!pHL2ResearchMode->m_PVLoopStarted)
-			{
-				continue;
-			}
-			
+            //wait for color sensor loop to have also started...
+            if (!pHL2ResearchMode->m_PVLoopStarted)
+            {
+                continue;
+            }
+
             IResearchModeSensorFrame* pDepthSensorFrame = nullptr;
             ResearchModeSensorResolution resolution;
 
@@ -566,14 +571,14 @@ namespace winrt::HL2UnityPlugin::implementation
 
 
             // process sensor frame
-                    
+
             auto pDepthTexture = std::make_unique<uint8_t[]>(outBufferCount);
             auto pDepthTextureFiltered = std::make_unique<uint16_t[]>(outBufferCount);
 
             std::vector<float> pointCloud;
 
             // get tracking transform
-                    
+
             //timestamp continuosly increases... but does depth buffer change?
             /*std::stringstream ss;
             ss << fc << ": " << timestamp.HostTicks << " , " << timestamp.SensorTicks << "\n";
@@ -603,6 +608,21 @@ namespace winrt::HL2UnityPlugin::implementation
             auto posMat = XMMatrixTranslation(pos.x, pos.y, pos.z);
             auto depthToWorld = pHL2ResearchMode->m_longDepthCameraPoseInvMatrix * rotMat * posMat;
 
+            std::wstring m_datetime;
+            wchar_t m_datetime_c[200];
+            const std::time_t now = std::time(nullptr);
+            std::tm tm;
+            localtime_s(&tm, &now);
+            std::wcsftime(m_datetime_c, sizeof(m_datetime_c), L"%F-%H%M%S", &tm);
+
+            m_datetime.assign(m_datetime_c);
+
+            wchar_t m_ms[64];
+            swprintf_s(m_ms, L"%d", GetTickCount());
+
+            winrt::Windows::Storage::StorageFolder storageFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
+            auto path = storageFolder.Path().data();
+            std::wstring fullName(path);
 
             pHL2ResearchMode->m_depthSensorPosition[0] = pos.x;
             pHL2ResearchMode->m_depthSensorPosition[1] = pos.y;
@@ -616,6 +636,26 @@ namespace winrt::HL2UnityPlugin::implementation
                     pHL2ResearchMode->m_currRotation[p * 4 + q] = rotMat.r[p].n128_f32[q];
                     pHL2ResearchMode->m_currPosition[p * 4 + q] = posMat.r[p].n128_f32[q];
                 }
+            }
+
+            if (pHL2ResearchMode->IsCapturingTransforms())
+            {
+                std::ofstream file;
+                std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_pc.txt";
+                file.open(pcName);
+                file << pHL2ResearchMode->m_depthToWorld[0] << " " << pHL2ResearchMode->m_depthToWorld[1] << " " << pHL2ResearchMode->m_depthToWorld[2] << " " << pHL2ResearchMode->m_depthToWorld[3] << std::endl;
+                file << pHL2ResearchMode->m_depthToWorld[4] << " " << pHL2ResearchMode->m_depthToWorld[5] << " " << pHL2ResearchMode->m_depthToWorld[6] << " " << pHL2ResearchMode->m_depthToWorld[7] << std::endl;
+                file << pHL2ResearchMode->m_depthToWorld[8] << " " << pHL2ResearchMode->m_depthToWorld[9] << " " << pHL2ResearchMode->m_depthToWorld[10] << " " << pHL2ResearchMode->m_depthToWorld[11] << std::endl;
+                file << pHL2ResearchMode->m_depthToWorld[12] << " " << pHL2ResearchMode->m_depthToWorld[13] << " " << pHL2ResearchMode->m_depthToWorld[14] << " " << pHL2ResearchMode->m_depthToWorld[15] << std::endl;
+
+                file.close();
+            }
+
+            FILE* fLocalDepth = 0;
+            if (pHL2ResearchMode->IsCapturingBinaryDepth())
+            {
+                std::wstring localName = fullName + +L"\\" + m_datetime + L"_" + m_ms + L"_ld.bytes";
+                _wfopen_s(&fLocalDepth, localName.c_str(), L"wb");
             }
 
             for (UINT i = 0; i < resolution.Height; i++)
@@ -715,6 +755,14 @@ namespace winrt::HL2UnityPlugin::implementation
                         pHL2ResearchMode->m_localDepth[idx * 4 + 3] = sqrtf(dX + dY + dZ);
                     }
 
+                    if (pHL2ResearchMode->IsCapturingBinaryDepth())
+                    {
+                        fwrite(&(pHL2ResearchMode->m_localDepth[idx * 4]), sizeof(float), 1, fLocalDepth);
+                        fwrite(&(pHL2ResearchMode->m_localDepth[idx * 4 + 1]), sizeof(float), 1, fLocalDepth);
+                        fwrite(&(pHL2ResearchMode->m_localDepth[idx * 4 + 2]), sizeof(float), 1, fLocalDepth);
+                        fwrite(&(pHL2ResearchMode->m_localDepth[idx * 4 + 3]), sizeof(float), 1, fLocalDepth);
+                    }
+
                     auto pointInWorld = XMVector3Transform(XMLoadFloat3(&tempPoint), depthToWorld);
 
                     pHL2ResearchMode->_depthPts[idx].x = pointInWorld.n128_f32[0];// /= pointInWorld.n128_f32[3];
@@ -734,7 +782,14 @@ namespace winrt::HL2UnityPlugin::implementation
                     }
                 }
             }
-                
+            
+            if (pHL2ResearchMode->IsCapturingBinaryDepth())
+            {
+                if (fLocalDepth != 0)
+                {
+                    fclose(fLocalDepth);
+                }
+            }
        
             winrt::Windows::Foundation::Numerics::float4x4 worldToPV = winrt::Windows::Foundation::Numerics::float4x4::identity();
 
@@ -826,10 +881,14 @@ namespace winrt::HL2UnityPlugin::implementation
                     
                 if (pHL2ResearchMode->IsCapturingHiResColor())
                 {
-                    wchar_t fName[50];
-                    wprintf(fName, L"%u_color.png", pHL2ResearchMode->_frameCount);
-                    CreateLocalFile(fName, softwareBitmap);
-                    pHL2ResearchMode->_frameCount++;
+                    //wchar_t fName[50];
+                    //swprintf(fName, 50, L"%ucolor.png", pHL2ResearchMode->_frameCount);
+                    std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_hicolor.png";
+                    CreateLocalFile(pcName.c_str(), softwareBitmap);
+                    if (!pHL2ResearchMode->IsCapturingRectColor())
+                    {
+                        pHL2ResearchMode->_frameCount++;
+                    }
                 }
 
                 //frameCount++;
@@ -883,6 +942,7 @@ namespace winrt::HL2UnityPlugin::implementation
                     for (UINT j = 0; j < resolution.Width; j++)
                     {
                         UINT idx = resolution.Width * i + j;
+                        //multiply depthPts by the QRTransform here...
                         XMFLOAT3 depthVec;
                         depthVec.x = pHL2ResearchMode->_depthPts[idx].x;
                         depthVec.y = pHL2ResearchMode->_depthPts[idx].y;
@@ -907,25 +967,24 @@ namespace winrt::HL2UnityPlugin::implementation
 
                 frame.VideoMediaFrame().CameraIntrinsics().ProjectManyOntoFrame(camPointsView, screenPointsView);
 
-                /*std::wstring m_datetime;
-                wchar_t m_datetime_c[200];
-                const std::time_t now = std::time(nullptr);
-                std::tm tm;
-                localtime_s(&tm, &now);
-                std::wcsftime(m_datetime_c, sizeof(m_datetime_c), L"%F-%H%M%S", &tm);
-
-                m_datetime.assign(m_datetime_c);
+                std::ofstream file;
+                if (pHL2ResearchMode->IsCapturingColoredPointCloud())
+                {
+                    std::wstring pcName = fullName + +L"\\" + m_datetime + L"_" + m_ms + L"_pc.txt";
+                    file.open(pcName);
+                }
                 
-                wchar_t m_ms[64];
-                swprintf_s(m_ms, L"%d", GetTickCount());
+                winrt::Windows::Graphics::Imaging::SoftwareBitmap rectColor = winrt::Windows::Graphics::Imaging::SoftwareBitmap(winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Bgra8, 320, 288, winrt::Windows::Graphics::Imaging::BitmapAlphaMode::Premultiplied);
+                winrt::Windows::Graphics::Imaging::BitmapBuffer buffer = rectColor.LockBuffer(winrt::Windows::Graphics::Imaging::BitmapBufferAccessMode::Write);
+                winrt::Windows::Foundation::IMemoryBufferReference reference = buffer.CreateReference();
 
-                winrt::Windows::Storage::StorageFolder storageFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
-                auto path = storageFolder.Path().data();
-                std::wstring fullName(path);
-                fullName += +L"\\" + m_datetime + L"_"+m_ms+L".txt";
-                std::ofstream file(fullName);*/
+                byte* dataInBytes;
+                unsigned int capacity;
+                reference.as<::Windows::Foundation::IMemoryBufferByteAccess>()->GetBuffer(&dataInBytes, &capacity);
 
-
+                // Fill-in the BGRA plane
+                winrt::Windows::Graphics::Imaging::BitmapPlaneDescription bufferLayout = buffer.GetPlaneDescription(0);
+                
                 //INT totalImageSize = imageWidth * 4 * imageHeight;
                 //iterate through screenpointsview and lookup colors...
                 for (UINT i = 0; i < resolution.Height; i++)
@@ -949,16 +1008,34 @@ namespace winrt::HL2UnityPlugin::implementation
                                 UINT8 g = pHL2ResearchMode->m_pixelBufferData[cIdx + 1]; //imageBufferAsVector[cIdx + 1]; //
                                 UINT8 b = pHL2ResearchMode->m_pixelBufferData[cIdx];//imageBufferAsVector[cIdx]; //
                                 UINT8 a = pHL2ResearchMode->m_pixelBufferData[cIdx + 3]; //imageBufferAsVector[cIdx + 3]; //
+                                
+                                if (pHL2ResearchMode->IsCapturingRectColor())
+                                {
+                                    dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 0] = b;
+                                    dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 1] = g;
+                                    dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 2] = r;
+                                    dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 3] = a;
+                                }
+                                
+                                XMFLOAT3 depthVec;
+                                depthVec.x = pHL2ResearchMode->_depthPts[idx].x;
+                                depthVec.y = pHL2ResearchMode->_depthPts[idx].y;
+                                depthVec.z = pHL2ResearchMode->_depthPts[idx].z;
+                                XMVECTOR pointInQR = XMVector3Transform(XMLoadFloat3(&depthVec), pHL2ResearchMode->m_QRMatrix);
 
-                                //file << pHL2ResearchMode->_depthPts[idx].x << " " << pHL2ResearchMode->_depthPts[idx].y << " " << pHL2ResearchMode->_depthPts[idx].z << " " << ((float)r / 255.0f) << " " << (float)g / 255.0f << " " << (float)b / 255.0f << std::endl;
-
-                                pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].x);
-                                pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].y);
-                                pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].z);
+                                pointCloud.push_back(pointInQR.n128_f32[0]);
+                                pointCloud.push_back(pointInQR.n128_f32[1]);
+                                pointCloud.push_back(pointInQR.n128_f32[2]);
+                                //pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].x);
+                                //pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].y);
+                                //pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].z);
                                 pointCloud.push_back((float)r/255.0f);
                                 pointCloud.push_back((float)g/255.0f);
                                 pointCloud.push_back((float)b/255.0f);
-
+                                if (file.is_open() && pHL2ResearchMode->IsCapturingColoredPointCloud())
+                                {
+                                    file << pointInQR.n128_f32[0] << " " << pointInQR.n128_f32[1] << " " << pointInQR.n128_f32[2] << " " << ((float)r / 255.0f) << " " << (float)g / 255.0f << " " << (float)b / 255.0f << std::endl;
+                                }
                             }
                             else
                             {
@@ -968,6 +1045,14 @@ namespace winrt::HL2UnityPlugin::implementation
                                 pointCloud.push_back(0.0f);
                                 pointCloud.push_back(0.0f);
                                 pointCloud.push_back(0.0f);
+
+                                if (pHL2ResearchMode->IsCapturingRectColor())
+                                {
+                                    dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 0] = 0;
+                                    dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 1] = 0;
+                                    dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 2] = 0;
+                                    dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 3] = 255;
+                                }
                             }
                         }
                         else
@@ -981,11 +1066,31 @@ namespace winrt::HL2UnityPlugin::implementation
                             pointCloud.push_back(0.0f);
                             pointCloud.push_back(0.0f);
                             pointCloud.push_back(0.0f);
+
+                            if (pHL2ResearchMode->IsCapturingRectColor())
+                            {
+                                dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 0] = 0;
+                                dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 1] = 0;
+                                dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 2] = 0;
+                                dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 3] = 255;
+                            }
                         }
                     }
                 }
 
-                //file.close();
+                if (file.is_open() && pHL2ResearchMode->IsCapturingColoredPointCloud())
+                {
+                    file.close();
+                }
+
+                if (pHL2ResearchMode->IsCapturingRectColor())
+                {
+                    //wchar_t fName[50];
+                    //swprintf(fName, 50, L"%ucolor.png", pHL2ResearchMode->_frameCount);
+                    std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_color.png";
+                    CreateLocalFile(pcName.c_str(), rectColor);
+                    pHL2ResearchMode->_frameCount++;
+                }
             }
 
             // save point cloud
@@ -1284,7 +1389,7 @@ namespace winrt::HL2UnityPlugin::implementation
 
     inline bool HL2ResearchMode::RRImageUpdated() { return m_RRImageUpdated; }
 
-    hstring HL2ResearchMode::PrintDepthResolution()
+    /*hstring HL2ResearchMode::PrintDepthResolution()
     {
         std::string res_c_ctr = std::to_string(m_depthResolution.Height) + "x" + std::to_string(m_depthResolution.Width) + "x" + std::to_string(m_depthResolution.BytesPerPixel);
         return winrt::to_hstring(res_c_ctr);
@@ -1330,7 +1435,7 @@ namespace winrt::HL2UnityPlugin::implementation
 		std::wstring widemsg = std::wstring(msg.begin(), msg.end());
 		OutputDebugString(widemsg.c_str());
 		return winrt::to_hstring(msg);
-	}
+	}*/
 
     std::string HL2ResearchMode::MatrixToString(DirectX::XMFLOAT4X4 mat)
     {
@@ -1376,6 +1481,7 @@ namespace winrt::HL2UnityPlugin::implementation
             delete[] m_depthMapTexture;
             m_depthMapTexture = nullptr;
         }
+
         if (m_pointCloud) 
         {
             m_pointcloudLength = 0;
@@ -1384,11 +1490,13 @@ namespace winrt::HL2UnityPlugin::implementation
         }
 
         m_longDepthSensorLoopStarted = false;
+
         if (m_longDepthMap)
         {
             delete[] m_longDepthMap;
             m_longDepthMap = nullptr;
         }
+
         if (m_longDepthMapTexture)
         {
             delete[] m_longDepthMapTexture;
@@ -1663,15 +1771,49 @@ namespace winrt::HL2UnityPlugin::implementation
         m_depthOffset = offset;
     }
 
+    void HL2ResearchMode::SetQRTransform(float f00, float f01, float f02, float f03, float f10, float f11, float f12, float f13, float f20, float f21, float f22, float f23, float f30, float f31, float f32, float f33)
+    {
+        m_QRTransform[0] = f00;
+        m_QRTransform[1] = f01;
+        m_QRTransform[2] = f02;
+        m_QRTransform[3] = f03;
+        m_QRTransform[4] = f10;
+        m_QRTransform[5] = f11;
+        m_QRTransform[6] = f12;
+        m_QRTransform[7] = f13;
+        m_QRTransform[8] = f20;
+        m_QRTransform[9] = f21;
+        m_QRTransform[10] = f22;
+        m_QRTransform[11] = f23;
+        m_QRTransform[12] = f30;
+        m_QRTransform[13] = f31;
+        m_QRTransform[14] = f32;
+        m_QRTransform[15] = f33;
+
+        m_QR._11 = m_QRTransform[0];
+        m_QR._12 = m_QRTransform[1];
+        m_QR._13 = m_QRTransform[2];
+        m_QR._14 = m_QRTransform[3];
+        m_QR._21 = m_QRTransform[4];
+        m_QR._22 = m_QRTransform[5];
+        m_QR._23 = m_QRTransform[6];
+        m_QR._24 = m_QRTransform[7];
+        m_QR._31 = m_QRTransform[8];
+        m_QR._32 = m_QRTransform[9];
+        m_QR._33 = m_QRTransform[10];
+        m_QR._34 = m_QRTransform[11];
+        m_QR._41 = m_QRTransform[12];
+        m_QR._42 = m_QRTransform[13];
+        m_QR._43 = m_QRTransform[14];
+        m_QR._44 = m_QRTransform[15];
+
+        m_QRMatrix = XMLoadFloat4x4(&m_QR);
+    }
+
     long long HL2ResearchMode::checkAndConvertUnsigned(UINT64 val)
     {
         //assert(val <= kMaxLongLong);
         return static_cast<long long>(val);
-    }
-
-    void HL2ResearchMode::SetCaptureHiResColorImage()
-    {
-        m_bCaptureHiResImages = true;
     }
 
 }
