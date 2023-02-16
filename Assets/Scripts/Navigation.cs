@@ -119,9 +119,12 @@ public class Navigation : MonoBehaviour
     // Querying the server with path between two points
     public void FindPath()
     {
+        //will change these vector to EasyVizAR.Position
         Vector3 start = new Vector3(2f,2f,4f); // this is hard coded for now --> will add these points later
         Vector3 target = new Vector3(12f,-2f, 2f); // is the type Position? or Vector3?
+        // EasyVizARServer.Instance.Get("locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + target.x + "," + target.y + "," + target.z + "&envelope=points", EasyVizARServer.JSON_TYPE, GetPathCallback);
         EasyVizARServer.Instance.Get("locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + target.x + "," + target.y + "," + target.z, EasyVizARServer.JSON_TYPE, GetPathCallback);
+
     }
 
     void GetPathCallback(string result)
@@ -133,14 +136,15 @@ public class Navigation : MonoBehaviour
             Debug.Log("Successfully added the points");
 
             //path = JsonUtility.FromJson<EasyVizAR.Path>("[\"points\"," + result + "]");
+           // path = JsonUtility.FromJson<EasyVizAR.Path>(result);
             path = JsonUtility.FromJson<EasyVizAR.Path>("{\"points\":" + result + "}");
             Debug.Log("the path is: " + path.points);
             Debug.Log("location id: " + location_id);
-            foreach (Vector3 points in path.points)
+            foreach (EasyVizAR.Position points in path.points)
             {
                 line.positionCount++;
                 Debug.Log("number of points in the path is: " + line.positionCount);
-                Debug.Log("points: " + points);
+                Debug.Log("points: " + points.x + ", " + points.y + ", " + points.z);
 
             }
 

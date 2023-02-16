@@ -173,7 +173,7 @@ namespace EasyVizAR
 	[System.Serializable]
 	public class Path
 	{
-		public Vector3[] points;
+		public Position[] points;
 	}
 
 	[System.Serializable]
