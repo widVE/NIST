@@ -61,6 +61,9 @@ namespace HL2UnityPlugin
         void SetCaptureBinaryDepth();
         Boolean IsCapturingBinaryDepth();
 
+        void SetQRCodeDetected();
+        Boolean IsQRCodeDetected();
+
         void InitializeDepthSensor();
         void InitializeLongDepthSensor();
         void InitializeSpatialCamerasFront();

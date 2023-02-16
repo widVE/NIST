@@ -74,6 +74,9 @@ namespace winrt::HL2UnityPlugin::implementation
         void SetCaptureBinaryDepth() { m_bCaptureBinaryDepth = true; }
         bool IsCapturingBinaryDepth() { return m_bCaptureBinaryDepth; }
 
+        void SetQRCodeDetected();
+        bool IsQRCodeDetected() { return m_bIsQRCodeDetected; }
+
         void SetReferenceCoordinateSystem(Windows::Perception::Spatial::SpatialCoordinateSystem refCoord);
         void SetPointCloudRoiInSpace(float centerX, float centerY, float centerZ, float boundX, float boundY, float boundZ);
         void SetQRTransform(float f00, float f01, float f02, float f03, float f10, float f11, float f12, float f13, float f20, float f21, float f22, float f23, float f30, float f31, float f32, float f33);
@@ -197,6 +200,7 @@ namespace winrt::HL2UnityPlugin::implementation
         std::atomic_bool m_bCaptureColoredPointCloud = false;
         std::atomic_bool m_bCaptureTransform = false;
         std::atomic_bool m_bCaptureBinaryDepth = false;
+        std::atomic_bool m_bIsQRCodeDetected = false;
 
         float m_roiBound[3]{ 0,0,0 };
         float m_roiCenter[3]{ 0,0,0 };

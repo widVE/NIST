@@ -31,8 +31,8 @@ public class HololensDepthPVCapture : MonoBehaviour
 	[SerializeField]
 	bool _startOnQRDetection = true;
 	
-	[SerializeField]
-	float _captureTime = 1f;
+	//[SerializeField]
+	//float _captureTime = 1f;
 	
 	[SerializeField]
 	bool _captureColorPointCloud = false;
@@ -55,9 +55,12 @@ public class HololensDepthPVCapture : MonoBehaviour
 	[SerializeField]
 	bool _captureVideo = false;
 	
-	Texture2D colorTexture = null;
+	//Texture2D colorTexture = null;
 
-	Texture2D colorTextureRect = null;
+	//Texture2D colorTextureRect = null;
+	static readonly float MaxRecordingTime = 5.0f;
+	VideoCapture m_VideoCapture = null;
+    float m_stopRecordingTimer = float.MaxValue;
 
 	bool _isCapturing = false;
 	
@@ -72,44 +75,54 @@ public class HololensDepthPVCapture : MonoBehaviour
 	const int COLOR_WIDTH = 760;
 	const int COLOR_HEIGHT = 428;
 	
-	byte[] depthTextureBytes = new byte[DEPTH_RESOLUTION];
-	byte[] depthTextureFilteredBytes = new byte[DEPTH_RESOLUTION*2];
+	//byte[] depthTextureBytes = new byte[DEPTH_RESOLUTION];
+	//byte[] depthTextureFilteredBytes = new byte[DEPTH_RESOLUTION*2];
 	
 	bool _firstHeadsetSend = true;
 	
 	int _fileOutNumber = 0;
 	
-	float[] _pcTest = new float[6 * 320 * 288];
+	//float[] _pcTest = new float[6 * 320 * 288];
 	
     void Start()
     {
 		// Depth sensor should be initialized in only one mode
-        colorTexture = new Texture2D(COLOR_WIDTH, COLOR_HEIGHT, TextureFormat.RGBA32, false);
+        //colorTexture = new Texture2D(COLOR_WIDTH, COLOR_HEIGHT, TextureFormat.RGBA32, false);
 
-		colorTextureRect = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RGBA32, false);
+		//colorTextureRect = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RGBA32, false);
 
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
 #else
-        researchMode = new HL2ResearchMode();
-
-		//if(longDepthPreviewPlane != null)
-		//{
-		researchMode.InitializeLongDepthSensor();
 		
-		//researchMode.InitializePVCamera();
-		if(!_startOnQRDetection)
+		if(_captureVideo)
 		{
-			RunSensors();
+			StartVideoCaptureTest();
 		}
 		else
 		{
-			_qrScanner.QRTransformChanged += (o, ev) =>
+			researchMode = new HL2ResearchMode();
+
+			//if(longDepthPreviewPlane != null)
+			//{
+			researchMode.InitializeLongDepthSensor();
+			
+			//researchMode.InitializePVCamera();
+			if(!_startOnQRDetection)
 			{
-				Matrix4x4 m = ev.NewTransform;
-				researchMode.SetQRTransform(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
+				researchMode.SetQRCodeDetected();
 				RunSensors();
-			};
+			}
+			else
+			{
+				_qrScanner.QRTransformChanged += (o, ev) =>
+				{
+					Matrix4x4 m = ev.NewTransform;
+					researchMode.SetQRTransform(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);					
+					researchMode.SetQRCodeDetected();
+					RunSensors();
+				};
+			}
 		}
 		
 		//PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
@@ -128,6 +141,66 @@ public class HololensDepthPVCapture : MonoBehaviour
 		
     }
 
+	void StartVideoCaptureTest()
+    {
+        Resolution cameraResolution = VideoCapture.SupportedResolutions.OrderByDescending((res) => res.width * res.height).First();
+        Debug.Log(cameraResolution);
+
+        float cameraFramerate = VideoCapture.GetSupportedFrameRatesForResolution(cameraResolution).OrderByDescending((fps) => fps).First();
+        Debug.Log(cameraFramerate);
+
+        VideoCapture.CreateAsync(false, delegate(VideoCapture videoCapture)
+        {
+            if (videoCapture != null)
+            {
+                m_VideoCapture = videoCapture;
+                Debug.Log("Created VideoCapture Instance!");
+
+                CameraParameters cameraParameters = new CameraParameters();
+                cameraParameters.hologramOpacity = 0.0f;
+                cameraParameters.frameRate = cameraFramerate;
+                cameraParameters.cameraResolutionWidth = cameraResolution.width;
+                cameraParameters.cameraResolutionHeight = cameraResolution.height;
+                cameraParameters.pixelFormat = CapturePixelFormat.BGRA32;
+
+                m_VideoCapture.StartVideoModeAsync(cameraParameters,
+                    VideoCapture.AudioState.ApplicationAndMicAudio,
+                    OnStartedVideoCaptureMode);
+            }
+            else
+            {
+                Debug.LogError("Failed to create VideoCapture Instance!");
+            }
+        });
+    }
+
+    void OnStartedVideoCaptureMode(VideoCapture.VideoCaptureResult result)
+    {
+        Debug.Log("Started Video Capture Mode!");
+        string timeStamp = Time.time.ToString().Replace(".", "").Replace(":", "");
+        string filename = string.Format("TestVideo_{0}.mp4", timeStamp);
+        string filepath = System.IO.Path.Combine(Application.persistentDataPath, filename);
+        filepath = filepath.Replace("/", @"\");
+        m_VideoCapture.StartRecordingAsync(filepath, OnStartedRecordingVideo);
+    }
+
+    void OnStoppedVideoCaptureMode(VideoCapture.VideoCaptureResult result)
+    {
+        Debug.Log("Stopped Video Capture Mode!");
+    }
+
+    void OnStartedRecordingVideo(VideoCapture.VideoCaptureResult result)
+    {
+        Debug.Log("Started Recording Video!");
+        m_stopRecordingTimer = Time.time + MaxRecordingTime;
+    }
+
+    void OnStoppedRecordingVideo(VideoCapture.VideoCaptureResult result)
+    {
+        Debug.Log("Stopped Recording Video!");
+        m_VideoCapture.StopVideoModeAsync(OnStoppedVideoCaptureMode);
+    }
+	
 	void OnDestroy()
 	{
 		_isCapturing = false;

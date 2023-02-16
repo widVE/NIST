@@ -1919,13 +1919,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _qrScanner: {fileID: 291935032}
   _startOnQRDetection: 1
-  _captureTime: 1
-  _captureColorPointCloud: 0
-  _captureHiResColorImages: 0
+  _captureColorPointCloud: 1
+  _captureHiResColorImages: 1
   _captureRectifiedColorImages: 1
-  _captureDepthImages: 0
-  _captureBinaryDepth: 0
-  _captureTransforms: 0
+  _captureDepthImages: 1
+  _captureBinaryDepth: 1
+  _captureTransforms: 1
   _captureVideo: 0
 --- !u!1 &891683166
 GameObject:
@@ -4412,7 +4411,7 @@ PrefabInstance:
       objectReference: {fileID: 5167179012354323528}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: _makeUniqueLocalHeadset
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: _visualizePreviousLocal
