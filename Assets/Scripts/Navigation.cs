@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Collections.Specialized;
 
 public class Navigation : MonoBehaviour
 {
@@ -37,7 +38,7 @@ public class Navigation : MonoBehaviour
 
         location_id = GameObject.Find("EasyVizARHeadsetManager").GetComponent<EasyVizARHeadsetManager>().LocationID;
 
-        FindPath(); //find path between two objects TODO: need to ask Lance about the JSON format, right now the format is not consistent w/ normal JSON format
+        //FindPath(); //find path between two objects TODO: need to ask Lance about the JSON format, right now the format is not consistent w/ normal JSON format
     }
 
     // Update is called once per frame
@@ -74,7 +75,7 @@ public class Navigation : MonoBehaviour
         waypoints[0] = Camera.main.transform; // this is not used currently
         // newly added
         Transform cam_pos = Camera.main.transform;
-        float cam_pos_y_offset = cam_pos.position.y - 0.075f; //NOTE: might change this later in the future
+        float cam_pos_y_offset = cam_pos.position.y - 0.1f; //NOTE (0.075f): might change this later in the future --> need to lower it substantially
         Vector3 camera = new Vector3(cam_pos.position.x, cam_pos_y_offset, cam_pos.position.z);
 
         waypoints[1] = markerSpawnParent.transform.Find(this.name); // might move this line to elsewhere, but for now, it should work fine
@@ -83,8 +84,10 @@ public class Navigation : MonoBehaviour
         line.SetPosition(0, camera); // the position of the user (i.e. the main camera's position)
         if (waypoints[1])
         {
-            line.SetPosition(1, waypoints[1].position); // the position of the desire landmark/icon
-
+            float waypoints_y_offset = waypoints[1].position.y - 0.1f;
+            line.SetPosition(1, new Vector3(waypoints[1].position.x, waypoints_y_offset, waypoints[1].position.z)); // the position of the desire landmark/icon
+           
+            /*
             // when successfully navigated to the target, disable line renderer --> maybe need these later
             if ((Math.Abs(camera.x - waypoints[1].position.x) < 0.05) || ((Math.Abs(camera.z - waypoints[1].position.z) < 0.05))) //TODO: need to fix it! 
             {
@@ -93,7 +96,7 @@ public class Navigation : MonoBehaviour
                 waypoints[1] = null;
                 line.positionCount = 0;
             }
-
+            */
         }
 
 
@@ -140,9 +143,11 @@ public class Navigation : MonoBehaviour
             path = JsonUtility.FromJson<EasyVizAR.Path>("{\"points\":" + result + "}");
             Debug.Log("the path is: " + path.points);
             Debug.Log("location id: " + location_id);
+            int cnt = 0;
             foreach (EasyVizAR.Position points in path.points)
             {
                 line.positionCount++;
+                line.SetPosition(cnt++, new Vector3(points.x, points.y, points.z)); // this draws the line 
                 Debug.Log("number of points in the path is: " + line.positionCount);
                 Debug.Log("points: " + points.x + ", " + points.y + ", " + points.z);
 
