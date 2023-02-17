@@ -75,7 +75,7 @@ public class Navigation : MonoBehaviour
         waypoints[0] = Camera.main.transform; // this is not used currently
         // newly added
         Transform cam_pos = Camera.main.transform;
-        float cam_pos_y_offset = cam_pos.position.y - 0.1f; //NOTE (0.075f): might change this later in the future --> need to lower it substantially
+        float cam_pos_y_offset = cam_pos.position.y *0.75f; //NOTE (0.075f): might change this later in the future --> need to lower it substantially
         Vector3 camera = new Vector3(cam_pos.position.x, cam_pos_y_offset, cam_pos.position.z);
 
         waypoints[1] = markerSpawnParent.transform.Find(this.name); // might move this line to elsewhere, but for now, it should work fine
@@ -84,7 +84,7 @@ public class Navigation : MonoBehaviour
         line.SetPosition(0, camera); // the position of the user (i.e. the main camera's position)
         if (waypoints[1])
         {
-            float waypoints_y_offset = waypoints[1].position.y - 0.1f;
+            float waypoints_y_offset = waypoints[1].position.y*0.75f;
             line.SetPosition(1, new Vector3(waypoints[1].position.x, waypoints_y_offset, waypoints[1].position.z)); // the position of the desire landmark/icon
            
             /*
