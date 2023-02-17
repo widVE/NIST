@@ -16,7 +16,7 @@
 #include<winrt/Windows.Perception.Spatial.h>
 #include<winrt/Windows.Perception.Spatial.Preview.h>
 #include <shared_mutex>
-
+#include "TimeConverter.h"
 
 namespace winrt::HL2UnityPlugin::implementation
 {
@@ -209,7 +209,6 @@ namespace winrt::HL2UnityPlugin::implementation
         static void LongDepthSensorLoop(HL2ResearchMode* pHL2ResearchMode);
         static void SpatialCamerasFrontLoop(HL2ResearchMode* pHL2ResearchMode);
         static void CamAccessOnComplete(ResearchModeSensorConsent consent);
-        static void ColorSensorLoop(HL2ResearchMode* pHL2ResearchMode);
 
         std::string MatrixToString(DirectX::XMFLOAT4X4 mat);
 
@@ -236,6 +235,8 @@ namespace winrt::HL2UnityPlugin::implementation
         std::thread* m_pSpatialCamerasFrontUpdateThread;
 
         winrt::Windows::Foundation::Numerics::float3* _depthPts = 0;
+
+        TimeConverter m_converter;
 
         static long long checkAndConvertUnsigned(UINT64 val);
 

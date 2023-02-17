@@ -263,12 +263,14 @@ namespace winrt::HL2UnityPlugin::implementation
         const winrt::Windows::Media::Capture::Frames::MediaFrameReader& sender,
         const winrt::Windows::Media::Capture::Frames::MediaFrameArrivedEventArgs& args)
     {
-        std::lock_guard<std::mutex> l(mu);
+        //std::lock_guard<std::mutex> l(mu);
+        mu.lock();
 
         if (winrt::Windows::Media::Capture::Frames::MediaFrameReference frame = sender.TryAcquireLatestFrame())
         {
             m_latestFrame = frame;
         }
+        mu.unlock();
     }
 
     winrt::Windows::Foundation::IAsyncAction CreateLocalFile(const wchar_t* sName, winrt::Windows::Graphics::Imaging::SoftwareBitmap softwareBitmap)
@@ -546,10 +548,14 @@ namespace winrt::HL2UnityPlugin::implementation
 
             IResearchModeSensorFrame* pDepthSensorFrame = nullptr;
             ResearchModeSensorResolution resolution;
+            
+            //let's lock before calling GetNextBuffer (which blocks this), so that other color frames don't come in
+            //with different times...
+            pHL2ResearchMode->mu.lock();
 
+            //from the documentation - GetNextBuffer blocks...
             pHL2ResearchMode->m_longDepthSensor->GetNextBuffer(&pDepthSensorFrame);
 
-            pHL2ResearchMode->mu.lock();
             pDepthSensorFrame->GetResolution(&resolution);
             pHL2ResearchMode->m_longDepthResolution = resolution;
 
@@ -591,6 +597,7 @@ namespace winrt::HL2UnityPlugin::implementation
             OutputDebugString(widemsg.c_str());*/
 
             auto ts = PerceptionTimestampHelper::FromSystemRelativeTargetTime(HundredsOfNanoseconds(checkAndConvertUnsigned(timestamp.HostTicks)));
+
             auto transToWorld = pHL2ResearchMode->m_locator.TryLocateAtTimestamp(ts, pHL2ResearchMode->m_refFrame);
             if (transToWorld == nullptr)
             {
@@ -622,7 +629,10 @@ namespace winrt::HL2UnityPlugin::implementation
             m_datetime.assign(m_datetime_c);
 
             wchar_t m_ms[64];
-            swprintf_s(m_ms, L"%d", GetTickCount());
+            swprintf_s(m_ms, L"%lu", GetTickCount64());
+
+            wchar_t depthTimestampString[64];
+            swprintf_s(depthTimestampString, L"%llu", timestamp.HostTicks);
 
             winrt::Windows::Storage::StorageFolder storageFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
             auto path = storageFolder.Path().data();
@@ -658,7 +668,7 @@ namespace winrt::HL2UnityPlugin::implementation
             FILE* fLocalDepth = 0;
             if (pHL2ResearchMode->IsCapturingBinaryDepth())
             {
-                std::wstring localName = fullName + +L"\\" + m_datetime + L"_" + m_ms + L"_ld.bytes";
+                std::wstring localName = fullName + +L"\\" + m_datetime + L"_" + depthTimestampString + L"_ld.bytes";
                 _wfopen_s(&fLocalDepth, localName.c_str(), L"wb");
             }
 
@@ -801,6 +811,8 @@ namespace winrt::HL2UnityPlugin::implementation
             {
                 winrt::Windows::Media::Capture::Frames::MediaFrameReference frame = pHL2ResearchMode->m_latestFrame;
 
+                long long ts = pHL2ResearchMode->m_converter.RelativeTicksToAbsoluteTicks(HundredsOfNanoseconds(frame.SystemRelativeTime().Value().count())).count();
+                
                 winrt::Windows::Foundation::Numerics::float4x4 PVtoWorldtransform;
                 winrt::Windows::Foundation::Numerics::float4x4 worldToPVtransform;
 
@@ -886,7 +898,9 @@ namespace winrt::HL2UnityPlugin::implementation
                 if (pHL2ResearchMode->IsCapturingHiResColor())
                 {
                     wchar_t fName[128];
-                    swprintf(fName, 128, L"%s_%s_hicolor.png", m_datetime.c_str(), m_ms);
+                    wchar_t fDate[64];
+                    swprintf(fDate, 64, L"%ld", ts);
+                    swprintf(fName, 128, L"%s_%s_hicolor.png", m_datetime.c_str(), fDate);
                     //std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_hicolor.png";
                     CreateLocalFile(fName, softwareBitmap);
                     if (!pHL2ResearchMode->IsCapturingRectColor())
@@ -1092,7 +1106,9 @@ namespace winrt::HL2UnityPlugin::implementation
                     if (pHL2ResearchMode->IsCapturingRectColor())
                     {
                         wchar_t fName[128];
-                        swprintf(fName, 128, L"%s_%s_color.png", m_datetime.c_str(), m_ms);
+                        wchar_t fDate[64];
+                        swprintf(fDate, 64, L"%ld", ts);
+                        swprintf(fName, 128, L"%s_%s_color.png", m_datetime.c_str(), fDate);
                         //std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_color.png";
                         CreateLocalFile(fName, rectColor);
                         pHL2ResearchMode->_frameCount++;
@@ -1100,6 +1116,7 @@ namespace winrt::HL2UnityPlugin::implementation
                 }
 
                 winrt::Windows::Graphics::Imaging::SoftwareBitmap depthImage = winrt::Windows::Graphics::Imaging::SoftwareBitmap(winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Gray16, 320, 288, winrt::Windows::Graphics::Imaging::BitmapAlphaMode::Ignore);
+                //winrt::Windows::Graphics::Imaging
 
                 {    
                     winrt::Windows::Graphics::Imaging::BitmapBuffer bufferDepth = depthImage.LockBuffer(winrt::Windows::Graphics::Imaging::BitmapBufferAccessMode::Write);
@@ -1161,8 +1178,8 @@ namespace winrt::HL2UnityPlugin::implementation
                 if (pHL2ResearchMode->IsCapturingDepthImages())
                 {
                     wchar_t fName[128];
-                    swprintf(fName, 128, L"%s_%s_depth.png", m_datetime.c_str(), m_ms);
-                    depthImage = winrt::Windows::Graphics::Imaging::SoftwareBitmap::Convert(depthImage, winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Rgba16);
+                    swprintf(fName, 128, L"%s_%s_depth.png", m_datetime.c_str(), depthTimestampString);
+                    depthImage = winrt::Windows::Graphics::Imaging::SoftwareBitmap::Convert(depthImage, winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Rgba8);
                     //std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_color.png";
                     CreateLocalFile(fName, depthImage);
                     //pHL2ResearchMode->_frameCount++;
