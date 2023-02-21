@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "endel.nativewebsocket", "en
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.VCRTForwarders.140", "Microsoft.VCRTForwarders.140.csproj", "{1151C445-9EAC-7276-B1E7-69B066F29844}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Windows.MixedReality.DotNetWinRT.Editor", "Microsoft.Windows.MixedReality.DotNetWinRT.Editor.csproj", "{62E6DF23-1795-A3F4-A5A4-BDE450BE3EAC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.SpatialAudio.Spatializer.Editor", "Microsoft.SpatialAudio.Spatializer.Editor.csproj", "{86E782CF-7E7A-0A47-2D1B-54779294481B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.MixedReality.QR.Editor", "Microsoft.MixedReality.QR.Editor.csproj", "{CBB5A096-AEFA-0F94-446E-88076D4F27E6}"
@@ -37,10 +35,6 @@ Global
 		{1151C445-9EAC-7276-B1E7-69B066F29844}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1151C445-9EAC-7276-B1E7-69B066F29844}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1151C445-9EAC-7276-B1E7-69B066F29844}.Release|Any CPU.Build.0 = Release|Any CPU
-		{62E6DF23-1795-A3F4-A5A4-BDE450BE3EAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{62E6DF23-1795-A3F4-A5A4-BDE450BE3EAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{62E6DF23-1795-A3F4-A5A4-BDE450BE3EAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{62E6DF23-1795-A3F4-A5A4-BDE450BE3EAC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{86E782CF-7E7A-0A47-2D1B-54779294481B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{86E782CF-7E7A-0A47-2D1B-54779294481B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86E782CF-7E7A-0A47-2D1B-54779294481B}.Release|Any CPU.ActiveCfg = Release|Any CPU
