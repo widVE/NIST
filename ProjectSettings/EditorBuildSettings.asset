@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/PointCloudSample.unity
     guid: b2ea44247999fe846983588a46fa8ad7
   - enabled: 0
@@ -20,7 +20,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/v2.3 Marker_with_distance_indicator.unity
     guid: d038747f60cc07a46948974302f1a80c
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/v2.4 Headset_with_distance_indicator.unity
     guid: 8016a6e261698954188da215e91ace4f
   m_configObjects:

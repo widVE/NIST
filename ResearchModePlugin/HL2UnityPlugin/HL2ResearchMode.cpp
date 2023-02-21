@@ -668,7 +668,7 @@ namespace winrt::HL2UnityPlugin::implementation
             FILE* fLocalDepth = 0;
             if (pHL2ResearchMode->IsCapturingBinaryDepth())
             {
-                std::wstring localName = fullName + +L"\\" + m_datetime + L"_" + depthTimestampString + L"_ld.bytes";
+                std::wstring localName = fullName + +L"\\" + m_datetime + L"_" + m_ms + L"_ld.bytes";
                 _wfopen_s(&fLocalDepth, localName.c_str(), L"wb");
             }
 
@@ -898,9 +898,9 @@ namespace winrt::HL2UnityPlugin::implementation
                 if (pHL2ResearchMode->IsCapturingHiResColor())
                 {
                     wchar_t fName[128];
-                    wchar_t fDate[64];
-                    swprintf(fDate, 64, L"%ld", ts);
-                    swprintf(fName, 128, L"%s_%s_hicolor.png", m_datetime.c_str(), fDate);
+                    //wchar_t fDate[64];
+                    //swprintf(fDate, 64, L"%ld", ts);
+                    swprintf(fName, 128, L"%s_%s_hicolor.png", m_datetime.c_str(), m_ms);
                     //std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_hicolor.png";
                     CreateLocalFile(fName, softwareBitmap);
                     if (!pHL2ResearchMode->IsCapturingRectColor())
@@ -1106,9 +1106,9 @@ namespace winrt::HL2UnityPlugin::implementation
                     if (pHL2ResearchMode->IsCapturingRectColor())
                     {
                         wchar_t fName[128];
-                        wchar_t fDate[64];
-                        swprintf(fDate, 64, L"%ld", ts);
-                        swprintf(fName, 128, L"%s_%s_color.png", m_datetime.c_str(), fDate);
+                        //wchar_t fDate[64];
+                        //swprintf(fDate, 64, L"%ld", ts);
+                        swprintf(fName, 128, L"%s_%s_color.png", m_datetime.c_str(), m_ms);
                         //std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_color.png";
                         CreateLocalFile(fName, rectColor);
                         pHL2ResearchMode->_frameCount++;
