@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Collections.Specialized;
+using System.Diagnostics;
+//using UnityEngine.Debug;
 
 public class Navigation : MonoBehaviour
 {
@@ -13,6 +15,8 @@ public class Navigation : MonoBehaviour
     // For querying the server 
     string location_id;
     EasyVizAR.Path path = new EasyVizAR.Path();
+    GameObject main_cam;
+    Transform feature;
 
     // Start is called before the first frame update
     void Start()
@@ -22,7 +26,7 @@ public class Navigation : MonoBehaviour
 
         if (!markerSpawnParent)
         {
-            Debug.Log("Navigation: cannot find the icon parent");
+            UnityEngine.Debug.Log("Navigation: cannot find the icon parent");
         }
         //collider = this.GetComponent<Collider>();
         collider = this.transform.Find("Quad").gameObject.GetComponent<Collider>();
@@ -31,14 +35,21 @@ public class Navigation : MonoBehaviour
         collider.enabled = true;
         // initializing the line render
         line = GameObject.Find("Main Camera").GetComponent<LineRenderer>();
-        if (line != null) { Debug.Log("found line renderer!"); }
+        if (line != null) { UnityEngine.Debug.Log("found line renderer!"); }
         line.positionCount = 0; // this is hard coded for now.
         waypoints = new Transform[2];
 
 
         location_id = GameObject.Find("EasyVizARHeadsetManager").GetComponent<EasyVizARHeadsetManager>().LocationID;
 
-        //FindPath(); //find path between two objects TODO: need to ask Lance about the JSON format, right now the format is not consistent w/ normal JSON format
+        main_cam = GameObject.Find("Main Camera");
+        //UnityEngine.Debug.Log("the type of icon: " + this.transform.Find("type").GetChild(0).name);
+        if (this.transform.Find("type").GetChild(0).name != "Headset")
+        {
+            feature = markerSpawnParent.transform.Find(this.name);
+            FindPath();
+        }
+
     }
 
     // Update is called once per frame
@@ -52,24 +63,13 @@ public class Navigation : MonoBehaviour
             RenderNavigationPath();
 
         }
-        
-
-        Debug.Log("Got to Update() from Navigation");
-        //update the position of user and landmark 
-        /*
-        points[0] = Camera.main.transform;
-        points[1] = markerSpawnParent.transform.Find(this.name); // might move this line to elsewhere, but for now, it should work fine
-
-        line.SetPosition(0, points[0].position); // the position of the user (i.e. the main camera's position)
-        line.SetPosition(1, points[1].position); // the position of the desire landmark/icon
-        */
 
     }
 
     public void RenderNavigationPath()
     {
         //TODO: this is where I should add the line render between the user and the desire landmark/icon
-        Debug.Log("Touched the icon!");
+        //Debug.Log("Touched the icon!");
         line.positionCount = 2; // this is hard coded for now.
 
         waypoints[0] = Camera.main.transform; // this is not used currently
@@ -111,7 +111,7 @@ public class Navigation : MonoBehaviour
         float change_dist = (float)Math.Sqrt(change_x + change_z);
         if (change_dist < 0.05)
         {
-            Debug.Log("Disabled the line");
+            //Debug.Log("Disabled the line");
             line.enabled = false;
             waypoints[1] = null;
             line.positionCount = 0;
@@ -120,41 +120,44 @@ public class Navigation : MonoBehaviour
     }
 
     // Querying the server with path between two points
-    public void FindPath()
+    public void FindPath() // Vector3 start, Vector3 target
     {
-        //will change these vector to EasyVizAR.Position
-        Vector3 start = new Vector3(2f,2f,4f); // this is hard coded for now --> will add these points later
-        Vector3 target = new Vector3(12f,-2f, 2f); // is the type Position? or Vector3?
-        // EasyVizARServer.Instance.Get("locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + target.x + "," + target.y + "," + target.z + "&envelope=points", EasyVizARServer.JSON_TYPE, GetPathCallback);
-        EasyVizARServer.Instance.Get("locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + target.x + "," + target.y + "," + target.z, EasyVizARServer.JSON_TYPE, GetPathCallback);
+        //Vector3 start = new Vector3(2f,2f,4f); // this is hard coded for now --> will add these points later
+        //Vector3 target = new Vector3(12f,-2f, 2f); // is the type Position? or Vector3?
+        if (feature != null)
+        {
+            UnityEngine.Debug.Log("initiated querying path");
+            Vector3 start = Camera.main.transform.position;
+            Vector3 target = feature.position; // is the type Position? or Vector3?
+            EasyVizARServer.Instance.Get("locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + target.x + "," + target.y + "," + target.z, EasyVizARServer.JSON_TYPE, GetPathCallback);
 
+        }        
     }
 
     void GetPathCallback(string result)
     {
-        Debug.Log("initiated querying path");
-        Debug.Log("the result: " + result);
+        //Debug.Log("initiated querying path");
+        //Debug.Log("the result: " + result);
         if (result != "error")
         {
-            Debug.Log("Successfully added the points");
 
             //path = JsonUtility.FromJson<EasyVizAR.Path>("[\"points\"," + result + "]");
            // path = JsonUtility.FromJson<EasyVizAR.Path>(result);
             path = JsonUtility.FromJson<EasyVizAR.Path>("{\"points\":" + result + "}");
-            Debug.Log("the path is: " + path.points);
-            Debug.Log("location id: " + location_id);
+            //Debug.Log("the path is: " + path.points);
+            //Debug.Log("location id: " + location_id);
             int cnt = 0;
             foreach (EasyVizAR.Position points in path.points)
             {
                 line.positionCount++;
                 line.SetPosition(cnt++, new Vector3(points.x, points.y, points.z)); // this draws the line 
-                Debug.Log("number of points in the path is: " + line.positionCount);
-                Debug.Log("points: " + points.x + ", " + points.y + ", " + points.z);
+                //Debug.Log("number of points in the path is: " + line.positionCount);
+                UnityEngine.Debug.Log("points: " + points.x + ", " + points.y + ", " + points.z);
 
             }
 
            
-            Debug.Log("Successfully added the points");
+            UnityEngine.Debug.Log("Successfully added the points");
            
         }
 

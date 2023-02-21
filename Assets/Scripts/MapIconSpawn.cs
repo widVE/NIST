@@ -28,7 +28,7 @@ public class MapIconSpawn : MonoBehaviour
     public void DisplayPNGMap()
     {
         EasyVizARServer.Instance.Get("locations/" + currHeadset.GetComponent<EasyVizARHeadsetManager>().LocationID + "/layers/1/", EasyVizARServer.JSON_TYPE, DisplayPNGMapCallback);
-        Debug.Log("Got into DisplayPNGMap()");
+        //Debug.Log("Got into DisplayPNGMap()");
     }
 
     public void DisplayPNGMapCallback(string results)
@@ -47,7 +47,7 @@ public class MapIconSpawn : MonoBehaviour
             foreach (GameObject map in map_objects) map.transform.localScale = new Vector3(mapWidth / 10, mapHeight / 10, 1);
             float icon_origin_x = -1*(mapWidth / 2.0f + mapLeft);
             float icon_origin_y = mapHeight / 2.0f + mapTop;
-            Debug.Log("origin x and y: " + icon_origin_x + ", " + icon_origin_y);
+            //Debug.Log("origin x and y: " + icon_origin_x + ", " + icon_origin_y);
             float icon_z_offset = -0.12f;
 
             iconParent.transform.localPosition = new Vector3(icon_origin_x, icon_origin_y, icon_z_offset); // the scale may need to be adjusted

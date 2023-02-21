@@ -426,7 +426,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 				
 				if (map_parent != null)
                 {
-					Debug.Log("the delete name: " + name);
+					//Debug.Log("the delete name: " + name);
 					Transform delete_headset = map_parent.transform.Find(hs._headsetID);
 					if (delete_headset)
                     {

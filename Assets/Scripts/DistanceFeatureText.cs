@@ -61,11 +61,9 @@ public class DistanceFeatureText : MonoBehaviour
         if (isFeet)
         {
             feature_text.text = feature_type + ": " + distance.ToString() + "ft";
-            Debug.Log("Distance before map icon: " + distance);
-            //feature_text_map.text = distance.ToString() + "ft";
+            //Debug.Log("Distance before map icon: " + distance);
             feature_text_map.text = feature_text.text;
-
-            Debug.Log("Distance for icon: " + distance);
+            //Debug.Log("Distance for icon: " + distance);
 
             
             //feature_text_map.text = distance.ToString() + "ft";

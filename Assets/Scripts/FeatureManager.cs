@@ -330,7 +330,7 @@ public class FeatureManager : MonoBehaviour
     public void ListFeatures() 
     {
         EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
-        Debug.Log("ListFeatures Called");
+        //Debug.Log("ListFeatures Called");
     }
 
     public void ListFeaturesFromLocation(string locationID)
@@ -389,7 +389,7 @@ public class FeatureManager : MonoBehaviour
         
         if (this.feature_dictionary.ContainsKey(id))
         {
-            Debug.Log("in the if statement");
+            //Debug.Log("in the if statement");
             //creating new feature
             //EasyVizAR.Feature feature_to_patch = feature_gameobj_dictionary[id].GetComponent<MarkerObject>().feature;
             EasyVizAR.Feature feature_to_patch = feature_dictionary[id];
@@ -405,7 +405,7 @@ public class FeatureManager : MonoBehaviour
                 feature_to_patch.type = name;
             }
 
-            Debug.Log("feature name: " + feature_to_patch.name);
+            //Debug.Log("feature name: " + feature_to_patch.name);
             //eature_to_patch.name = "Updated name: ";
             // Main: updating the position
 
@@ -504,8 +504,9 @@ public class FeatureManager : MonoBehaviour
     {
         //GameObject feature_to_spawn = feature_type_dictionary[feature_type];
         // billboarding effect
-        Debug.Log(context);
-        Debug.Log("spawned using input phase: " + context.phase); 
+
+        //Debug.Log(context);
+        //Debug.Log("spawned using input phase: " + context.phase); 
         if (context.performed) // there are 3 phases started, performed, and canceled 
         {
             string feature_type = "biohazard"; // initialize to biohazard
