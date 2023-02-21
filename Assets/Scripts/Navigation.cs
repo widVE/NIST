@@ -127,8 +127,11 @@ public class Navigation : MonoBehaviour
         if (feature != null)
         {
             UnityEngine.Debug.Log("initiated querying path");
-            Vector3 start = Camera.main.transform.position;
+            Vector3 start = main_cam.transform.position;
             Vector3 target = feature.position; // is the type Position? or Vector3?
+            UnityEngine.Debug.Log("start: " + start.x + ", " + start.y + ", " + start.z);
+            UnityEngine.Debug.Log("target: " + target.x + ", " + target.y + ", " + target.z);
+
             EasyVizARServer.Instance.Get("locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + target.x + "," + target.y + "," + target.z, EasyVizARServer.JSON_TYPE, GetPathCallback);
 
         }        
