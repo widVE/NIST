@@ -77,6 +77,10 @@ public class QRScanner : MonoBehaviour
 	[Tooltip("Whether we should continue to adjust the world coordinate system if the currently tracked QR code moves.")]
 	bool followMovingQRCode = false;
 	
+	[SerializeField]
+	[Tooltip("In scanning mode, we don't re-add QR codes from the Hololens 2 system memory, and we only update the QR code Axis once.")]
+	bool _scanningMode = false;
+	
 	bool _updatedServerFromQR = false;
 	string _currentLocationID = null;
 
@@ -136,10 +140,15 @@ public class QRScanner : MonoBehaviour
 		{
 			CodeAddedOrUpdated(e.Code);
 		};
-		watcher.Added += (sender, e) =>
+		
+		if(!_scanningMode)
 		{
-			CodeAddedOrUpdated(e.Code);
-		};
+			watcher.Added += (sender, e) =>
+			{
+				CodeAddedOrUpdated(e.Code);
+			};
+		}
+		
 		//watcher.Removed += (sender, e) => { };
 
 		watcher.Start();
@@ -147,6 +156,8 @@ public class QRScanner : MonoBehaviour
 
 	private void CodeAddedOrUpdated(QRCode qr)
     {
+		//check timestamps here...
+		//qrCode.LastDetectedTime;
 		bool isVizarScheme = false;
 		bool isLocation = false;
 
@@ -194,6 +205,10 @@ public class QRScanner : MonoBehaviour
                 {
 					// We may have a better estimate of the QR code location, so trigger an update of the world coordinate system.
 					isCoordinateSystemChanging = true;
+					if(_scanningMode)
+					{
+						followMovingQRCode = false;
+					}
 				}
             }
         }

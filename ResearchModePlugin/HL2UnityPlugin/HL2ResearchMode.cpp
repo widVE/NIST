@@ -507,6 +507,8 @@ namespace winrt::HL2UnityPlugin::implementation
         {
             m_refFrame = m_locator.GetDefault().CreateStationaryFrameOfReferenceAtCurrentLocation().CoordinateSystem();
         }
+        
+        OutputDebugString(L"Starting long depth sensor loop\n");
 
         m_pLongDepthUpdateThread = new std::thread(HL2ResearchMode::LongDepthSensorLoop, this);
     }
@@ -1178,7 +1180,7 @@ namespace winrt::HL2UnityPlugin::implementation
                 if (pHL2ResearchMode->IsCapturingDepthImages())
                 {
                     wchar_t fName[128];
-                    swprintf(fName, 128, L"%s_%s_depth.png", m_datetime.c_str(), depthTimestampString);
+                    swprintf(fName, 128, L"%s_%s_depth.png", m_datetime.c_str(), m_ms);// depthTimestampString);
                     depthImage = winrt::Windows::Graphics::Imaging::SoftwareBitmap::Convert(depthImage, winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Rgba8);
                     //std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_color.png";
                     CreateLocalFile(fName, depthImage);

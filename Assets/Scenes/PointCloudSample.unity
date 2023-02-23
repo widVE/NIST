@@ -568,6 +568,7 @@ MonoBehaviour:
   _qrPrefabParent: {fileID: 46054712}
   _headsetManager: {fileID: 758851942}
   followMovingQRCode: 1
+  _scanningMode: 1
   testQRCodeData: vizar://halo05.wings.cs.wisc.edu:5000/locations/66a4e9f2-e978-4405-988e-e168a9429030
   triggerQRCodeDetected: 0
 --- !u!82 &291935033

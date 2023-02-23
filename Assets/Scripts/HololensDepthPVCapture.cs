@@ -86,11 +86,6 @@ public class HololensDepthPVCapture : MonoBehaviour
 	
     void Start()
     {
-		// Depth sensor should be initialized in only one mode
-        //colorTexture = new Texture2D(COLOR_WIDTH, COLOR_HEIGHT, TextureFormat.RGBA32, false);
-
-		//colorTextureRect = new Texture2D(DEPTH_WIDTH, DEPTH_HEIGHT, TextureFormat.RGBA32, false);
-
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
 #else

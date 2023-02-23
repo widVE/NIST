@@ -75,7 +75,11 @@ namespace winrt::HL2UnityPlugin::implementation
         bool IsCapturingBinaryDepth() { return m_bCaptureBinaryDepth; }
 
         void SetQRCodeDetected();
-        bool IsQRCodeDetected() { return m_bIsQRCodeDetected; }
+
+        bool IsQRCodeDetected() 
+        { 
+            return m_bIsQRCodeDetected; 
+        }
 
         void SetReferenceCoordinateSystem(Windows::Perception::Spatial::SpatialCoordinateSystem refCoord);
         void SetPointCloudRoiInSpace(float centerX, float centerY, float centerZ, float boundX, float boundY, float boundZ);
