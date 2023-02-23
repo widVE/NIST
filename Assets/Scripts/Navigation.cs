@@ -47,7 +47,7 @@ public class Navigation : MonoBehaviour
         if (this.transform.Find("type").GetChild(0).name != "Headset")
         {
             feature = markerSpawnParent.transform.Find(this.name);
-            FindPath();
+            //FindPath();
         }
 
     }
@@ -71,7 +71,7 @@ public class Navigation : MonoBehaviour
     {
         //TODO: this is where I should add the line render between the user and the desire landmark/icon
         //Debug.Log("Touched the icon!");
-        //line.positionCount = 2; // this is hard coded for now.
+       line.positionCount = 2; // this is hard coded for now.
 
         waypoints[0] = Camera.main.transform; // this is not used currently
         // newly added
@@ -88,8 +88,7 @@ public class Navigation : MonoBehaviour
             //float waypoints_y_offset = waypoints[1].position.y*0.75f;
            // line.SetPosition(1, new Vector3(waypoints[1].position.x, waypoints_y_offset, waypoints[1].position.z)); // the position of the desire landmark/icon
             line.SetPosition(1, waypoints[1].position); // the position of the desire landmark/icon
-            line.positionCount = 2; // this is hard coded for now.
-
+            UnityEngine.Debug.Log("line count: " + line.positionCount);
             /*
             // when successfully navigated to the target, disable line renderer --> maybe need these later
             if ((Math.Abs(camera.x - waypoints[1].position.x) < 0.05) || ((Math.Abs(camera.z - waypoints[1].position.z) < 0.05))) //TODO: need to fix it! 
