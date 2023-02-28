@@ -275,7 +275,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	
 	public void Put(string url, string contentType, string jsonData, System.Action<string> callBack)
 	{
-		
+		StartCoroutine(DoRequest("PUT", _baseURL + url, contentType, jsonData, callBack));
 	}
 	
 	public void PutImage(string url, string contentType, string pathToFile, System.Action<string> callBack)
@@ -380,6 +380,38 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	IEnumerator DoDELETE(string url, string contentType, string jsonData, System.Action<string> callBack)
 	{
 		UnityWebRequest www = new UnityWebRequest(url, "DELETE");
+
+		www.SetRequestHeader("Content-Type", contentType);
+		if (_hasRegistration)
+		{
+			www.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+
+		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(jsonData);
+		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
+		www.downloadHandler = new DownloadHandlerBuffer();
+
+		yield return www.SendWebRequest();
+
+		string result = "";
+		if (www.result != UnityWebRequest.Result.Success)
+		{
+			result = "error";
+			//Debug.Log(www.error);
+		}
+		else
+		{
+			result = www.downloadHandler.text;
+			//Debug.Log("Form upload complete!");
+		}
+
+		www.Dispose();
+		callBack(result);
+	}
+
+	IEnumerator DoRequest(string method, string url, string contentType, string jsonData, System.Action<string> callBack)
+	{
+		UnityWebRequest www = new UnityWebRequest(url, method);
 
 		www.SetRequestHeader("Content-Type", contentType);
 		if (_hasRegistration)
