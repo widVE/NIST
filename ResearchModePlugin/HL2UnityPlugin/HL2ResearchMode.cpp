@@ -62,6 +62,8 @@ namespace winrt::HL2UnityPlugin::implementation
         m_sensorDescriptors.resize(sensorCount);
         winrt::check_hresult(m_pSensorDevice->GetSensorDescriptors(m_sensorDescriptors.data(), m_sensorDescriptors.size(), &sensorCount));
         
+        m_QRMatrix = XMMatrixIdentity();
+
         /*winrt::Windows::Perception::Spatial::SpatialCoordinateSystem m_worldOrigin = m_locator.CreateStationaryFrameOfReferenceAtCurrentLocation().CoordinateSystem();
 
         OutputDebugString(L"Initializing Video Frame Streamer...\n");
