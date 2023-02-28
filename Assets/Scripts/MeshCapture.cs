@@ -19,6 +19,13 @@ using SpatialAwarenessHandler = Microsoft.MixedReality.Toolkit.SpatialAwareness.
 
 public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
 {
+    // Attach QRScanner GameObject so we can listen for location change events.
+    [SerializeField]
+    GameObject _qrScanner;
+
+    [SerializeField]
+    string _locationId = "none";
+
     // Name of the mesh observer from MRTK that we want to use.
     public string meshObserverName = "Spatial Object Mesh Observer";
 
@@ -41,24 +48,28 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         // Get the SpatialObjectMeshObserver specifically
         observer = dataProviderAccess.GetDataProvider<IMixedRealitySpatialAwarenessMeshObserver>(meshObserverName);
         */
+
+        if (_qrScanner)
+        {
+            var scanner = _qrScanner.GetComponent<QRScanner>();
+            scanner.LocationChanged += (o, ev) =>
+            {
+                _locationId = ev.LocationID;
+            };
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        /*
-        if (!observer.IsRunning)
+        if (updatedMeshData.Count > 0 && _locationId != "none")
         {
-            Debug.Log("Observer is not running");
-            return;
+            foreach (var meshObject in updatedMeshData.Values)
+            {
+                SendSurfaceUpdate(meshObject);
+            }
+            updatedMeshData.Clear();
         }
-        */
-
-        foreach (var meshObject in updatedMeshData.Values)
-        {
-            SendSurfaceUpdate(meshObject);
-        }
-        updatedMeshData.Clear();
     }
 
     private void OnEnable()
@@ -85,7 +96,7 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
 
     public virtual void OnObservationRemoved(MixedRealitySpatialAwarenessEventData<SpatialAwarenessMeshObject> eventData)
     {
-        // Do stuff
+
     }
 
     void SendSurfaceUpdate(SpatialAwarenessMeshObject meshObject)
@@ -126,7 +137,7 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
             }
         }
 
-        var path = $"locations/628b00d4-ac6b-41bb-8e13-1d7d50eceeb9/surfaces/{System.Convert.ToUInt32(meshObject.Id)}/surface.ply";
+        var path = $"locations/{_locationId}/surfaces/{System.Convert.ToUInt32(meshObject.Id)}/surface.ply";
         EasyVizARServer.Instance.Put(path, "application/ply", body, UpdateSurfaceCallback);
     }
 
