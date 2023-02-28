@@ -24,6 +24,8 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
 
     private IMixedRealitySpatialAwarenessMeshObserver observer;
 
+    private Dictionary<int, SpatialAwarenessMeshObject> updatedMeshData = new Dictionary<int, SpatialAwarenessMeshObject>();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -52,7 +54,11 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         }
         */
 
-        //foreach (var meshObject in observer.Meshes)
+        foreach (var meshObject in updatedMeshData.Values)
+        {
+            SendSurfaceUpdate(meshObject);
+        }
+        updatedMeshData.Clear();
     }
 
     private void OnEnable()
@@ -69,12 +75,12 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
 
     public virtual void OnObservationAdded(MixedRealitySpatialAwarenessEventData<SpatialAwarenessMeshObject> eventData)
     {
-        SendSurfaceUpdate(eventData);
+        updatedMeshData[eventData.Id] = eventData.SpatialObject;
     }
 
     public virtual void OnObservationUpdated(MixedRealitySpatialAwarenessEventData<SpatialAwarenessMeshObject> eventData)
     {
-        SendSurfaceUpdate(eventData);
+        updatedMeshData[eventData.Id] = eventData.SpatialObject;
     }
 
     public virtual void OnObservationRemoved(MixedRealitySpatialAwarenessEventData<SpatialAwarenessMeshObject> eventData)
@@ -82,17 +88,14 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         // Do stuff
     }
 
-    void SendSurfaceUpdate(MixedRealitySpatialAwarenessEventData<SpatialAwarenessMeshObject> eventData)
+    void SendSurfaceUpdate(SpatialAwarenessMeshObject meshObject)
     {
-        var mesh = eventData.SpatialObject.Filter.sharedMesh;
+        var mesh = meshObject.Filter.sharedMesh;
 
         string body = "ply\n" +
             "format ascii 1.0\n" +
-            $"comment Event ID: {eventData.Id}\n" +
-            $"comment Event Source: {eventData.EventSource.SourceName}\n" +
-            $"comment Event Time: {eventData.EventTime.ToString()}\n" +
-            $"comment Spatial Object Id: {eventData.SpatialObject.Id}\n" +
-            $"comment Mesh Filter Name: {eventData.SpatialObject.Filter.name}\n" +
+            $"comment Spatial Object Id: {meshObject.Id}\n" +
+            $"comment Mesh Filter Name: {meshObject.Filter.name}\n" +
             $"element vertex {mesh.vertices.Length}\n" +
             "property double x\n" +
             "property double y\n" +
@@ -123,7 +126,7 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
             }
         }
 
-        var path = $"locations/628b00d4-ac6b-41bb-8e13-1d7d50eceeb9/surfaces/{System.Convert.ToUInt32(eventData.Id)}/surface.ply";
+        var path = $"locations/628b00d4-ac6b-41bb-8e13-1d7d50eceeb9/surfaces/{System.Convert.ToUInt32(meshObject.Id)}/surface.ply";
         EasyVizARServer.Instance.Put(path, "application/ply", body, UpdateSurfaceCallback);
     }
 
