@@ -84,6 +84,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "HandMenu",
+            "id": "f336398c-7db0-48b9-87be-1e3f0073ef56",
+            "actions": [
+                {
+                    "name": "Activate Menu",
+                    "type": "Button",
+                    "id": "bd288543-7c49-4f5f-bd18-5a0e530b20fe",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "f898dd0e-4774-4353-b788-1dca8792be4b",
+                    "path": "<Keyboard>/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Activate Menu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []

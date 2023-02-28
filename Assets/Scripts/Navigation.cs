@@ -146,8 +146,6 @@ public class Navigation : MonoBehaviour
         if (result != "error")
         {
 
-            //path = JsonUtility.FromJson<EasyVizAR.Path>("[\"points\"," + result + "]");
-           // path = JsonUtility.FromJson<EasyVizAR.Path>(result);
             path = JsonUtility.FromJson<EasyVizAR.Path>("{\"points\":" + result + "}");
             //Debug.Log("the path is: " + path.points);
             //Debug.Log("location id: " + location_id);
