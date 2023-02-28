@@ -64,10 +64,10 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
     {
         if (updatedMeshData.Count > 0 && _locationId != "none")
         {
-            foreach (var meshObject in updatedMeshData.Values)
-            {
-                SendSurfaceUpdate(meshObject);
-            }
+            // Make a copy of the updated mesh dictionary and use a coroutine to send the batch to the server.
+            // The coroutine lets us slow the updates down to a more manageable rate.
+            Dictionary<int, SpatialAwarenessMeshObject> copiedItems = new Dictionary<int, SpatialAwarenessMeshObject>(updatedMeshData);
+            StartCoroutine(SendAllSurfaceUpdates(copiedItems));
             updatedMeshData.Clear();
         }
     }
@@ -99,7 +99,16 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
 
     }
 
-    void SendSurfaceUpdate(SpatialAwarenessMeshObject meshObject)
+    IEnumerator SendAllSurfaceUpdates(Dictionary<int, SpatialAwarenessMeshObject> meshes)
+    {
+        foreach (var meshObject in meshes.Values)
+        {
+            yield return SendSurfaceUpdate(meshObject);
+            yield return new WaitForSeconds(1);
+        }
+    }
+
+    IEnumerator SendSurfaceUpdate(SpatialAwarenessMeshObject meshObject)
     {
         var mesh = meshObject.Filter.sharedMesh;
 
@@ -137,8 +146,8 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
             }
         }
 
-        var path = $"locations/{_locationId}/surfaces/{System.Convert.ToUInt32(meshObject.Id)}/surface.ply";
-        EasyVizARServer.Instance.Put(path, "application/ply", body, UpdateSurfaceCallback);
+        var path = $"/locations/{_locationId}/surfaces/{System.Convert.ToUInt32(meshObject.Id)}/surface.ply";
+        yield return EasyVizARServer.Instance.DoRequest("PUT", path, "application/ply", body, UpdateSurfaceCallback);
     }
 
     void UpdateSurfaceCallback(string resultData)

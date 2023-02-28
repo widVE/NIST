@@ -409,8 +409,13 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		callBack(result);
 	}
 
-	IEnumerator DoRequest(string method, string url, string contentType, string jsonData, System.Action<string> callBack)
+	public IEnumerator DoRequest(string method, string url, string contentType, string jsonData, System.Action<string> callBack)
 	{
+		if (url.StartsWith("/"))
+        {
+			url = _baseURL + url.Substring(1);
+		}
+
 		UnityWebRequest www = new UnityWebRequest(url, method);
 
 		www.SetRequestHeader("Content-Type", contentType);

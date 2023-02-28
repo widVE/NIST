@@ -1155,6 +1155,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff38da39be66d094fbc7ff31ceebd34c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _qrScanner: {fileID: 291935030}
+  _locationId: none
   meshObserverName: Spatial Object Mesh Observer
 --- !u!1 &382997460
 GameObject:
