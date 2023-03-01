@@ -24,31 +24,14 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
     GameObject _qrScanner;
 
     [SerializeField]
-    string _locationId = "none";
-
-    // Name of the mesh observer from MRTK that we want to use.
-    public string meshObserverName = "Spatial Object Mesh Observer";
-
-    private IMixedRealitySpatialAwarenessMeshObserver observer;
+    string _locationId = "";
 
     private Dictionary<int, SpatialAwarenessMeshObject> updatedMeshData = new Dictionary<int, SpatialAwarenessMeshObject>();
+    private int sendingInProgress = 0;
 
     // Start is called before the first frame update
     void Start()
     {
-        /*
-        // Use CoreServices to quickly get access to the IMixedRealitySpatialAwarenessSystem
-        var spatialAwarenessService = CoreServices.SpatialAwarenessSystem;
-
-        // Cast to the IMixedRealityDataProviderAccess to get access to the data providers
-        var dataProviderAccess = spatialAwarenessService as IMixedRealityDataProviderAccess;
-
-        var meshObserver = dataProviderAccess.GetDataProvider<IMixedRealitySpatialAwarenessMeshObserver>();
-
-        // Get the SpatialObjectMeshObserver specifically
-        observer = dataProviderAccess.GetDataProvider<IMixedRealitySpatialAwarenessMeshObserver>(meshObserverName);
-        */
-
         if (_qrScanner)
         {
             var scanner = _qrScanner.GetComponent<QRScanner>();
@@ -62,14 +45,7 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
     // Update is called once per frame
     void Update()
     {
-        if (updatedMeshData.Count > 0 && _locationId != "none")
-        {
-            // Make a copy of the updated mesh dictionary and use a coroutine to send the batch to the server.
-            // The coroutine lets us slow the updates down to a more manageable rate.
-            Dictionary<int, SpatialAwarenessMeshObject> copiedItems = new Dictionary<int, SpatialAwarenessMeshObject>(updatedMeshData);
-            StartCoroutine(SendAllSurfaceUpdates(copiedItems));
-            updatedMeshData.Clear();
-        }
+
     }
 
     private void OnEnable()
@@ -86,17 +62,35 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
 
     public virtual void OnObservationAdded(MixedRealitySpatialAwarenessEventData<SpatialAwarenessMeshObject> eventData)
     {
-        updatedMeshData[eventData.Id] = eventData.SpatialObject;
+        EnqueueMeshUpdate(eventData.SpatialObject);
     }
 
     public virtual void OnObservationUpdated(MixedRealitySpatialAwarenessEventData<SpatialAwarenessMeshObject> eventData)
     {
-        updatedMeshData[eventData.Id] = eventData.SpatialObject;
+        EnqueueMeshUpdate(eventData.SpatialObject);
     }
 
     public virtual void OnObservationRemoved(MixedRealitySpatialAwarenessEventData<SpatialAwarenessMeshObject> eventData)
     {
 
+    }
+
+    void EnqueueMeshUpdate(SpatialAwarenessMeshObject meshObject)
+    {
+        //Debug.Log($"Received mesh {meshObject.Id}, In progress {sendingInProgress}, Current queue {updatedMeshData.Count}");
+
+        updatedMeshData[meshObject.Id] = meshObject;
+
+        if (sendingInProgress <= 0 && _locationId != "")
+        {
+            // Make a copy of the updated mesh dictionary and use a coroutine to send the batch to the server.
+            // The coroutine lets us slow the updates down to a more manageable rate.
+            Dictionary<int, SpatialAwarenessMeshObject> copiedItems = new Dictionary<int, SpatialAwarenessMeshObject>(updatedMeshData);
+            sendingInProgress = copiedItems.Count;
+            updatedMeshData.Clear();
+
+            StartCoroutine(SendAllSurfaceUpdates(copiedItems));
+        }
     }
 
     IEnumerator SendAllSurfaceUpdates(Dictionary<int, SpatialAwarenessMeshObject> meshes)
@@ -152,6 +146,6 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
 
     void UpdateSurfaceCallback(string resultData)
     {
-        
+        sendingInProgress--;
     }
 }

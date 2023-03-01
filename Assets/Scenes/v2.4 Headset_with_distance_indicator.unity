@@ -1156,8 +1156,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _qrScanner: {fileID: 291935030}
-  _locationId: none
-  meshObserverName: Spatial Object Mesh Observer
+  _locationId: 
 --- !u!1 &382997460
 GameObject:
   m_ObjectHideFlags: 0
