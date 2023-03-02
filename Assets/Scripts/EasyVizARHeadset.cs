@@ -178,7 +178,7 @@ public class EasyVizARHeadset : MonoBehaviour
 	{
 		EasyVizAR.Headset h = new EasyVizAR.Headset();
 		h.position = new EasyVizAR.Position();
-		h.position.x = -transform.position.x;
+		h.position.x = transform.position.x;
 		h.position.y = transform.position.y;
 		h.position.z = transform.position.z;
 		h.orientation = new EasyVizAR.Orientation();
@@ -269,7 +269,7 @@ public class EasyVizARHeadset : MonoBehaviour
 	{
 		EasyVizAR.HeadsetPositionUpdate h = new EasyVizAR.HeadsetPositionUpdate();
 		h.position = new EasyVizAR.Position();
-		h.position.x = -transform.position.x;
+		h.position.x = transform.position.x;
 		h.position.y = transform.position.y;
 		h.position.z = transform.position.z;
 		h.orientation = new EasyVizAR.Orientation();

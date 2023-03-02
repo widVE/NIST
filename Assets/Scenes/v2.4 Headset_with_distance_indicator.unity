@@ -1156,7 +1156,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _qrScanner: {fileID: 291935030}
-  _locationId: 
+  debug: 0
 --- !u!1 &382997460
 GameObject:
   m_ObjectHideFlags: 0
