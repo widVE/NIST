@@ -76,7 +76,7 @@ public class Navigation : MonoBehaviour
         waypoints[0] = Camera.main.transform; // this is not used currently
         // newly added
         Transform cam_pos = Camera.main.transform;
-        float cam_pos_y_offset = cam_pos.position.y *0.75f; //NOTE (0.075f): might change this later in the future --> need to lower it substantially
+        float cam_pos_y_offset = cam_pos.position.y *0.5f; //NOTE (0.5f): might change this later in the future --> if need to lower it substantially
         Vector3 camera = new Vector3(cam_pos.position.x, cam_pos_y_offset, cam_pos.position.z);
 
         waypoints[1] = markerSpawnParent.transform.Find(this.name); // might move this line to elsewhere, but for now, it should work fine
