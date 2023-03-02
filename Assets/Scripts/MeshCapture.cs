@@ -26,6 +26,11 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
     GameObject _qrScanner;
 
     [SerializeField]
+    [Tooltip("Amount of work to do before yielding in the sender coroutine.")]
+    int workPerFrame = 100;
+
+    [SerializeField]
+    [Tooltip("Enable debugging messages and initializing to test location.")]
     bool debug = false;
 
     private Dictionary<int, SpatialAwarenessMeshObject> updatedMeshData = new Dictionary<int, SpatialAwarenessMeshObject>();
@@ -36,6 +41,12 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
     // Start is called before the first frame update
     void Start()
     {
+        if(debug)
+        {
+            // Initialize to a testing location
+            _locationId = "628b00d4-ac6b-41bb-8e13-1d7d50eceeb9";
+        }
+
         if (_qrScanner)
         {
             var scanner = _qrScanner.GetComponent<QRScanner>();
@@ -44,21 +55,14 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
                 _locationId = ev.LocationID;
             };
         }
+
+        StartCoroutine(SenderLoop());
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (sendingInProgress <= 0 && _locationId != "")
-        {
-            // Make a copy of the updated mesh dictionary and use a coroutine to send the batch to the server.
-            // The coroutine lets us slow the updates down to a more manageable rate.
-            Dictionary<int, SpatialAwarenessMeshObject> copiedItems = new Dictionary<int, SpatialAwarenessMeshObject>(updatedMeshData);
-            sendingInProgress = copiedItems.Count;
-            updatedMeshData.Clear();
 
-            StartCoroutine(SendAllSurfaceUpdates(copiedItems));
-        }
     }
 
     private void OnEnable()
@@ -88,6 +92,25 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
 
     }
 
+    IEnumerator SenderLoop()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+
+            if (sendingInProgress <= 0 && _locationId != "")
+            {
+                // Make a copy of the updated mesh dictionary and use a coroutine to send the batch to the server.
+                // The coroutine lets us slow the updates down to a more manageable rate.
+                Dictionary<int, SpatialAwarenessMeshObject> copiedItems = new Dictionary<int, SpatialAwarenessMeshObject>(updatedMeshData);
+                sendingInProgress = copiedItems.Count;
+                updatedMeshData.Clear();
+
+                yield return SendAllSurfaceUpdates(copiedItems);
+            }
+        }
+    }
+
     void EnqueueMeshUpdate(SpatialAwarenessMeshObject meshObject)
     {
         updatedMeshData[meshObject.Id] = meshObject;
@@ -103,7 +126,6 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         foreach (var meshObject in meshes.Values)
         {
             yield return SendSurfaceUpdate(meshObject);
-            yield return new WaitForSeconds(1.0f);
         }
     }
 
@@ -145,16 +167,30 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         sb.AppendLine("property list uchar int vertex_index");
         sb.AppendLine("end_header");
 
+        int next_yield = workPerFrame;
         for (int i = 0; i < mesh.vertices.Length; i++)
         {
             var v = mesh.vertices[i];
             var n = mesh.vertices[i];
             sb.AppendLine($"{v.x} {v.y} {v.z} {n.x} {n.y} {n.z}");
+
+            if (i >= next_yield)
+            {
+                yield return null;
+                next_yield += workPerFrame;
+            }
         }
 
+        next_yield = workPerFrame;
         for (int i = 0; i < mesh.triangles.Length; i+=3)
         {
             sb.AppendLine($"3 {mesh.triangles[i]} {mesh.triangles[i+1]} {mesh.triangles[i+2]}");
+
+            if (i >= next_yield)
+            {
+                yield return null;
+                next_yield += workPerFrame;
+            }
         }
 
         var path = $"/locations/{_locationId}/surfaces/{surface_id}/surface.ply";
