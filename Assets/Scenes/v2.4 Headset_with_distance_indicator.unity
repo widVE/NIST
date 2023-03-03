@@ -34659,6 +34659,10 @@ PrefabInstance:
       propertyPath: map_text
       value: 
       objectReference: {fileID: 4146024326901750735, guid: 38b995097b245fa41adbdf56f24d3c55, type: 3}
+    - target: {fileID: 4146024326901750733, guid: 38b995097b245fa41adbdf56f24d3c55, type: 3}
+      propertyPath: location_id
+      value: 69e92dff-7138-4091-89c4-ed073035bfe6
+      objectReference: {fileID: 0}
     - target: {fileID: 4146024326901750736, guid: 38b995097b245fa41adbdf56f24d3c55, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -35185,6 +35189,10 @@ PrefabInstance:
     - target: {fileID: 3566677480603874026, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: additionalOffset.y
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3566677482455454033, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3566677482629638461, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: m_IsActive
@@ -41365,6 +41373,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: a216017b-0acd-42c0-80ab-bc7a6b1cd72f
     m_ActionName: Map/Toggle[/Keyboard/l]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: bd288543-7c49-4f5f-bd18-5a0e530b20fe
+    m_ActionName: HandMenu/Activate Menu[/Keyboard/x]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Markers
