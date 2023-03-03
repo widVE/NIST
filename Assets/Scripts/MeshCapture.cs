@@ -34,9 +34,15 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
     bool debug = false;
 
     private Dictionary<int, SpatialAwarenessMeshObject> updatedMeshData = new Dictionary<int, SpatialAwarenessMeshObject>();
+    private Queue<int> workQueue = new Queue<int>();
     private int sendingInProgress = 0;
 
     private string _locationId = "";
+
+    // We might not need this reference to the mesh observer depending on whether
+    // we use the observer to iterate through its meshes or if we go through the
+    // mesh change notifications.
+    private IMixedRealitySpatialAwarenessMeshObserver meshObserver;
 
     // Start is called before the first frame update
     void Start()
@@ -55,6 +61,34 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
                 _locationId = ev.LocationID;
             };
         }
+
+        // Use CoreServices to quickly get access to the IMixedRealitySpatialAwarenessSystem
+        var spatialAwarenessService = CoreServices.SpatialAwarenessSystem;
+
+        // Cast to the IMixedRealityDataProviderAccess to get access to the data providers
+        var dataProviderAccess = spatialAwarenessService as IMixedRealityDataProviderAccess;
+
+        // Initialize to the first available mesh observer, then search for our preferred observer.
+        meshObserver = CoreServices.GetSpatialAwarenessSystemDataProvider<IMixedRealitySpatialAwarenessMeshObserver>();
+
+        foreach (var provider in dataProviderAccess.GetDataProviders<IMixedRealitySpatialAwarenessMeshObserver>())
+        {
+#if UNITY_EDITOR
+            // This observer can be used in Unity Editor for testing.
+            if (provider.Name == "Spatial Object Mesh Observer") {
+                meshObserver = provider;
+                break;
+            }
+#endif
+
+            // This is the observer we expect to find on the HoloLens 2.
+            if (provider.Name == "OpenXR Spatial Mesh Observer")
+            {
+                meshObserver = provider;
+            }
+        }
+
+        Debug.Log("Found spatial mesh observer: " + meshObserver.Name);
 
         StartCoroutine(SenderLoop());
     }
@@ -98,6 +132,7 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         {
             yield return new WaitForSeconds(1);
 
+            /*
             if (sendingInProgress <= 0 && _locationId != "")
             {
                 // Make a copy of the updated mesh dictionary and use a coroutine to send the batch to the server.
@@ -108,17 +143,64 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
 
                 yield return SendAllSurfaceUpdates(copiedItems);
             }
+            */
+
+            if (_locationId != "" && workQueue.Count > 0)
+            {
+                //meshObserver.Update();
+                //yield return null;
+
+                // Loop through all known Meshes
+                /*
+                foreach (SpatialAwarenessMeshObject meshObject in meshObserver.Meshes.Values)
+                {
+                    //Mesh mesh = meshObject.Filter.mesh;
+                    yield return SendSurfaceUpdate(meshObject);
+                    // Do something with the Mesh object
+                }
+                */
+
+                // There may be duplicates in the work queue if a surface has been updated multiple times.
+                // After we process the surface, we remove it from the updatedMeshData dictionary.
+                // If we dequeue the same ID a second time from the queue, but it is not in the dictionary, then
+                // we can skip that that update because it has already been sent to the server.
+
+                int nextId = workQueue.Dequeue();
+                if (updatedMeshData.ContainsKey(nextId))
+                {
+                    var meshObject = updatedMeshData[nextId];
+                    updatedMeshData.Remove(nextId);
+
+                    // It is considered not ideal to launch nested coroutines like this.
+                    // However, the SendSurfaceUpdate function occasionally encounters an exception
+                    // when accessing the mesh data. I think perhaps it is because the mesh is
+                    // freed from memory sometime between when we receive it and when we finally
+                    // get around to processing it. I am not sure how to prevent the exception,
+                    // so we just let it happen and crash the coroutine, I guess.
+                    StartCoroutine(SendSurfaceUpdate(meshObject));
+                }
+            }
+
+            if (debug)
+            {
+                Debug.Log("Still in SenderLoop");
+            }
         }
     }
 
     void EnqueueMeshUpdate(SpatialAwarenessMeshObject meshObject)
     {
-        updatedMeshData[meshObject.Id] = meshObject;
+        //updatedMeshData[meshObject.Id] = meshObject;
 
         if (debug)
         {
             Debug.Log($"Received mesh {meshObject.Id}, sending in progress {sendingInProgress}, queue size {updatedMeshData.Count}");
         }
+
+        updatedMeshData[meshObject.Id] = meshObject;
+        workQueue.Enqueue(meshObject.Id);
+
+        //StartCoroutine(SendSurfaceUpdate(meshObject));
     }
 
     IEnumerator SendAllSurfaceUpdates(Dictionary<int, SpatialAwarenessMeshObject> meshes)
@@ -148,27 +230,30 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
             surface_id = "s" + meshObject.Id.ToString();
         }
 
+        int num_vertices = mesh.vertices.Length;
+        int num_triangles = mesh.triangles.Length / 3;
+
         // Rough estimate of the PLY file size based on header block + one row per vertex + one row per triangle.
-        int capacity = 1000 + 100 * mesh.vertices.Length + 10 * mesh.triangles.Length;
+        int capacity = 1000 + 100 * num_vertices + 10 * num_triangles;
 
         StringBuilder sb = new StringBuilder(capacity);
         sb.AppendLine("ply");
         sb.AppendLine("format ascii 1.0");
         sb.AppendLine("comment Spatial Object Id: " + meshObject.Id);
         sb.AppendLine("comment Mesh Filter Name: " + meshObject.Filter.name);
-        sb.AppendLine("element vertex " + mesh.vertices.Length);
+        sb.AppendLine("element vertex " + num_vertices);
         sb.AppendLine("property double x");
         sb.AppendLine("property double y");
         sb.AppendLine("property double z");
         sb.AppendLine("property double nx");
         sb.AppendLine("property double ny");
         sb.AppendLine("property double nz");
-        sb.AppendLine("element face " + mesh.triangles.Length / 3);
+        sb.AppendLine("element face " + num_triangles);
         sb.AppendLine("property list uchar int vertex_index");
         sb.AppendLine("end_header");
 
         int next_yield = workPerFrame;
-        for (int i = 0; i < mesh.vertices.Length; i++)
+        for (int i = 0; i < num_vertices; i++)
         {
             var v = mesh.vertices[i];
             var n = mesh.vertices[i];
