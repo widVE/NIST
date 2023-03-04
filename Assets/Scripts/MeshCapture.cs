@@ -1,7 +1,11 @@
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+using Unity.Collections;
 using UnityEngine;
 
 using Microsoft.MixedReality.Toolkit;
@@ -19,6 +23,15 @@ using SpatialAwarenessHandler = Microsoft.MixedReality.Toolkit.SpatialAwareness.
  * https://github.com/microsoft/MixedRealityCompanionKit/blob/master/RealtimeStreaming/Samples/Unity/Assets/MixedRealityToolkit.Examples/Demos/SpatialAwareness/Scripts/DemoSpatialMeshHandler.cs
  */
 
+public struct MeshConversionResult
+{
+    public int InternalId;
+    public string SurfaceId;
+    public string LocationId;
+
+    public string MeshData;
+}
+
 public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
 {
     // Attach QRScanner GameObject so we can listen for location change events.
@@ -26,16 +39,8 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
     GameObject _qrScanner;
 
     [SerializeField]
-    [Tooltip("Amount of work to do before yielding in the sender coroutine.")]
-    int workPerFrame = 100;
-
-    [SerializeField]
     [Tooltip("Enable debugging messages and initializing to test location.")]
     bool debug = false;
-
-    private Dictionary<int, SpatialAwarenessMeshObject> updatedMeshData = new Dictionary<int, SpatialAwarenessMeshObject>();
-    private Queue<int> workQueue = new Queue<int>();
-    private int sendingInProgress = 0;
 
     private string _locationId = "";
 
@@ -43,6 +48,8 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
     // we use the observer to iterate through its meshes or if we go through the
     // mesh change notifications.
     private IMixedRealitySpatialAwarenessMeshObserver meshObserver;
+
+    private Queue<MeshConversionResult> resultQueue = new Queue<MeshConversionResult>();
 
     // Start is called before the first frame update
     void Start()
@@ -111,17 +118,17 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         CoreServices.SpatialAwarenessSystem.UnregisterHandler<SpatialAwarenessHandler>(this);
     }
 
-    public virtual void OnObservationAdded(MixedRealitySpatialAwarenessEventData<SpatialAwarenessMeshObject> eventData)
+    public void OnObservationAdded(MixedRealitySpatialAwarenessEventData<SpatialAwarenessMeshObject> eventData)
     {
         EnqueueMeshUpdate(eventData.SpatialObject);
     }
 
-    public virtual void OnObservationUpdated(MixedRealitySpatialAwarenessEventData<SpatialAwarenessMeshObject> eventData)
+    public void OnObservationUpdated(MixedRealitySpatialAwarenessEventData<SpatialAwarenessMeshObject> eventData)
     {
         EnqueueMeshUpdate(eventData.SpatialObject);
     }
 
-    public virtual void OnObservationRemoved(MixedRealitySpatialAwarenessEventData<SpatialAwarenessMeshObject> eventData)
+    public void OnObservationRemoved(MixedRealitySpatialAwarenessEventData<SpatialAwarenessMeshObject> eventData)
     {
 
     }
@@ -132,106 +139,59 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         {
             yield return new WaitForSeconds(1);
 
-            /*
-            if (sendingInProgress <= 0 && _locationId != "")
+            MeshConversionResult result;
+            while (resultQueue.TryDequeue(out result))
             {
-                // Make a copy of the updated mesh dictionary and use a coroutine to send the batch to the server.
-                // The coroutine lets us slow the updates down to a more manageable rate.
-                Dictionary<int, SpatialAwarenessMeshObject> copiedItems = new Dictionary<int, SpatialAwarenessMeshObject>(updatedMeshData);
-                sendingInProgress = copiedItems.Count;
-                updatedMeshData.Clear();
-
-                yield return SendAllSurfaceUpdates(copiedItems);
-            }
-            */
-
-            if (_locationId != "" && workQueue.Count > 0)
-            {
-                //meshObserver.Update();
-                //yield return null;
-
-                // Loop through all known Meshes
-                /*
-                foreach (SpatialAwarenessMeshObject meshObject in meshObserver.Meshes.Values)
-                {
-                    //Mesh mesh = meshObject.Filter.mesh;
-                    yield return SendSurfaceUpdate(meshObject);
-                    // Do something with the Mesh object
-                }
-                */
-
-                // There may be duplicates in the work queue if a surface has been updated multiple times.
-                // After we process the surface, we remove it from the updatedMeshData dictionary.
-                // If we dequeue the same ID a second time from the queue, but it is not in the dictionary, then
-                // we can skip that that update because it has already been sent to the server.
-
-                int nextId = workQueue.Dequeue();
-                if (updatedMeshData.ContainsKey(nextId))
-                {
-                    var meshObject = updatedMeshData[nextId];
-                    updatedMeshData.Remove(nextId);
-
-                    // It is considered not ideal to launch nested coroutines like this.
-                    // However, the SendSurfaceUpdate function occasionally encounters an exception
-                    // when accessing the mesh data. I think perhaps it is because the mesh is
-                    // freed from memory sometime between when we receive it and when we finally
-                    // get around to processing it. I am not sure how to prevent the exception,
-                    // so we just let it happen and crash the coroutine, I guess.
-                    StartCoroutine(SendSurfaceUpdate(meshObject));
-                }
-            }
-
-            if (debug)
-            {
-                Debug.Log("Still in SenderLoop");
+                var path = $"/locations/{result.LocationId}/surfaces/{result.SurfaceId}/surface.ply";
+                yield return EasyVizARServer.Instance.DoRequest("PUT", path, "application/ply", result.MeshData, UpdateSurfaceCallback);
             }
         }
     }
 
-    void EnqueueMeshUpdate(SpatialAwarenessMeshObject meshObject)
+    async void EnqueueMeshUpdate(SpatialAwarenessMeshObject meshObject)
     {
-        //updatedMeshData[meshObject.Id] = meshObject;
+        MeshConversionResult result;
+        result.InternalId = meshObject.Id;
+        result.LocationId = _locationId;
 
-        if (debug)
-        {
-            Debug.Log($"Received mesh {meshObject.Id}, sending in progress {sendingInProgress}, queue size {updatedMeshData.Count}");
-        }
-
-        updatedMeshData[meshObject.Id] = meshObject;
-        workQueue.Enqueue(meshObject.Id);
-
-        //StartCoroutine(SendSurfaceUpdate(meshObject));
-    }
-
-    IEnumerator SendAllSurfaceUpdates(Dictionary<int, SpatialAwarenessMeshObject> meshes)
-    {
-        foreach (var meshObject in meshes.Values)
-        {
-            yield return SendSurfaceUpdate(meshObject);
-        }
-    }
-
-    IEnumerator SendSurfaceUpdate(SpatialAwarenessMeshObject meshObject)
-    {
-        var mesh = meshObject.Filter.sharedMesh;
-
-        string surface_id;
         string pattern = @"\S+ - (\S+)";
         Match match = Regex.Match(meshObject.Filter.name, pattern);
         if (match.Success && match.Groups.Count > 1)
         {
             // Regex match should extract system-provided surface ID from Unity object.
-            surface_id = match.Groups[1].Value;
+            result.SurfaceId = match.Groups[1].Value;
         }
         else
         {
             // Something went wrong with the regex match if we hit this branch
             // but perhaps not a good reason to discard the surface data.
-            surface_id = "s" + meshObject.Id.ToString();
+            result.SurfaceId = "s" + meshObject.Id.ToString();
         }
 
-        int num_vertices = mesh.vertices.Length;
-        int num_triangles = mesh.triangles.Length / 3;
+        // AcquireReadOnlyMeshData is supposed to give us a thread-safe data structure.
+        // The using block makes sure it is properly cleaned up when we are done.
+        using (var meshDataArray = Mesh.AcquireReadOnlyMeshData(meshObject.Filter.sharedMesh))
+        {
+            // Goal here is to offload the heavy computation to a worker thread. Is it working?
+            result.MeshData = await Task.Run<string>(() => ExportMeshDataAsPly(meshDataArray[0]));
+        }
+
+        resultQueue.Enqueue(result);
+    }
+
+    public string ExportMeshDataAsPly(Mesh.MeshData mesh)
+    {
+        int num_vertices = mesh.vertexCount;
+        int num_indices = mesh.GetSubMesh(0).indexCount;
+        int num_triangles = num_indices / 3;
+
+        var vertices = new NativeArray<Vector3>(num_vertices, Allocator.TempJob);
+        var normals = new NativeArray<Vector3>(num_vertices, Allocator.TempJob);
+        var indices = new NativeArray<int>(num_indices, Allocator.TempJob);
+
+        mesh.GetVertices(vertices);
+        mesh.GetNormals(normals);
+        mesh.GetIndices(indices, 0);
 
         // Rough estimate of the PLY file size based on header block + one row per vertex + one row per triangle.
         int capacity = 1000 + 100 * num_vertices + 10 * num_triangles;
@@ -239,8 +199,8 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         StringBuilder sb = new StringBuilder(capacity);
         sb.AppendLine("ply");
         sb.AppendLine("format ascii 1.0");
-        sb.AppendLine("comment Spatial Object Id: " + meshObject.Id);
-        sb.AppendLine("comment Mesh Filter Name: " + meshObject.Filter.name);
+        //sb.AppendLine("comment Spatial Object Id: " + meshObject.Id);
+        //sb.AppendLine("comment Mesh Filter Name: " + meshObject.Filter.name);
         sb.AppendLine("element vertex " + num_vertices);
         sb.AppendLine("property double x");
         sb.AppendLine("property double y");
@@ -252,41 +212,23 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         sb.AppendLine("property list uchar int vertex_index");
         sb.AppendLine("end_header");
 
-        int next_yield = workPerFrame;
         for (int i = 0; i < num_vertices; i++)
         {
-            var v = mesh.vertices[i];
-            var n = mesh.vertices[i];
+            var v = vertices[i];
+            var n = normals[i];
             sb.AppendLine($"{v.x} {v.y} {v.z} {n.x} {n.y} {n.z}");
-
-            if (i >= next_yield)
-            {
-                yield return null;
-                next_yield += workPerFrame;
-            }
         }
 
-        next_yield = workPerFrame;
-        for (int i = 0; i < mesh.triangles.Length; i+=3)
+        for (int i = 0; i < num_indices; i += 3)
         {
-            sb.AppendLine($"3 {mesh.triangles[i]} {mesh.triangles[i+1]} {mesh.triangles[i+2]}");
-
-            if (i >= next_yield)
-            {
-                yield return null;
-                next_yield += workPerFrame;
-            }
+            sb.AppendLine($"3 {indices[i]} {indices[i + 1]} {indices[i + 2]}");
         }
 
-        var path = $"/locations/{_locationId}/surfaces/{surface_id}/surface.ply";
-        yield return EasyVizARServer.Instance.DoRequest("PUT", path, "application/ply", sb.ToString(), UpdateSurfaceCallback);
+        vertices.Dispose();
+        normals.Dispose();
+        indices.Dispose();
 
-        sendingInProgress--;
-
-        if (debug)
-        {
-            Debug.Log($"Finished sending surface {surface_id}");
-        }
+        return sb.ToString();
     }
 
     void UpdateSurfaceCallback(string resultData)
