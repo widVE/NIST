@@ -171,6 +171,12 @@ namespace EasyVizAR
 	}
 
 	[System.Serializable]
+	public class Path
+	{
+		public Position[] points;
+	}
+
+	[System.Serializable]
 	public class Feature
 	{
 		public string color;

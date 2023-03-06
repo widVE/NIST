@@ -2,13 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Collections.Specialized;
 
 public class Navigation : MonoBehaviour
 {
     GameObject markerSpawnParent = null;
     Collider collider;
     LineRenderer line;
-    [SerializeField] Transform[] points; //this contains the position of the landmark/icon
+    [SerializeField] Transform[] waypoints; //this contains the position of the landmark/icon
+    // For querying the server 
+    string location_id;
+    EasyVizAR.Path path = new EasyVizAR.Path();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -28,19 +33,26 @@ public class Navigation : MonoBehaviour
         line = GameObject.Find("Main Camera").GetComponent<LineRenderer>();
         if (line != null) { Debug.Log("found line renderer!"); }
         line.positionCount = 0; // this is hard coded for now.
-        points = new Transform[2];
+        waypoints = new Transform[2];
+
+
+        location_id = GameObject.Find("EasyVizARHeadsetManager").GetComponent<EasyVizARHeadsetManager>().LocationID;
+
+        //FindPath(); //find path between two objects TODO: need to ask Lance about the JSON format, right now the format is not consistent w/ normal JSON format
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (points[1] != null)
+        
+        if (waypoints[1] != null)
         {
             line.enabled = true;
             // disable line renderer once approach the target
             RenderNavigationPath();
 
         }
+        
 
         Debug.Log("Got to Update() from Navigation");
         //update the position of user and landmark 
@@ -51,8 +63,6 @@ public class Navigation : MonoBehaviour
         line.SetPosition(0, points[0].position); // the position of the user (i.e. the main camera's position)
         line.SetPosition(1, points[1].position); // the position of the desire landmark/icon
         */
-       
-
 
     }
 
@@ -62,27 +72,91 @@ public class Navigation : MonoBehaviour
         Debug.Log("Touched the icon!");
         line.positionCount = 2; // this is hard coded for now.
 
-        points[0] = Camera.main.transform; // this is not used currently
+        waypoints[0] = Camera.main.transform; // this is not used currently
         // newly added
         Transform cam_pos = Camera.main.transform;
-        float cam_pos_y_offset = cam_pos.position.y - 0.075f; //NOTE: might change this later in the future
+        float cam_pos_y_offset = cam_pos.position.y *0.75f; //NOTE (0.075f): might change this later in the future --> need to lower it substantially
         Vector3 camera = new Vector3(cam_pos.position.x, cam_pos_y_offset, cam_pos.position.z);
 
-        points[1] = markerSpawnParent.transform.Find(this.name); // might move this line to elsewhere, but for now, it should work fine
+        waypoints[1] = markerSpawnParent.transform.Find(this.name); // might move this line to elsewhere, but for now, it should work fine
 
         //line.SetPosition(0, points[0].position); // the position of the user (i.e. the main camera's position)
         line.SetPosition(0, camera); // the position of the user (i.e. the main camera's position)
-
-        line.SetPosition(1, points[1].position); // the position of the desire landmark/icon
-        // Note: I set the line renderer to be in world space, so it may not render because of this 
-
-        // when successfully navigated to the target
-        if ((Math.Abs(camera.x - points[1].position.x) < 0.1) || ((Math.Abs(camera.z - points[1].position.z) < 0.1))) //TODO: need to fix it! 
+        if (waypoints[1])
         {
-            Debug.Log("Disabled the line.");
+            float waypoints_y_offset = waypoints[1].position.y*0.75f;
+            line.SetPosition(1, new Vector3(waypoints[1].position.x, waypoints_y_offset, waypoints[1].position.z)); // the position of the desire landmark/icon
+           
+            /*
+            // when successfully navigated to the target, disable line renderer --> maybe need these later
+            if ((Math.Abs(camera.x - waypoints[1].position.x) < 0.05) || ((Math.Abs(camera.z - waypoints[1].position.z) < 0.05))) //TODO: need to fix it! 
+            {
+                Debug.Log("Disabled the line.");
+                line.enabled = false;
+                waypoints[1] = null;
+                line.positionCount = 0;
+            }
+            */
+        }
+
+
+    }
+    // This is for the future, if we would want to turn certain marker's line renderer off
+    public void DisableLineRenderer(EasyVizAR.Feature marker, string type)
+    {
+        Vector3 cam_pos = GetComponent<Camera>().transform.position;
+
+        float change_x = (float)Math.Pow((cam_pos.x - marker.position.x), 2);
+        float change_z = (float)Math.Pow((cam_pos.z - marker.position.z), 2);
+        float change_dist = (float)Math.Sqrt(change_x + change_z);
+        if (change_dist < 0.05)
+        {
+            Debug.Log("Disabled the line");
             line.enabled = false;
-            points[1] = null;
+            waypoints[1] = null;
             line.positionCount = 0;
         }
+
+    }
+
+    // Querying the server with path between two points
+    public void FindPath()
+    {
+        //will change these vector to EasyVizAR.Position
+        Vector3 start = new Vector3(2f,2f,4f); // this is hard coded for now --> will add these points later
+        Vector3 target = new Vector3(12f,-2f, 2f); // is the type Position? or Vector3?
+        // EasyVizARServer.Instance.Get("locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + target.x + "," + target.y + "," + target.z + "&envelope=points", EasyVizARServer.JSON_TYPE, GetPathCallback);
+        EasyVizARServer.Instance.Get("locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + target.x + "," + target.y + "," + target.z, EasyVizARServer.JSON_TYPE, GetPathCallback);
+
+    }
+
+    void GetPathCallback(string result)
+    {
+        Debug.Log("initiated querying path");
+        Debug.Log("the result: " + result);
+        if (result != "error")
+        {
+            Debug.Log("Successfully added the points");
+
+            //path = JsonUtility.FromJson<EasyVizAR.Path>("[\"points\"," + result + "]");
+           // path = JsonUtility.FromJson<EasyVizAR.Path>(result);
+            path = JsonUtility.FromJson<EasyVizAR.Path>("{\"points\":" + result + "}");
+            Debug.Log("the path is: " + path.points);
+            Debug.Log("location id: " + location_id);
+            int cnt = 0;
+            foreach (EasyVizAR.Position points in path.points)
+            {
+                line.positionCount++;
+                line.SetPosition(cnt++, new Vector3(points.x, points.y, points.z)); // this draws the line 
+                Debug.Log("number of points in the path is: " + line.positionCount);
+                Debug.Log("points: " + points.x + ", " + points.y + ", " + points.z);
+
+            }
+
+           
+            Debug.Log("Successfully added the points");
+           
+        }
+
     }
 }
