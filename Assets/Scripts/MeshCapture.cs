@@ -42,6 +42,10 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
     [Tooltip("Enable debugging messages and initializing to test location.")]
     bool debug = false;
 
+    [SerializeField]
+    [Tooltip("Game object that determines the world coordinate system, ie. the one that changes when QR code is scanned.")]
+    GameObject coordinateSystemSource;
+
     private string _locationId = "";
 
     // We might not need this reference to the mesh observer depending on whether
@@ -172,14 +176,27 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         // The using block makes sure it is properly cleaned up when we are done.
         using (var meshDataArray = Mesh.AcquireReadOnlyMeshData(meshObject.Filter.sharedMesh))
         {
+            Matrix4x4 transformation;
+            if (coordinateSystemSource)
+            {
+                transformation = coordinateSystemSource.transform.localToWorldMatrix;
+            }
+            else
+            {
+                // This path would prevent crashing but is probably not going to work as expected.
+                // The meshes will end up being aligned relative to the starting position when the app started,
+                // not relative to the QR code.
+                transformation = transform.localToWorldMatrix;
+            }
+
             // Goal here is to offload the heavy computation to a worker thread. Is it working?
-            result.MeshData = await Task.Run<string>(() => ExportMeshDataAsPly(meshDataArray[0]));
+            result.MeshData = await Task.Run<string>(() => ExportMeshDataAsPly(meshDataArray[0], transformation));
         }
 
         resultQueue.Enqueue(result);
     }
 
-    public string ExportMeshDataAsPly(Mesh.MeshData mesh)
+    public string ExportMeshDataAsPly(Mesh.MeshData mesh, Matrix4x4 transformation)
     {
         int num_vertices = mesh.vertexCount;
         int num_indices = mesh.GetSubMesh(0).indexCount;
@@ -214,8 +231,8 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
 
         for (int i = 0; i < num_vertices; i++)
         {
-            var v = vertices[i];
-            var n = normals[i];
+            var v = transformation.MultiplyPoint(vertices[i]);
+            var n = transformation.MultiplyPoint(normals[i]);
             sb.AppendLine($"{v.x} {v.y} {v.z} {n.x} {n.y} {n.z}");
         }
 

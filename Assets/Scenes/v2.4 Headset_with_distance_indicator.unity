@@ -1157,6 +1157,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _qrScanner: {fileID: 291935030}
   debug: 0
+  coordinateSystemSource: {fileID: 46054712}
 --- !u!1 &382997460
 GameObject:
   m_ObjectHideFlags: 0
