@@ -46,7 +46,7 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
     [Tooltip("Game object that determines the world coordinate system, ie. the one that changes when QR code is scanned.")]
     GameObject coordinateSystemSource;
 
-    private string _locationId = "";
+    private string _locationId = null;
 
     // We might not need this reference to the mesh observer depending on whether
     // we use the observer to iterate through its meshes or if we go through the
@@ -154,6 +154,12 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
 
     async void EnqueueMeshUpdate(SpatialAwarenessMeshObject meshObject)
     {
+        // It is not useful to send meshes if the location is unknown.
+        if (_locationId is null)
+        {
+            return;
+        }
+
         MeshConversionResult result;
         result.InternalId = meshObject.Id;
         result.LocationId = _locationId;

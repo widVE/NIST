@@ -91,7 +91,7 @@ public class QRScanner : MonoBehaviour
 	 */
 	Dictionary<Guid, QRData> originCodes = new Dictionary<Guid, QRData>();
 	Guid currentOriginId = Guid.Empty;
-	DateTimeOffset lastDetectedTime = DateTimeOffset.MinValue;
+	DateTimeOffset lastDetectedTime = DateTimeOffset.Now;
 	bool isOriginChanging = false;
 	bool isCoordinateSystemChanging = false;
 
@@ -215,6 +215,17 @@ public class QRScanner : MonoBehaviour
 			// Expected path segments: "/", "locations/", and "<location-id>"
 			if (uri.Segments.Length == 3 && uri.Segments[1] == "locations/")
 			{
+				/* 
+				 * Added this redundant logic to solve a race condition with the MeshCapture script,
+				 * which would start sending data with the new location ID but unaligned coordinate system.
+				 * Ideally, we want to set the coordinate system and location ID as an atomic operation.
+				 */
+				if (isCoordinateSystemChanging)
+				{
+					ChangeCoordinateSystemFromCode(d);
+					isCoordinateSystemChanging = false;
+				}
+
 				string loc = uri.Segments[2];
 				Debug.Log("Detected location ID from QR code: " + loc);
 				if (loc != _currentLocationID)
