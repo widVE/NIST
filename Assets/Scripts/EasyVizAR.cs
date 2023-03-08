@@ -288,6 +288,19 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	{
 		
 	}
+
+	public string GetAuthorizationHeader()
+	{
+		if (_hasRegistration)
+		{
+			return "Bearer " + _registration.auth_token;
+
+		}
+		else
+        {
+			return "";
+        }
+	}
 	
 	IEnumerator DoGET(string url, string contentType, System.Action<string> callBack)
 	{

@@ -113,9 +113,9 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
     private WebSocket initializeWebSocket()
     {
-        // This is just a placeholder. We may need to set authorization headers later on.
         var headers = new Dictionary<string, string>
         {
+            { "Authorization", EasyVizARServer.Instance.GetAuthorizationHeader() },
             { "X-Ignore", "ignore" }
         };
 
@@ -140,6 +140,9 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     private async void onConnected()
     {
         Debug.Log("WS Connected: " + _webSocketURL);
+
+        // Suppress event messages that were triggered by this user.
+        await _ws.SendText("suppress on");
 
         if (headsetManager)
         {
