@@ -11,8 +11,9 @@ public class HandMenu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        hand_menu.SetActive(false);
-        menu_enable = false;
+        hand_menu.SetActive(true);
+        //hand_menu.SetActive(false);
+        //menu_enable = false;
     }
 
     // Update is called once per frame

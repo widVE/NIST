@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using System;
 using UnityEngine.InputSystem;
+//using System.Diagnostics;
 //using Color = UnityEngine.Color;
 
 
@@ -97,6 +98,7 @@ public class FeatureManager : MonoBehaviour
     public Vector3 newPos;
 
     string location_id = "";
+
 
     // Attach QRScanner GameObject so we can listen for location change events.
     [SerializeField]
@@ -570,7 +572,7 @@ public class FeatureManager : MonoBehaviour
         pos.y = feature.position.y;
         pos.z = feature.position.z;
 
-
+        //cur_feature_name = feature.name;
         //This is where the world markers happen I think.
         GameObject world_marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
         world_marker.name = string.Format("feature-{0}", feature.id);
@@ -591,6 +593,10 @@ public class FeatureManager : MonoBehaviour
 
 
         //GameObject mapMarker = Instantiate(feature_to_spawn, mapParent.transform, false);
+
+        // Add the name of the feature to DistanceFeatureText.cs 
+        world_marker.transform.Find("type").GetChild(0).name = feature.name;
+        //UnityEngine.Debug.Log("the feature name is in feature manager: " + spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("type").GetChild(0).name);
 
 
         Color myColor;
@@ -623,6 +629,11 @@ public class FeatureManager : MonoBehaviour
         // its display settings such as the feature type may have changed.
         DeleteFeatureFromServer(feature.id);
         AddFeatureFromServer(feature);
+                // Add the name of the feature to DistanceFeatureText.cs 
+        //spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("Feature_Text").GetComponent<DistanceFeatureText>().feature_name = feature.name;
+       //UnityEngine.Debug.Log("the feature name is in feature manager: " + spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("Feature_Text").GetComponent<DistanceFeatureText>().feature_name);
+
+
         isChanged = true;
     }
 

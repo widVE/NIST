@@ -52,7 +52,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     {
         if (!featureManager)
         {
-            featureManager = GameObject.Find("HandMenu_Large_AutoWorldLock_On_HandDrop_Marker_Array");
+            featureManager = GameObject.Find("SummonMenu");
         }
         
         if (!headsetManager)

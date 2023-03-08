@@ -67,12 +67,17 @@ public class DistanceFeatureText : MonoBehaviour
 
         var feature_text = feature.transform.Find("Feature_Text").GetComponent<TextMeshPro>();
         var type = feature.transform.Find(string.Format("type"));
+
+        //string feature_type = feature.transform.Find("type").GetChild(0).name;
+        //if (type != null) { UnityEngine.Debug.Log("type is null"); }
         string feature_type = type.transform.GetChild(0).name;
+
         // for map icon 
         var feature_text_map = feature_map.transform.Find("Feature_Text").GetComponent<TextMeshPro>();
-
+        
         if (isFeet)
         {
+
             feature_text.text = feature_type + ": " + distance.ToString() + "ft";
             //Debug.Log("Distance before map icon: " + distance);
             feature_text_map.text = feature_text.text;
