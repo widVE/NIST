@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using System;
 using UnityEngine.InputSystem;
+//using System.Diagnostics;
 //using Color = UnityEngine.Color;
 
 
@@ -97,6 +98,7 @@ public class FeatureManager : MonoBehaviour
     public Vector3 newPos;
 
     string location_id = "";
+
 
     // Attach QRScanner GameObject so we can listen for location change events.
     [SerializeField]
@@ -330,7 +332,7 @@ public class FeatureManager : MonoBehaviour
     public void ListFeatures() 
     {
         EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
-        Debug.Log("ListFeatures Called");
+        //Debug.Log("ListFeatures Called");
     }
 
     public void ListFeaturesFromLocation(string locationID)
@@ -389,7 +391,7 @@ public class FeatureManager : MonoBehaviour
         
         if (this.feature_dictionary.ContainsKey(id))
         {
-            Debug.Log("in the if statement");
+            //Debug.Log("in the if statement");
             //creating new feature
             //EasyVizAR.Feature feature_to_patch = feature_gameobj_dictionary[id].GetComponent<MarkerObject>().feature;
             EasyVizAR.Feature feature_to_patch = feature_dictionary[id];
@@ -405,7 +407,7 @@ public class FeatureManager : MonoBehaviour
                 feature_to_patch.type = name;
             }
 
-            Debug.Log("feature name: " + feature_to_patch.name);
+            //Debug.Log("feature name: " + feature_to_patch.name);
             //eature_to_patch.name = "Updated name: ";
             // Main: updating the position
 
@@ -504,8 +506,9 @@ public class FeatureManager : MonoBehaviour
     {
         //GameObject feature_to_spawn = feature_type_dictionary[feature_type];
         // billboarding effect
-        Debug.Log(context);
-        Debug.Log("spawned using input phase: " + context.phase); 
+
+        //Debug.Log(context);
+        //Debug.Log("spawned using input phase: " + context.phase); 
         if (context.performed) // there are 3 phases started, performed, and canceled 
         {
             string feature_type = "biohazard"; // initialize to biohazard
@@ -569,7 +572,7 @@ public class FeatureManager : MonoBehaviour
         pos.y = feature.position.y;
         pos.z = feature.position.z;
 
-
+        //cur_feature_name = feature.name;
         //This is where the world markers happen I think.
         GameObject world_marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
         world_marker.name = string.Format("feature-{0}", feature.id);
@@ -590,6 +593,10 @@ public class FeatureManager : MonoBehaviour
 
 
         //GameObject mapMarker = Instantiate(feature_to_spawn, mapParent.transform, false);
+
+        // Add the name of the feature to DistanceFeatureText.cs 
+        world_marker.transform.Find("type").GetChild(0).name = feature.name;
+        //UnityEngine.Debug.Log("the feature name is in feature manager: " + spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("type").GetChild(0).name);
 
 
         Color myColor;
@@ -622,6 +629,11 @@ public class FeatureManager : MonoBehaviour
         // its display settings such as the feature type may have changed.
         DeleteFeatureFromServer(feature.id);
         AddFeatureFromServer(feature);
+                // Add the name of the feature to DistanceFeatureText.cs 
+        //spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("Feature_Text").GetComponent<DistanceFeatureText>().feature_name = feature.name;
+       //UnityEngine.Debug.Log("the feature name is in feature manager: " + spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("Feature_Text").GetComponent<DistanceFeatureText>().feature_name);
+
+
         isChanged = true;
     }
 

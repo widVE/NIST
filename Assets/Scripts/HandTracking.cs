@@ -66,7 +66,7 @@ public class HandTracking : MonoBehaviour
 
     public void PalmAwayRightAlways()
     {
-        Debug.Log("Hand see");
+        //Debug.Log("Hand see");
         right_wrist_label.GetComponent<Renderer>().enabled = true;
     }
 

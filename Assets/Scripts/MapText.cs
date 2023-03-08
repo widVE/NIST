@@ -39,7 +39,7 @@ public class MapText : MonoBehaviour
 
 
         //StartCoroutine(GetMapName("http://easyvizar.wings.cs.wisc.edu:5000/locations/66a4e9f2-e978-4405-988e-e168a9429030/"));
-        Debug.Log("manager ID: " + manager.LocationID);
+        //Debug.Log("manager ID: " + manager.LocationID);
         StartCoroutine(GetLocationInfo(baseURL + "/locations/" + manager.LocationID));
 
 

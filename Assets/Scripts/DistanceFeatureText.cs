@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using TMPro;
+using System.Collections.Specialized;
 
 public class DistanceFeatureText : MonoBehaviour
 {
@@ -16,7 +17,6 @@ public class DistanceFeatureText : MonoBehaviour
 
     public Vector3 oldPos;
     public Vector3 newPos;
-
 
     // Start is called before the first frame update
     void Start()
@@ -41,6 +41,18 @@ public class DistanceFeatureText : MonoBehaviour
     {
         cam_pos = cam.GetComponent<Transform>().position;
         quad = feature.transform.Find("Quad").gameObject;
+        // The ocmmented part is not doing what it's supposed to, but it should be working, but the original code below (uncommented portion) does work
+        /*
+        Vector3 feature_pos = quad.transform.position;
+
+        float distance = Vector3.Distance(cam_pos, feature_pos);
+        distance = Mathf.Round(distance * 10f) / 10f; // round to one decimal place
+
+        if (isFeet)
+        {
+            distance *= 3.281f; // convert to feet
+        }
+        */
 
         float x_distance = (float)Math.Pow(quad.transform.position.x - cam_pos.x, 2);
         float z_distance = (float)Math.Pow(quad.gameObject.transform.position.z - cam_pos.z, 2);
@@ -52,20 +64,24 @@ public class DistanceFeatureText : MonoBehaviour
         }
         float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
         
+
         var feature_text = feature.transform.Find("Feature_Text").GetComponent<TextMeshPro>();
         var type = feature.transform.Find(string.Format("type"));
+
+        //string feature_type = feature.transform.Find("type").GetChild(0).name;
+        //if (type != null) { UnityEngine.Debug.Log("type is null"); }
         string feature_type = type.transform.GetChild(0).name;
+
         // for map icon 
         var feature_text_map = feature_map.transform.Find("Feature_Text").GetComponent<TextMeshPro>();
-
+        
         if (isFeet)
         {
-            feature_text.text = feature_type + ": " + distance.ToString() + "ft";
-            Debug.Log("Distance before map icon: " + distance);
-            //feature_text_map.text = distance.ToString() + "ft";
-            feature_text_map.text = feature_text.text;
 
-            Debug.Log("Distance for icon: " + distance);
+            feature_text.text = feature_type + ": " + distance.ToString() + "ft";
+            //Debug.Log("Distance before map icon: " + distance);
+            feature_text_map.text = feature_text.text;
+            //Debug.Log("Distance for icon: " + distance);
 
             
             //feature_text_map.text = distance.ToString() + "ft";

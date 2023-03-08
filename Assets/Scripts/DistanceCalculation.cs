@@ -75,22 +75,60 @@ public class DistanceCalculation : MonoBehaviour
 		// displaying headset on map here 
 		if (mapParent != null)
         {
+			GameObject mapMarker = null;
 
-			if (mapParent.transform.Find(cur_prefab.name))
+			//If we don't have our headset on the map, we instantiate it, otherwise we get a reference to it
+			if (!mapParent.transform.Find(cur_prefab.name))
             {
-				Destroy(mapParent.transform.Find(cur_prefab.name).gameObject);
+				mapMarker = Instantiate(headset_icon, mapParent.transform, false);
 			}
-			GameObject mapMarker = Instantiate(headset_icon, mapParent.transform, false);
-			mapMarker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
-			mapMarker.name = cur_prefab.name;
-			mapMarker.transform.Find("Feature_Text").GetComponent<TextMeshPro>().text = distance.ToString() + "ft";
-			//cur_prefab.GetComponent<EasyVizARHeadset>()
-			//GetHeadsets();
-			Color myColor = cur_prefab.GetComponent<EasyVizARHeadset>()._color;
-			mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+			else
+            {
+				mapMarker = mapParent.transform.Find(cur_prefab.name).gameObject;
+			}
+
+			//If our map marker is found, we manipulate it's position
+			if (mapMarker != null)
+			{
+				mapMarker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
+				mapMarker.name = cur_prefab.name;
+				mapMarker.transform.Find("Feature_Text").GetComponent<TextMeshPro>().text = distance.ToString() + "ft";
+				//cur_prefab.GetComponent<EasyVizARHeadset>()
+				//GetHeadsets();
+				Color myColor = cur_prefab.GetComponent<EasyVizARHeadset>()._color;
+				mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+			}
+			else
+			{
+				Debug.LogWarning("Missing headset Map Marker");
+
+			}
 		}
 		
 	}
+	
+	
+	//old logic for posterity & refernce
+		//	// displaying headset on map here 
+		//if (mapParent != null)
+  //      {
+
+		//	if (mapParent.transform.Find(cur_prefab.name))
+  //          {
+		//		Destroy(mapParent.transform.Find(cur_prefab.name).gameObject);
+		//	}
+		//	GameObject mapMarker = Instantiate(headset_icon, mapParent.transform, false);
+		//	mapMarker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
+		//	mapMarker.name = cur_prefab.name;
+		//	mapMarker.transform.Find("Feature_Text").GetComponent<TextMeshPro>().text = distance.ToString() + "ft";
+		//	//cur_prefab.GetComponent<EasyVizARHeadset>()
+		//	//GetHeadsets();
+		//	Color myColor = cur_prefab.GetComponent<EasyVizARHeadset>()._color;
+		//	mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+		//}
+
+
+
 	
 
 	IEnumerator HeadsetDistanceCalculate()
