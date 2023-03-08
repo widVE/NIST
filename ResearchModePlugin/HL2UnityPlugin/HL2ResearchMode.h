@@ -34,6 +34,20 @@ namespace winrt::HL2UnityPlugin::implementation
 		hstring PrintRFResolution();
 		hstring PrintRFExtrinsics();*/
 
+        hstring GetTransformName() { return _lastTransformName;  }
+        hstring GetBinaryDepthName() { return _lastBinaryDepthName; }
+        hstring GetRectColorName() { return _lastRectColorName; }
+        hstring GetHiColorName() { return _lastHiColorName; }
+        hstring GetDepthImageName() { return _lastDepthImageName; }
+        hstring GetPointCloudName() { return _lastPointCloudName; }
+
+        hstring _lastTransformName;
+        hstring _lastBinaryDepthName;
+        hstring _lastRectColorName;
+        hstring _lastHiColorName;
+        hstring _lastDepthImageName;
+        hstring _lastPointCloudName;
+
         void InitializeDepthSensor();
         void InitializeLongDepthSensor();
         void InitializeSpatialCamerasFront();

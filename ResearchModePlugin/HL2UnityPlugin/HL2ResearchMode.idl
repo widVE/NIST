@@ -31,6 +31,14 @@ namespace HL2UnityPlugin
 
         Int32 GetDepthBufferSize();
         Int32 GetLongDepthBufferSize();
+
+        String GetTransformName();
+        String GetBinaryDepthName();
+        String GetRectColorName();
+        String GetHiColorName();
+        String GetDepthImageName();
+        String GetPointCloudName();
+
         /*String PrintDepthResolution();
         String PrintDepthExtrinsics();
 		String PrintLFResolution();

@@ -280,6 +280,7 @@ namespace winrt::HL2UnityPlugin::implementation
         winrt::Windows::Storage::StorageFolder storageFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
         winrt::Windows::Storage::StorageFile saveTest = co_await storageFolder.CreateFileAsync(hstring(sName), winrt::Windows::Storage::CreationCollisionOption::ReplaceExisting);
 
+        
         winrt::Windows::Storage::Streams::IRandomAccessStream outputStream = co_await saveTest.OpenAsync(winrt::Windows::Storage::FileAccessMode::ReadWrite);
         
         winrt::Windows::Graphics::Imaging::BitmapEncoder be = co_await winrt::Windows::Graphics::Imaging::BitmapEncoder::CreateAsync(winrt::Windows::Graphics::Imaging::BitmapEncoder::PngEncoderId(), outputStream);
@@ -667,6 +668,8 @@ namespace winrt::HL2UnityPlugin::implementation
                 file << pHL2ResearchMode->m_depthToWorld[12] << " " << pHL2ResearchMode->m_depthToWorld[13] << " " << pHL2ResearchMode->m_depthToWorld[14] << " " << pHL2ResearchMode->m_depthToWorld[15] << std::endl;
 
                 file.close();
+
+                pHL2ResearchMode->_lastTransformName = hstring(pcName);
             }
 
             FILE* fLocalDepth = 0;
@@ -674,6 +677,8 @@ namespace winrt::HL2UnityPlugin::implementation
             {
                 std::wstring localName = fullName + +L"\\" + m_datetime + L"_" + m_ms + L"_ld.bytes";
                 _wfopen_s(&fLocalDepth, localName.c_str(), L"wb");
+
+                pHL2ResearchMode->_lastBinaryDepthName = hstring(localName);
             }
 
             for (UINT i = 0; i < resolution.Height; i++)
@@ -906,6 +911,10 @@ namespace winrt::HL2UnityPlugin::implementation
                     //swprintf(fDate, 64, L"%ld", ts);
                     swprintf(fName, 128, L"%s_%s_hicolor.png", m_datetime.c_str(), m_ms);
                     //std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_hicolor.png";
+                    winrt::Windows::Storage::StorageFolder storageFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
+                    pHL2ResearchMode->_lastHiColorName = storageFolder.Path();
+                    pHL2ResearchMode->_lastHiColorName = pHL2ResearchMode->_lastHiColorName + hstring(L"\\") + hstring(fName);
+
                     CreateLocalFile(fName, softwareBitmap);
                     if (!pHL2ResearchMode->IsCapturingRectColor())
                     {
@@ -994,6 +1003,7 @@ namespace winrt::HL2UnityPlugin::implementation
                 {
                     std::wstring pcName = fullName + +L"\\" + m_datetime + L"_" + m_ms + L"_pc.txt";
                     file.open(pcName);
+                    pHL2ResearchMode->_lastPointCloudName = hstring(pcName);
                 }
                 
                 {
@@ -1114,6 +1124,10 @@ namespace winrt::HL2UnityPlugin::implementation
                         //swprintf(fDate, 64, L"%ld", ts);
                         swprintf(fName, 128, L"%s_%s_color.png", m_datetime.c_str(), m_ms);
                         //std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_color.png";
+                        winrt::Windows::Storage::StorageFolder storageFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
+                        pHL2ResearchMode->_lastRectColorName = storageFolder.Path();
+                        pHL2ResearchMode->_lastRectColorName = pHL2ResearchMode->_lastRectColorName + hstring(L"\\") + hstring(fName);
+
                         CreateLocalFile(fName, rectColor);
                         pHL2ResearchMode->_frameCount++;
                     }
@@ -1185,6 +1199,10 @@ namespace winrt::HL2UnityPlugin::implementation
                     swprintf(fName, 128, L"%s_%s_depth.png", m_datetime.c_str(), m_ms);// depthTimestampString);
                     depthImage = winrt::Windows::Graphics::Imaging::SoftwareBitmap::Convert(depthImage, winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Rgba8);
                     //std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_color.png";
+                    winrt::Windows::Storage::StorageFolder storageFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
+                    pHL2ResearchMode->_lastDepthImageName = storageFolder.Path();
+                    pHL2ResearchMode->_lastDepthImageName = pHL2ResearchMode->_lastDepthImageName + hstring(L"\\") + hstring(fName);
+
                     CreateLocalFile(fName, depthImage);
                     //pHL2ResearchMode->_frameCount++;
                 }
