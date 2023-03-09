@@ -19870,7 +19870,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _webSocketURL: ws://easyvizar.wings.cs.wisc.edu:5000/ws
   _locationId: 69e92dff-7138-4091-89c4-ed073035bfe6
-  featureManager: {fileID: 3439373403337540982}
+  featureManager: {fileID: 935252631}
   headsetManager: {fileID: 1361342022}
   map_parent: {fileID: 335883421}
   _qrScanner: {fileID: 291935030}
@@ -45453,17 +45453,12 @@ Transform:
   m_Father: {fileID: 5060590940027585985}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &3439373403337540982 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3892548743586717580, guid: 905f5ec265c7ec6419a3a994f767ec61, type: 3}
-  m_PrefabInstance: {fileID: 1854928438150650618}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &3439373403337540986 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3295442938852557676, guid: 905f5ec265c7ec6419a3a994f767ec61, type: 3}
   m_PrefabInstance: {fileID: 1854928438150650618}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3439373403337540982}
+  m_GameObject: {fileID: 0}
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 049c882cddb65644db05fd32c5d4e50e, type: 3}
@@ -45474,7 +45469,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3892548743586717581, guid: 905f5ec265c7ec6419a3a994f767ec61, type: 3}
   m_PrefabInstance: {fileID: 1854928438150650618}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3439373403337540982}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 956af6ee031a2eb47b9c0ab5dcd50fd7, type: 3}
@@ -45490,7 +45485,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9210921789052660644, guid: 905f5ec265c7ec6419a3a994f767ec61, type: 3}
   m_PrefabInstance: {fileID: 1854928438150650618}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3439373403337540982}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b55691ad5b034fe6966763a6e23818d2, type: 3}
