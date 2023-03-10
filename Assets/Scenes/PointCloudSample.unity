@@ -1919,6 +1919,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _qrScanner: {fileID: 291935032}
+  _manager: {fileID: 561901448}
   _startOnQRDetection: 1
   _captureColorPointCloud: 1
   _captureHiResColorImages: 0

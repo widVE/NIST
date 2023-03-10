@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿#define ENABLE_WINMD_SUPPORT
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -29,6 +30,9 @@ public class HololensDepthPVCapture : MonoBehaviour
 	QRScanner _qrScanner;
 	
 	[SerializeField]
+	EasyVizARHeadsetManager _manager;
+	
+	[SerializeField]
 	bool _startOnQRDetection = true;
 	
 	//[SerializeField]
@@ -55,9 +59,10 @@ public class HololensDepthPVCapture : MonoBehaviour
 	[SerializeField]
 	bool _captureVideo = false;
 	
-	//Texture2D colorTexture = null;
-
-	//Texture2D colorTextureRect = null;
+	string _lastDepthBinaryName = "";
+	string _lastRectColorName = "";
+	string _lastTransformName = "";
+	
 	static readonly float MaxRecordingTime = 5.0f;
 	VideoCapture m_VideoCapture = null;
     float m_stopRecordingTimer = float.MaxValue;
@@ -202,14 +207,76 @@ public class HololensDepthPVCapture : MonoBehaviour
 		
 		StopSensorsEvent();
 	}
-
+	
+	public void TextureUploaded(string imageURL)
+	{
+		Debug.Log("Texture uploaded to: " + imageURL);
+	}
+	
     void LateUpdate()
     {
 		
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
 #else
-
+		bool isNewDepth = false;
+		if(_lastDepthBinaryName.Length == 0)
+		{
+			_lastDepthBinaryName = researchMode.GetBinaryDepthName();
+			isNewDepth = true;
+		}
+		else
+		{
+			string s = researchMode.GetBinaryDepthName();
+			if(s != _lastDepthBinaryName)
+			{
+				isNewDepth = true;
+			}
+		}
+		
+		if(isNewDepth)
+		{
+			if(_manager != null)
+			{
+				//Debug.Log(_lastDepthBinaryName);
+				//EasyVizARServer.Instance.PutImage(
+			}
+		}
+		
+		bool isNewColor = false;
+		if(_lastRectColorName.Length == 0)
+		{
+			_lastRectColorName = researchMode.GetRectColorName();
+			isNewColor = true;
+		}
+		else
+		{
+			string s = researchMode.GetRectColorName();
+			if(s != _lastRectColorName)
+			{
+				isNewColor = true;
+			}
+		}
+		
+		if(isNewColor)
+		{
+			if(_manager != null)
+			{
+				var headset = _manager.LocalHeadset;
+				if (headset != null)
+				{
+					var hsObject = headset.GetComponent<EasyVizARHeadset>();
+					if (hsObject != null)
+					{
+						//this is working, but floods the server at the moment...
+						//EasyVizARServer.Instance.PutImage("image/png", _lastRectColorName, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, hsObject.transform.position, hsObject.transform.rotation, hsObject._headsetID);
+					}
+				}
+				
+				//Debug.Log(_lastRectColorName);
+				
+			}
+		}
 		 // update long depth map texture
 
          /****float currTime = Time.time;
