@@ -231,6 +231,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 			if(s != _lastDepthBinaryName)
 			{
 				isNewDepth = true;
+				_lastDepthBinaryName = s;
 			}
 		}
 		
@@ -239,42 +240,49 @@ public class HololensDepthPVCapture : MonoBehaviour
 			if(_manager != null)
 			{
 				//Debug.Log(_lastDepthBinaryName);
-				//EasyVizARServer.Instance.PutImage(
+				//EasyVizARServer.Instance.PutImage("image/png", _lastRectColorName, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, hsObject.transform.position, hsObject.transform.rotation, hsObject._headsetID);
+					//}
 			}
 		}
 		
-		bool isNewColor = false;
-		if(_lastRectColorName.Length == 0)
+		string sColor = researchMode.GetRectColorName();
+		if(sColor.Length > 0)
 		{
-			_lastRectColorName = researchMode.GetRectColorName();
-			isNewColor = true;
-		}
-		else
-		{
-			string s = researchMode.GetRectColorName();
-			if(s != _lastRectColorName)
+			bool isNewColor = false;
+			if(_lastRectColorName.Length == 0)
 			{
+				_lastRectColorName = sColor;
 				isNewColor = true;
 			}
-		}
-		
-		if(isNewColor)
-		{
-			if(_manager != null)
+			else
 			{
-				var headset = _manager.LocalHeadset;
-				if (headset != null)
+				if(sColor != _lastRectColorName)
 				{
-					var hsObject = headset.GetComponent<EasyVizARHeadset>();
-					if (hsObject != null)
-					{
-						//this is working, but floods the server at the moment...
-						//EasyVizARServer.Instance.PutImage("image/png", _lastRectColorName, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, hsObject.transform.position, hsObject.transform.rotation, hsObject._headsetID);
-					}
+					isNewColor = true;		
 				}
-				
-				//Debug.Log(_lastRectColorName);
-				
+			}
+			
+			if(isNewColor)
+			{
+				if(_manager != null)
+				{
+					var headset = _manager.LocalHeadset;
+					if (headset != null)
+					{
+						var hsObject = headset.GetComponent<EasyVizARHeadset>();
+						if (hsObject != null)
+						{
+							//this is working, but floods the server at the moment...
+							if(EasyVizARServer.Instance.PutImage("image/png", sColor, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, hsObject.transform.position, hsObject.transform.rotation, hsObject._headsetID))
+							{
+								_lastRectColorName = sColor;
+							}
+						}
+					}
+					
+					//Debug.Log(_lastRectColorName);
+					
+				}
 			}
 		}
 		 // update long depth map texture

@@ -213,7 +213,9 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	public const string JSON_TYPE = "application/json";
 	public const string JPEG_TYPE = "image/jpeg";
 	public const string PNG_TYPE = "image/png";
-
+	
+	bool _isUploadingImage = false;
+	
 	void Start()
     {
 		_hasRegistration = TryLoadRegistration(out _registration);
@@ -278,11 +280,17 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		
 	}
 	
-	public void PutImage(string contentType, string pathToFile, string locationID, int width, int height, System.Action<string> callBack, 
+	public bool PutImage(string contentType, string pathToFile, string locationID, int width, int height, System.Action<string> callBack, 
 				Vector3 position, Quaternion orientation, string headsetID = "")
 	{
+		if(!_isUploadingImage)
+		{
+			_isUploadingImage = true;
+			StartCoroutine(UploadImage(contentType, pathToFile, locationID, width, height, callBack, position, orientation, headsetID));
+			return true;
+		}
 		
-		StartCoroutine(UploadImage(contentType, pathToFile, locationID, width, height, callBack, position, orientation, headsetID));
+		return false;
 	}
 	
 	IEnumerator DoGET(string url, string contentType, System.Action<string> callBack)
@@ -505,21 +513,26 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 
 		if (www.result != UnityWebRequest.Result.Success)
 		{
-			Debug.Log(www.error);
+			//Debug.Log(www.error);
+			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOutErr1.txt"), www.error);
 		}
 		else
 		{
-			Debug.Log("Form upload complete!");
+			//Debug.Log("Form upload complete!");
+			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOut1.txt"), "successfully posted photo");
 		}
 
 		string resultText = www.downloadHandler.text;
-
-		Debug.Log(resultText);
+		
+		System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "path.txt"), path);
+		
+		System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "result.txt"), resultText);
+		//Debug.Log(resultText);
 
 		EasyVizAR.Hololens2PhotoPut h2 = JsonUtility.FromJson<EasyVizAR.Hololens2PhotoPut>(resultText);
 		//h2.imagePath = h2Location;
 
-		string photoJson = JsonUtility.ToJson(h2);
+		//string photoJson = JsonUtility.ToJson(h2);
 		//Debug.Log(photoJson);
 		//Debug.Log(h2.imageUrl);
 
@@ -536,16 +549,18 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		if (www2.result != UnityWebRequest.Result.Success)
 		{
 			//Debug.Log(www2.error);
-			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOutErr.txt"), www2.error);
+			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOutErr2.txt"), www2.error);
 		}
 		else
 		{
 			//Debug.Log("Photo upload complete!");
-			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOut.txt"), "successfully sent photo");
+			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOut2.txt"), "successfully sent photo");
 		}
 
 		www.Dispose();
 		www2.Dispose();
+		
+		_isUploadingImage = false;
 	}
 
 	// Try to load a previous registration (headset ID, auth token) from file.
