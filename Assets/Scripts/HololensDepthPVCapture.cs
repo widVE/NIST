@@ -272,8 +272,26 @@ public class HololensDepthPVCapture : MonoBehaviour
 						var hsObject = headset.GetComponent<EasyVizARHeadset>();
 						if (hsObject != null)
 						{
-							//this is working, but floods the server at the moment...
-							if(EasyVizARServer.Instance.PutImage("image/png", sColor, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, hsObject.transform.position, hsObject.transform.rotation, hsObject._headsetID))
+							Matrix4x4 depthTrans = Matrix4x4.identity;
+							string sTransform = researchMode.GetTransformName();
+							//load the transform... decompose to the position and rotation...
+							string[] transLines = File.ReadAllLines(sTransform);
+							Vector3 pos = Vector3.zero;
+							Quaternion rot = Quaternion.identity;
+							
+							for(int i = 0; i < 4; ++i)
+							{
+								string[] vals = transLines[i].Split(" ");
+								for(int j = 0; j < 4; ++j)
+								{
+									depthTrans[i][j] = float.Parse(vals[j]);
+								}
+							}
+							
+							pos = depthTrans.position;
+							rot = depthTrans.rotation;
+							
+							if(EasyVizARServer.Instance.PutImage("image/png", sColor, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID))
 							{
 								_lastRectColorName = sColor;
 							}
@@ -285,6 +303,51 @@ public class HololensDepthPVCapture : MonoBehaviour
 				}
 			}
 		}
+		
+		/*string sTransform = researchMode.GetTransformName();
+		if(sTransform.Length > 0)
+		{
+			bool isNewTransform = false;
+			if(_lastTransformName.Length == 0)
+			{
+				_lastTransformName = sTransform;
+				isNewTransform = true;
+			}
+			else
+			{
+				if(sTransform != _lastTransformName)
+				{
+					isNewTransform = true;		
+				}
+			}
+			
+			if(isNewTransform)
+			{
+				if(_manager != null)
+				{
+					var headset = _manager.LocalHeadset;
+					if (headset != null)
+					{
+						var hsObject = headset.GetComponent<EasyVizARHeadset>();
+						if (hsObject != null)
+						{
+							//this is working, but floods the server at the moment...
+							//if(EasyVizARServer.Instance.PutImage("image/png", sColor, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, hsObject.transform.position, hsObject.transform.rotation, hsObject._headsetID))
+							{
+								_lastTransformName = sTransform;
+								//read this file and patch the photo with this transform?
+								
+								//
+							}
+						}
+					}
+					
+					//Debug.Log(_lastTransformName);
+					
+				}
+			}	
+		}*/
+		
 		 // update long depth map texture
 
          /****float currTime = Time.time;
