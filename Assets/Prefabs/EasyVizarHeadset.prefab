@@ -51,13 +51,14 @@ MonoBehaviour:
   _updateFrequency: 3
   _headsetName: ross_test
   _isLocal: 0
-  _showPositionChanges: 1
+  _showPositionChanges: 0
   _realTimeChanges: 0
   _postPositionChanges: 1
   _headsetID: 
   _color: {r: 1, g: 0, b: 0, a: 1}
   _locationID: 
   map_parent: {fileID: 0}
+  headset_parent: {fileID: 0}
 --- !u!114 &5003610570359901067
 MonoBehaviour:
   m_ObjectHideFlags: 0
