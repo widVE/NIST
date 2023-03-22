@@ -63,5 +63,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: Template Marker Variant - danger
       objectReference: {fileID: 0}
+    - target: {fileID: 7132239816822482889, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: feature_map
+      value: 
+      objectReference: {fileID: 4815252816942109241, guid: 1852a5944cf310340baa2cdc649aa6c9, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
