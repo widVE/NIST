@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 using NativeWebSocket;
@@ -44,8 +45,14 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     [SerializeField]
     GameObject _qrScanner = null;
 
+    [SerializeField]
+    float _updateInterval = 0.2f;
+
     private WebSocket _ws = null;
     private bool isConnected = false;
+    
+    private Camera _mainCamera;
+    private float _lastUpdated = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -59,6 +66,8 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
         {
             headsetManager = GameObject.Find("EasyVizARHeadsetManager");
         }
+
+        _mainCamera = Camera.main;
 
 #if UNITY_EDITOR
         // In editor mode, use the default server and location ID.
@@ -92,7 +101,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    async void Update()
     {
 #if !UNITY_WEBGL || UNITY_EDITOR
         if (_ws is not null)
@@ -100,6 +109,22 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
             _ws.DispatchMessageQueue();
         }
 #endif
+
+        if (isConnected)
+        {
+            float t = UnityEngine.Time.time;
+            if (t - _lastUpdated > _updateInterval)
+            {
+                var pos = _mainCamera.transform.position;
+                var rot = _mainCamera.transform.rotation;
+
+                object[] parts = { "move", pos[0], pos[1], pos[2], rot[0], rot[1], rot[2], rot[3] };
+                string message = string.Join(" ", parts);
+
+                Task.Run(() => _ws.SendText(message));
+                _lastUpdated = t;
+            }
+        }
     }
 
     private async void OnApplicationQuit()
