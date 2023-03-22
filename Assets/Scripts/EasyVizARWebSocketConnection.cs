@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using NativeWebSocket;
+using System.Diagnostics;
 
 [System.Serializable]
 public class FeaturesEvent
@@ -204,6 +205,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
                 }
             case "features:updated":
                 {
+                    Debug.Log("updated initiated");// TODO: this line is not being called when changing feature name from server...
                     FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(event_body);
                     featureManager.GetComponent<FeatureManager>().UpdateFeatureFromServer(ev.current);
                     break;
