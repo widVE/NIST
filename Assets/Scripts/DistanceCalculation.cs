@@ -99,7 +99,7 @@ public class DistanceCalculation : MonoBehaviour
 				Color myColor = cur_prefab.GetComponent<EasyVizARHeadset>()._color;
 				mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
 				//TODO: add the rotation/quaterinion here
-				//mapMarker.transform.rotation = Quaternion.Euler(0, 0, capsule.transform.position.z); 
+				mapMarker.transform.rotation = Quaternion.Euler(0, 0, capsule.transform.position.z); 
 			}
 			else
 			{
