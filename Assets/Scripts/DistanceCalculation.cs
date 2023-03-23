@@ -98,8 +98,8 @@ public class DistanceCalculation : MonoBehaviour
 				//GetHeadsets();
 				Color myColor = cur_prefab.GetComponent<EasyVizARHeadset>()._color;
 				mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
-				//TODO: add the rotation/quaterinion here
-				mapMarker.transform.rotation = Quaternion.Euler(0, 0, capsule.transform.position.z); 
+				//TODO: add the rotation/quaterinion here --> z axis is where we would like to apply the rotation to, but I'm still figuring out how to determine the orientation
+				//mapMarker.transform.rotation = Quaternion.Euler(0, 0, capsule.transform.position.z); 
 			}
 			else
 			{
