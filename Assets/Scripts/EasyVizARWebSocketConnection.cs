@@ -170,17 +170,20 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
         // Suppress event messages that were triggered by this user.
         await _ws.SendText("suppress on");
 
+        // Tell the server to filter events pertaining to the current location.
+        var event_uri = $"/locations/{_locationId}/*";
+
         if (headsetManager)
         {
-            await _ws.SendText("subscribe headsets:created");
-            await _ws.SendText("subscribe headsets:updated");
-            await _ws.SendText("subscribe headsets:deleted");
+            await _ws.SendText("subscribe location-headsets:created " + event_uri);
+            await _ws.SendText("subscribe location-headsets:updated " + event_uri);
+            await _ws.SendText("subscribe location-headsets:deleted " + event_uri);
         }
 
         if (featureManager) {
-            await _ws.SendText(string.Format("subscribe features:created /locations/{0}/*", _locationId));
-            await _ws.SendText(string.Format("subscribe features:updated /locations/{0}/*", _locationId));
-            await _ws.SendText(string.Format("subscribe features:deleted /locations/{0}/*", _locationId));
+            await _ws.SendText("subscribe features:created " + event_uri);
+            await _ws.SendText("subscribe features:updated " + event_uri);
+            await _ws.SendText("subscribe features:deleted " + event_uri);
         }
 
         isConnected = true;
@@ -206,19 +209,19 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
         switch (event_type)
         {
-            case "headsets:created":
+            case "location-headsets:created":
                 {
                     HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
                     headsetManager.GetComponent<EasyVizARHeadsetManager>().CreateRemoteHeadset(ev.current);
                     break;
                 }
-            case "headsets:updated":
+            case "location-headsets:updated":
                 {
                     HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
                     headsetManager.GetComponent<EasyVizARHeadsetManager>().UpdateRemoteHeadset(ev.previous.id, ev.current);
                     break;
                 }
-            case "headsets:deleted":
+            case "location-headsets:deleted":
                 {
                     HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
                     headsetManager.GetComponent<EasyVizARHeadsetManager>().DeleteRemoteHeadset(ev.previous.id);
