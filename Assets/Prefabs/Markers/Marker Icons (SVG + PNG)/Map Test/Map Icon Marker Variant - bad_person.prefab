@@ -10,7 +10,7 @@ PrefabInstance:
     - target: {fileID: 759943075284539836, guid: 40f9c67d83a7bfb48b466cbac06b2f4f, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 9dc3c8cb59a091e4493fb89b4a5bf48b, type: 2}
+      objectReference: {fileID: 2100000, guid: c98fd66e30bf24c4aaa152bb1d9b508d, type: 2}
     - target: {fileID: 3961399598258537733, guid: 40f9c67d83a7bfb48b466cbac06b2f4f, type: 3}
       propertyPath: m_Name
       value: Bad Person

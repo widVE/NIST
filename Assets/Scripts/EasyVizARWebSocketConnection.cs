@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 using NativeWebSocket;
+using System.Diagnostics;
 
 [System.Serializable]
 public class FeaturesEvent
@@ -153,7 +154,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
         ws.OnError += (error) =>
         {
-            Debug.Log("WS Error: " + error);
+            UnityEngine.Debug.Log("WS Error: " + error);
         };
 
         ws.OnOpen += this.onConnected;
@@ -164,7 +165,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
     private async void onConnected()
     {
-        Debug.Log("WS Connected: " + _webSocketURL);
+        UnityEngine.Debug.Log("WS Connected: " + _webSocketURL);
 
         // Suppress event messages that were triggered by this user.
         await _ws.SendText("suppress on");
@@ -195,7 +196,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
         var parts = message.Split(" ", 3);
         if (parts.Length < 3)
         {
-            Debug.Log("Warning: received malformed websocket message from server");
+            UnityEngine.Debug.Log("Warning: received malformed websocket message from server");
             return;
         }
 
@@ -232,6 +233,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
                 }
             case "features:updated":
                 {
+                    UnityEngine.Debug.Log("updated initiated");// TODO: this line is not being called when changing feature name from server...
                     FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(event_body);
                     featureManager.GetComponent<FeatureManager>().UpdateFeatureFromServer(ev.current);
                     break;
@@ -244,7 +246,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
                 }
             default:
                 {
-                    Debug.Log("Event: " + event_type + " " + event_uri);
+                    UnityEngine.Debug.Log("Event: " + event_type + " " + event_uri);
                     break;
                 }
         }

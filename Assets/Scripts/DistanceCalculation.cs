@@ -80,9 +80,10 @@ public class DistanceCalculation : MonoBehaviour
 			//If we don't have our headset on the map, we instantiate it, otherwise we get a reference to it
 			if (!mapParent.transform.Find(cur_prefab.name))
             {
-				mapMarker = Instantiate(headset_icon, mapParent.transform, false);
-			}
-			else
+                mapMarker = Instantiate(headset_icon, mapParent.transform, false); // This is where we instantiate the headset icon on the map --> need to change the reference of the headset_icon.
+
+            }
+            else
             {
 				mapMarker = mapParent.transform.Find(cur_prefab.name).gameObject;
 			}
@@ -97,6 +98,8 @@ public class DistanceCalculation : MonoBehaviour
 				//GetHeadsets();
 				Color myColor = cur_prefab.GetComponent<EasyVizARHeadset>()._color;
 				mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+				//TODO: add the rotation/quaterinion here --> z axis is where we would like to apply the rotation to, but I'm still figuring out how to determine the orientation
+				//mapMarker.transform.rotation = Quaternion.Euler(0, 0, capsule.transform.position.z); 
 			}
 			else
 			{

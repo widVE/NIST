@@ -6589,7 +6589,7 @@ MonoBehaviour:
   iconSprite: {fileID: 21300000, guid: 20f25674b9512834f88938d45ed495d7, type: 3}
   iconQuadRenderer: {fileID: 857413450}
   iconQuadTextureNameID: _MainTex
-  iconQuadTexture: {fileID: 2800000, guid: bb1b4a9241fba2042a81428e917afd5d, type: 3}
+  iconQuadTexture: {fileID: 2800000, guid: 49a59150fd8a7c1438828c262032e023, type: 3}
   defaultButtonQuadMaterial: {fileID: 2100000, guid: fa419ab56051229449e3b813df8f295f, type: 2}
   iconSet: {fileID: 11400000, guid: 8b386ef895f7c924f8c4b03d1d3ed683, type: 2}
   defaultIconSet: {fileID: 11400000, guid: 8b386ef895f7c924f8c4b03d1d3ed683, type: 2}
@@ -6948,16 +6948,17 @@ MonoBehaviour:
   TouchBegin:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 3439373403337540986}
-        m_TargetAssemblyTypeName: SpawnListIndex, Assembly-CSharp
-        m_MethodName: spawnObjectAtIndex
-        m_Mode: 5
+      - m_Target: {fileID: 276145575}
+        m_TargetAssemblyTypeName: Microsoft.MixedReality.Toolkit.PhysicalPressEventRouter,
+          Microsoft.MixedReality.Toolkit.SDK
+        m_MethodName: OnHandPressTouched
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Marker
+          m_StringArgument: audio
           m_BoolArgument: 0
         m_CallState: 2
   TouchEnd:
@@ -7246,7 +7247,7 @@ MonoBehaviour:
   _qrPrefabParent: {fileID: 46054712}
   _headsetManager: {fileID: 1361342022}
   followMovingQRCode: 1
-  testQRCodeData: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/69e92dff-7138-4091-89c4-ed073035bfe6
+  testQRCodeData: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/1cc48e8d-890d-413a-aa66-cabaaa6e5458
   triggerQRCodeDetected: 0
 --- !u!82 &291935033
 AudioSource:
@@ -11565,7 +11566,7 @@ MonoBehaviour:
   iconSprite: {fileID: 21300000, guid: 20f25674b9512834f88938d45ed495d7, type: 3}
   iconQuadRenderer: {fileID: 1442620597}
   iconQuadTextureNameID: _MainTex
-  iconQuadTexture: {fileID: 2800000, guid: 114589bc5b891c3488cbb8607b6b9171, type: 3}
+  iconQuadTexture: {fileID: 2800000, guid: 8d0274d8bc6a17844a08b493920d9491, type: 3}
   defaultButtonQuadMaterial: {fileID: 2100000, guid: fa419ab56051229449e3b813df8f295f, type: 2}
   iconSet: {fileID: 11400000, guid: 8b386ef895f7c924f8c4b03d1d3ed683, type: 2}
   defaultIconSet: {fileID: 11400000, guid: 8b386ef895f7c924f8c4b03d1d3ed683, type: 2}
@@ -15034,7 +15035,7 @@ MonoBehaviour:
   iconSprite: {fileID: 21300000, guid: 20f25674b9512834f88938d45ed495d7, type: 3}
   iconQuadRenderer: {fileID: 1032758362}
   iconQuadTextureNameID: _MainTex
-  iconQuadTexture: {fileID: 2800000, guid: ed2f699f32ec17f4cad3423d2c449119, type: 3}
+  iconQuadTexture: {fileID: 2800000, guid: ac8550a474419054d9621216812fd098, type: 3}
   defaultButtonQuadMaterial: {fileID: 2100000, guid: fa419ab56051229449e3b813df8f295f, type: 2}
   iconSet: {fileID: 11400000, guid: 8b386ef895f7c924f8c4b03d1d3ed683, type: 2}
   defaultIconSet: {fileID: 11400000, guid: 8b386ef895f7c924f8c4b03d1d3ed683, type: 2}
@@ -19870,7 +19871,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _webSocketURL: ws://easyvizar.wings.cs.wisc.edu:5000/ws
   _locationId: 69e92dff-7138-4091-89c4-ed073035bfe6
-  featureManager: {fileID: 3439373403337540982}
+  featureManager: {fileID: 935252631}
   headsetManager: {fileID: 1361342022}
   map_parent: {fileID: 335883421}
   _qrScanner: {fileID: 291935030}
@@ -20133,7 +20134,7 @@ MonoBehaviour:
     type: 
     updated: 0
   markerHolder: {fileID: 0}
-  featureID: 32
+  featureID: 1
   color: 
   name: 
   new_position:
@@ -20154,7 +20155,7 @@ MonoBehaviour:
   map_fire_icon: {fileID: 5035943243370458903, guid: f2440b4ec2d22a24fafed66410029289, type: 3}
   map_headset_icon: {fileID: 4402188086708784334, guid: d8bfdd92541e05d438e4d0d1945df5aa, type: 3}
   map_injury_icon: {fileID: 2004794065475310447, guid: 0acf7b3895827f442bb669f1d9bd9f19, type: 3}
-  map_message_icon: {fileID: 5318789042369293505, guid: 900905efde3465c4daf62e7c1f5d4d10, type: 3}
+  map_message_icon: {fileID: 288360056468445405, guid: ff93914915aabee42b48e3aaa39ca108, type: 3}
   map_object_icon: {fileID: 6875439886385581506, guid: 6b140dfc0095d114b85769204dbbfc09, type: 3}
   map_person_icon: {fileID: 3853431206861463370, guid: 52942bd3952bbb446b88b6ed3fbe7d99, type: 3}
   map_radiation_icon: {fileID: 9092256845123000539, guid: c246fefea99c3ce43bb921421b44cd1e, type: 3}
@@ -27073,7 +27074,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1368765918
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27081,7 +27082,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1368765917}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 236468377}
   m_Name: 
@@ -45502,28 +45503,12 @@ Transform:
   m_Father: {fileID: 5060590940027585985}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &3439373403337540982 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3892548743586717580, guid: 905f5ec265c7ec6419a3a994f767ec61, type: 3}
-  m_PrefabInstance: {fileID: 1854928438150650618}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &3439373403337540986 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3295442938852557676, guid: 905f5ec265c7ec6419a3a994f767ec61, type: 3}
-  m_PrefabInstance: {fileID: 1854928438150650618}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3439373403337540982}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 049c882cddb65644db05fd32c5d4e50e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &3439373403337540989 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3892548743586717581, guid: 905f5ec265c7ec6419a3a994f767ec61, type: 3}
   m_PrefabInstance: {fileID: 1854928438150650618}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3439373403337540982}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 956af6ee031a2eb47b9c0ab5dcd50fd7, type: 3}
@@ -45539,7 +45524,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9210921789052660644, guid: 905f5ec265c7ec6419a3a994f767ec61, type: 3}
   m_PrefabInstance: {fileID: 1854928438150650618}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3439373403337540982}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b55691ad5b034fe6966763a6e23818d2, type: 3}
