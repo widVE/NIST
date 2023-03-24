@@ -207,6 +207,11 @@ namespace EasyVizAR
 		public string auth_token;
     }
 
+	[System.Serializable]
+	public class NewCheckIn
+	{
+		public string location_id;
+	}
 }
 
 public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
