@@ -72,7 +72,7 @@ public class DistanceCalculation : MonoBehaviour
 			display_dist_text.text = headset_name + " : " + distance.ToString() + "m";
 		}
 		
-		// displaying headset on map here 
+		// displaying headset on map here --> below has nothing to do with distance calculation 
 		if (mapParent != null)
         {
 			GameObject mapMarker = null;
@@ -98,10 +98,15 @@ public class DistanceCalculation : MonoBehaviour
 				//GetHeadsets();
 				Color myColor = cur_prefab.GetComponent<EasyVizARHeadset>()._color;
 				mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
-				//TODO: add the rotation/quaterinion here --> z axis is where we would like to apply the rotation to, but I'm still figuring out how to determine the orientation
-				//mapMarker.transform.rotation = Quaternion.Euler(0, 0, capsule.transform.position.z); 
-			}
-			else
+                //TODO: add the rotation/quaterinion here --> z axis is where we would like to apply the rotation to, but I'm still figuring out how to determine the orientation
+                //mapMarker.transform.rotation = Quaternion.Euler(-90, 0, capsule.transform.position.z); 
+                //mapMarker.transform.rotation = Quaternion.Euler(-7, capsule.transform.rotation.x, capsule.transform.rotation.z);
+
+                
+
+
+            }
+            else
 			{
 				Debug.LogWarning("Missing headset Map Marker");
 
@@ -109,29 +114,6 @@ public class DistanceCalculation : MonoBehaviour
 		}
 		
 	}
-	
-	
-	//old logic for posterity & refernce
-		//	// displaying headset on map here 
-		//if (mapParent != null)
-  //      {
-
-		//	if (mapParent.transform.Find(cur_prefab.name))
-  //          {
-		//		Destroy(mapParent.transform.Find(cur_prefab.name).gameObject);
-		//	}
-		//	GameObject mapMarker = Instantiate(headset_icon, mapParent.transform, false);
-		//	mapMarker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
-		//	mapMarker.name = cur_prefab.name;
-		//	mapMarker.transform.Find("Feature_Text").GetComponent<TextMeshPro>().text = distance.ToString() + "ft";
-		//	//cur_prefab.GetComponent<EasyVizARHeadset>()
-		//	//GetHeadsets();
-		//	Color myColor = cur_prefab.GetComponent<EasyVizARHeadset>()._color;
-		//	mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
-		//}
-
-
-
 	
 
 	IEnumerator HeadsetDistanceCalculate()

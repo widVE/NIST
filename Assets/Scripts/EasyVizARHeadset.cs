@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
 
 public class EasyVizARHeadset : MonoBehaviour
@@ -50,7 +51,7 @@ public class EasyVizARHeadset : MonoBehaviour
 	Camera _mainCamera;
 	public GameObject map_parent; // This will get populated by EasyVizARHeadsetManager.cs
 	public GameObject headset_parent;
-	
+
     // Start is called before the first frame update
     void Start()
     {
@@ -126,7 +127,7 @@ public class EasyVizARHeadset : MonoBehaviour
 		transform.position = newPos;
 		transform.rotation = new Quaternion(h.orientation.x, h.orientation.y, h.orientation.z, h.orientation.w);
 
-		_headsetID = h.id;
+        _headsetID = h.id;
 		_headsetName = h.name;
 		_locationID = h.location_id;
 
@@ -139,6 +140,8 @@ public class EasyVizARHeadset : MonoBehaviour
 		if (headset_icon)
 		{
 			headset_icon.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", newColor);
+			//TODO: might need to remove it
+			//headset_icon.Find("Quad").rotation = transform.rotation;
 		}
 		if (cur_headset)
         {
