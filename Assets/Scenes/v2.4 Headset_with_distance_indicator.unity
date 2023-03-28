@@ -19870,7 +19870,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _webSocketURL: ws://easyvizar.wings.cs.wisc.edu:5000/ws
-  _locationId: 69e92dff-7138-4091-89c4-ed073035bfe6
+  _locationId: 1cc48e8d-890d-413a-aa66-cabaaa6e5458
   featureManager: {fileID: 935252631}
   headsetManager: {fileID: 1361342022}
   map_parent: {fileID: 335883421}
