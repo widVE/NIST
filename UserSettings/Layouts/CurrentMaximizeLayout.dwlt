@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 400, y: 200}
   m_MaxSize: {x: 32384, y: 16192}
   vertical: 0
-  controlID: 12555
+  controlID: 395
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -41,7 +41,7 @@ MonoBehaviour:
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
     m_Text: Game
-    m_Image: {fileID: 4621777727084837110, guid: 0000000000000000d000000000000000, type: 0}
+    m_Image: {fileID: -6423792434712278376, guid: 0000000000000000d000000000000000, type: 0}
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
@@ -141,7 +141,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 1
-  controlID: 12556
+  controlID: 396
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -167,7 +167,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 100}
   m_MaxSize: {x: 24288, y: 8096}
   vertical: 0
-  controlID: 12557
+  controlID: 397
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -224,10 +224,10 @@ MonoBehaviour:
     m_SaveData: []
   m_SceneHierarchy:
     m_TreeViewState:
-      scrollPos: {x: 0, y: 176.5}
-      m_SelectedIDs: fa1c0000
-      m_LastClickedID: 0
-      m_ExpandedIDs: 28fbffff6c6e0000487000005871000066740000ae74000086760000
+      scrollPos: {x: 0, y: 237}
+      m_SelectedIDs: 44750000
+      m_LastClickedID: 30020
+      m_ExpandedIDs: 28fbffff906e00006c7000007c710000aa760000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -553,7 +553,7 @@ MonoBehaviour:
   m_Rotation:
     m_Target: {x: -0.013810115, y: 0.0077946335, z: -0.00040125332, w: -1.0000671}
     speed: 2
-    m_Value: {x: -0.013807451, y: 0.0077931304, z: -0.00040117593, w: -0.99987423}
+    m_Value: {x: -0.013810116, y: 0.007794634, z: -0.00040125335, w: -1.0000671}
   m_Size:
     m_Target: 1.9402198
     speed: 2
@@ -676,22 +676,22 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Prefabs/Markers/Marker Icons (SVG + PNG)
+    - Packages/com.microsoft.mixedreality.toolkit.foundation/SDK/Features/UX/Buttons
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 16
   m_LastFolders:
-  - Assets/Prefabs/Markers/Marker Icons (SVG + PNG)
+  - Packages/com.microsoft.mixedreality.toolkit.foundation/SDK/Features/UX/Buttons
   m_LastFoldersGridSize: 64
   m_LastProjectPath: /Users/yesuiulziibayar/Desktop/NIST
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 287}
-    m_SelectedIDs: ceb10000
-    m_LastClickedID: 45518
-    m_ExpandedIDs: 000000004eb1000070b100008ab10000eab10000eab50000ecb50000eeb5000000ca9a3bffffff7f
+    scrollPos: {x: 0, y: 532}
+    m_SelectedIDs: aab20000
+    m_LastClickedID: 45738
+    m_ExpandedIDs: 0000000072b1000074b1000096b10000b0b10000acb20000aeb20000b0b2000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -719,7 +719,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000004eb10000eab1000000ca9a3bffffff7f
+    m_ExpandedIDs: 0000000072b1000074b1000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -744,24 +744,24 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: fa1c0000
-    m_LastClickedInstanceID: 7418
+    m_SelectedInstanceIDs: 44750000
+    m_LastClickedInstanceID: 30020
     m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: c6230000000000004ae20000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: _EasyVizAR_Icons
-      m_OriginalName: _EasyVizAR_Icons
+      m_Name: 
+      m_OriginalName: 
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 7418
+      m_UserData: 0
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 0
+      m_OriginalEventType: 11
       m_IsRenamingFilename: 1
       m_ClientGUIView: {fileID: 10}
     m_CreateAssetUtility:
@@ -795,9 +795,9 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 0
+    x: 213
     y: 560
-    width: 1067.5
+    width: 909.5
     height: 256
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
@@ -822,8 +822,8 @@ MonoBehaviour:
     y: 0
     width: 316.5
     height: 754
-  m_MinSize: {x: 275, y: 50}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 276, y: 71}
+  m_MaxSize: {x: 4001, y: 4021}
   m_ActualView: {fileID: 14}
   m_Panes:
   - {fileID: 14}
