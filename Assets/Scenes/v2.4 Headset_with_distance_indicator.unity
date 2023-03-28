@@ -44681,6 +44681,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1556404472619698932, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
+      propertyPath: m_TagString
+      value: Headset
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
 --- !u!33 &1558338565354896895
