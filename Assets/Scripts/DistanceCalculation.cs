@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using TMPro;
 using System.Collections.Specialized;
+using System.Diagnostics;
 
 public class DistanceCalculation : MonoBehaviour
 {
@@ -23,7 +24,9 @@ public class DistanceCalculation : MonoBehaviour
 	public GameObject headset_parent;
 	public EasyVizAR.HeadsetList headset_list;
 	public EasyVizAR.Headset cur_headset;
-	public string headset_name; // this is set in the EasyVizARHeadsetManager.cs script 
+	public string headset_name; // this is set in the EasyVizARHeadsetManager.cs script \
+	public bool isLocal = false;
+	public string local_headset_id = "";
 
 	// Start is called before the first frame update
 	void Start()
@@ -35,7 +38,20 @@ public class DistanceCalculation : MonoBehaviour
 		
 		cam_pos = cam.GetComponent<Transform>().position;
 		oldPos = cam_pos;
-		CalcHeadsetDist();
+
+		if (EasyVizARServer.Instance.TryGetHeadsetID(out string headsetId))
+		{
+            if (this.name.Equals(headsetId))
+            {
+                isLocal = true;
+                local_headset_id = headsetId;
+
+            }
+
+        }
+
+
+        CalcHeadsetDist();
 		// get all the headset
 		//GetHeadsets();
 		StartCoroutine(HeadsetDistanceCalculate());
@@ -92,8 +108,19 @@ public class DistanceCalculation : MonoBehaviour
 			//If our map marker is found, we manipulate it's position
 			if (mapMarker != null)
 			{
-				mapMarker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
-				mapMarker.name = cur_prefab.name;
+                UnityEngine.Debug.Log(this.name + " is local?: " + isLocal);
+
+                if (isLocal)
+				{
+                    UnityEngine.Debug.Log("get into local: " + this.name);
+
+                    mapMarker.transform.localPosition = new Vector3(cam_pos.x, 0, cam_pos.z);
+                }
+                else
+				{
+                    mapMarker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
+                }
+                mapMarker.name = cur_prefab.name;
 				mapMarker.transform.Find("Feature_Text").GetComponent<TextMeshPro>().text = distance.ToString() + "ft";
 				//cur_prefab.GetComponent<EasyVizARHeadset>()
 				//GetHeadsets();
@@ -112,7 +139,7 @@ public class DistanceCalculation : MonoBehaviour
             }
             else
 			{
-				Debug.LogWarning("Missing headset Map Marker");
+				UnityEngine.Debug.Log("Missing headset Map Marker");
 
 			}
 		}

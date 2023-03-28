@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using UnityEngine;
 
@@ -51,6 +52,8 @@ public class EasyVizARHeadset : MonoBehaviour
 	Camera _mainCamera;
 	public GameObject map_parent; // This will get populated by EasyVizARHeadsetManager.cs
 	public GameObject headset_parent;
+	public string local_headset_id = "";
+	public bool isLocal = false;
 
     // Start is called before the first frame update
     void Start()
@@ -73,14 +76,20 @@ public class EasyVizARHeadset : MonoBehaviour
 		{
 			_realTimeChanges = true;
 
+			DistanceCalculation d_s = this.GetComponent<DistanceCalculation>();
+
 			// Either reload our existing headset from the server or create a new one.
 			if (EasyVizARServer.Instance.TryGetHeadsetID(out string headsetId))
             {
-				Debug.Log("Reloading headset: " + headsetId);
-				LoadHeadset(headsetId);
+				UnityEngine.Debug.Log("Reloading headset: " + headsetId);
+                UnityEngine.Debug.Log("This is the local headset: " + headsetId);
+				local_headset_id = headsetId;
+				isLocal= true;
+				d_s.isLocal = true;
+                LoadHeadset(headsetId);
             } else
             {
-				Debug.Log("Creating headset...");
+				UnityEngine.Debug.Log("Creating headset...");
 				CreateHeadset();
             }
 		}
@@ -222,11 +231,11 @@ public class EasyVizARHeadset : MonoBehaviour
 
 			EasyVizARServer.Instance.SaveRegistration(h.id, h.token);
 
-			Debug.Log("Successfully connected headset: " + h.name);
+			UnityEngine.Debug.Log("Successfully connected headset: " + h.name);
 		}
 		else
 		{
-			Debug.Log("Received an error when creating headset");
+			UnityEngine.Debug.Log("Received an error when creating headset");
 		}
 	}
 
@@ -261,7 +270,7 @@ public class EasyVizARHeadset : MonoBehaviour
 			if (ColorUtility.TryParseHtmlString(h.color, out newColor))
 				_color = newColor;
 
-			Debug.Log("Successfully connected headset: " + h.name);
+			UnityEngine.Debug.Log("Successfully connected headset: " + h.name);
 
 			CreateCheckIn(h.id, _locationID);
 		}
@@ -346,7 +355,7 @@ public class EasyVizARHeadset : MonoBehaviour
 		}
 		else
 		{
-			Debug.Log("Received an error when obtaining past positions");
+			UnityEngine.Debug.Log("Received an error when obtaining past positions");
 		}
 	}
 	

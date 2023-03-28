@@ -363,6 +363,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 				{
 					h.CreateLocalHeadset(_localHeadsetName, _locationId, !_visualizePreviousLocal);
 				}
+				Debug.Log("this is the local headset name: " + h.name);
 			}
 		}
 	}
