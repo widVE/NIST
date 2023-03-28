@@ -899,7 +899,7 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
-    Windows Store Apps: ENABLE_WINMD_SUPPORT
+    Windows Store Apps: 
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}
@@ -915,7 +915,8 @@ PlayerSettings:
   gcIncremental: 1
   assemblyVersionValidation: 1
   gcWBarrierValidation: 0
-  apiCompatibilityLevelPerPlatform: {}
+  apiCompatibilityLevelPerPlatform:
+    Windows Store Apps: 3
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
   metroPackageName: EasyVizAR

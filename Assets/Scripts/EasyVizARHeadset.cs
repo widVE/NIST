@@ -181,7 +181,7 @@ public class EasyVizARHeadset : MonoBehaviour
 	{
 		EasyVizAR.Headset h = new EasyVizAR.Headset();
 		h.position = new EasyVizAR.Position();
-		h.position.x = -transform.position.x;
+		h.position.x = transform.position.x;
 		h.position.y = transform.position.y;
 		h.position.z = transform.position.z;
 		h.orientation = new EasyVizAR.Orientation();
@@ -251,15 +251,19 @@ public class EasyVizARHeadset : MonoBehaviour
 			transform.position = newPos;
 			transform.rotation = new Quaternion(h.orientation.x, h.orientation.y, h.orientation.z, h.orientation.w);
 
+			// We should load the name and color information from the server, but not the location ID, which may be out of date.
+			// Instead, since we probably just scanned a QR code, we should inform the server of our new location by
+			// sending a check-in.
 			_headsetID = h.id;
 			_headsetName = h.name;
-			_locationID = h.location_id;
 
 			Color newColor;
 			if (ColorUtility.TryParseHtmlString(h.color, out newColor))
 				_color = newColor;
 
 			Debug.Log("Successfully connected headset: " + h.name);
+
+			CreateCheckIn(h.id, _locationID);
 		}
 		else
 		{
@@ -268,11 +272,22 @@ public class EasyVizARHeadset : MonoBehaviour
 		}
 	}
 
+	public void CreateCheckIn(string headsetId, string locationId)
+	{
+		var checkIn = new EasyVizAR.NewCheckIn();
+		checkIn.location_id = locationId;
+
+		EasyVizARServer.Instance.Post($"/headsets/{headsetId}/check-ins", EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(checkIn), delegate (string result)
+		{
+			// Not much to do after check-in was created.
+		});
+	}
+
 	void PostPosition()
 	{
 		EasyVizAR.HeadsetPositionUpdate h = new EasyVizAR.HeadsetPositionUpdate();
 		h.position = new EasyVizAR.Position();
-		h.position.x = -transform.position.x;
+		h.position.x = transform.position.x;
 		h.position.y = transform.position.y;
 		h.position.z = transform.position.z;
 		h.orientation = new EasyVizAR.Orientation();

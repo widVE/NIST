@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 using NativeWebSocket;
@@ -45,8 +46,14 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     [SerializeField]
     GameObject _qrScanner = null;
 
+    [SerializeField]
+    float _updateInterval = 0.2f;
+
     private WebSocket _ws = null;
     private bool isConnected = false;
+    
+    private Camera _mainCamera;
+    private float _lastUpdated = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -60,6 +67,8 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
         {
             headsetManager = GameObject.Find("EasyVizARHeadsetManager");
         }
+
+        _mainCamera = Camera.main;
 
 #if UNITY_EDITOR
         // In editor mode, use the default server and location ID.
@@ -93,7 +102,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    async void Update()
     {
 #if !UNITY_WEBGL || UNITY_EDITOR
         if (_ws is not null)
@@ -101,6 +110,22 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
             _ws.DispatchMessageQueue();
         }
 #endif
+
+        if (isConnected)
+        {
+            float t = UnityEngine.Time.time;
+            if (t - _lastUpdated > _updateInterval)
+            {
+                var pos = _mainCamera.transform.position;
+                var rot = _mainCamera.transform.rotation;
+
+                object[] parts = { "move", pos[0], pos[1], pos[2], rot[0], rot[1], rot[2], rot[3] };
+                string message = string.Join(" ", parts);
+
+                Task.Run(() => _ws.SendText(message));
+                _lastUpdated = t;
+            }
+        }
     }
 
     private async void OnApplicationQuit()
@@ -114,9 +139,9 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
     private WebSocket initializeWebSocket()
     {
-        // This is just a placeholder. We may need to set authorization headers later on.
         var headers = new Dictionary<string, string>
         {
+            { "Authorization", EasyVizARServer.Instance.GetAuthorizationHeader() },
             { "X-Ignore", "ignore" }
         };
 
@@ -142,17 +167,23 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     {
         UnityEngine.Debug.Log("WS Connected: " + _webSocketURL);
 
+        // Suppress event messages that were triggered by this user.
+        await _ws.SendText("suppress on");
+
+        // Tell the server to filter events pertaining to the current location.
+        var event_uri = $"/locations/{_locationId}/*";
+
         if (headsetManager)
         {
-            await _ws.SendText("subscribe headsets:created");
-            await _ws.SendText("subscribe headsets:updated");
-            await _ws.SendText("subscribe headsets:deleted");
+            await _ws.SendText("subscribe location-headsets:created " + event_uri);
+            await _ws.SendText("subscribe location-headsets:updated " + event_uri);
+            await _ws.SendText("subscribe location-headsets:deleted " + event_uri);
         }
 
         if (featureManager) {
-            await _ws.SendText(string.Format("subscribe features:created /locations/{0}/*", _locationId));
-            await _ws.SendText(string.Format("subscribe features:updated /locations/{0}/*", _locationId));
-            await _ws.SendText(string.Format("subscribe features:deleted /locations/{0}/*", _locationId));
+            await _ws.SendText("subscribe features:created " + event_uri);
+            await _ws.SendText("subscribe features:updated " + event_uri);
+            await _ws.SendText("subscribe features:deleted " + event_uri);
         }
 
         isConnected = true;
@@ -178,19 +209,19 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
         switch (event_type)
         {
-            case "headsets:created":
+            case "location-headsets:created":
                 {
                     HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
                     headsetManager.GetComponent<EasyVizARHeadsetManager>().CreateRemoteHeadset(ev.current);
                     break;
                 }
-            case "headsets:updated":
+            case "location-headsets:updated":
                 {
                     HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
                     headsetManager.GetComponent<EasyVizARHeadsetManager>().UpdateRemoteHeadset(ev.previous.id, ev.current);
                     break;
                 }
-            case "headsets:deleted":
+            case "location-headsets:deleted":
                 {
                     HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
                     headsetManager.GetComponent<EasyVizARHeadsetManager>().DeleteRemoteHeadset(ev.previous.id);
