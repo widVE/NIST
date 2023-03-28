@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using TMPro;
+using System.Collections.Specialized;
 
 public class DistanceCalculation : MonoBehaviour
 {
@@ -99,11 +100,14 @@ public class DistanceCalculation : MonoBehaviour
 				Color myColor = cur_prefab.GetComponent<EasyVizARHeadset>()._color;
 				mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
                 //TODO: add the rotation/quaterinion here --> z axis is where we would like to apply the rotation to, but I'm still figuring out how to determine the orientation
-                //mapMarker.transform.rotation = Quaternion.Euler(-90, 0, capsule.transform.position.z); 
-                //mapMarker.transform.rotation = Quaternion.Euler(-7, capsule.transform.rotation.x, capsule.transform.rotation.z);
-
-                
-
+                //mapMarker.transform.Find("Quad").Find("arrow").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+                //mapMarker.transform.Find("Quad").Find("arrow").Rotate(new Vector3(capsule.transform.rotation.x, capsule.transform.rotation.y, capsule.transform.rotation.z));
+               
+				//mapMarker.transform.rotation = Quaternion.Euler(-7, capsule.transform.rotation.x, capsule.transform.rotation.z);
+                double radians = Math.Atan2(capsule.transform.rotation.y, capsule.transform.rotation.w);
+                //double angle = radians * (180 / Math.PI);
+                mapMarker.transform.Find("Quad").Find("arrow").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+                mapMarker.transform.Find("Quad").Rotate(new Vector3(0, 0, (float)radians));
 
             }
             else
