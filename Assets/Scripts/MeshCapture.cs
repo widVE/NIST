@@ -235,13 +235,16 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         sb.AppendLine("property list uchar int vertex_index");
         sb.AppendLine("end_header");
 
+
+        //TODO Disable the multiplication for perforamnce testing.
+        /*
         for (int i = 0; i < num_vertices; i++)
         {
             var v = transformation.MultiplyPoint(vertices[i]);
             var n = transformation.MultiplyPoint(normals[i]);
             sb.AppendLine($"{v.x} {v.y} {v.z} {n.x} {n.y} {n.z}");
         }
-
+        */
         for (int i = 0; i < num_indices; i += 3)
         {
             sb.AppendLine($"3 {indices[i]} {indices[i + 1]} {indices[i + 2]}");
