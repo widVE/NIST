@@ -7247,7 +7247,7 @@ MonoBehaviour:
   _qrPrefabParent: {fileID: 46054712}
   _headsetManager: {fileID: 1361342022}
   followMovingQRCode: 1
-  testQRCodeData: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/1cc48e8d-890d-413a-aa66-cabaaa6e5458
+  testQRCodeData: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/628b00d4-ac6b-41bb-8e13-1d7d50eceeb9
   triggerQRCodeDetected: 0
 --- !u!82 &291935033
 AudioSource:
@@ -9396,7 +9396,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1539913615}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &404529391
 MonoBehaviour:
@@ -19854,8 +19854,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1539913615}
-  m_RootOrder: 7
+  m_Father: {fileID: 1361342023}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &892259352
 MonoBehaviour:
@@ -19875,6 +19875,7 @@ MonoBehaviour:
   headsetManager: {fileID: 1361342022}
   map_parent: {fileID: 335883421}
   _qrScanner: {fileID: 291935030}
+  _updateInterval: 0.2
 --- !u!1 &920408654
 GameObject:
   m_ObjectHideFlags: 0
@@ -19937,7 +19938,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1539913615}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &925204596
 MonoBehaviour:
@@ -26811,6 +26812,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1556404472619698932, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
   m_PrefabInstance: {fileID: 1556404472470392495}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1361342023 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1556404472619698930, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
+  m_PrefabInstance: {fileID: 1556404472470392495}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1361608337
 GameObject:
   m_ObjectHideFlags: 0
@@ -27132,7 +27138,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1539913615}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1375559503
 MonoBehaviour:
