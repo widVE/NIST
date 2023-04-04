@@ -49,6 +49,9 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     [SerializeField]
     float _updateInterval = 0.2f;
 
+    [SerializeField]
+    bool _echoMessages = true;
+
     private WebSocket _ws = null;
     private bool isConnected = false;
     
@@ -168,7 +171,12 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
         UnityEngine.Debug.Log("WS Connected: " + _webSocketURL);
 
         // Suppress event messages that were triggered by this user.
-        await _ws.SendText("suppress on");
+        // Note: this feature would prevent us from receiving a notification from the server
+        // when the headset navigation target should be changed.
+        if (!_echoMessages)
+        {
+            await _ws.SendText("echo off");
+        }
 
         // Tell the server to filter events pertaining to the current location.
         var event_uri = $"/locations/{_locationId}/*";
