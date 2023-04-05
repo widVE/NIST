@@ -1133,7 +1133,7 @@ namespace winrt::HL2UnityPlugin::implementation
                     }
                 }
 
-                winrt::Windows::Graphics::Imaging::SoftwareBitmap depthImage = winrt::Windows::Graphics::Imaging::SoftwareBitmap(winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Gray16, 320, 288, winrt::Windows::Graphics::Imaging::BitmapAlphaMode::Ignore);
+                winrt::Windows::Graphics::Imaging::SoftwareBitmap depthImage = winrt::Windows::Graphics::Imaging::SoftwareBitmap(winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Rgba16, 320, 288, winrt::Windows::Graphics::Imaging::BitmapAlphaMode::Straight);
                 //winrt::Windows::Graphics::Imaging
 
                 {    
@@ -1168,16 +1168,32 @@ namespace winrt::HL2UnityPlugin::implementation
                                         //UINT idx2 = bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + j;
                                         UINT16 depth = pDepth[idx];
                                         depth = (pSigma[idx] & 0x80) ? 0 : depth;
-                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = (depth & 0x00FF);
-                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = ((depth && 0xFF00) >> 8);
+                                        //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = (depth & 0x00FF);
+                                        //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = ((depth && 0xFF00) >> 8);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 0] = (depth & 0x00FF); 
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 1] = ((depth & 0xFF00) >> 8);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 2] = (depth & 0x00FF);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 3] = ((depth & 0xFF00) >> 8); 
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 4] = (depth & 0x00FF);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 5] = ((depth & 0xFF00) >> 8);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 6] = 0xFF;// ((depth & 0xFF00) >> 8);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 7] = 0xFF;// (depth & 0x00FF);
                                     }
                                 }
                                 else
                                 {
                                     if (pHL2ResearchMode->IsCapturingDepthImages())
                                     {
-                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = 0;
-                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = 0;
+                                        //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = 0;
+                                        //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = 0;
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 0] = 0;
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 1] = 0;
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 2] = 0;
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 3] = 0;
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 4] = 0;
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 5] = 0;
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 6] = 0xFF;// ((depth & 0xFF00) >> 8);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 7] = 0xFF;// ((depth & 0xFF00) >> 8);
                                     }
                                 }
                             }
@@ -1185,8 +1201,16 @@ namespace winrt::HL2UnityPlugin::implementation
                             {
                                 if (pHL2ResearchMode->IsCapturingDepthImages())
                                 {
-                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = 0;
-                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = 0;
+                                    //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = 0;
+                                    //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = 0;
+                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 0] = 0;
+                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 1] = 0;
+                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 2] = 0;
+                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 3] = 0;
+                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 4] = 0;
+                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 5] = 0;
+                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 6] = 0xFF;// ((depth & 0xFF00) >> 8);
+                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 7] = 0xFF;// ((depth & 0xFF00) >> 8);
                                 }
                             }
                         }
@@ -1197,7 +1221,7 @@ namespace winrt::HL2UnityPlugin::implementation
                 {
                     wchar_t fName[128];
                     swprintf(fName, 128, L"%s_%s_depth.png", m_datetime.c_str(), m_ms);// depthTimestampString);
-                    depthImage = winrt::Windows::Graphics::Imaging::SoftwareBitmap::Convert(depthImage, winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Rgba16);
+                    //depthImage = winrt::Windows::Graphics::Imaging::SoftwareBitmap::Convert(depthImage, winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Rgba16);
                     //std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_color.png";
                     winrt::Windows::Storage::StorageFolder storageFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
                     pHL2ResearchMode->_lastDepthImageName = storageFolder.Path();
