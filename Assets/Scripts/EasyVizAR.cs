@@ -33,7 +33,15 @@ namespace EasyVizAR
 		public float y;
 		public float z;
 	}
-	
+
+	[System.Serializable]
+	public class NavigationTarget
+	{
+		public string type;			// One of (none|point|feature|headset)
+		public string target_id;    // May be set to headset_id or feature_id depending on type
+		public Position position;
+	}
+
 	[System.Serializable]
 	public class Headset
 	{
@@ -43,6 +51,7 @@ namespace EasyVizAR
 		public string location_id;
 		public string mapId;
 		public string name;
+		public NavigationTarget navigation_target;
 		public Orientation orientation;
 		public Position position;
 		public int updated;
@@ -61,6 +70,7 @@ namespace EasyVizAR
 		public string location_id;
 		public string mapId;
 		public string name;
+		public NavigationTarget navigation_target;
 		public Orientation orientation;
 		public Position position;
 		public int updated;
