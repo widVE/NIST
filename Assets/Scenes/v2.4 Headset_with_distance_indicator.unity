@@ -7683,6 +7683,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 561901448}
+  mirror_map_axis: 1
   feature_list:
     features:
     - color: '#aa4499'
@@ -19876,6 +19877,7 @@ MonoBehaviour:
   map_parent: {fileID: 335883421}
   _qrScanner: {fileID: 291935030}
   _updateInterval: 0.2
+  _echoMessages: 1
 --- !u!1 &920408654
 GameObject:
   m_ObjectHideFlags: 0
@@ -20115,6 +20117,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 561901448}
+  mirror_map_axis: 1
   feature_list:
     features: []
   featureHolder:
@@ -35248,6 +35251,10 @@ PrefabInstance:
     - target: {fileID: 3566677482455454033, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3566677482455454045, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: m_LocalScale.z
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 3566677482629638461, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: m_IsActive
@@ -52317,6 +52324,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 561901448}
+  mirror_map_axis: 1
   feature_list:
     features: []
   featureHolder:

@@ -598,11 +598,11 @@ public class FeatureManager : MonoBehaviour
         palm_map_marker.transform.localPosition = new Vector3(pos.x, y_offset, map_coordinate_position.z);
         palm_map_marker.name = string.Format("feature-{0}", feature.id);
 
-
+        
         GameObject floating_map_marker = Instantiate(map_icon_to_spawn, floating_map_spawn_target.transform, false);
         floating_map_marker.transform.localPosition = new Vector3(pos.x, y_offset, map_coordinate_position.z);
         floating_map_marker.name = string.Format("feature-{0}", feature.id);
-
+         
 
         //GameObject mapMarker = Instantiate(feature_to_spawn, mapParent.transform, false);
 
