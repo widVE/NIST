@@ -7247,7 +7247,7 @@ MonoBehaviour:
   _qrPrefabParent: {fileID: 46054712}
   _headsetManager: {fileID: 1361342022}
   followMovingQRCode: 1
-  testQRCodeData: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/628b00d4-ac6b-41bb-8e13-1d7d50eceeb9
+  testQRCodeData: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/1cc48e8d-890d-413a-aa66-cabaaa6e5458
   triggerQRCodeDetected: 0
 --- !u!82 &291935033
 AudioSource:
