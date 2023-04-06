@@ -73,8 +73,9 @@ public class DistanceFeatureText : MonoBehaviour
         string feature_type = type.transform.GetChild(0).name;
 
         // for map icon 
-        var feature_text_map = feature_map.transform.Find("Feature_Text").GetComponent<TextMeshPro>();
-        
+        //var feature_text_map = feature_map.transform.Find("Feature_Text").GetComponent<TextMeshPro>();
+        var feature_text_map = this.gameObject.GetComponent<TextMeshPro>();
+
         if (isFeet)
         {
 

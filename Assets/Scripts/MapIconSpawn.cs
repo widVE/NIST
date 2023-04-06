@@ -50,8 +50,10 @@ public class MapIconSpawn : MonoBehaviour
             //enlarging the map to the scale listed from the server (width and height)
             foreach (GameObject map in map_objects) map.transform.localScale = new Vector3(mapWidth / 10, mapHeight / 10, 1);
             float icon_origin_x = (mapWidth / 2.0f + mapLeft);
+            float icon_origin_y = mapHeight / 2.0f + mapTop;
             if (mirror_axis) icon_origin_x *= -1;
-            float icon_origin_y = mapHeight / 2.0f + mapTop; 
+            if (mirror_axis) icon_origin_y *= -1;
+
             //float icon_origin_x = (0 - mapLeft) / mapWidth;
             //loat icon_origin_y = (0 - mapTop) / mapHeight;
 
