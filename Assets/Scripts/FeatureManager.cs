@@ -17,7 +17,7 @@ public class FeatureManager : MonoBehaviour
 
     // Each GameObject now contains a field call obj_feature (in the script MarkerObject.cs) so that feature is now one of the fields of the GameObject 
     //public Dictionary<int, GameObject> feature_gameobj_dictionary = new Dictionary<int, GameObject>(); // a seperate dictionary for keeping track of Gameobject in the scene
-    public bool mirror_map_axis = true;
+    public bool mirror_map_axis = false;
     
     public EasyVizAR.FeatureList feature_list = new EasyVizAR.FeatureList();
     public EasyVizAR.Feature featureHolder = null;
@@ -577,25 +577,30 @@ public class FeatureManager : MonoBehaviour
         GameObject world_marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
         world_marker.name = string.Format("feature-{0}", feature.id);
         
-        float y_offset = -1f * (feature.id / 100f);
+        float y_offset = (feature.id / 100f);
+        if (mirror_map_axis) y_offset *= -1;
 
         //I'm trying to add in the marker icon spawning to the floating map. I think this is where it happens!
-        
-        
+
+
 
         GameObject palm_map_marker = Instantiate(map_icon_to_spawn, palm_map_spawn_target.transform, false);
         
         
-        //WARNING: When we mirror the map to have it look like what it is on the server we need to negat the z values of the position of the icons because of the coordinate space inversion
+        
 
         Vector3 map_coordinate_position = Vector3.zero;
         map_coordinate_position.x = pos.x;
         map_coordinate_position.y = pos.y;
-        map_coordinate_position.z = -1 * pos.z;
+
+        //WARNING: When we mirror the map to have it look like what it is on the server we need to negat the z values of the position of the icons because of the coordinate space inversion
+        if (mirror_map_axis) map_coordinate_position.z = -1 * pos.z;
+        else map_coordinate_position.z = pos.z;
+
 
 
         //mapMarker.transform.localPosition = new Vector3(pos.x, 0, pos.z);
-        palm_map_marker.transform.localPosition = new Vector3(pos.x, y_offset, map_coordinate_position.z);
+        palm_map_marker.transform.localPosition = new Vector3(map_coordinate_position.x, y_offset, map_coordinate_position.z);
         palm_map_marker.name = string.Format("feature-{0}", feature.id);
 
         

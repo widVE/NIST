@@ -12,7 +12,7 @@ public class MapIconSpawn : MonoBehaviour
     public GameObject feature_parent;
 
     public bool verbose_debug = false;
-    public bool mirror_axis = true;
+    public bool mirror_axis = false;
     
     // Start is called before the first frame update
     void Start()
