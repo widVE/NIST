@@ -35,16 +35,6 @@ public class TakeColorPhoto : MonoBehaviour
         
     }
 
-	void OnEnable()
-	{
-		BeginContinuousCapture();
-	}
-
-	void OnDisable()
-    {
-		EndContinuousCapture();
-	}
-
 	void OnValidate()
     {
 		if (triggerCapture)
@@ -67,14 +57,17 @@ public class TakeColorPhoto : MonoBehaviour
 		
 	}
 
-	void BeginContinuousCapture()
+	public void BeginContinuousCapture()
     {
 		_continuousCapture = true;
-		_isCapturing = true;
-		PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
+		if (!_isCapturing)
+        {
+			_isCapturing = true;
+			PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
+		}
 	}
 	
-	void EndContinuousCapture()
+	public void EndContinuousCapture()
     {
 		_continuousCapture = false;
 	}

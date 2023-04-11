@@ -274,7 +274,15 @@ public class QRScanner : MonoBehaviour
 
 		if (_photoCapture)
         {
-			_photoCapture.SetActive(location.headset_configuration.enable_photo_capture);
+			var script = _photoCapture.GetComponent<TakeColorPhoto>();
+			if (location.headset_configuration.enable_photo_capture)
+            {
+				script.BeginContinuousCapture();
+            }
+            else
+            {
+				script.EndContinuousCapture();
+            }
         }
     }
 
