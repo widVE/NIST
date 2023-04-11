@@ -222,6 +222,7 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         StringBuilder sb = new StringBuilder(capacity);
         sb.AppendLine("ply");
         sb.AppendLine("format ascii 1.0");
+        sb.AppendLine($"comment Transformation: {transformation[0, 0]} {transformation[0, 1]} {transformation[0, 2]} {transformation[1, 0]} {transformation[1, 1]} {transformation[1, 2]} {transformation[2, 0]} {transformation[2, 1]} {transformation[2, 2]}");
         //sb.AppendLine("comment Spatial Object Id: " + meshObject.Id);
         //sb.AppendLine("comment Mesh Filter Name: " + meshObject.Filter.name);
         sb.AppendLine("element vertex " + num_vertices);
