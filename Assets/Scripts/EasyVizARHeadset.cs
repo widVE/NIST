@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -144,21 +145,21 @@ public class EasyVizARHeadset : MonoBehaviour
 		if (ColorUtility.TryParseHtmlString(h.color, out newColor))
 			_color = newColor;
 		
-		Transform headset_icon = map_parent.transform.Find(h.id);
 		Transform cur_headset = headset_parent.transform.Find(h.id);
-		if (headset_icon)
-		{
-			headset_icon.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", newColor);
-			//TODO: might need to remove it
-			//headset_icon.Find("Quad").rotation = transform.rotation;
-		}
-		if (cur_headset)
+		
+        if (cur_headset)
         {
 			cur_headset.Find("Capsule").GetComponent<Renderer>().material.color = newColor;
-		}
+
+        }
+        else
+		{
+            UnityEngine.Debug.Log("the cur_headset is not found");
+
+        }
 
 
-		if (_showPositionChanges)
+        if (_showPositionChanges)
 		{
 			GetPastPositions();
 		}
