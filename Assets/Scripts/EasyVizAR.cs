@@ -222,6 +222,24 @@ namespace EasyVizAR
 	{
 		public string location_id;
 	}
+
+	[System.Serializable]
+	public class HeadsetConfiguration
+    {
+		public bool enable_mesh_capture;
+		public bool enable_photo_capture;
+    }
+
+	[System.Serializable]
+	public class Location
+    {
+		public string id;
+		public string name;
+		public string description;
+		public string model_path;
+		public string model_url;
+		public HeadsetConfiguration headset_configuration;
+    }
 }
 
 public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>

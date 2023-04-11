@@ -69,6 +69,12 @@ public class QRScanner : MonoBehaviour
 	GameObject _headsetManager;
 
 	[SerializeField]
+	GameObject _meshCapture;
+
+	[SerializeField]
+	GameObject _photoCapture;
+
+	[SerializeField]
 	[Tooltip("Whether we should continue to adjust the world coordinate system if the currently tracked QR code moves.")]
 	bool followMovingQRCode = false;
 	
@@ -240,6 +246,13 @@ public class QRScanner : MonoBehaviour
 					}
 
 					_currentLocationID = loc;
+
+					// Fetch location information from the server and apply any applicable configuration.
+					EasyVizARServer.Instance.Get("/locations/" + loc, EasyVizARServer.JSON_TYPE, delegate (string result)
+					{
+						var location = JsonUtility.FromJson<EasyVizAR.Location>(result);
+						ApplyLocationConfiguration(location);
+					});
 				}
 			}
 		}
@@ -250,6 +263,20 @@ public class QRScanner : MonoBehaviour
 			manager.CreateAllHeadsets();
 		}
 	}
+
+	// Enable or disable certain features based on the configuration values from the server.
+	void ApplyLocationConfiguration(EasyVizAR.Location location)
+    {
+		if (_meshCapture)
+        {
+			_meshCapture.SetActive(location.headset_configuration.enable_mesh_capture);
+        }
+
+		if (_photoCapture)
+        {
+			_photoCapture.SetActive(location.headset_configuration.enable_photo_capture);
+        }
+    }
 
 	void ChangeCoordinateSystemFromCode(QRData d)
     {

@@ -21,6 +21,8 @@ public class TakeColorPhoto : MonoBehaviour
 	private int _currentHeight;
 
 	bool _isCapturing = false;
+	bool _continuousCapture = true;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -32,6 +34,16 @@ public class TakeColorPhoto : MonoBehaviour
     {
         
     }
+
+	void OnEnable()
+	{
+		BeginContinuousCapture();
+	}
+
+	void OnDisable()
+    {
+		EndContinuousCapture();
+	}
 
 	void OnValidate()
     {
@@ -54,7 +66,19 @@ public class TakeColorPhoto : MonoBehaviour
         }
 		
 	}
+
+	void BeginContinuousCapture()
+    {
+		_continuousCapture = true;
+		_isCapturing = true;
+		PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
+	}
 	
+	void EndContinuousCapture()
+    {
+		_continuousCapture = false;
+	}
+
 	void OnPhotoCaptureCreated(UnityEngine.Windows.WebCam.PhotoCapture captureObject)
 	{
 		photoCaptureObject = captureObject;
@@ -84,6 +108,7 @@ public class TakeColorPhoto : MonoBehaviour
 	{
 		photoCaptureObject.Dispose();
 		photoCaptureObject = null;
+		_isCapturing = false;
 	}
 	
 	private void OnPhotoModeStarted(PhotoCapture.PhotoCaptureResult result)
@@ -107,15 +132,21 @@ public class TakeColorPhoto : MonoBehaviour
 		if (result.success)
 		{
 			Debug.Log("Saved Photo to disk: " + _currentFilePath);
-			photoCaptureObject.StopPhotoModeAsync(OnStoppedPhotoMode);
 			StartCoroutine(UploadImage(_currentFilePath, _currentWidth, _currentHeight));
+			
+			if (_continuousCapture)
+			{
+				OnPhotoModeStarted(result);
+			}
+			else
+			{
+				photoCaptureObject.StopPhotoModeAsync(OnStoppedPhotoMode);
+			}
 		}
 		else
 		{
 			Debug.Log("Failed to save Photo to disk");
 		}
-		
-		_isCapturing = false;
 	}
 
 	IEnumerator UploadImage(string path, int width, int height)

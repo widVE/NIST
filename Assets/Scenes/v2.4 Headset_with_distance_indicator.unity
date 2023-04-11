@@ -7246,6 +7246,8 @@ MonoBehaviour:
   _qrPrefab: {fileID: 1539913616}
   _qrPrefabParent: {fileID: 46054712}
   _headsetManager: {fileID: 1361342022}
+  _meshCapture: {fileID: 1375559501}
+  _photoCapture: {fileID: 404529389}
   followMovingQRCode: 1
   testQRCodeData: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/1cc48e8d-890d-413a-aa66-cabaaa6e5458
   triggerQRCodeDetected: 0
@@ -9383,7 +9385,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &404529390
 Transform:
   m_ObjectHideFlags: 0
