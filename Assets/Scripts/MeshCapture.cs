@@ -212,6 +212,13 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         var normals = new NativeArray<Vector3>(num_vertices, Allocator.TempJob);
         var indices = new NativeArray<int>(num_indices, Allocator.TempJob);
 
+        // OpenXR specifies a right-handed coordinate system
+        // <https://registry.khronos.org/OpenXR/specs/1.0/html/xrspec.html#coordinate-system>,
+        // whereas Unity uses a left-handed coordinate system. This might possibly be the source of our troubles.
+        // Negating the third row of the transformation matrix will have the same effect as negating
+        // the z value in the resulting the mesh coordinates.
+        transformation.SetRow(2, -1.0f * transformation.GetRow(2));
+
         mesh.GetVertices(vertices);
         mesh.GetNormals(normals);
         mesh.GetIndices(indices, 0);
@@ -222,9 +229,11 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         StringBuilder sb = new StringBuilder(capacity);
         sb.AppendLine("ply");
         sb.AppendLine("format ascii 1.0");
-        sb.AppendLine($"comment Transformation: {transformation[0, 0]} {transformation[0, 1]} {transformation[0, 2]} {transformation[1, 0]} {transformation[1, 1]} {transformation[1, 2]} {transformation[2, 0]} {transformation[2, 1]} {transformation[2, 2]}");
-        //sb.AppendLine("comment Spatial Object Id: " + meshObject.Id);
-        //sb.AppendLine("comment Mesh Filter Name: " + meshObject.Filter.name);
+        sb.AppendLine("comment System: unity");
+        sb.AppendLine($"comment T1: {transformation[0, 0]} {transformation[0, 1]} {transformation[0, 2]}  {transformation[0, 3]}");
+        sb.AppendLine($"comment T2: {transformation[1, 0]} {transformation[1, 1]} {transformation[1, 2]}  {transformation[1, 3]}");
+        sb.AppendLine($"comment T3: {transformation[2, 0]} {transformation[2, 1]} {transformation[2, 2]}  {transformation[2, 3]}");
+        sb.AppendLine($"comment T4: {transformation[3, 0]} {transformation[3, 1]} {transformation[3, 2]}  {transformation[3, 3]}");
         sb.AppendLine("element vertex " + num_vertices);
         sb.AppendLine("property double x");
         sb.AppendLine("property double y");
@@ -235,7 +244,6 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         sb.AppendLine("element face " + num_triangles);
         sb.AppendLine("property list uchar int vertex_index");
         sb.AppendLine("end_header");
-
 
         for (int i = 0; i < num_vertices; i++)
         {
