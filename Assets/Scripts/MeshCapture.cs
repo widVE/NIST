@@ -212,13 +212,6 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         var normals = new NativeArray<Vector3>(num_vertices, Allocator.TempJob);
         var indices = new NativeArray<int>(num_indices, Allocator.TempJob);
 
-        // OpenXR specifies a right-handed coordinate system
-        // <https://registry.khronos.org/OpenXR/specs/1.0/html/xrspec.html#coordinate-system>,
-        // whereas Unity uses a left-handed coordinate system. This might possibly be the source of our troubles.
-        // Negating the third row of the transformation matrix will have the same effect as negating
-        // the z value in the resulting the mesh coordinates.
-        transformation.SetRow(2, -1.0f * transformation.GetRow(2));
-
         mesh.GetVertices(vertices);
         mesh.GetNormals(normals);
         mesh.GetIndices(indices, 0);
