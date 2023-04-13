@@ -25,6 +25,9 @@ namespace HoloToolkit.Unity
         [Tooltip("Display a small green cube where the target position is.")]
         public bool DebugDisplayTargetPosition = false;
 
+        [Tooltip("Rotatational offset from forward vector.")]
+        public Vector3 RotationalOffset = new Vector3(0f, 0f, 0f);
+
         private Vector3 targetPosition;
         private Vector3 optimalPosition;
         private float initialDistanceToCamera;
@@ -36,7 +39,7 @@ namespace HoloToolkit.Unity
 
         void Update()
         {
-            optimalPosition = Camera.main.transform.position + Camera.main.transform.forward * initialDistanceToCamera;
+            optimalPosition = Camera.main.transform.position + Quaternion.Euler(RotationalOffset) * Camera.main.transform.forward * initialDistanceToCamera;
 
             Vector3 offsetDir = this.transform.position - optimalPosition;
             if (offsetDir.magnitude > SphereRadius)

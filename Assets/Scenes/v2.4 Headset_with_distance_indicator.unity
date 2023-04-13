@@ -44452,7 +44452,7 @@ MonoBehaviour:
   reorientWhenOutsideParameters: 1
   orientToControllerDeadzoneDegrees: 60
   ignoreAngleClamp: 0
-  ignoreDistanceClamp: 0
+  ignoreDistanceClamp: 1
   ignoreReferencePitchAndRoll: 0
   pitchOffset: 0
   verticalMaxDistance: 0
@@ -52470,6 +52470,7 @@ MonoBehaviour:
   MoveSpeed: 15
   DebugDisplaySphere: 0
   DebugDisplayTargetPosition: 0
+  RotationalOffset: {x: 0, y: 15, z: 0}
 --- !u!1 &7836591909051288777
 GameObject:
   m_ObjectHideFlags: 0
