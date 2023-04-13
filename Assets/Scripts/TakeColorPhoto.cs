@@ -12,6 +12,15 @@ public class TakeColorPhoto : MonoBehaviour
 
 	public EasyVizARHeadsetManager headsetManager;
 
+	[SerializeField]
+	int continuousResolutionWidth = 760;
+
+	[SerializeField]
+	int continuousResolutionHeight = 428;
+
+	[SerializeField]
+	float continuousHologramOpacity = 0.0f;
+
 	[Header("Manual Trigger")]
 	[Tooltip("Click to trigger a photo capture.")]
 	public bool triggerCapture = false;
@@ -76,16 +85,26 @@ public class TakeColorPhoto : MonoBehaviour
 	{
 		photoCaptureObject = captureObject;
 
-		Resolution cameraResolution = PhotoCapture.SupportedResolutions.OrderByDescending((res) => res.width * res.height).First();
-
 		CameraParameters c = new UnityEngine.Windows.WebCam.CameraParameters();
-		c.hologramOpacity = 0.0f;
-		c.cameraResolutionWidth = cameraResolution.width;
-		c.cameraResolutionHeight = cameraResolution.height;
 		c.pixelFormat = UnityEngine.Windows.WebCam.CapturePixelFormat.BGRA32;
 
-		_currentWidth = cameraResolution.width;
-		_currentHeight = cameraResolution.height;
+		if (_continuousCapture)
+        {
+			c.hologramOpacity = continuousHologramOpacity;
+			c.cameraResolutionWidth = continuousResolutionWidth;
+			c.cameraResolutionHeight = continuousResolutionHeight;
+		}
+        else
+        {
+			Resolution cameraResolution = PhotoCapture.SupportedResolutions.OrderByDescending((res) => res.width * res.height).First();
+
+			c.hologramOpacity = 0.0f;
+			c.cameraResolutionWidth = cameraResolution.width;
+			c.cameraResolutionHeight = cameraResolution.height;
+		}
+		
+		_currentWidth = c.cameraResolutionWidth;
+		_currentHeight = c.cameraResolutionHeight;
 
 		captureObject.StartPhotoModeAsync(c, delegate(PhotoCapture.PhotoCaptureResult result) {
 			// Take a picture
