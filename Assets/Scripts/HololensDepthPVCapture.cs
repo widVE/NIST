@@ -122,7 +122,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 				_qrScanner.QRTransformChanged += (o, ev) =>
 				{
 					Matrix4x4 m = ev.NewTransform;
-					m = m.transpose;
+					//m = m.transpose;
 					//m = m.inverse;
 					researchMode.SetQRTransform(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);					
 					researchMode.SetQRCodeDetected();
@@ -273,7 +273,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 								pos = depthTrans.GetPosition();
 								rot = depthTrans.rotation;
 								
-								if(EasyVizARServer.Instance.PutImage("image/png", sDepth, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID))
+								if(EasyVizARServer.Instance.PutImage("image/png", sDepth, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "depth"))
 								{
 									_lastDepthImageName = sDepth;
 								}

@@ -281,12 +281,12 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	}
 	
 	public bool PutImage(string contentType, string pathToFile, string locationID, int width, int height, System.Action<string> callBack, 
-				Vector3 position, Quaternion orientation, string headsetID = "")
+				Vector3 position, Quaternion orientation, string headsetID = "", string imageType="photo")
 	{
 		if(!_isUploadingImage)
 		{
 			_isUploadingImage = true;
-			StartCoroutine(UploadImage(contentType, pathToFile, locationID, width, height, callBack, position, orientation, headsetID));
+			StartCoroutine(UploadImage(contentType, pathToFile, locationID, width, height, callBack, position, orientation, headsetID, imageType));
 			return true;
 		}
 		
@@ -470,7 +470,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	
 
 	IEnumerator UploadImage(string contentType, string path, string locationID, int width, int height, System.Action<string> callBack, 
-				Vector3 position, Quaternion orientation, string headsetID = "")
+				Vector3 position, Quaternion orientation, string headsetID = "", string imageType="photo")
     {
 		EasyVizAR.Hololens2PhotoPost h = new EasyVizAR.Hololens2PhotoPost();
 		h.width = width;
@@ -535,8 +535,13 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		//string photoJson = JsonUtility.ToJson(h2);
 		//Debug.Log(photoJson);
 		//Debug.Log(h2.imageUrl);
+		
+		//instead let's add "photo.png" or "depth.png" to the end of the image URL...
+		string iUrl = h2.imageUrl;
+		iUrl = iUrl.Replace("image", imageType);
+		iUrl = iUrl + ".png";
 
-		UnityWebRequest www2 = new UnityWebRequest("http://halo05.wings.cs.wisc.edu:5000" + h2.imageUrl, "PUT");
+		UnityWebRequest www2 = new UnityWebRequest("http://halo05.wings.cs.wisc.edu:5000" + iUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
