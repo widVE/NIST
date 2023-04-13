@@ -179,7 +179,7 @@ public class TakeColorPhoto : MonoBehaviour
 			}
 
 			h.camera_position = new EasyVizAR.Position();
-			h.camera_position.x = -headset.transform.position.x;
+			h.camera_position.x = headset.transform.position.x;
 			h.camera_position.y = headset.transform.position.y;
 			h.camera_position.z = headset.transform.position.z;
 
