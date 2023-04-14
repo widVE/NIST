@@ -293,6 +293,20 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		return false;
 	}
 	
+	public bool PutImagePair(string contentType, string pathToFile, string pathToFile2, string locationID, int width, int height, System.Action<string> callBack, 
+				Vector3 position, Quaternion orientation, string headsetID = "", string imageType="photo", string imageType2="depth")
+	{
+		if(!_isUploadingImage)
+		{
+			_isUploadingImage = true;
+			StartCoroutine(UploadImagePair(contentType, pathToFile, pathToFile2, locationID, width, height, callBack, position, orientation, headsetID, imageType, imageType2));
+			return true;
+		}
+		
+		return false;
+	}
+	
+	
 	IEnumerator DoGET(string url, string contentType, System.Action<string> callBack)
 	{
 		UnityWebRequest www = UnityWebRequest.Get(url);
@@ -468,9 +482,8 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		}
 	}
 	
-
-	IEnumerator UploadImage(string contentType, string path, string locationID, int width, int height, System.Action<string> callBack, 
-				Vector3 position, Quaternion orientation, string headsetID = "", string imageType="photo")
+	IEnumerator UploadImagePair(string contentType, string path, string path2, string locationID, int width, int height, System.Action<string> callBack, 
+				Vector3 position, Quaternion orientation, string headsetID = "", string imageType="photo", string imageType2="depth")
     {
 		EasyVizAR.Hololens2PhotoPost h = new EasyVizAR.Hololens2PhotoPost();
 		h.width = width;
@@ -500,7 +513,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		}
 		
 
-		UnityWebRequest www = new UnityWebRequest("http://halo05.wings.cs.wisc.edu:5000/photos", "POST");
+		UnityWebRequest www = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000/photos", "POST");
 		www.SetRequestHeader("Content-Type", "application/json");
 
 		string ourJson = JsonUtility.ToJson(h);
@@ -541,7 +554,133 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType);
 		iUrl = iUrl + ".png";
 
-		UnityWebRequest www2 = new UnityWebRequest("http://halo05.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www2 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		www2.SetRequestHeader("Content-Type", "image/png");
+
+		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
+		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
+		www2.uploadHandler = new UploadHandlerFile(path);//new UploadHandlerRaw(image_as_bytes2);//
+		www2.downloadHandler = new DownloadHandlerBuffer();
+
+		yield return www2.SendWebRequest();
+
+		if (www2.result != UnityWebRequest.Result.Success)
+		{
+			//Debug.Log(www2.error);
+			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOutErr2.txt"), www2.error);
+		}
+		else
+		{
+			//Debug.Log("Photo upload complete!");
+			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOut2.txt"), iUrl);
+		}
+
+		iUrl = h2.imageUrl;
+		iUrl = iUrl.Replace("image", imageType2);
+		iUrl = iUrl + ".png";
+		
+		UnityWebRequest www3 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		www3.SetRequestHeader("Content-Type", "image/png");
+
+		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
+		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
+		www3.uploadHandler = new UploadHandlerFile(path2);//new UploadHandlerRaw(image_as_bytes2);//
+		www3.downloadHandler = new DownloadHandlerBuffer();
+
+		yield return www3.SendWebRequest();
+
+		if (www3.result != UnityWebRequest.Result.Success)
+		{
+			//Debug.Log(www2.error);
+			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOutErr3.txt"), www3.error);
+		}
+		else
+		{
+			//Debug.Log("Photo upload complete!");
+			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOut3.txt"), iUrl);
+		}
+		
+		www.Dispose();
+		www2.Dispose();
+		www3.Dispose();
+		
+		_isUploadingImage = false;
+		
+	}
+
+	IEnumerator UploadImage(string contentType, string path, string locationID, int width, int height, System.Action<string> callBack, 
+				Vector3 position, Quaternion orientation, string headsetID = "", string imageType="photo")
+    {
+		EasyVizAR.Hololens2PhotoPost h = new EasyVizAR.Hololens2PhotoPost();
+		h.width = width;
+		h.height = height;
+		h.contentType = contentType;//"image/png";
+		h.camera_location_id = locationID;
+
+		//var headset = headsetManager.LocalHeadset;
+		//if (headset != null)
+        {
+			//var hsObject = headset.GetComponent<EasyVizARHeadset>();
+			//if (hsObject != null)
+            {
+				h.created_by = headsetID;//hsObject._headsetID;
+			}
+
+			h.camera_position = new EasyVizAR.Position();
+			h.camera_position.x = -position.x;//headset.transform.position.x;
+			h.camera_position.y = position.y;//headset.transform.position.y;
+			h.camera_position.z = position.z;//headset.transform.position.z;
+
+			h.camera_orientation = new EasyVizAR.Orientation();
+			h.camera_orientation.x = orientation.x;
+			h.camera_orientation.y = orientation.y;
+			h.camera_orientation.z = orientation.z;
+			h.camera_orientation.w = orientation.w;
+		}
+		
+
+		UnityWebRequest www = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000/photos", "POST");
+		www.SetRequestHeader("Content-Type", "application/json");
+
+		string ourJson = JsonUtility.ToJson(h);
+
+		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(ourJson);
+		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
+		www.downloadHandler = new DownloadHandlerBuffer();
+
+		yield return www.SendWebRequest();
+
+		if (www.result != UnityWebRequest.Result.Success)
+		{
+			//Debug.Log(www.error);
+			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOutErr1.txt"), www.error);
+		}
+		else
+		{
+			//Debug.Log("Form upload complete!");
+			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOut1.txt"), "successfully posted photo");
+		}
+
+		string resultText = www.downloadHandler.text;
+		
+		System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "path.txt"), path);
+		
+		System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "result.txt"), resultText);
+		//Debug.Log(resultText);
+
+		EasyVizAR.Hololens2PhotoPut h2 = JsonUtility.FromJson<EasyVizAR.Hololens2PhotoPut>(resultText);
+		//h2.imagePath = h2Location;
+
+		//string photoJson = JsonUtility.ToJson(h2);
+		//Debug.Log(photoJson);
+		//Debug.Log(h2.imageUrl);
+		
+		//instead let's add "photo.png" or "depth.png" to the end of the image URL...
+		string iUrl = h2.imageUrl;
+		iUrl = iUrl.Replace("image", imageType);
+		iUrl = iUrl + ".png";
+
+		UnityWebRequest www2 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);

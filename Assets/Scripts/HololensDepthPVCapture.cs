@@ -123,7 +123,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 				{
 					Matrix4x4 m = ev.NewTransform;
 					//m = m.transpose;
-					//m = m.inverse;
+					m = m.inverse;
 					researchMode.SetQRTransform(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);					
 					researchMode.SetQRCodeDetected();
 					RunSensors();
@@ -227,20 +227,158 @@ public class HololensDepthPVCapture : MonoBehaviour
 #else
 		if(_uploadToServer)
 		{
-			bool isNewDepth = false;
-			string sDepth = researchMode.GetDepthImageName();
-			if(sDepth.Length > 0)
+			if(_captureDepthImages && _captureRectifiedColorImages)
 			{
-				if(_lastDepthImageName.Length == 0)
+				bool isNewDepth = false;
+				string sDepth = researchMode.GetDepthImageName();
+				if(sDepth.Length > 0)
 				{
-					_lastDepthImageName = sDepth;
+					if(_lastDepthImageName.Length == 0)
+					{
+						_lastDepthImageName = sDepth;
+						isNewDepth = true;
+					}
+					else
+					{
+						if(sDepth != _lastDepthImageName)
+						{
+							isNewDepth = true;		
+						}
+					}
+				}
+				
+				bool isNewColor = false;
+				string sColor = researchMode.GetRectColorName();
+				if(sColor.Length > 0)
+				{
+					if(_lastRectColorName.Length == 0)
+					{
+						_lastRectColorName = sColor;
+						isNewColor = true;
+					}
+					else
+					{
+						if(sColor != _lastRectColorName)
+						{
+							isNewColor = true;		
+						}
+					}
+				}
+						
+				if(isNewColor && isNewDepth)
+				{
+					if(_manager != null)
+					{
+						var headset = _manager.LocalHeadset;
+						if (headset != null)
+						{
+							var hsObject = headset.GetComponent<EasyVizARHeadset>();
+							if (hsObject != null)
+							{
+								Matrix4x4 depthTrans = Matrix4x4.identity;
+								string sTransform = researchMode.GetTransformName();
+								//load the transform... decompose to the position and rotation...
+								string[] transLines = File.ReadAllLines(sTransform);
+								Vector3 pos = Vector3.zero;
+								Quaternion rot = Quaternion.identity;
+								
+								for(int i = 0; i < 4; ++i)
+								{
+									string[] vals = transLines[i].Split(" ");
+									for(int j = 0; j < 4; ++j)
+									{
+										depthTrans[i*4+j] = float.Parse(vals[j]);
+									}
+								}
+								
+								pos = depthTrans.GetPosition();
+								rot = depthTrans.rotation;
+								
+								if(EasyVizARServer.Instance.PutImagePair("image/png", sColor, sDepth, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "photo", "depth"))
+								{
+									_lastDepthImageName = sDepth;
+									_lastRectColorName = sColor;
+								}
+							}
+						}
+					}	
+					
+				}
+			}
+			else
+			{
+				if(_captureDepthImages)
+				{
+					bool isNewDepth = false;
+					string sDepth = researchMode.GetDepthImageName();
+					if(sDepth.Length > 0)
+					{
+						if(_lastDepthImageName.Length == 0)
+						{
+							_lastDepthImageName = sDepth;
+							isNewDepth = true;
+						}
+						else
+						{
+							if(sDepth != _lastDepthImageName)
+							{
+								isNewDepth = true;		
+							}
+						}
+						
+						if(isNewDepth)
+						{
+							if(_manager != null)
+							{
+								var headset = _manager.LocalHeadset;
+								if (headset != null)
+								{
+									var hsObject = headset.GetComponent<EasyVizARHeadset>();
+									if (hsObject != null)
+									{
+										Matrix4x4 depthTrans = Matrix4x4.identity;
+										string sTransform = researchMode.GetTransformName();
+										//load the transform... decompose to the position and rotation...
+										string[] transLines = File.ReadAllLines(sTransform);
+										Vector3 pos = Vector3.zero;
+										Quaternion rot = Quaternion.identity;
+										
+										for(int i = 0; i < 4; ++i)
+										{
+											string[] vals = transLines[i].Split(" ");
+											for(int j = 0; j < 4; ++j)
+											{
+												depthTrans[i*4+j] = float.Parse(vals[j]);
+											}
+										}
+										
+										pos = depthTrans.GetPosition();
+										rot = depthTrans.rotation;
+										
+										if(EasyVizARServer.Instance.PutImage("image/png", sDepth, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "depth"))
+										{
+											_lastDepthImageName = sDepth;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				/*
+				if(_lastDepthBinaryName.Length == 0)
+				{
+					_lastDepthBinaryName = researchMode.GetBinaryDepthName();
 					isNewDepth = true;
 				}
 				else
 				{
-					if(sDepth != _lastDepthImageName)
+					string s = researchMode.GetBinaryDepthName();
+					if(s != _lastDepthBinaryName)
 					{
-						isNewDepth = true;		
+						isNewDepth = true;
+						_lastDepthBinaryName = s;
 					}
 				}
 				
@@ -248,122 +386,71 @@ public class HololensDepthPVCapture : MonoBehaviour
 				{
 					if(_manager != null)
 					{
-						var headset = _manager.LocalHeadset;
-						if (headset != null)
-						{
-							var hsObject = headset.GetComponent<EasyVizARHeadset>();
-							if (hsObject != null)
-							{
-								Matrix4x4 depthTrans = Matrix4x4.identity;
-								string sTransform = researchMode.GetTransformName();
-								//load the transform... decompose to the position and rotation...
-								string[] transLines = File.ReadAllLines(sTransform);
-								Vector3 pos = Vector3.zero;
-								Quaternion rot = Quaternion.identity;
-								
-								for(int i = 0; i < 4; ++i)
-								{
-									string[] vals = transLines[i].Split(" ");
-									for(int j = 0; j < 4; ++j)
-									{
-										depthTrans[i*4+j] = float.Parse(vals[j]);
-									}
-								}
-								
-								pos = depthTrans.GetPosition();
-								rot = depthTrans.rotation;
-								
-								if(EasyVizARServer.Instance.PutImage("image/png", sDepth, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "depth"))
-								{
-									_lastDepthImageName = sDepth;
-								}
-							}
-						}
+						//Debug.Log(_lastDepthBinaryName);
+						//EasyVizARServer.Instance.PutImage("image/png", _lastRectColorName, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, hsObject.transform.position, hsObject.transform.rotation, hsObject._headsetID);
+							//}
 					}
-				}
-			}
-			
-			/*
-			if(_lastDepthBinaryName.Length == 0)
-			{
-				_lastDepthBinaryName = researchMode.GetBinaryDepthName();
-				isNewDepth = true;
-			}
-			else
-			{
-				string s = researchMode.GetBinaryDepthName();
-				if(s != _lastDepthBinaryName)
-				{
-					isNewDepth = true;
-					_lastDepthBinaryName = s;
-				}
-			}
-			
-			if(isNewDepth)
-			{
-				if(_manager != null)
-				{
-					//Debug.Log(_lastDepthBinaryName);
-					//EasyVizARServer.Instance.PutImage("image/png", _lastRectColorName, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, hsObject.transform.position, hsObject.transform.rotation, hsObject._headsetID);
-						//}
-				}
-			}*/
-			
-			string sColor = researchMode.GetRectColorName();
-			if(sColor.Length > 0)
-			{
-				bool isNewColor = false;
-				if(_lastRectColorName.Length == 0)
-				{
-					_lastRectColorName = sColor;
-					isNewColor = true;
-				}
-				else
-				{
-					if(sColor != _lastRectColorName)
-					{
-						isNewColor = true;		
-					}
-				}
+				}*/
 				
-				if(isNewColor)
+				if(_captureRectifiedColorImages)
 				{
-					if(_manager != null)
+					string sColor = researchMode.GetRectColorName();
+					if(sColor.Length > 0)
 					{
-						var headset = _manager.LocalHeadset;
-						if (headset != null)
+						bool isNewColor = false;
+						if(_lastRectColorName.Length == 0)
 						{
-							var hsObject = headset.GetComponent<EasyVizARHeadset>();
-							if (hsObject != null)
+							_lastRectColorName = sColor;
+							isNewColor = true;
+						}
+						else
+						{
+							if(sColor != _lastRectColorName)
 							{
-								Matrix4x4 depthTrans = Matrix4x4.identity;
-								string sTransform = researchMode.GetTransformName();
-								//load the transform... decompose to the position and rotation...
-								string[] transLines = File.ReadAllLines(sTransform);
-								Vector3 pos = Vector3.zero;
-								Quaternion rot = Quaternion.identity;
-								
-								for(int i = 0; i < 4; ++i)
-								{
-									string[] vals = transLines[i].Split(" ");
-									for(int j = 0; j < 4; ++j)
-									{
-										depthTrans[i*4+j] = float.Parse(vals[j]);
-									}
-								}
-								
-								pos = depthTrans.GetPosition();
-								rot = depthTrans.rotation;
-								
-								if(EasyVizARServer.Instance.PutImage("image/png", sColor, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID))
-								{
-									_lastRectColorName = sColor;
-								}
+								isNewColor = true;		
 							}
 						}
 						
-						//Debug.Log(_lastRectColorName);
-						
+						if(isNewColor)
+						{
+							if(_manager != null)
+							{
+								var headset = _manager.LocalHeadset;
+								if (headset != null)
+								{
+									var hsObject = headset.GetComponent<EasyVizARHeadset>();
+									if (hsObject != null)
+									{
+										Matrix4x4 depthTrans = Matrix4x4.identity;
+										string sTransform = researchMode.GetTransformName();
+										//load the transform... decompose to the position and rotation...
+										string[] transLines = File.ReadAllLines(sTransform);
+										Vector3 pos = Vector3.zero;
+										Quaternion rot = Quaternion.identity;
+										
+										for(int i = 0; i < 4; ++i)
+										{
+											string[] vals = transLines[i].Split(" ");
+											for(int j = 0; j < 4; ++j)
+											{
+												depthTrans[i*4+j] = float.Parse(vals[j]);
+											}
+										}
+										
+										pos = depthTrans.GetPosition();
+										rot = depthTrans.rotation;
+										
+										if(EasyVizARServer.Instance.PutImage("image/png", sColor, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID))
+										{
+											_lastRectColorName = sColor;
+										}
+									}
+								}
+								
+								//Debug.Log(_lastRectColorName);
+								
+							}
+						}
 					}
 				}
 			}
