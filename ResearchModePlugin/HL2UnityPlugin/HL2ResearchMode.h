@@ -88,6 +88,9 @@ namespace winrt::HL2UnityPlugin::implementation
         void SetCaptureBinaryDepth() { m_bCaptureBinaryDepth = true; }
         bool IsCapturingBinaryDepth() { return m_bCaptureBinaryDepth; }
 
+        void SetCaptureIntensity() { m_bCaptureIntensity = true; }
+        bool IsCapturingIntensity() { return m_bCaptureIntensity; }
+
         void SetQRCodeDetected();
 
         bool IsQRCodeDetected() 
@@ -148,6 +151,8 @@ namespace winrt::HL2UnityPlugin::implementation
         UINT8* m_shortAbImageTexture = nullptr;
         UINT16* m_longDepthMap = nullptr;
         UINT8* m_longDepthMapTexture = nullptr;
+        UINT16* m_longAbImage = nullptr;
+
 		UINT8* m_LFImage = nullptr;
 		UINT8* m_RFImage = nullptr;
         UINT8* m_LRImage = nullptr;
@@ -219,6 +224,7 @@ namespace winrt::HL2UnityPlugin::implementation
         std::atomic_bool m_bCaptureTransform = false;
         std::atomic_bool m_bCaptureBinaryDepth = false;
         std::atomic_bool m_bIsQRCodeDetected = false;
+        std::atomic_bool m_bCaptureIntensity = false;
 
         float m_roiBound[3]{ 0,0,0 };
         float m_roiCenter[3]{ 0,0,0 };

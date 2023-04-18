@@ -60,12 +60,16 @@ public class HololensDepthPVCapture : MonoBehaviour
 	bool _captureTransforms = false;
 	
 	[SerializeField]
+	bool _captureIntensity = false;
+	
+	[SerializeField]
 	bool _captureVideo = false;
 	
 	string _lastDepthBinaryName = "";
 	string _lastRectColorName = "";
 	string _lastTransformName = "";
 	string _lastDepthImageName = "";
+	string _lastIntensityImageName = "";
 	
 	static readonly float MaxRecordingTime = 5.0f;
 	VideoCapture m_VideoCapture = null;

@@ -575,11 +575,15 @@ namespace winrt::HL2UnityPlugin::implementation
             winrt::check_hresult(pDepthSensorFrame->QueryInterface(IID_PPV_ARGS(&pDepthFrame)));
 
             size_t outBufferCount = 0;
+            size_t activeBrightnessCount = 0;
             const UINT16* pDepth = nullptr;
-
+            const UINT16* pActiveBrightness = nullptr;
             const BYTE* pSigma = nullptr;
+
             pDepthFrame->GetSigmaBuffer(&pSigma, &outBufferCount);
+            pDepthFrame->GetAbDepthBuffer(&pActiveBrightness, &activeBrightnessCount);
             pDepthFrame->GetBuffer(&pDepth, &outBufferCount);
+
             pHL2ResearchMode->m_longDepthBufferSize = outBufferCount;
             ResearchModeSensorTimestamp timestamp;
             pDepthSensorFrame->GetTimeStamp(&timestamp);
@@ -1056,19 +1060,20 @@ namespace winrt::HL2UnityPlugin::implementation
                                     depthVec.y = pHL2ResearchMode->_depthPts[idx].y;
                                     depthVec.z = pHL2ResearchMode->_depthPts[idx].z;
                                     XMVECTOR pointInQR = XMVector3Transform(XMLoadFloat3(&depthVec), pHL2ResearchMode->m_QRMatrix);
-
                                     pointCloud.push_back(pointInQR.n128_f32[0]);
                                     pointCloud.push_back(pointInQR.n128_f32[1]);
                                     pointCloud.push_back(pointInQR.n128_f32[2]);
-                                    //pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].x);
-                                    //pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].y);
-                                    //pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].z);
+
+                                    /*pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].x);
+                                    pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].y);
+                                    pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].z);
                                     pointCloud.push_back((float)r / 255.0f);
                                     pointCloud.push_back((float)g / 255.0f);
-                                    pointCloud.push_back((float)b / 255.0f);
+                                    pointCloud.push_back((float)b / 255.0f);*/
                                     if (file.is_open() && pHL2ResearchMode->IsCapturingColoredPointCloud())
                                     {
-                                        file << pointInQR.n128_f32[0] << " " << pointInQR.n128_f32[1] << " " << pointInQR.n128_f32[2] << " " << ((float)r / 255.0f) << " " << (float)g / 255.0f << " " << (float)b / 255.0f << std::endl;
+                                        //file << pointInQR.n128_f32[0] << " " << pointInQR.n128_f32[1] << " " << pointInQR.n128_f32[2] << " " << ((float)r / 255.0f) << " " << (float)g / 255.0f << " " << (float)b / 255.0f << std::endl;
+                                        file << pHL2ResearchMode->_depthPts[idx].x << " " << pHL2ResearchMode->_depthPts[idx].y << " " << pHL2ResearchMode->_depthPts[idx].z << " " << ((float)r / 255.0f) << " " << (float)g / 255.0f << " " << (float)b / 255.0f << std::endl;
                                     }
                                 }
                                 else
@@ -1247,6 +1252,14 @@ namespace winrt::HL2UnityPlugin::implementation
                 OutputDebugString(L"Create Space for local depth...\n");
                 pHL2ResearchMode->m_localDepth = new float[outBufferCount * 4];
             }
+
+            if (!pHL2ResearchMode->m_longAbImage)
+            {
+                OutputDebugString(L"Create Space for long AbImage...\n");
+                pHL2ResearchMode->m_longAbImage = new UINT16[outBufferCount];
+            }
+            memcpy(pHL2ResearchMode->m_longAbImage, pActiveBrightness, outBufferCount * sizeof(UINT16));
+
 
             // save raw depth map
             if (!pHL2ResearchMode->m_longDepthMap)

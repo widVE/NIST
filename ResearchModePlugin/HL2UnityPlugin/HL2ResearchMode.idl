@@ -68,6 +68,8 @@ namespace HL2UnityPlugin
         Boolean IsCapturingColoredPointCloud();
         void SetCaptureBinaryDepth();
         Boolean IsCapturingBinaryDepth();
+        void SetCaptureIntensity();
+        Boolean IsCapturingIntensity();
 
         void SetQRCodeDetected();
         Boolean IsQRCodeDetected();

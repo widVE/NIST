@@ -1921,13 +1921,14 @@ MonoBehaviour:
   _qrScanner: {fileID: 291935032}
   _manager: {fileID: 561901448}
   _startOnQRDetection: 1
-  _uploadToServer: 1
+  _uploadToServer: 0
   _captureColorPointCloud: 1
   _captureHiResColorImages: 0
   _captureRectifiedColorImages: 1
   _captureDepthImages: 1
   _captureBinaryDepth: 1
   _captureTransforms: 1
+  _captureIntensity: 0
   _captureVideo: 0
 --- !u!1 &891683166
 GameObject:
