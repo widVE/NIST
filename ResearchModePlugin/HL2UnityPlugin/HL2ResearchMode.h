@@ -40,6 +40,7 @@ namespace winrt::HL2UnityPlugin::implementation
         hstring GetHiColorName() { return _lastHiColorName; }
         hstring GetDepthImageName() { return _lastDepthImageName; }
         hstring GetPointCloudName() { return _lastPointCloudName; }
+        hstring GetIntensityImageName() { return _lastIntensityImageName; }
 
         hstring _lastTransformName;
         hstring _lastBinaryDepthName;
@@ -47,6 +48,7 @@ namespace winrt::HL2UnityPlugin::implementation
         hstring _lastHiColorName;
         hstring _lastDepthImageName;
         hstring _lastPointCloudName;
+        hstring _lastIntensityImageName;
 
         void InitializeDepthSensor();
         void InitializeLongDepthSensor();

@@ -1072,8 +1072,8 @@ namespace winrt::HL2UnityPlugin::implementation
                                     pointCloud.push_back((float)b / 255.0f);*/
                                     if (file.is_open() && pHL2ResearchMode->IsCapturingColoredPointCloud())
                                     {
-                                        //file << pointInQR.n128_f32[0] << " " << pointInQR.n128_f32[1] << " " << pointInQR.n128_f32[2] << " " << ((float)r / 255.0f) << " " << (float)g / 255.0f << " " << (float)b / 255.0f << std::endl;
-                                        file << pHL2ResearchMode->_depthPts[idx].x << " " << pHL2ResearchMode->_depthPts[idx].y << " " << pHL2ResearchMode->_depthPts[idx].z << " " << ((float)r / 255.0f) << " " << (float)g / 255.0f << " " << (float)b / 255.0f << std::endl;
+                                        file << pointInQR.n128_f32[0] << " " << pointInQR.n128_f32[1] << " " << pointInQR.n128_f32[2] << " " << ((float)r / 255.0f) << " " << (float)g / 255.0f << " " << (float)b / 255.0f << std::endl;
+                                        //file << pHL2ResearchMode->_depthPts[idx].x << " " << pHL2ResearchMode->_depthPts[idx].y << " " << pHL2ResearchMode->_depthPts[idx].z << " " << ((float)r / 255.0f) << " " << (float)g / 255.0f << " " << (float)b / 255.0f << std::endl;
                                     }
                                 }
                                 else
@@ -1233,6 +1233,104 @@ namespace winrt::HL2UnityPlugin::implementation
                     pHL2ResearchMode->_lastDepthImageName = pHL2ResearchMode->_lastDepthImageName + hstring(L"\\") + hstring(fName);
 
                     CreateLocalFile(fName, depthImage);
+                    //pHL2ResearchMode->_frameCount++;
+                }
+
+                winrt::Windows::Graphics::Imaging::SoftwareBitmap intensityImage = winrt::Windows::Graphics::Imaging::SoftwareBitmap(winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Rgba16, 320, 288, winrt::Windows::Graphics::Imaging::BitmapAlphaMode::Straight);
+                //winrt::Windows::Graphics::Imaging
+
+                {
+                    winrt::Windows::Graphics::Imaging::BitmapBuffer bufferIntensity = intensityImage.LockBuffer(winrt::Windows::Graphics::Imaging::BitmapBufferAccessMode::Write);
+                    winrt::Windows::Foundation::IMemoryBufferReference referenceDepth = bufferIntensity.CreateReference();
+
+                    byte* dataInBytesDepth;
+                    unsigned int capacityIntensity;
+                    referenceDepth.as<::Windows::Foundation::IMemoryBufferByteAccess>()->GetBuffer(&dataInBytesDepth, &capacityIntensity);
+
+                    // Fill-in the BGRA plane
+                    winrt::Windows::Graphics::Imaging::BitmapPlaneDescription bufferLayoutDepth = bufferIntensity.GetPlaneDescription(0);
+
+                    for (UINT i = 0; i < resolution.Height; i++)
+                    {
+                        UINT wIdx = resolution.Width * i;
+                        for (UINT j = 0; j < resolution.Width; j++)
+                        {
+                            UINT idx = wIdx + j;
+
+                            float fX = screenPointsView[idx].X; // imageWidth;
+                            float fY = screenPointsView[idx].Y; // imageHeight;
+
+                            if (fX >= 0.0f && fX < imageWidth && fY >= 0.0f && fY < imageHeight)
+                            {
+                                INT cIdx = (INT)((imageWidth * 4) * (INT)(imageHeight - fY)) + (INT)(imageWidth - 1 - fX) * 4;
+
+                                if (cIdx > 0 && cIdx < (INT)(imageWidth * 4 * imageHeight))
+                                {
+                                    if (pHL2ResearchMode->IsCapturingIntensity())
+                                    {
+                                        //UINT idx2 = bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + j;
+                                        UINT16 depth = pActiveBrightness[idx];
+                                        depth = (pSigma[idx] & 0x80) ? 0 : depth;
+                                        //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = (depth & 0x00FF);
+                                        //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = ((depth && 0xFF00) >> 8);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 0] = (depth & 0x00FF);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 1] = ((depth & 0xFF00) >> 8);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 2] = (depth & 0x00FF);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 3] = ((depth & 0xFF00) >> 8);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 4] = (depth & 0x00FF);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 5] = ((depth & 0xFF00) >> 8);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 6] = 0xFF;// ((depth & 0xFF00) >> 8);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 7] = 0xFF;// (depth & 0x00FF);
+                                    }
+                                }
+                                else
+                                {
+                                    if (pHL2ResearchMode->IsCapturingIntensity())
+                                    {
+                                        //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = 0;
+                                        //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = 0;
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 0] = 0;
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 1] = 0;
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 2] = 0;
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 3] = 0;
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 4] = 0;
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 5] = 0;
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 6] = 0xFF;// ((depth & 0xFF00) >> 8);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 7] = 0xFF;// ((depth & 0xFF00) >> 8);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (pHL2ResearchMode->IsCapturingIntensity())
+                                {
+                                    //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = 0;
+                                    //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = 0;
+                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 0] = 0;
+                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 1] = 0;
+                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 2] = 0;
+                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 3] = 0;
+                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 4] = 0;
+                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 5] = 0;
+                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 6] = 0xFF;// ((depth & 0xFF00) >> 8);
+                                    dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 7] = 0xFF;// ((depth & 0xFF00) >> 8);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (pHL2ResearchMode->IsCapturingIntensity())
+                {
+                    wchar_t fName[128];
+                    swprintf(fName, 128, L"%s_%s_intensity.png", m_datetime.c_str(), m_ms);// depthTimestampString);
+                    //depthImage = winrt::Windows::Graphics::Imaging::SoftwareBitmap::Convert(depthImage, winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Rgba16);
+                    //std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_color.png";
+                    winrt::Windows::Storage::StorageFolder storageFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
+                    pHL2ResearchMode->_lastIntensityImageName = storageFolder.Path();
+                    pHL2ResearchMode->_lastIntensityImageName = pHL2ResearchMode->_lastIntensityImageName + hstring(L"\\") + hstring(fName);
+
+                    CreateLocalFile(fName, intensityImage);
                     //pHL2ResearchMode->_frameCount++;
                 }
             }

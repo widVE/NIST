@@ -457,6 +457,68 @@ public class HololensDepthPVCapture : MonoBehaviour
 						}
 					}
 				}
+				
+				if(_captureIntensity)
+				{
+					string sIntensity = researchMode.GetIntensityImageName();
+					if(sIntensity.Length > 0)
+					{
+						bool isNewIntensity = false;
+						if(_lastIntensityImageName.Length == 0)
+						{
+							_lastIntensityImageName = sIntensity;
+							isNewIntensity = true;
+						}
+						else
+						{
+							if(sIntensity != _lastIntensityImageName)
+							{
+								isNewIntensity = true;		
+							}
+						}
+						
+						if(isNewIntensity)
+						{
+							if(_manager != null)
+							{
+								var headset = _manager.LocalHeadset;
+								if (headset != null)
+								{
+									var hsObject = headset.GetComponent<EasyVizARHeadset>();
+									if (hsObject != null)
+									{
+										Matrix4x4 depthTrans = Matrix4x4.identity;
+										string sTransform = researchMode.GetTransformName();
+										//load the transform... decompose to the position and rotation...
+										string[] transLines = File.ReadAllLines(sTransform);
+										Vector3 pos = Vector3.zero;
+										Quaternion rot = Quaternion.identity;
+										
+										for(int i = 0; i < 4; ++i)
+										{
+											string[] vals = transLines[i].Split(" ");
+											for(int j = 0; j < 4; ++j)
+											{
+												depthTrans[i*4+j] = float.Parse(vals[j]);
+											}
+										}
+										
+										pos = depthTrans.GetPosition();
+										rot = depthTrans.rotation;
+										
+										if(EasyVizARServer.Instance.PutImage("image/png", sIntensity, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "thermal"))
+										{
+											_lastIntensityImageName = sIntensity;
+										}
+									}
+								}
+								
+								//Debug.Log(_lastRectColorName);
+								
+							}
+						}
+					}
+				}
 			}
 		}
 		
@@ -936,6 +998,11 @@ public class HololensDepthPVCapture : MonoBehaviour
 		if(_captureTransforms)
 		{
 			researchMode.SetCaptureTransforms();
+		}
+		
+		if(_captureIntensity)
+		{
+			researchMode.SetCaptureIntensity();
 		}
 		
        	researchMode.StartPVCameraLoop();

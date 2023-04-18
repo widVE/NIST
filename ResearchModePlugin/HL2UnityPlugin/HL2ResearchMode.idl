@@ -38,6 +38,7 @@ namespace HL2UnityPlugin
         String GetHiColorName();
         String GetDepthImageName();
         String GetPointCloudName();
+        String GetIntensityImageName();
 
         /*String PrintDepthResolution();
         String PrintDepthExtrinsics();

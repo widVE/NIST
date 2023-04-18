@@ -1928,7 +1928,7 @@ MonoBehaviour:
   _captureDepthImages: 1
   _captureBinaryDepth: 1
   _captureTransforms: 1
-  _captureIntensity: 0
+  _captureIntensity: 1
   _captureVideo: 0
 --- !u!1 &891683166
 GameObject:
