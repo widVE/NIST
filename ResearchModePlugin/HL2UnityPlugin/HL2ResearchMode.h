@@ -154,6 +154,7 @@ namespace winrt::HL2UnityPlugin::implementation
         UINT16* m_longDepthMap = nullptr;
         UINT8* m_longDepthMapTexture = nullptr;
         UINT16* m_longAbImage = nullptr;
+        UINT16* m_localPointCloud = nullptr;
 
 		UINT8* m_LFImage = nullptr;
 		UINT8* m_RFImage = nullptr;
@@ -227,6 +228,7 @@ namespace winrt::HL2UnityPlugin::implementation
         std::atomic_bool m_bCaptureBinaryDepth = false;
         std::atomic_bool m_bIsQRCodeDetected = false;
         std::atomic_bool m_bCaptureIntensity = false;
+        std::atomic_bool m_bRectifyWithColor = false;
 
         float m_roiBound[3]{ 0,0,0 };
         float m_roiCenter[3]{ 0,0,0 };
