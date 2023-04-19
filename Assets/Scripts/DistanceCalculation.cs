@@ -115,6 +115,14 @@ public class DistanceCalculation : MonoBehaviour
                     UnityEngine.Debug.Log("get into local: " + this.name);
 
                     mapMarker.transform.localPosition = new Vector3(cam_pos.x, 0, cam_pos.z);
+					
+					// TODO: trying to get the rotation of the local headset --> since local headset's prefab is disabled
+                    headset_parent.transform.Find(local_headset_id).position = cam_pos;
+                    headset_parent.transform.Find(local_headset_id).eulerAngles = cam.transform.eulerAngles;
+					UnityEngine.Debug.Log("this is the local headset's rotation: " + headset_parent.transform.Find(local_headset_id).eulerAngles);
+                    UnityEngine.Debug.Log("this is the real rotation: " + cam.transform.eulerAngles);
+
+
                 }
                 else
 				{
