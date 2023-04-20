@@ -35169,6 +35169,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1492607365016697350, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1492607365964717172, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: m_Name
       value: PalmUp Map
@@ -35203,7 +35207,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1492607365964717175, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.000000029802322
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1492607365964717175, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: m_LocalRotation.w
@@ -35232,6 +35236,10 @@ PrefabInstance:
     - target: {fileID: 1492607365964717175, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1588475783602737595, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: additionalOffset.z
+      value: -0.12
       objectReference: {fileID: 0}
     - target: {fileID: 3379009441806115807, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: m_LocalScale.x
@@ -35325,6 +35333,10 @@ PrefabInstance:
       propertyPath: map_objects.Array.data[1]
       value: 
       objectReference: {fileID: 1208726034}
+    - target: {fileID: 6587590130336271339, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: additionalOffset.z
+      value: -0.15
+      objectReference: {fileID: 0}
     - target: {fileID: 6710163434822126697, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: m_Mesh
       value: 
