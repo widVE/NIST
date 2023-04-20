@@ -787,7 +787,8 @@ MonoBehaviour:
   copy_x_rotation: 0
   copy_y_rotation: 1
   copy_z_rotation: 0
-  rotation_camera_name: Main Camera
+  rotation_source_name: Main Camera
+  headset_manager_name: EasyVizARHeadsetManager
 --- !u!65 &6315028196032513876
 BoxCollider:
   m_ObjectHideFlags: 0
