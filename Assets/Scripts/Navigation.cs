@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.CodeDom;
 //using UnityEngine.Debug;
 
 public class Navigation : MonoBehaviour
@@ -12,11 +13,13 @@ public class Navigation : MonoBehaviour
     Collider collider;
     LineRenderer line;
     [SerializeField] Transform[] waypoints; //this contains the position of the landmark/icon
+    
     // For querying the server 
     string location_id;
     EasyVizAR.Path path = new EasyVizAR.Path();
     GameObject main_cam;
     Transform feature;
+   // [SerializeField] Vector3[] points; //this contains the position of the landmark/icon
 
     // Start is called before the first frame update
     void Start()
@@ -50,7 +53,8 @@ public class Navigation : MonoBehaviour
         if (this.transform.Find("type").GetChild(0).name != "Headset")
         {
             feature = markerSpawnParent.transform.Find(this.name);
-            //FindPath();
+            // Testing Querying path
+            FindPath();
         }
 
     }
@@ -148,16 +152,19 @@ public class Navigation : MonoBehaviour
         //Debug.Log("the result: " + result);
         if (result != "error")
         {
-
+            // defining the length of the waypoints
+            //waypoints = new Transform
             path = JsonUtility.FromJson<EasyVizAR.Path>("{\"points\":" + result + "}");
-            //Debug.Log("the path is: " + path.points);
-            //Debug.Log("location id: " + location_id);
+            UnityEngine.Debug.Log("the path is: " + path.points);
+            UnityEngine.Debug.Log("location id: " + location_id);
             int cnt = 0;
+            // making sure we are creating a new line
+            if (line.positionCount > 0) line.positionCount = 0;
             foreach (EasyVizAR.Position points in path.points)
             {
                 line.positionCount++;
                 line.SetPosition(cnt++, new Vector3(points.x, points.y, points.z)); // this draws the line 
-                //Debug.Log("number of points in the path is: " + line.positionCount);
+                UnityEngine.Debug.Log("number of points in the path is: " + line.positionCount);
                 UnityEngine.Debug.Log("points: " + points.x + ", " + points.y + ", " + points.z);
 
             }

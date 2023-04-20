@@ -98,7 +98,7 @@ public class DistanceCalculation : MonoBehaviour
 			if (!mapParent.transform.Find(cur_prefab.name))
             {
                 mapMarker = Instantiate(headset_icon, mapParent.transform, false); // This is where we instantiate the headset icon on the map --> need to change the reference of the headset_icon.
-
+				// TODO: Add your local headset icon here
             }
             else
             {
