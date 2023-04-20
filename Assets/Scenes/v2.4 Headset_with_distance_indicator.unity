@@ -9414,6 +9414,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   headsetManager: {fileID: 561901448}
+  continuousResolutionWidth: 760
+  continuousResolutionHeight: 428
+  continuousHologramOpacity: 0
   triggerCapture: 0
 --- !u!114 &404529392
 MonoBehaviour:
@@ -20159,7 +20162,7 @@ MonoBehaviour:
   map_exit_icon: {fileID: 4252723170412605694, guid: 1f6d11e0e84f1fb4d902fd794a6f7eae, type: 3}
   map_extinguisher_icon: {fileID: 3800510486315543192, guid: 63e4cb30289512045b15c961cfc1ce43, type: 3}
   map_fire_icon: {fileID: 5035943243370458903, guid: f2440b4ec2d22a24fafed66410029289, type: 3}
-  map_headset_icon: {fileID: 4402188086708784334, guid: d8bfdd92541e05d438e4d0d1945df5aa, type: 3}
+  map_headset_icon: {fileID: 4402188086708784334, guid: b234550f30f629c41ba6c5c3b64682a6, type: 3}
   map_injury_icon: {fileID: 2004794065475310447, guid: 0acf7b3895827f442bb669f1d9bd9f19, type: 3}
   map_message_icon: {fileID: 288360056468445405, guid: ff93914915aabee42b48e3aaa39ca108, type: 3}
   map_object_icon: {fileID: 6875439886385581506, guid: 6b140dfc0095d114b85769204dbbfc09, type: 3}
@@ -44989,6 +44992,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1661586568}
     - target: {fileID: 1854928437424279049, guid: 905f5ec265c7ec6419a3a994f767ec61, type: 3}
+      propertyPath: map_headset_icon
+      value: 
+      objectReference: {fileID: 4402188086708784334, guid: b234550f30f629c41ba6c5c3b64682a6, type: 3}
+    - target: {fileID: 1854928437424279049, guid: 905f5ec265c7ec6419a3a994f767ec61, type: 3}
       propertyPath: palm_map_spawn_target
       value: 
       objectReference: {fileID: 335883421}
@@ -45026,6 +45033,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9210921789052660644, guid: 905f5ec265c7ec6419a3a994f767ec61, type: 3}
       propertyPath: trackedHandness
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 9210921789052660644, guid: 905f5ec265c7ec6419a3a994f767ec61, type: 3}
+      propertyPath: trackedHandedness
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 9210921789052660644, guid: 905f5ec265c7ec6419a3a994f767ec61, type: 3}
@@ -52395,7 +52406,7 @@ MonoBehaviour:
   map_exit_icon: {fileID: 4252723170412605694, guid: 1f6d11e0e84f1fb4d902fd794a6f7eae, type: 3}
   map_extinguisher_icon: {fileID: 3800510486315543192, guid: 63e4cb30289512045b15c961cfc1ce43, type: 3}
   map_fire_icon: {fileID: 5035943243370458903, guid: f2440b4ec2d22a24fafed66410029289, type: 3}
-  map_headset_icon: {fileID: 4402188086708784334, guid: d8bfdd92541e05d438e4d0d1945df5aa, type: 3}
+  map_headset_icon: {fileID: 4402188086708784334, guid: b234550f30f629c41ba6c5c3b64682a6, type: 3}
   map_injury_icon: {fileID: 2004794065475310447, guid: 0acf7b3895827f442bb669f1d9bd9f19, type: 3}
   map_message_icon: {fileID: 5318789042369293505, guid: 900905efde3465c4daf62e7c1f5d4d10, type: 3}
   map_object_icon: {fileID: 6875439886385581506, guid: 6b140dfc0095d114b85769204dbbfc09, type: 3}

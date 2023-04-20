@@ -133,8 +133,11 @@ public class DistanceCalculation : MonoBehaviour
 				//cur_prefab.GetComponent<EasyVizARHeadset>()
 				//GetHeadsets();
 				Color myColor = cur_prefab.GetComponent<EasyVizARHeadset>()._color;
-				mapMarker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
-                mapMarker.transform.Find("Quad").Find("arrow").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+
+				//Find the icon components and set their color accordingly.
+				//NOTE: Transform.find is not recursive and only searches children of calling transform
+				mapMarker.transform.Find("Icon Visuals").Find("Icon").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+                mapMarker.transform.Find("Icon Visuals").Find("Arrow").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
 
                 //TODO: add the rotation/quaterinion here --> z axis is where we would like to apply the rotation to, but I'm still figuring out how to determine the orientation               
                 //mapMarker.transform.rotation = Quaternion.Euler(-7, capsule.transform.rotation.x, capsule.transform.rotation.z);

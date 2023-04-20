@@ -81,7 +81,7 @@ MonoBehaviour:
   isFeet: 0
   oldPos: {x: 0, y: 0, z: 0}
   newPos: {x: 0, y: 0, z: 0}
-  headset_icon: {fileID: 4402188086708784334, guid: d8bfdd92541e05d438e4d0d1945df5aa, type: 3}
+  headset_icon: {fileID: 4402188086708784334, guid: b234550f30f629c41ba6c5c3b64682a6, type: 3}
   mapParent: {fileID: 0}
   headset_parent: {fileID: 0}
   headset_list:

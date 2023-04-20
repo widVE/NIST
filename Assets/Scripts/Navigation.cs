@@ -29,10 +29,13 @@ public class Navigation : MonoBehaviour
             UnityEngine.Debug.Log("Navigation: cannot find the icon parent");
         }
         //collider = this.GetComponent<Collider>();
-        collider = this.transform.Find("Quad").gameObject.GetComponent<Collider>();
+        //The prefabs aren't the same anymore so we will need to restructure them, for now
+        //we will have two different ways to assign the variable
+        //collider = this.transform.Find("Icon Visuals").GetComponent<Collider>();
+        //if (collider == null) collider = this.transform.Find("Quad").GetComponent<Collider>();
 
         //set the collider active --> TODO: might not need this anymore
-        collider.enabled = true;
+        //collider.enabled = true;
         // initializing the line render
         line = GameObject.Find("Main Camera").GetComponent<LineRenderer>();
         if (line != null) { UnityEngine.Debug.Log("found line renderer!"); }
