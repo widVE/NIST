@@ -1386,16 +1386,25 @@ namespace winrt::HL2UnityPlugin::implementation
                                     if (pHL2ResearchMode->IsCapturingBinaryDepth())
                                     {
                                         //UINT idx2 = bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + j;
-                                        UINT16 depth = pHL2ResearchMode->m_localPointCloud[idx];
-                                        depth = (pSigma[idx] & 0x80) ? 0 : depth;
+                                        UINT pcIndex = wIdx * 4 + j * 4;
+                                        UINT16 depthX = pHL2ResearchMode->m_localPointCloud[pcIndex];
+                                        UINT16 depthY = pHL2ResearchMode->m_localPointCloud[pcIndex+1];
+                                        UINT16 depthZ = pHL2ResearchMode->m_localPointCloud[pcIndex+2];
+                                        if (pSigma[idx] & 0x80)
+                                        {
+                                            depthX = 0;
+                                            depthY = 0;
+                                            depthZ = 0;
+                                        }
+                                        
                                         //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = (depth & 0x00FF);
                                         //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = ((depth && 0xFF00) >> 8);
-                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 0] = (depth & 0x00FF);
-                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 1] = ((depth & 0xFF00) >> 8);
-                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 2] = (depth & 0x00FF);
-                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 3] = ((depth & 0xFF00) >> 8);
-                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 4] = (depth & 0x00FF);
-                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 5] = ((depth & 0xFF00) >> 8);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 0] = (depthX & 0x00FF);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 1] = ((depthX & 0xFF00) >> 8);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 2] = (depthY & 0x00FF);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 3] = ((depthY & 0xFF00) >> 8);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 4] = (depthZ & 0x00FF);
+                                        dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 5] = ((depthZ & 0xFF00) >> 8);
                                         dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 6] = 0xFF;// ((depth & 0xFF00) >> 8);
                                         dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 7] = 0xFF;// (depth & 0x00FF);
                                     }
@@ -1447,7 +1456,7 @@ namespace winrt::HL2UnityPlugin::implementation
                     pHL2ResearchMode->_lastBinaryDepthName = storageFolder.Path();
                     pHL2ResearchMode->_lastBinaryDepthName = pHL2ResearchMode->_lastBinaryDepthName + hstring(L"\\") + hstring(fName);
 
-                    CreateLocalFile(fName, depthImage);
+                    CreateLocalFile(fName, localPCImage);
                     //pHL2ResearchMode->_frameCount++;
                 }
             }
