@@ -65,6 +65,9 @@ public class HololensDepthPVCapture : MonoBehaviour
 	[SerializeField]
 	bool _captureVideo = false;
 	
+	[SerializeField]
+	bool _rectifyAllImages = true;
+	
 	string _lastDepthBinaryName = "";
 	string _lastRectColorName = "";
 	string _lastTransformName = "";
@@ -231,7 +234,218 @@ public class HololensDepthPVCapture : MonoBehaviour
 #else
 		if(_uploadToServer)
 		{
-			if(_captureDepthImages && _captureRectifiedColorImages)
+			if(_captureDepthImages && _captureRectifiedColorImages && _captureBinaryDepth && _captureIntensity)
+			{
+				bool isNewDepth = false;
+				string sDepth = researchMode.GetDepthImageName();
+				if(sDepth.Length > 0)
+				{
+					if(_lastDepthImageName.Length == 0)
+					{
+						_lastDepthImageName = sDepth;
+						isNewDepth = true;
+					}
+					else
+					{
+						if(sDepth != _lastDepthImageName)
+						{
+							isNewDepth = true;		
+						}
+					}
+				}
+				
+				bool isNewColor = false;
+				string sColor = researchMode.GetRectColorName();
+				if(sColor.Length > 0)
+				{
+					if(_lastRectColorName.Length == 0)
+					{
+						_lastRectColorName = sColor;
+						isNewColor = true;
+					}
+					else
+					{
+						if(sColor != _lastRectColorName)
+						{
+							isNewColor = true;		
+						}
+					}
+				}
+				
+				bool isNewBinaryDepth = false;
+				string sPC = researchMode.GetBinaryDepthName();
+				if(sPC.Length > 0)
+				{
+					if(_lastDepthBinaryName.Length == 0)
+					{
+						_lastDepthBinaryName = sPC;
+						isNewBinaryDepth = true;
+					}
+					else
+					{
+						if(sPC != _lastDepthBinaryName)
+						{
+							isNewBinaryDepth = true;		
+						}
+					}
+				}
+				
+				bool isNewIntensity = false;
+				string sI = researchMode.GetIntensityImageName();
+				if(sI.Length > 0)
+				{
+					if(_lastIntensityImageName.Length == 0)
+					{
+						_lastIntensityImageName = sI;
+						isNewIntensity = true;
+					}
+					else
+					{
+						if(sI != _lastIntensityImageName)
+						{
+							isNewIntensity = true;		
+						}
+					}
+				}
+				
+				if(isNewColor && isNewDepth && isNewBinaryDepth && isNewIntensity)
+				{
+					if(_manager != null)
+					{
+						var headset = _manager.LocalHeadset;
+						if (headset != null)
+						{
+							var hsObject = headset.GetComponent<EasyVizARHeadset>();
+							if (hsObject != null)
+							{
+								Matrix4x4 depthTrans = Matrix4x4.identity;
+								string sTransform = researchMode.GetTransformName();
+								//load the transform... decompose to the position and rotation...
+								string[] transLines = File.ReadAllLines(sTransform);
+								Vector3 pos = Vector3.zero;
+								Quaternion rot = Quaternion.identity;
+								
+								for(int i = 0; i < 4; ++i)
+								{
+									string[] vals = transLines[i].Split(" ");
+									for(int j = 0; j < 4; ++j)
+									{
+										depthTrans[i*4+j] = float.Parse(vals[j]);
+									}
+								}
+								
+								pos = depthTrans.GetPosition();
+								rot = depthTrans.rotation;
+								
+								if(EasyVizARServer.Instance.PutImageQuad("image/png", sColor, sDepth, sPC, sI, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "photo", "depth", "geometry", "thermal"))
+								{
+									_lastDepthImageName = sDepth;
+									_lastRectColorName = sColor;
+									_lastDepthBinaryName = sPC;
+									_lastIntensityImageName = sI;
+								}
+							}
+						}
+					}	
+				}
+			}
+			else if(_captureDepthImages && _captureRectifiedColorImages && _captureBinaryDepth)
+			{
+				bool isNewDepth = false;
+				string sDepth = researchMode.GetDepthImageName();
+				if(sDepth.Length > 0)
+				{
+					if(_lastDepthImageName.Length == 0)
+					{
+						_lastDepthImageName = sDepth;
+						isNewDepth = true;
+					}
+					else
+					{
+						if(sDepth != _lastDepthImageName)
+						{
+							isNewDepth = true;		
+						}
+					}
+				}
+				
+				bool isNewColor = false;
+				string sColor = researchMode.GetRectColorName();
+				if(sColor.Length > 0)
+				{
+					if(_lastRectColorName.Length == 0)
+					{
+						_lastRectColorName = sColor;
+						isNewColor = true;
+					}
+					else
+					{
+						if(sColor != _lastRectColorName)
+						{
+							isNewColor = true;		
+						}
+					}
+				}
+				
+				bool isNewBinaryDepth = false;
+				string sPC = researchMode.GetBinaryDepthName();
+				if(sPC.Length > 0)
+				{
+					if(_lastDepthBinaryName.Length == 0)
+					{
+						_lastDepthBinaryName = sPC;
+						isNewBinaryDepth = true;
+					}
+					else
+					{
+						if(sPC != _lastDepthBinaryName)
+						{
+							isNewBinaryDepth = true;		
+						}
+					}
+				}
+						
+				if(isNewColor && isNewDepth && isNewBinaryDepth)
+				{
+					if(_manager != null)
+					{
+						var headset = _manager.LocalHeadset;
+						if (headset != null)
+						{
+							var hsObject = headset.GetComponent<EasyVizARHeadset>();
+							if (hsObject != null)
+							{
+								Matrix4x4 depthTrans = Matrix4x4.identity;
+								string sTransform = researchMode.GetTransformName();
+								//load the transform... decompose to the position and rotation...
+								string[] transLines = File.ReadAllLines(sTransform);
+								Vector3 pos = Vector3.zero;
+								Quaternion rot = Quaternion.identity;
+								
+								for(int i = 0; i < 4; ++i)
+								{
+									string[] vals = transLines[i].Split(" ");
+									for(int j = 0; j < 4; ++j)
+									{
+										depthTrans[i*4+j] = float.Parse(vals[j]);
+									}
+								}
+								
+								pos = depthTrans.GetPosition();
+								rot = depthTrans.rotation;
+								
+								if(EasyVizARServer.Instance.PutImageTriple("image/png", sColor, sDepth, sPC, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "photo", "depth", "geometry"))
+								{
+									_lastDepthImageName = sDepth;
+									_lastRectColorName = sColor;
+									_lastDepthBinaryName = sPC;
+								}
+							}
+						}
+					}	
+				}
+			}
+			else if(_captureDepthImages && _captureRectifiedColorImages)
 			{
 				bool isNewDepth = false;
 				string sDepth = researchMode.GetDepthImageName();
@@ -306,7 +520,6 @@ public class HololensDepthPVCapture : MonoBehaviour
 							}
 						}
 					}	
-					
 				}
 			}
 			else
