@@ -140,7 +140,8 @@ public class Navigation : MonoBehaviour
             Vector3 target = feature.position; // is the type Position? or Vector3?
             UnityEngine.Debug.Log("start: " + start.x + ", " + start.y + ", " + start.z);
             UnityEngine.Debug.Log("target: " + target.x + ", " + target.y + ", " + target.z);
-
+            
+            UnityEngine.Debug.Log("http://easyvizar.wings.cs.wisc.edu:5000/locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + target.x + "," + target.y + "," + target.z);
             EasyVizARServer.Instance.Get("locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + target.x + "," + target.y + "," + target.z, EasyVizARServer.JSON_TYPE, GetPathCallback);
 
         }        
