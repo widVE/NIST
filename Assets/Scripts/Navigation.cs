@@ -5,7 +5,15 @@ using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.CodeDom;
+using System.Security.Cryptography;
 //using UnityEngine.Debug;
+
+[System.Serializable]
+public class NavigationTargetUpdate
+{
+    public EasyVizAR.NavigationTarget navigation_target;
+}
+
 
 public class Navigation : MonoBehaviour
 {
@@ -14,12 +22,15 @@ public class Navigation : MonoBehaviour
     LineRenderer line;
     [SerializeField] Transform[] waypoints; //this contains the position of the landmark/icon
     
+    
     // For querying the server 
     string location_id;
-    EasyVizAR.Path path = new EasyVizAR.Path();
+    EasyVizAR.Path path = new EasyVizAR.Path(); // this stores the path of points 
     GameObject main_cam;
     Transform feature;
-   // [SerializeField] Vector3[] points; //this contains the position of the landmark/icon
+
+    public string local_headset_id = "";
+    //public EasyVizAR.Position last_
 
     // Start is called before the first frame update
     void Start()
@@ -159,22 +170,56 @@ public class Navigation : MonoBehaviour
             path = JsonUtility.FromJson<EasyVizAR.Path>("{\"points\":" + result + "}");
             UnityEngine.Debug.Log("the path is: " + path.points);
             UnityEngine.Debug.Log("location id: " + location_id);
+            
             int cnt = 0;
             // making sure we are creating a new line
             if (line.positionCount > 0) line.positionCount = 0;
+            EasyVizAR.Position target_pos = new EasyVizAR.Position();
             foreach (EasyVizAR.Position points in path.points)
             {
                 line.positionCount++;
                 line.SetPosition(cnt++, new Vector3(points.x, points.y, points.z)); // this draws the line 
                 UnityEngine.Debug.Log("number of points in the path is: " + line.positionCount);
                 UnityEngine.Debug.Log("points: " + points.x + ", " + points.y + ", " + points.z);
-
+                target_pos = points;
             }
 
            
             UnityEngine.Debug.Log("Successfully added the points");
-           
+
+
+            // send the target information to the server
+            NavigationTargetUpdate nav_update = new NavigationTargetUpdate();
+            EasyVizAR.NavigationTarget target = new EasyVizAR.NavigationTarget();
+            target.type = "feature";
+            target.target_id = feature.Find("ID").GetChild(0).name;
+            target.position = target_pos;
+            GameObject local = GameObject.Find("LocalHeadset");
+            local_headset_id = local.transform.GetChild(0).name;
+            nav_update.navigation_target = target;
+            UnityEngine.Debug.Log("returned json: " + JsonUtility.ToJson(target));
+            EasyVizARServer.Instance.Patch("headsets/" + local_headset_id, EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(nav_update), PostTargetCallback);
+
+
         }
 
     }
+
+    void PostTargetCallback(string resultData)
+    {
+        //Debug.Log(resultData);
+
+        if (resultData != "error")
+        {
+            UnityEngine.Debug.Log("successfully patched the target to the server: " + resultData);
+        }
+        else
+        {
+            UnityEngine.Debug.Log("failed to patch the target to the server");
+
+        }
+    }
+
+
+
 }

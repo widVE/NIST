@@ -45,6 +45,8 @@ public class DistanceCalculation : MonoBehaviour
             {
                 isLocal = true;
                 local_headset_id = headsetId;
+				GameObject local = GameObject.Find("LocalHeadset");
+				local.transform.GetChild(0).name = headsetId;
 
             }
 

@@ -77,12 +77,13 @@ namespace EasyVizAR
 		public string token;
 	};
 
-	/*
+
+    /*
 	 * HeadsetPositionUpdate contains a subset of the Headset class attributes
 	 * that we send with position updates. Sending this instead of the full
 	 * Headset object can avoid clobbering other fields such as color.
 	 */
-	[System.Serializable]
+    [System.Serializable]
 	public class HeadsetPositionUpdate
     {
 		public string location_id;
