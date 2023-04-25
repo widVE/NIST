@@ -11,7 +11,8 @@ public class OffsetRotation : MonoBehaviour
     public bool copy_x_rotation = false;
     public bool copy_y_rotation = true;
     public bool copy_z_rotation = false;
-    
+    public bool verbose = true;
+
     public string rotation_source_name = "Main Camera";
     public string headset_manager_name = "EasyVizARHeadsetManager";
 
@@ -37,26 +38,31 @@ public class OffsetRotation : MonoBehaviour
     private void Start()
     {
         GameObject headset_manager_GO = GameObject.Find(headset_manager_name);
-        Debug.Log("LOOK AT " + headset_manager_GO);
+        if (verbose) Debug.Log("LOOK AT " + headset_manager_GO);
         EasyVizARHeadsetManager headset_manager_script = null;
         headset_manager_script = headset_manager_GO.GetComponent<EasyVizARHeadsetManager>();
 
         if(headset_manager_script != null)
         {
-            Debug.Log("Found Script!!!");
+            if (verbose) Debug.Log("Found Script!!!");
         }
         else
         {
-            Debug.Log("No Manager");
+            if (verbose) Debug.Log("No Manager");
         }
         //List<EasyVizARHeadset> active_headsets = headset_manager_script._activeHeadsets;
 
         foreach (EasyVizARHeadset headset in headset_manager_script._activeHeadsets)
         {
             bool is_local_headset = headset.GetComponent<DistanceCalculation>().isLocal;
-            if (is_local_headset) 
+            if (is_local_headset)
                 //check against the name of the connected headset;
-                local_headset = true;
+                if (this.transform.parent.name == headset.name)
+                {
+                    if (verbose) Debug.Log("Found headset: " + this.transform.parent.name + " is active, and matches " + headset.name);
+                    local_headset = true;
+                    this.transform.Find("Star").gameObject.SetActive(true);
+                }
         }
 
         // We need to get the main camera only for the local headset
