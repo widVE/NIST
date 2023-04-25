@@ -255,7 +255,6 @@ public class FeatureManager : MonoBehaviour
         EasyVizAR.FeatureDisplayStyle style = new EasyVizAR.FeatureDisplayStyle();
         style.placement = "point";
         feature_to_post.style = style;
-
         
         //Serialize the feature into JSON
         var data = JsonUtility.ToJson(feature_to_post);
@@ -576,7 +575,7 @@ public class FeatureManager : MonoBehaviour
         //This is where the world markers happen I think.
         GameObject world_marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
         world_marker.name = string.Format("feature-{0}", feature.id);
-        
+        world_marker.transform.Find("ID").GetChild(0).name = feature.id.ToString(); // this helps keeping track of feature id
         float y_offset = (feature.id / 100f);
         if (mirror_map_axis) y_offset *= -1;
 
