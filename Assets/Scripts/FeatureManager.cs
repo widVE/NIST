@@ -566,45 +566,44 @@ public class FeatureManager : MonoBehaviour
             map_icon_to_spawn = warning_icon;
         }
 
-        Vector3 pos = Vector3.zero;
-        pos.x = feature.position.x;
-        pos.y = feature.position.y;
-        pos.z = feature.position.z;
+        Vector3 world_position = Vector3.zero;
+        world_position.x = feature.position.x;
+        world_position.y = feature.position.y;
+        world_position.z = feature.position.z;
 
         //cur_feature_name = feature.name;
         //This is where the world markers happen I think.
-        GameObject world_marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
+        GameObject world_marker = Instantiate(feature_to_spawn, world_position, spawn_root.transform.rotation, spawn_parent.transform);
         world_marker.name = string.Format("feature-{0}", feature.id);
         world_marker.transform.Find("ID").GetChild(0).name = feature.id.ToString(); // this helps keeping track of feature id
         float y_offset = (feature.id / 100f);
         if (mirror_map_axis) y_offset *= -1;
 
         //I'm trying to add in the marker icon spawning to the floating map. I think this is where it happens!
-
-
-
-        GameObject palm_map_marker = Instantiate(map_icon_to_spawn, palm_map_spawn_target.transform, false);
-        
-        
+        GameObject palm_map_marker = Instantiate(map_icon_to_spawn, palm_map_spawn_target.transform, false);       
         
 
         Vector3 map_coordinate_position = Vector3.zero;
-        map_coordinate_position.x = pos.x;
-        map_coordinate_position.y = pos.y;
+        map_coordinate_position.x = world_position.x;
+        map_coordinate_position.y = world_position.y;
 
         //WARNING: When we mirror the map to have it look like what it is on the server we need to negat the z values of the position of the icons because of the coordinate space inversion
-        if (mirror_map_axis) map_coordinate_position.z = -1 * pos.z;
-        else map_coordinate_position.z = pos.z;
-
-
+        if (mirror_map_axis) map_coordinate_position.z = -1 * world_position.z;
+        else map_coordinate_position.z = world_position.z;
 
         //mapMarker.transform.localPosition = new Vector3(pos.x, 0, pos.z);
         palm_map_marker.transform.localPosition = new Vector3(map_coordinate_position.x, y_offset, map_coordinate_position.z);
         palm_map_marker.name = string.Format("feature-{0}", feature.id);
 
-        
+        //Adding the rotation to the map marker, we want it specifically for the headsets, but the other icons might look weird
+        Vector3 map_rotation = Vector3.zero;
+        map_rotation.x = feature.position.x;
+        map_rotation.y = feature.position.y;
+        map_rotation.z = feature.position.z;
+
+
         GameObject floating_map_marker = Instantiate(map_icon_to_spawn, floating_map_spawn_target.transform, false);
-        floating_map_marker.transform.localPosition = new Vector3(pos.x, y_offset, map_coordinate_position.z);
+        floating_map_marker.transform.localPosition = new Vector3(world_position.x, y_offset, map_coordinate_position.z);
         floating_map_marker.name = string.Format("feature-{0}", feature.id);
          
 
