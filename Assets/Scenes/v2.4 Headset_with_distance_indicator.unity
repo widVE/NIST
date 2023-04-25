@@ -35341,6 +35341,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 7419221152134798865, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: map_spawn_target
+      value: 
+      objectReference: {fileID: 335883421}
     - target: {fileID: 8705007549346784224, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: onHandActivate.m_PersistentCalls.m_Calls.Array.size
       value: 3
