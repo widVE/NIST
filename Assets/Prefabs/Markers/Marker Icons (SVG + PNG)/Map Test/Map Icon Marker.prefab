@@ -1464,7 +1464,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2070291447063185073, guid: b20573eb9bf8a914882fa4a571d2e8dc, type: 3}
       propertyPath: TouchBegin.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
-      value: RenderNavigationPath
+      value: FindPath
       objectReference: {fileID: 0}
     - target: {fileID: 2070291447063185073, guid: b20573eb9bf8a914882fa4a571d2e8dc, type: 3}
       propertyPath: TouchBegin.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
@@ -1561,6 +1561,14 @@ PrefabInstance:
     - target: {fileID: 8405082116546204954, guid: b20573eb9bf8a914882fa4a571d2e8dc, type: 3}
       propertyPath: iconStyle
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8779034279059886464, guid: b20573eb9bf8a914882fa4a571d2e8dc, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8779034279059886464, guid: b20573eb9bf8a914882fa4a571d2e8dc, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b20573eb9bf8a914882fa4a571d2e8dc, type: 3}

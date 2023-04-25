@@ -54,7 +54,7 @@ public class Navigation : MonoBehaviour
         {
             feature = markerSpawnParent.transform.Find(this.name);
             // Testing Querying path
-            FindPath();
+            //FindPath();
         }
 
     }
@@ -152,6 +152,7 @@ public class Navigation : MonoBehaviour
         //Debug.Log("the result: " + result);
         if (result != "error")
         {
+            UnityEngine.Debug.Log("path callback: " + result);
             // defining the length of the waypoints
             //waypoints = new Transform
             path = JsonUtility.FromJson<EasyVizAR.Path>("{\"points\":" + result + "}");
