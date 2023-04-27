@@ -13,6 +13,7 @@ public class MapIconSpawn : MonoBehaviour
 
     public bool verbose_debug = false;
     public bool mirror_axis = false;
+    public string last_clicked_target = "";
     
     // Start is called before the first frame update
     void Start()

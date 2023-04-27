@@ -65,6 +65,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	public GameObject map_parent;
 	public GameObject headsetManager;
 	public Color _color = Color.red;
+	public GameObject feature_parent;
 
 
 
@@ -378,6 +379,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		d_s.headset_name = remoteHeadset.name;
 		hs.map_parent = map_parent;
 		hs.headset_parent = headsetManager;
+		hs.feature_parent = feature_parent;
 
 		if (hs != null)
         {

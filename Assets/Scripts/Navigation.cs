@@ -21,7 +21,7 @@ public class Navigation : MonoBehaviour
     Collider collider;
     LineRenderer line;
     [SerializeField] Transform[] waypoints; //this contains the position of the landmark/icon
-    
+    public GameObject map_parent;
     
     // For querying the server 
     string location_id;
@@ -30,12 +30,15 @@ public class Navigation : MonoBehaviour
     Transform feature;
 
     public string local_headset_id = "";
-    public Vector3 last_target = new Vector3(0,0,0);
+    public string last_target;
 
     // Start is called before the first frame update
     void Start()
     {
         markerSpawnParent = this.transform.parent.gameObject.GetComponent<MapIconSpawn>().feature_parent;
+        map_parent = this.transform.parent.gameObject;
+        last_target = map_parent.GetComponent<MapIconSpawn>().last_clicked_target;
+        
         //markerSpawnParent = GameObject.Find("Marker Spawn Parent");
 
         if (!markerSpawnParent)
@@ -77,12 +80,14 @@ public class Navigation : MonoBehaviour
 
     }
 
+    
+
     // Querying the server with path between two points
     public void FindPath() // Vector3 start, Vector3 target
     {
         //Vector3 start = new Vector3(2f,2f,4f); // this is hard coded for now --> will add these points later
         //Vector3 target = new Vector3(12f,-2f, 2f); // is the type Position? or Vector3?
-        if (feature != null) // checking if the last target is the same as the newly selected target, if so, do query it again 
+        if (feature != null && !last_target.Equals(this.name)) // checking if the last target is the same as the newly selected target, if so, do query it again 
         {
             UnityEngine.Debug.Log("initiated querying path");
             Vector3 start = main_cam.transform.position;
@@ -132,11 +137,14 @@ public class Navigation : MonoBehaviour
             target.type = "feature";
             target.target_id = feature.Find("ID").GetChild(0).name;
             target.position = target_pos;
-            //last_target = new Vector3(this.transform.position); // updating the last target here
+            // updating the last target here
+            last_target = this.name;
+            UnityEngine.Debug.Log("the last target: " + last_target);
 
             GameObject local = GameObject.Find("LocalHeadset");
             local_headset_id = local.transform.GetChild(0).name;
             nav_update.navigation_target = target;
+
             //UnityEngine.Debug.Log("returned json: " + JsonUtility.ToJson(target));
             EasyVizARServer.Instance.Patch("headsets/" + local_headset_id, EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(nav_update), PostTargetCallback);
 

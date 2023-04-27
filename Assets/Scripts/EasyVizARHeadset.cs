@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Security.Cryptography;
 using UnityEngine;
 
@@ -52,21 +53,29 @@ public class EasyVizARHeadset : MonoBehaviour
 	//if local, we set this to the MainCamera (the Hololens 2's camera)
 	Camera _mainCamera;
 	public GameObject map_parent; // This will get populated by EasyVizARHeadsetManager.cs
-	public GameObject headset_parent;
-	public string local_headset_id = "";
+	public GameObject headset_parent; // This will get populated by EasyVizARHeadsetManager.cs
+    public string local_headset_id = "";
 	public bool isLocal = false;
+	
+	// This is for navigation
+	public GameObject feature_parent;
+    public LineRenderer line;
+    EasyVizAR.Path path = new EasyVizAR.Path(); // this stores the path of points 
+
 
     // Start is called before the first frame update
     void Start()
     {
 		_lastTime = UnityEngine.Time.time;
-		//Debug.Log("In start");
-		//CreateHeadset();
-		//RegisterHeadset();
+        line = GameObject.Find("Main Camera").GetComponent<LineRenderer>();
+
+        //Debug.Log("In start");
+        //CreateHeadset();
+        //RegisterHeadset();
 
     }
 
-	public void CreateLocalHeadset(string headsetName, string location, bool postChanges)
+    public void CreateLocalHeadset(string headsetName, string location, bool postChanges)
 	{
 		_isLocal = true;
 		_mainCamera = Camera.main;
@@ -141,12 +150,14 @@ public class EasyVizARHeadset : MonoBehaviour
 		_headsetName = h.name;
 		_locationID = h.location_id;
 
-		Color newColor;
+		
+		// Not sure if this is the right area to do the navigation
+		FindPath(h.navigation_target.position);
+        Color newColor;
 		if (ColorUtility.TryParseHtmlString(h.color, out newColor))
-			_color = newColor;
-		
-		Transform cur_headset = headset_parent.transform.Find(h.id);
-		
+			_color = newColor; // this is where the color of the headset is assigned --> this field is populated 
+
+        Transform cur_headset = headset_parent.transform.Find(h.id);
         if (cur_headset)
         {
 			cur_headset.Find("Capsule").GetComponent<Renderer>().material.color = newColor;
@@ -158,14 +169,35 @@ public class EasyVizARHeadset : MonoBehaviour
 
         }
 
-
         if (_showPositionChanges)
 		{
 			GetPastPositions();
 		}
-	}
-	
-	void RegisterHeadset()
+
+        // Call the FindPath() from Navigation.cs to assign target from to the headset from the server
+        /*
+		if (feature_parent)
+		{
+            foreach (Transform feature in feature_parent.transform)
+            {
+                UnityEngine.Debug.Log("feature id: " + feature.Find("ID").GetChild(0).name);
+                if (feature.Find("ID").GetChild(0).name.Equals(h.navigation_target.target_id))
+                {
+                    UnityEngine.Debug.Log("Got into navigation");
+                    if (map_parent)
+                    {
+                        UnityEngine.Debug.Log("calling navigation map parent: " + );
+
+                        map_parent.transform.Find(feature.name).gameObject.GetComponent<Navigation>().FindPath();
+                    }
+                    break;
+                }
+            }
+        }
+		*/
+    }
+
+    void RegisterHeadset()
 	{
 		//register the headset with the server, first checking if it exists there already or not...
 		EasyVizARServer.Instance.Get("headsets/"+_headsetID, EasyVizARServer.JSON_TYPE, RegisterCallback);
@@ -364,4 +396,43 @@ public class EasyVizARHeadset : MonoBehaviour
 	{
 		EasyVizARServer.Instance.Get("headsets/"+_headsetID+"/pose-changes", EasyVizARServer.JSON_TYPE, GetPastPositionsCallback);
 	}
+
+    // Querying the server with path between two points
+    public void FindPath(EasyVizAR.Position target) // Vector3 start, Vector3 target
+    {
+        
+            UnityEngine.Debug.Log("initiated querying path");
+            Vector3 start = GameObject.Find("Main Camera").transform.position;
+
+        //UnityEngine.Debug.Log("http://easyvizar.wings.cs.wisc.edu:5000/locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + target.x + "," + target.y + "," + target.z);
+        EasyVizARServer.Instance.Get("locations/" + _locationID + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + target.x + "," + target.y + "," + target.z, EasyVizARServer.JSON_TYPE, GetPathCallback);
+
+        
+    }
+
+    void GetPathCallback(string result)
+    {
+        //Debug.Log("initiated querying path");
+        //Debug.Log("the result: " + result);
+        if (result != "error")
+        {
+            UnityEngine.Debug.Log("path callback: " + result);
+            path = JsonUtility.FromJson<EasyVizAR.Path>("{\"points\":" + result + "}");
+            int cnt = 0;
+            // making sure we are creating a new line
+            if (line.positionCount > 0) line.positionCount = 0;
+            EasyVizAR.Position target_pos = new EasyVizAR.Position();
+			foreach (EasyVizAR.Position points in path.points)
+            {
+                line.positionCount++;
+                line.SetPosition(cnt++, new Vector3(points.x, points.y, points.z)); // this draws the line 
+                //UnityEngine.Debug.Log("number of points in the path is: " + line.positionCount);
+                //UnityEngine.Debug.Log("points: " + points.x + ", " + points.y + ", " + points.z);
+                target_pos = points;
+            }
+            UnityEngine.Debug.Log("Successfully added the points");
+
+        }
+
+    }
 }
