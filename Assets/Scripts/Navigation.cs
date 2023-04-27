@@ -68,15 +68,7 @@ public class Navigation : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*
-        if (waypoints[1] != null)
-        {
-            line.enabled = true;
-            // disable line renderer once approach the target
-            RenderNavigationPath();
-
-        }
-        */
+     
 
     }
 

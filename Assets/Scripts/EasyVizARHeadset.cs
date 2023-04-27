@@ -173,28 +173,6 @@ public class EasyVizARHeadset : MonoBehaviour
 		{
 			GetPastPositions();
 		}
-
-        // Call the FindPath() from Navigation.cs to assign target from to the headset from the server
-        /*
-		if (feature_parent)
-		{
-            foreach (Transform feature in feature_parent.transform)
-            {
-                UnityEngine.Debug.Log("feature id: " + feature.Find("ID").GetChild(0).name);
-                if (feature.Find("ID").GetChild(0).name.Equals(h.navigation_target.target_id))
-                {
-                    UnityEngine.Debug.Log("Got into navigation");
-                    if (map_parent)
-                    {
-                        UnityEngine.Debug.Log("calling navigation map parent: " + );
-
-                        map_parent.transform.Find(feature.name).gameObject.GetComponent<Navigation>().FindPath();
-                    }
-                    break;
-                }
-            }
-        }
-		*/
     }
 
     void RegisterHeadset()

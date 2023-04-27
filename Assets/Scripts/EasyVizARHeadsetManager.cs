@@ -399,6 +399,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             if(hs._headsetID == previous_id)
             {
                 hs.AssignValuesFromJson(remoteHeadset);
+
 				//Debug.Log("the id: " + hs.Name + " new color: " +  remoteHeadset.color);				
 				return;
             }
