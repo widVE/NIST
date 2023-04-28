@@ -62,10 +62,14 @@ public class EasyVizARHeadset : MonoBehaviour
     public LineRenderer line;
     EasyVizAR.Path path = new EasyVizAR.Path(); // this stores the path of points 
 
+    private EasyVizAR.NavigationTarget currentTarget = new EasyVizAR.NavigationTarget();
+
 
     // Start is called before the first frame update
     void Start()
     {
+		currentTarget.type = "none";
+
 		_lastTime = UnityEngine.Time.time;
         line = GameObject.Find("Main Camera").GetComponent<LineRenderer>();
 
@@ -152,7 +156,20 @@ public class EasyVizARHeadset : MonoBehaviour
 
 		
 		// Not sure if this is the right area to do the navigation
-		FindPath(h.navigation_target.position);
+        if (h.navigation_target.type != currentTarget.type || h.navigation_target.target_id != currentTarget.target_id) {
+            currentTarget = h.navigation_target;
+			if (currentTarget.type == "feature" || currentTarget.type == "headset" || currentTarget.type == "point")
+			{
+				FindPath(h.navigation_target.position);
+			}
+			else
+            {
+				// If target type is none, we should clear the navigation path,
+				// but there is no need to call the server for pathing.
+				line.positionCount = 0;
+            }
+            
+        }
         Color newColor;
 		if (ColorUtility.TryParseHtmlString(h.color, out newColor))
 			_color = newColor; // this is where the color of the headset is assigned --> this field is populated 
