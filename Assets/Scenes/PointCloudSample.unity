@@ -1930,7 +1930,7 @@ MonoBehaviour:
   _captureTransforms: 1
   _captureIntensity: 1
   _captureVideo: 0
-  _rectifyAllImages: 1
+  _rectifyAllImages: 0
 --- !u!1 &891683166
 GameObject:
   m_ObjectHideFlags: 0
