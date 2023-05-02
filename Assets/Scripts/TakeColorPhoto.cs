@@ -48,11 +48,20 @@ public class TakeColorPhoto : MonoBehaviour
     {
 		if (triggerCapture)
         {
-			//TakeAColorPhoto(); // commented this out for compiling
+			TakeAColorPhoto();
 			triggerCapture = false;
         }
     }
-	
+
+	public void TakeAColorPhoto()
+    {
+		if (!_isCapturing)
+        {
+			_isCapturing = true;
+			PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
+		}
+    }
+
 	public void TakeAColorPhoto(InputAction.CallbackContext context)
 	{
 		if (context.performed)
@@ -63,7 +72,6 @@ public class TakeColorPhoto : MonoBehaviour
                 PhotoCapture.CreateAsync(false, OnPhotoCaptureCreated);
             }
         }
-		
 	}
 
 	public void BeginContinuousCapture()
@@ -189,9 +197,10 @@ public class TakeColorPhoto : MonoBehaviour
 			h.camera_orientation.z = headset.transform.rotation.z;
 			h.camera_orientation.w = headset.transform.rotation.w;
 		}
-		
 
-		UnityWebRequest www = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000/photos", "POST");
+		string baseURL = EasyVizARServer.Instance.GetBaseURL();
+
+		UnityWebRequest www = new UnityWebRequest(baseURL + "/photos", "POST");
 		www.SetRequestHeader("Content-Type", "application/json");
 
 		string ourJson = JsonUtility.ToJson(h);
@@ -222,7 +231,7 @@ public class TakeColorPhoto : MonoBehaviour
 		//Debug.Log(photoJson);
 		//Debug.Log(h2.imageUrl);
 
-		UnityWebRequest www2 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + h2.imageUrl, "PUT");
+		UnityWebRequest www2 = new UnityWebRequest(baseURL + h2.imageUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);

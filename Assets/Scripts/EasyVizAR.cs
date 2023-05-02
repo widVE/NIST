@@ -259,6 +259,15 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		_hasRegistration = TryLoadRegistration(out _registration);
     }
 
+	// Return server base URL without an ending slash, e.g. "http://easyvizar.wing.cs.wisc.edu:5000"
+	public string GetBaseURL()
+    {
+		if (_baseURL.EndsWith('/'))
+			return _baseURL.Substring(0, _baseURL.Length - 1);
+		else
+			return _baseURL;
+    }
+
 	// Change the server base URL, which will affect all future API calls, e.g. "http://easyvizar.wing.cs.wisc.edu:5000/".
 	public void SetBaseURL(string url)
     {
