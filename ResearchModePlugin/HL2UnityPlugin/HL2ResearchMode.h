@@ -72,6 +72,9 @@ namespace winrt::HL2UnityPlugin::implementation
         bool LRImageUpdated();
         bool RRImageUpdated();
 
+        void SetUsingRectifiedImages() { m_bRectifyWithColor = true; }
+        bool IsRectifyingImages() { return m_bRectifyWithColor; }
+
         void SetCaptureHiResColorImage() { m_bCaptureHiResImages = true; }
         bool IsCapturingHiResColor() { return m_bCaptureHiResImages; }
 

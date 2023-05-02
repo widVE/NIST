@@ -726,7 +726,7 @@ namespace winrt::HL2UnityPlugin::implementation
                             pHL2ResearchMode->m_localPointCloud[idx * 4] = 0;
                             pHL2ResearchMode->m_localPointCloud[idx * 4 + 1] = 0;
                             pHL2ResearchMode->m_localPointCloud[idx * 4 + 2] = 0;
-                            pHL2ResearchMode->m_localPointCloud[idx * 4 + 2] = 65535;
+                            pHL2ResearchMode->m_localPointCloud[idx * 4 + 3] = 65535;
                         }
                         continue;
                     }
@@ -1066,7 +1066,7 @@ namespace winrt::HL2UnityPlugin::implementation
                                     UINT8 b = pHL2ResearchMode->m_pixelBufferData[cIdx];//imageBufferAsVector[cIdx]; //
                                     UINT8 a = pHL2ResearchMode->m_pixelBufferData[cIdx + 3]; //imageBufferAsVector[cIdx + 3]; //
 
-                                    if (pHL2ResearchMode->IsCapturingRectColor())
+                                    if (pHL2ResearchMode->IsCapturingRectColor() && pHL2ResearchMode->IsRectifyingImages())
                                     {
                                         dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 0] = b;
                                         dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 1] = g;
@@ -1074,25 +1074,25 @@ namespace winrt::HL2UnityPlugin::implementation
                                         dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 3] = a;
                                     }
 
-                                    XMFLOAT3 depthVec;
-                                    depthVec.x = pHL2ResearchMode->_depthPts[idx].x;
-                                    depthVec.y = pHL2ResearchMode->_depthPts[idx].y;
-                                    depthVec.z = pHL2ResearchMode->_depthPts[idx].z;
-                                    XMVECTOR pointInQR = XMVector3Transform(XMLoadFloat3(&depthVec), pHL2ResearchMode->m_QRMatrix);
-                                    pointCloud.push_back(pointInQR.n128_f32[0]);
-                                    pointCloud.push_back(pointInQR.n128_f32[1]);
-                                    pointCloud.push_back(pointInQR.n128_f32[2]);
+                                    //XMFLOAT3 depthVec;
+                                    //depthVec.x = pHL2ResearchMode->_depthPts[idx].x;
+                                    //depthVec.y = pHL2ResearchMode->_depthPts[idx].y;
+                                    //depthVec.z = pHL2ResearchMode->_depthPts[idx].z;
+                                    //XMVECTOR pointInQR = XMVector3Transform(XMLoadFloat3(&depthVec), pHL2ResearchMode->m_QRMatrix);
+                                    //pointCloud.push_back(pointInQR.n128_f32[0]);
+                                    //pointCloud.push_back(pointInQR.n128_f32[1]);
+                                    //pointCloud.push_back(pointInQR.n128_f32[2]);
 
-                                    /*pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].x);
+                                    pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].x);
                                     pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].y);
                                     pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].z);
                                     pointCloud.push_back((float)r / 255.0f);
                                     pointCloud.push_back((float)g / 255.0f);
-                                    pointCloud.push_back((float)b / 255.0f);*/
+                                    pointCloud.push_back((float)b / 255.0f);
                                     if (file.is_open() && pHL2ResearchMode->IsCapturingColoredPointCloud())
                                     {
-                                        file << pointInQR.n128_f32[0] << " " << pointInQR.n128_f32[1] << " " << pointInQR.n128_f32[2] << " " << ((float)r / 255.0f) << " " << (float)g / 255.0f << " " << (float)b / 255.0f << std::endl;
-                                        //file << pHL2ResearchMode->_depthPts[idx].x << " " << pHL2ResearchMode->_depthPts[idx].y << " " << pHL2ResearchMode->_depthPts[idx].z << " " << ((float)r / 255.0f) << " " << (float)g / 255.0f << " " << (float)b / 255.0f << std::endl;
+                                        //file << pointInQR.n128_f32[0] << " " << pointInQR.n128_f32[1] << " " << pointInQR.n128_f32[2] << " " << ((float)r / 255.0f) << " " << (float)g / 255.0f << " " << (float)b / 255.0f << std::endl;
+                                        file << pHL2ResearchMode->_depthPts[idx].x << " " << pHL2ResearchMode->_depthPts[idx].y << " " << pHL2ResearchMode->_depthPts[idx].z << " " << ((float)r / 255.0f) << " " << (float)g / 255.0f << " " << (float)b / 255.0f << std::endl;
                                     }
                                 }
                                 else
@@ -1104,7 +1104,7 @@ namespace winrt::HL2UnityPlugin::implementation
                                     pointCloud.push_back(0.0f);
                                     pointCloud.push_back(0.0f);
 
-                                    if (pHL2ResearchMode->IsCapturingRectColor())
+                                    if (pHL2ResearchMode->IsCapturingRectColor() && pHL2ResearchMode->IsRectifyingImages())
                                     {
                                         dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 0] = 0;
                                         dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 1] = 0;
@@ -1125,7 +1125,7 @@ namespace winrt::HL2UnityPlugin::implementation
                                 pointCloud.push_back(0.0f);
                                 pointCloud.push_back(0.0f);
 
-                                if (pHL2ResearchMode->IsCapturingRectColor())
+                                if (pHL2ResearchMode->IsCapturingRectColor() && pHL2ResearchMode->IsRectifyingImages())
                                 {
                                     dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 0] = 0;
                                     dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 1] = 0;
@@ -1141,7 +1141,7 @@ namespace winrt::HL2UnityPlugin::implementation
                         file.close();
                     }
 
-                    if (pHL2ResearchMode->IsCapturingRectColor())
+                    if (pHL2ResearchMode->IsCapturingRectColor() && pHL2ResearchMode->IsRectifyingImages())
                     {
                         wchar_t fName[128];
                         //wchar_t fDate[64];
@@ -1187,7 +1187,7 @@ namespace winrt::HL2UnityPlugin::implementation
 
                                 if (cIdx > 0 && cIdx < (INT)(imageWidth * 4 * imageHeight))
                                 {
-                                    if (pHL2ResearchMode->IsCapturingDepthImages())
+                                    if (pHL2ResearchMode->IsCapturingDepthImages() && pHL2ResearchMode->IsRectifyingImages())
                                     {
                                         //UINT idx2 = bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + j;
                                         UINT16 depth = pDepth[idx];
@@ -1206,7 +1206,7 @@ namespace winrt::HL2UnityPlugin::implementation
                                 }
                                 else
                                 {
-                                    if (pHL2ResearchMode->IsCapturingDepthImages())
+                                    if (pHL2ResearchMode->IsCapturingDepthImages() && pHL2ResearchMode->IsRectifyingImages())
                                     {
                                         //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = 0;
                                         //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = 0;
@@ -1223,7 +1223,7 @@ namespace winrt::HL2UnityPlugin::implementation
                             }
                             else
                             {
-                                if (pHL2ResearchMode->IsCapturingDepthImages())
+                                if (pHL2ResearchMode->IsCapturingDepthImages() && pHL2ResearchMode->IsRectifyingImages())
                                 {
                                     //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = 0;
                                     //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = 0;
@@ -1241,7 +1241,7 @@ namespace winrt::HL2UnityPlugin::implementation
                     }
                 }
 
-                if (pHL2ResearchMode->IsCapturingDepthImages())
+                if (pHL2ResearchMode->IsCapturingDepthImages() && pHL2ResearchMode->IsRectifyingImages())
                 {
                     wchar_t fName[128];
                     swprintf(fName, 128, L"%s_%s_depth.png", m_datetime.c_str(), m_ms);// depthTimestampString);
@@ -1285,11 +1285,11 @@ namespace winrt::HL2UnityPlugin::implementation
 
                                 if (cIdx > 0 && cIdx < (INT)(imageWidth * 4 * imageHeight))
                                 {
-                                    if (pHL2ResearchMode->IsCapturingIntensity())
+                                    if (pHL2ResearchMode->IsCapturingIntensity() && pHL2ResearchMode->IsRectifyingImages())
                                     {
                                         //UINT idx2 = bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + j;
                                         UINT16 depth = pActiveBrightness[idx];
-                                        depth = (pSigma[idx] & 0x80) ? 0 : depth;
+                                        //depth = (pSigma[idx] & 0x80) ? 0 : depth;
                                         //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = (depth & 0x00FF);
                                         //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = ((depth && 0xFF00) >> 8);
                                         dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 8 * j + 0] = (depth & 0x00FF);
@@ -1304,7 +1304,7 @@ namespace winrt::HL2UnityPlugin::implementation
                                 }
                                 else
                                 {
-                                    if (pHL2ResearchMode->IsCapturingIntensity())
+                                    if (pHL2ResearchMode->IsCapturingIntensity() && pHL2ResearchMode->IsRectifyingImages())
                                     {
                                         //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = 0;
                                         //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = 0;
@@ -1321,7 +1321,7 @@ namespace winrt::HL2UnityPlugin::implementation
                             }
                             else
                             {
-                                if (pHL2ResearchMode->IsCapturingIntensity())
+                                if (pHL2ResearchMode->IsCapturingIntensity() && pHL2ResearchMode->IsRectifyingImages())
                                 {
                                     //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = 0;
                                     //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = 0;
@@ -1339,7 +1339,7 @@ namespace winrt::HL2UnityPlugin::implementation
                     }
                 }
 
-                if (pHL2ResearchMode->IsCapturingIntensity())
+                if (pHL2ResearchMode->IsCapturingIntensity() && pHL2ResearchMode->IsRectifyingImages())
                 {
                     wchar_t fName[128];
                     swprintf(fName, 128, L"%s_%s_intensity.png", m_datetime.c_str(), m_ms);// depthTimestampString);
@@ -1383,7 +1383,7 @@ namespace winrt::HL2UnityPlugin::implementation
 
                                 if (cIdx > 0 && cIdx < (INT)(imageWidth * 4 * imageHeight))
                                 {
-                                    if (pHL2ResearchMode->IsCapturingBinaryDepth())
+                                    if (pHL2ResearchMode->IsCapturingBinaryDepth() && pHL2ResearchMode->IsRectifyingImages())
                                     {
                                         //UINT idx2 = bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + j;
                                         UINT pcIndex = wIdx * 4 + j * 4;
@@ -1392,9 +1392,9 @@ namespace winrt::HL2UnityPlugin::implementation
                                         UINT16 depthZ = pHL2ResearchMode->m_localPointCloud[pcIndex+2];
                                         if (pSigma[idx] & 0x80)
                                         {
-                                            depthX = 0;
-                                            depthY = 0;
-                                            depthZ = 0;
+                                            //depthX = 0;
+                                            //depthY = 0;
+                                            //depthZ = 0;
                                         }
                                         
                                         //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = (depth & 0x00FF);
@@ -1411,7 +1411,7 @@ namespace winrt::HL2UnityPlugin::implementation
                                 }
                                 else
                                 {
-                                    if (pHL2ResearchMode->IsCapturingBinaryDepth())
+                                    if (pHL2ResearchMode->IsCapturingBinaryDepth() && pHL2ResearchMode->IsRectifyingImages())
                                     {
                                         //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = 0;
                                         //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = 0;
@@ -1428,7 +1428,7 @@ namespace winrt::HL2UnityPlugin::implementation
                             }
                             else
                             {
-                                if (pHL2ResearchMode->IsCapturingBinaryDepth())
+                                if (pHL2ResearchMode->IsCapturingBinaryDepth() && pHL2ResearchMode->IsRectifyingImages())
                                 {
                                     //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 0] = 0;
                                     //dataInBytesDepth[bufferLayoutDepth.StartIndex + bufferLayoutDepth.Stride * i + 2 * j + 1] = 0;
@@ -1446,7 +1446,7 @@ namespace winrt::HL2UnityPlugin::implementation
                     }
                 }
 
-                if (pHL2ResearchMode->IsCapturingBinaryDepth())
+                if (pHL2ResearchMode->IsCapturingBinaryDepth() && pHL2ResearchMode->IsRectifyingImages())
                 {
                     wchar_t fName[128];
                     swprintf(fName, 128, L"%s_%s_localPC.png", m_datetime.c_str(), m_ms);// depthTimestampString);

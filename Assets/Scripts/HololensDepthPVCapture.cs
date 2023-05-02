@@ -1218,6 +1218,11 @@ public class HololensDepthPVCapture : MonoBehaviour
 			researchMode.SetCaptureIntensity();
 		}
 		
+		if(_rectifyAllImages)
+		{
+			researchMode.SetUsingRectifiedImages();
+		}
+		
        	researchMode.StartPVCameraLoop();
 
 		researchMode.StartLongDepthSensorLoop();

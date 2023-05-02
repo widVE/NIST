@@ -52,6 +52,9 @@ namespace HL2UnityPlugin
         Boolean PointCloudUpdated();
         Boolean LongDepthMapTextureUpdated();
 
+        void SetUsingRectifiedImages();
+        Boolean IsRectifyingImages();
+
 		Boolean LFImageUpdated();
 		Boolean RFImageUpdated();
         Boolean LRImageUpdated();
