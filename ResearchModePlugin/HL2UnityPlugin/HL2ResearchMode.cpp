@@ -1066,7 +1066,7 @@ namespace winrt::HL2UnityPlugin::implementation
                                     UINT8 b = pHL2ResearchMode->m_pixelBufferData[cIdx];//imageBufferAsVector[cIdx]; //
                                     UINT8 a = pHL2ResearchMode->m_pixelBufferData[cIdx + 3]; //imageBufferAsVector[cIdx + 3]; //
 
-                                    if (pHL2ResearchMode->IsCapturingRectColor() && pHL2ResearchMode->IsRectifyingImages())
+                                    if (pHL2ResearchMode->IsCapturingRectColor())
                                     {
                                         dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 0] = b;
                                         dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 1] = g;
@@ -1104,7 +1104,7 @@ namespace winrt::HL2UnityPlugin::implementation
                                     pointCloud.push_back(0.0f);
                                     pointCloud.push_back(0.0f);
 
-                                    if (pHL2ResearchMode->IsCapturingRectColor() && pHL2ResearchMode->IsRectifyingImages())
+                                    if (pHL2ResearchMode->IsCapturingRectColor())
                                     {
                                         dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 0] = 0;
                                         dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 1] = 0;
@@ -1125,7 +1125,7 @@ namespace winrt::HL2UnityPlugin::implementation
                                 pointCloud.push_back(0.0f);
                                 pointCloud.push_back(0.0f);
 
-                                if (pHL2ResearchMode->IsCapturingRectColor() && pHL2ResearchMode->IsRectifyingImages())
+                                if (pHL2ResearchMode->IsCapturingRectColor())
                                 {
                                     dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 0] = 0;
                                     dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 1] = 0;
@@ -1141,7 +1141,7 @@ namespace winrt::HL2UnityPlugin::implementation
                         file.close();
                     }
 
-                    if (pHL2ResearchMode->IsCapturingRectColor() && pHL2ResearchMode->IsRectifyingImages())
+                    if (pHL2ResearchMode->IsCapturingRectColor())
                     {
                         wchar_t fName[128];
                         //wchar_t fDate[64];
