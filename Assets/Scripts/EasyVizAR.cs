@@ -320,7 +320,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	}
 	
 	public bool PutImageQuad(string contentType, string pathToFile, string pathToFile2, string pathToFile3, string pathToFile4, string locationID, int width, int height, System.Action<string> callBack, 
-				Vector3 position, Quaternion orientation, string headsetID = "", string imageType="photo", string imageType2="depth", string imageType3="geometry", string imageType4="thermal")
+				Vector3 position, Quaternion orientation, string headsetID = "", string imageType="photo", string imageType2="depth", string imageType3="geometry", string imageType4="thermal", int colorWidth=0, int colorHeight=0)
 	{
 		if(!_isUploadingImage)
 		{
@@ -788,7 +788,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	
 	
 	IEnumerator UploadImageQuad(string contentType, string path, string path2, string path3, string path4, string locationID, int width, int height, System.Action<string> callBack, 
-				Vector3 position, Quaternion orientation, string headsetID = "", string imageType="photo", string imageType2="depth", string imageType3="geometry", string imageType4="thermal")
+				Vector3 position, Quaternion orientation, string headsetID = "", string imageType="photo", string imageType2="depth", string imageType3="geometry", string imageType4="thermal", int colorWidth=0, int colorHeight=0)
     {
 		EasyVizAR.Hololens2PhotoPost h = new EasyVizAR.Hololens2PhotoPost();
 		h.width = width;

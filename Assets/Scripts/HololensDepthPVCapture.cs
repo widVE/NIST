@@ -73,6 +73,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 	string _lastTransformName = "";
 	string _lastDepthImageName = "";
 	string _lastIntensityImageName = "";
+	string _lastHiResColorName = "";
 	
 	static readonly float MaxRecordingTime = 5.0f;
 	VideoCapture m_VideoCapture = null;
@@ -234,7 +235,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 #else
 		if(_uploadToServer)
 		{
-			if(_captureDepthImages && _captureRectifiedColorImages && _captureBinaryDepth && _captureIntensity)
+			if(_captureDepthImages && (_captureRectifiedColorImages || (_captureHiResColorImages && !_rectifyAllImages)) && _captureBinaryDepth && _captureIntensity)
 			{
 				bool isNewDepth = false;
 				string sDepth = researchMode.GetDepthImageName();
@@ -255,19 +256,43 @@ public class HololensDepthPVCapture : MonoBehaviour
 				}
 				
 				bool isNewColor = false;
-				string sColor = researchMode.GetRectColorName();
-				if(sColor.Length > 0)
+				string sColor = "";
+				
+				if(_captureRectifiedColorImages)
 				{
-					if(_lastRectColorName.Length == 0)
+					sColor = researchMode.GetRectColorName();
+					if(sColor.Length > 0)
 					{
-						_lastRectColorName = sColor;
-						isNewColor = true;
-					}
-					else
-					{
-						if(sColor != _lastRectColorName)
+						if(_lastRectColorName.Length == 0)
 						{
-							isNewColor = true;		
+							_lastRectColorName = sColor;
+							isNewColor = true;
+						}
+						else
+						{
+							if(sColor != _lastRectColorName)
+							{
+								isNewColor = true;		
+							}
+						}
+					}
+				}
+				else if(_captureHiResColorImages)
+				{
+					sColor = researchMode.GetHiColorName();
+					if(sColor.Length > 0)
+					{
+						if(_lastHiResColorName.Length == 0)
+						{
+							_lastHiResColorName = sColor;
+							isNewColor = true;
+						}
+						else
+						{
+							if(sColor != _lastHiResColorName)
+							{
+								isNewColor = true;		
+							}
 						}
 					}
 				}
@@ -340,7 +365,14 @@ public class HololensDepthPVCapture : MonoBehaviour
 								if(EasyVizARServer.Instance.PutImageQuad("image/png", sColor, sDepth, sPC, sI, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "photo", "depth", "geometry", "thermal"))
 								{
 									_lastDepthImageName = sDepth;
-									_lastRectColorName = sColor;
+									if(_captureRectifiedColorImages)
+									{
+										_lastRectColorName = sColor;
+									}
+									else if(_captureHiResColorImages)
+									{
+										_lastHiResColorName = sColor;
+									}
 									_lastDepthBinaryName = sPC;
 									_lastIntensityImageName = sI;
 								}
