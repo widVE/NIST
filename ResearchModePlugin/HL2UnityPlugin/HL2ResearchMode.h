@@ -103,7 +103,7 @@ namespace winrt::HL2UnityPlugin::implementation
             return m_bIsQRCodeDetected; 
         }
 
-        void SetReferenceCoordinateSystem(Windows::Perception::Spatial::SpatialCoordinateSystem refCoord);
+        void SetReferenceCoordinateSystem(guid refCoord);
         void SetPointCloudRoiInSpace(float centerX, float centerY, float centerZ, float boundX, float boundY, float boundZ);
         void SetQRTransform(float f00, float f01, float f02, float f03, float f10, float f11, float f12, float f13, float f20, float f21, float f22, float f23, float f30, float f31, float f32, float f33);
         void SetPointCloudDepthOffset(uint16_t offset);

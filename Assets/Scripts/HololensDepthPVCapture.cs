@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System;
 using System.Runtime.InteropServices;
+using Microsoft.Windows.Perception.Spatial.Preview;
+using Microsoft.Windows.Perception.Spatial;
 using System.IO;
 using UnityEngine.Windows.WebCam;
 using System.Linq;
@@ -132,6 +134,8 @@ public class HololensDepthPVCapture : MonoBehaviour
 					Matrix4x4 m = ev.NewTransform;
 					//m = m.transpose;
 					m = m.inverse;
+
+					researchMode.SetReferenceCoordinateSystem(ev.spatialNodeId);
 					researchMode.SetQRTransform(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);					
 					researchMode.SetQRCodeDetected();
 					RunSensors();

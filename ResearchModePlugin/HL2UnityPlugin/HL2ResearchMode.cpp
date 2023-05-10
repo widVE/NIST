@@ -506,10 +506,10 @@ namespace winrt::HL2UnityPlugin::implementation
 
     void HL2ResearchMode::StartLongDepthSensorLoop()
     {
-        if (m_refFrame == nullptr)
+        /*if (m_refFrame == nullptr)
         {
             m_refFrame = m_locator.GetDefault().CreateStationaryFrameOfReferenceAtCurrentLocation().CoordinateSystem();
-        }
+        }*/
         
         OutputDebugString(L"Starting long depth sensor loop\n");
 
@@ -549,6 +549,11 @@ namespace winrt::HL2UnityPlugin::implementation
             if (!pHL2ResearchMode->IsQRCodeDetected())
             {
                 continue;
+            }
+
+            if (pHL2ResearchMode->m_refFrame == nullptr)
+            {
+                pHL2ResearchMode->m_refFrame = pHL2ResearchMode->m_locator.GetDefault().CreateStationaryFrameOfReferenceAtCurrentLocation().CoordinateSystem();
             }
 
             IResearchModeSensorFrame* pDepthSensorFrame = nullptr;
@@ -1284,6 +1289,7 @@ namespace winrt::HL2UnityPlugin::implementation
                     //pHL2ResearchMode->_frameCount++;
                 }
 
+                
                 winrt::Windows::Graphics::Imaging::SoftwareBitmap intensityImage = winrt::Windows::Graphics::Imaging::SoftwareBitmap(winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Rgba16, 320, 288, winrt::Windows::Graphics::Imaging::BitmapAlphaMode::Straight);
                 //winrt::Windows::Graphics::Imaging
 
@@ -2250,8 +2256,9 @@ namespace winrt::HL2UnityPlugin::implementation
     }
 
     // Set the reference coordinate system. Need to be set before the sensor loop starts; otherwise, default coordinate will be used.
-    void HL2ResearchMode::SetReferenceCoordinateSystem(winrt::Windows::Perception::Spatial::SpatialCoordinateSystem refCoord)
+    void HL2ResearchMode::SetReferenceCoordinateSystem(guid g)
     {
+        SpatialCoordinateSystem refCoord = SpatialGraphInteropPreview::CreateCoordinateSystemForNode(g);
         m_refFrame = refCoord;
     }
 
@@ -2317,6 +2324,17 @@ namespace winrt::HL2UnityPlugin::implementation
         m_QR._44 = m_QRTransform[15];
 
         m_QRMatrix = XMLoadFloat4x4(&m_QR);
+
+        
+        //SpatialAnchor s = SpatialAnchor::TryCreateRelativeTo(m_refFrame);
+        //s.CoordinateSystem().TryGetTransformTo()
+        /*float4x4 anchorSpaceToCurrentCoordinateSystem;
+        SpatialCoordinateSystem^ anchorSpace = someAnchor->CoordinateSystem;
+        const auto tryTransform = anchorSpace->TryGetTransformTo(currentCoordinateSystem);
+        if (tryTransform != nullptr)
+        {
+            anchorSpaceToCurrentCoordinateSystem = tryTransform->Value;
+        }*/
     }
 
     long long HL2ResearchMode::checkAndConvertUnsigned(UINT64 val)

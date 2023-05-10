@@ -5,6 +5,7 @@ using System;
 
 using Microsoft.MixedReality.QR;
 using Microsoft.Windows.Perception.Spatial;
+using Microsoft.Windows.Perception.Spatial.Preview;
 using Microsoft.MixedReality.OpenXR;
 using Microsoft.MixedReality.Toolkit.Utilities;
 
@@ -17,6 +18,7 @@ public class LocationChangedEventArgs
 public class QRTransformChangedEventArgs
 {
 	public Matrix4x4 NewTransform;
+	public Guid spatialNodeId;
 }
 
 [RequireComponent(typeof(AudioSource))]
@@ -28,6 +30,7 @@ public class QRScanner : MonoBehaviour
 		public float  size;
 		public string text;
 		public DateTimeOffset lastDetected;
+		public Guid spatialGraphNodeId;
 
 		public static QRData FromCode(QRCode qr)
 		{
@@ -41,7 +44,9 @@ public class QRScanner : MonoBehaviour
                 {
                     result.pose = result.pose.GetTransformedBy(CameraCache.Main.transform.parent);
                 }*/
-
+				
+				result.spatialGraphNodeId = qr.SpatialGraphNodeId;
+				
 				result.pose.rotation *= Quaternion.Euler(90, 0, 0);
 
 				// Move the anchor point to the *center* of the QR code
@@ -273,6 +278,8 @@ public class QRScanner : MonoBehaviour
 			QRTransformChangedEventArgs args = new QRTransformChangedEventArgs();
 			//args.NewTransform = new Matrix4x4();
 			args.NewTransform = mInv;
+			args.spatialNodeId = d.spatialGraphNodeId;
+			
 			if(QRTransformChanged is not null)
 			{
 				QRTransformChanged(this, args);

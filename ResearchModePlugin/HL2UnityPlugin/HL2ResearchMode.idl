@@ -1,5 +1,6 @@
 namespace HL2UnityPlugin
 {
+
     runtimeclass HL2ResearchMode
     {
         HL2ResearchMode();
@@ -89,7 +90,7 @@ namespace HL2UnityPlugin
 
         void StopAllSensorDevice();
 
-        void SetReferenceCoordinateSystem(Windows.Perception.Spatial.SpatialCoordinateSystem refCoord);
+        void SetReferenceCoordinateSystem(GUID g);
         void SetPointCloudRoiInSpace(Single centerX, Single centerY, Single centerZ, Single boundX, Single boundY, Single boundZ);
         void SetPointCloudDepthOffset(UInt16 offset);
         void SetQRTransform(Single f00, Single f01, Single f02, Single f03, Single f10, Single f11, Single f12, Single f13, Single f20, Single f21, Single f22, Single f23, Single f30, Single f31, Single f32, Single f33);
