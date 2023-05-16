@@ -70,12 +70,16 @@ public class HololensDepthPVCapture : MonoBehaviour
 	[SerializeField]
 	bool _rectifyAllImages = true;
 	
+	[SerializeField]
+	DrawCube _cubeTest;
+	
 	string _lastDepthBinaryName = "";
 	string _lastRectColorName = "";
 	string _lastTransformName = "";
 	string _lastDepthImageName = "";
 	string _lastIntensityImageName = "";
 	string _lastHiResColorName = "";
+	string _lastColorPCName = "";	//world space point cloud...
 	
 	static readonly float MaxRecordingTime = 5.0f;
 	VideoCapture m_VideoCapture = null;
@@ -766,6 +770,77 @@ public class HololensDepthPVCapture : MonoBehaviour
 								
 							}
 						}
+					}
+				}
+			}
+		}
+		
+		if(_captureColorPointCloud)
+		{
+			string sPC = researchMode.GetPointCloudName();
+			if(sPC.Length > 0)
+			{
+				bool isNewPC = false;
+				if(_lastColorPCName.Length == 0)
+				{
+					_lastColorPCName = sPC;
+					isNewPC = true;
+				}
+				else
+				{
+					if(sPC != _lastColorPCName)
+					{
+						isNewPC = true;		
+					}
+				}
+				
+				if(isNewPC)
+				{
+					//as a proof of concept try using the point cloud renderer stuff that came with the research mode plugin?
+					if(_manager != null)
+					{
+						var headset = _manager.LocalHeadset;
+						if (headset != null)
+						{
+							var hsObject = headset.GetComponent<EasyVizARHeadset>();
+							if (hsObject != null)
+							{
+								Matrix4x4 depthTrans = Matrix4x4.identity;
+								string sTransform = researchMode.GetTransformName();
+								//load the transform... decompose to the position and rotation...
+								string[] transLines = File.ReadAllLines(sTransform);
+								Vector3 pos = Vector3.zero;
+								Quaternion rot = Quaternion.identity;
+								
+								for(int i = 0; i < 4; ++i)
+								{
+									string[] vals = transLines[i].Split(" ");
+									for(int j = 0; j < 4; ++j)
+									{
+										depthTrans[i*4+j] = float.Parse(vals[j]);
+									}
+								}
+								
+								pos = depthTrans.GetPosition();
+								rot = depthTrans.rotation;
+								
+								_lastColorPCName = sPC;
+								
+								if(_cubeTest != null)
+								{
+									_cubeTest._pcFileName = _lastColorPCName;
+									
+								}
+								
+								/*if(EasyVizARServer.Instance.PutImage("image/png", sIntensity, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "thermal"))
+								{
+									_lastColorPCName = sPC;
+								}*/
+							}
+						}
+						
+						//Debug.Log(_lastRectColorName);
+						
 					}
 				}
 			}
