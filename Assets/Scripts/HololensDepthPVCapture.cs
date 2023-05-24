@@ -826,11 +826,12 @@ public class HololensDepthPVCapture : MonoBehaviour
 								
 								_lastColorPCName = sPC;
 								
-								if(_cubeTest != null)
+								//uncomment to test cube rendering.
+								/*if(_cubeTest != null)
 								{
 									_cubeTest._pcFileName = _lastColorPCName;
 									
-								}
+								}*/
 								
 								/*if(EasyVizARServer.Instance.PutImage("image/png", sIntensity, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "thermal"))
 								{

@@ -16,11 +16,11 @@ public class DrawCube : MonoBehaviour {
     private uint[] args = new uint[5] { 0, 0, 0, 0, 0 };
 	
 	public string _pcFileName = "";
-	
+	string _lastPCFileName = "";
 
     void Start() {
         argsBuffer = new ComputeBuffer(1, args.Length * sizeof(uint), ComputeBufferType.IndirectArguments);
-        UpdateBuffers();
+        //UpdateBuffers();
     }
 
     void Update() 
@@ -28,8 +28,11 @@ public class DrawCube : MonoBehaviour {
 		if(_pcFileName != "")
 		{
 			// Update starting position buffer
-			if (cachedInstanceCount != instanceCount || cachedSubMeshIndex != subMeshIndex)
+			if (_lastPCFileName != _pcFileName)//cachedInstanceCount != instanceCount || cachedSubMeshIndex != subMeshIndex)
+			{
 				UpdateBuffers();
+				_lastPCFileName = _pcFileName;
+			}
 
 			// Pad input
 			//if (Input.GetAxisRaw("Horizontal") != 0.0f)
@@ -40,12 +43,14 @@ public class DrawCube : MonoBehaviour {
 		}
     }
 
-    void OnGUI() {
+    /*void OnGUI() {
         GUI.Label(new Rect(265, 25, 200, 30), "Instance Count: " + instanceCount.ToString());
         instanceCount = (int)GUI.HorizontalSlider(new Rect(25, 20, 200, 30), (float)instanceCount, 1.0f, 5000000.0f);
-    }
+    }*/
 
-    void UpdateBuffers() {
+    void UpdateBuffers() 
+	{
+		Debug.Log("Updating buffers");
         // Ensure submesh index is in range
         if (instanceMesh != null)
             subMeshIndex = Mathf.Clamp(subMeshIndex, 0, instanceMesh.subMeshCount - 1);
@@ -53,6 +58,9 @@ public class DrawCube : MonoBehaviour {
         // Positions
         if (positionBuffer != null)
             positionBuffer.Release();
+		
+		if(colorBuffer != null)
+			colorBuffer.Release();
 		
         positionBuffer = new ComputeBuffer(instanceCount, 16);
 		colorBuffer = new ComputeBuffer(instanceCount, 16);
@@ -74,6 +82,13 @@ public class DrawCube : MonoBehaviour {
 				s.Write(_pcTest[i].ToString("F4") + " " + _pcTest[i+1].ToString("F4")+ " " + _pcTest[i+2].ToString("F4") + " " + _pcTest[i+3].ToString("F4") + " " + _pcTest[i+4].ToString("F4")+ " " + _pcTest[i+5].ToString("F4")+ "\n");
 			}*/
 		}
+		
+		instanceCount = transLines.Length;
+		/*for(int i = transLines.Length; i < instanceCount; ++i)
+		{
+			positions[i] = Vector4.zero;
+			colors[i] = Vector4.zero;
+		}*/
 								
         //for (int i = 0; i < instanceCount; i++) {
             /*float angle = Random.Range(0.0f, Mathf.PI * 2.0f);

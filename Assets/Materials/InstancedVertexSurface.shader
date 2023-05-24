@@ -23,8 +23,9 @@ Shader "Instanced/InstancedVertexShader" {
                
                 float4 data = positionBuffer[instanceID];  
                 float4 color = colorBuffer[instanceID];
-                float3 localPosition = v.vertex.xyz * data.w;
-                float3 worldPosition = data.xyz + localPosition;
+                //float3 localPosition = v.vertex.xyz * data.w;
+                float3 worldPosition = data.xyz + v.vertex.xyz * 0.0015;//localPosition;
+				//worldPosition *= 10;
                 float3 worldNormal = v.normal;
                                
                 v2f o;
