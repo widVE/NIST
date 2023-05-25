@@ -18864,6 +18864,37 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1492607365016697351, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
   m_PrefabInstance: {fileID: 1810665664}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &873797680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873797678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d609aa16ccf078e4fa2d88cc2e151678, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currHeadset: {fileID: 1361342022}
+  iconParent: {fileID: 335883421}
+  map_scale:
+  - {fileID: 1810665668}
+  - {fileID: 1208726034}
+  map_lines:
+  - {fileID: 1810665666}
+  - {fileID: 1810665667}
+  - {fileID: 1810665665}
+  - {fileID: 792694391}
+  - {fileID: 812520005}
+  - {fileID: 445203804}
+  mapCollection: {fileID: 665494468}
+  feature_parent: {fileID: 1968206798}
+  verbose_debug: 1
+  mirror_axis: 1
+  last_clicked_target: 
+  map_location_ID: 
+  map_resolution: 1200
 --- !u!1 &875509811
 GameObject:
   m_ObjectHideFlags: 0
@@ -21631,7 +21662,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7043154617577782646, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7043154617577782646, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
       propertyPath: m_LocalScale.x
@@ -28274,7 +28305,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3790148274104345818, guid: 926fb805b03eb2040a9c62b0166977e5, type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3790148274104345818, guid: 926fb805b03eb2040a9c62b0166977e5, type: 3}
       propertyPath: m_AnchorMax.x
@@ -35236,6 +35267,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1492607365016697351, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: m_Name
+      value: Visuals and Map Controller
+      objectReference: {fileID: 0}
     - target: {fileID: 1492607365964717172, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: m_Name
       value: PalmUp Map
@@ -35365,6 +35400,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1426975337}
     - target: {fileID: 3728181045455103163, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3728181045455103163, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: currHeadset
       value: 
       objectReference: {fileID: 1361342022}
@@ -35450,7 +35489,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8705007549346784224, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: onHandActivate.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8705007549346784224, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: onHandActivate.m_PersistentCalls.m_Calls.Array.data[2].m_CallState
@@ -45000,7 +45039,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 333121821772028945, guid: 905f5ec265c7ec6419a3a994f767ec61, type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 333121821772028945, guid: 905f5ec265c7ec6419a3a994f767ec61, type: 3}
       propertyPath: m_LocalPosition.x

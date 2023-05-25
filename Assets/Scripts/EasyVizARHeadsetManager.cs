@@ -129,16 +129,14 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		//Debug.Log("In map callback");
 		foreach (var map_layout in _mapObjects) 
 		{
-			map_layout.GetComponent<Renderer>().material.mainTexture = resultTexture;
+			//map_layout.GetComponent<Renderer>().material.mainTexture = resultTexture;
 		}
 	}
 	
 	public void DisplayHandMap()
 	{
-		EasyVizARServer.Instance.Texture("locations/" + _locationId + "/layers/1/image", "image/png", "1200", DisplayMapCallback); 
-		//EasyVizARServer.Instance.Texture("locations/" + _locationId + "/layers/1/image", "image/png", "100", DisplayMapCallback);
-
-	}
+        EasyVizARServer.Instance.Texture("locations/" + _locationId + "/layers/1/image", "image/png", "1200", DisplayMapCallback);
+    }
 
 
 
