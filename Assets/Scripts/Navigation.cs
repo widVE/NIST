@@ -31,10 +31,11 @@ public class Navigation : MonoBehaviour
     GameObject main_camera;
     Transform feature;
 
-    public string local_headset_id = "";
+    [SerializeField] string local_headset_id = "";
     public string last_target;
 
-    EasyVizAR.Position target_position;
+    // This holds the position data of the user's target
+    EasyVizAR.Position user_target_position = new EasyVizAR.Position();
 
     // Start is called before the first frame update
     void Start()
@@ -42,7 +43,9 @@ public class Navigation : MonoBehaviour
         markerSpawnParent = this.transform.parent.gameObject.GetComponent<MapIconSpawn>().feature_parent;
         map_parent = this.transform.parent.gameObject;
         last_target = map_parent.GetComponent<MapIconSpawn>().last_clicked_target;
-        
+
+        local_headset_id = "BRAWNDO!";
+
         //markerSpawnParent = GameObject.Find("Marker Spawn Parent");
 
         if (!markerSpawnParent)
@@ -81,12 +84,19 @@ public class Navigation : MonoBehaviour
         {
             UnityEngine.Debug.Log("initiated querying path");
             Vector3 start = main_camera.transform.position;
-            Vector3 target = feature.position; // is the type Position? or Vector3?
+
+            //The destination
+            Vector3 destination_position = feature.position; // is the type Position? or Vector3?
+            user_target_position.x = destination_position.x;
+            user_target_position.y = destination_position.y;
+            user_target_position.z = destination_position.z;
+
+
             //UnityEngine.Debug.Log("start: " + start.x + ", " + start.y + ", " + start.z);
             //UnityEngine.Debug.Log("target: " + target.x + ", " + target.y + ", " + target.z);
-            
+
             //UnityEngine.Debug.Log("http://easyvizar.wings.cs.wisc.edu:5000/locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + target.x + "," + target.y + "," + target.z);
-            EasyVizARServer.Instance.Get("locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + target.x + "," + target.y + "," + target.z, EasyVizARServer.JSON_TYPE, GetPathCallback);
+            EasyVizARServer.Instance.Get("locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + destination_position.x + "," + destination_position.y + "," + destination_position.z, EasyVizARServer.JSON_TYPE, GetPathCallback);
         }        
     }
 
@@ -120,9 +130,6 @@ public class Navigation : MonoBehaviour
         // Create a new line by deleting old points
         if (world_line.positionCount > 0) world_line.positionCount = 0;
 
-
-        target_position = new EasyVizAR.Position();
-
         int index = 0;
 
         foreach (EasyVizAR.Position point in path.points)
@@ -131,7 +138,7 @@ public class Navigation : MonoBehaviour
             world_line.SetPosition(index++, new Vector3(point.x, point.y, point.z)); // this draws the line 
                                                                                   //UnityEngine.Debug.Log("number of points in the path is: " + line.positionCount);
                                                                                   //UnityEngine.Debug.Log("points: " + points.x + ", " + points.y + ", " + points.z);
-            target_position = point;
+            user_target_position = point;
         }
 
 
@@ -154,29 +161,30 @@ public class Navigation : MonoBehaviour
             RenderWorldPath();
             RenderMapPath();
 
-            EasyVizAR.Position target_pos = new EasyVizAR.Position();
 
             // send the target information to the server
             // Why do we need to patch the server? should this be in a different function? B
             // The navigation path is getting called, but I've broken some of the target seleciton logic. Now it doesn't compose
             // the correct JSON for the server. I think it's because the target variable isn't updated correctly?
             // I think maybe it's working?? 
-            NavigationTargetUpdate nav_update = new NavigationTargetUpdate();
-            EasyVizAR.NavigationTarget target = new EasyVizAR.NavigationTarget();
-            target.type = "feature";
-            
-            target.target_id = feature.Find("ID").GetChild(0).name;
-            target.position = target_pos;
+
+            // The Navigation Target Update is a piece of a headset update that is required structure for patching
+            NavigationTargetUpdate navigation_target_update = new NavigationTargetUpdate();
+
+            EasyVizAR.NavigationTarget user_navigation_target = new EasyVizAR.NavigationTarget();
+            user_navigation_target.type = "feature";            
+            user_navigation_target.target_id = feature.Find("ID").GetChild(0).name;
+            user_navigation_target.position = user_target_position;
+
             // updating the last target here
             last_target = this.name;
-            UnityEngine.Debug.Log("the last target: " + last_target + " with ID " + target.target_id);
+            UnityEngine.Debug.Log("the last target: " + last_target + " with ID " + user_navigation_target.target_id);
 
             GameObject local = GameObject.Find("LocalHeadset");
-            local_headset_id = local.transform.GetChild(0).name;
-            nav_update.navigation_target = target;
+            navigation_target_update.navigation_target = user_navigation_target;
 
-            //UnityEngine.Debug.Log("returned json: " + JsonUtility.ToJson(target));
-            EasyVizARServer.Instance.Patch("headsets/" + local_headset_id, EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(nav_update), PostTargetCallback);
+            UnityEngine.Debug.Log("returned json: headset id " + local_headset_id + " of type " + EasyVizARServer.JSON_TYPE + " the payload " + JsonUtility.ToJson(navigation_target_update));
+            EasyVizARServer.Instance.Patch("headsets/" + local_headset_id, EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(navigation_target_update), PostTargetCallback);
 
 
         }
