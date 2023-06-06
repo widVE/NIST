@@ -5087,14 +5087,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 194597379}
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1810665669}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &194597381
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -7378,7 +7378,7 @@ MonoBehaviour:
   _meshCapture: {fileID: 1375559501}
   _photoCapture: {fileID: 404529389}
   followMovingQRCode: 1
-  testQRCodeData: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/1cc48e8d-890d-413a-aa66-cabaaa6e5458
+  testQRCodeData: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/69e92dff-7138-4091-89c4-ed073035bfe6
   triggerQRCodeDetected: 0
 --- !u!82 &291935033
 AudioSource:
