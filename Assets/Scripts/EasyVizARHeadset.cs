@@ -17,7 +17,7 @@ public class EasyVizARHeadset : MonoBehaviour
 	
 	[SerializeField]
 	bool _isLocal = false;
-	public bool IsLocal
+	public bool is_local
 	{
 		get { return _isLocal; }
 		set { _isLocal = value; }
@@ -55,7 +55,7 @@ public class EasyVizARHeadset : MonoBehaviour
 	public GameObject map_parent; // This will get populated by EasyVizARHeadsetManager.cs
 	public GameObject headset_parent; // This will get populated by EasyVizARHeadsetManager.cs
     public string local_headset_id = "";
-	public bool isLocal = false;
+	//public bool is_local = false;
 	
 	// This is for navigation
 	public GameObject feature_parent;
@@ -98,10 +98,11 @@ public class EasyVizARHeadset : MonoBehaviour
 				UnityEngine.Debug.Log("Reloading headset: " + headsetId);
                 UnityEngine.Debug.Log("This is the local headset: " + headsetId);
 				local_headset_id = headsetId;
-				isLocal= true;
-				d_s.isLocal = true;
+				is_local= true;
+				d_s.is_local = true;
                 LoadHeadset(headsetId);
-            } else
+            } 
+			else
             {
 				UnityEngine.Debug.Log("Creating headset...");
 				CreateHeadset();
@@ -139,6 +140,8 @@ public class EasyVizARHeadset : MonoBehaviour
 		}
     }
 	
+
+	//This might be a problem here? B I don't think this should be doing what it's doing /B
 	public void AssignValuesFromJson(EasyVizAR.Headset h)
 	{
 		Vector3 newPos = Vector3.zero;
@@ -166,7 +169,9 @@ public class EasyVizARHeadset : MonoBehaviour
             {
 				// If target type is none, we should clear the navigation path,
 				// but there is no need to call the server for pathing.
-				line.positionCount = 0;
+
+				//this line is throwing an null refernce error /B
+				//line.positionCount = 0;
             }
             
         }

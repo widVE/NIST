@@ -38,7 +38,7 @@ public class WorldToMapHeadsetRotate : MonoBehaviour
         foreach (EasyVizARHeadset headset in headset_manager_script._activeHeadsets)
         {
             //If they are not the local headset, then copy their rotation from the world space into the map
-            bool is_local_headset = headset.GetComponent<DistanceCalculation>().isLocal;
+            bool is_local_headset = headset.GetComponent<DistanceCalculation>().is_local;
             
             if (!is_local_headset)
             {

@@ -54,7 +54,7 @@ public class OffsetRotation : MonoBehaviour
 
         foreach (EasyVizARHeadset headset in headset_manager_script._activeHeadsets)
         {
-            bool is_local_headset = headset.GetComponent<DistanceCalculation>().isLocal;
+            bool is_local_headset = headset.GetComponent<DistanceCalculation>().is_local;
             if (is_local_headset)
                 //check against the name of the connected headset;
                 if (this.transform.parent.name == headset.name)

@@ -455,6 +455,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 			//parse list of headsets for this location and create...
 			//the key to parsing the array - the text we add here has to match the name of the variable in the array wrapper class (headsets).
 			EasyVizAR.HeadsetList headset_list = JsonUtility.FromJson<EasyVizAR.HeadsetList>("{\"headsets\":" + resultData + "}");
+			
+			// why are we pre-incrementing i???
 			for(int i = 0; i < headset_list.headsets.Length; ++i)
 			{
 				if(headset_list.headsets[i].name != _localHeadsetName || _visualizePreviousLocal)
@@ -474,7 +476,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 								headset_game_object.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
 							}
 							headset.AssignValuesFromJson(headset_list.headsets[i]);
-							headset.IsLocal = true;
+							headset.is_local = true;
 							headset.LocationID = headset_list.headsets[i].location_id;
 							_activeHeadsets.Add(headset);
 						}

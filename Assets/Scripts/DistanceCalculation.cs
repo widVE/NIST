@@ -13,7 +13,7 @@ public class DistanceCalculation : MonoBehaviour
 	public GameObject distText;
 	public GameObject capsule;
 	public GameObject cur_prefab;
-	public bool isFeet;
+	public bool isFeet = true;
 
 	public Vector3 oldPos;
 	public Vector3 newPos;
@@ -25,7 +25,7 @@ public class DistanceCalculation : MonoBehaviour
 	public EasyVizAR.HeadsetList headset_list;
 	public EasyVizAR.Headset cur_headset;
 	public string headset_name; // this is set in the EasyVizARHeadsetManager.cs script \
-	public bool isLocal = false;
+	public bool is_local = false;
 	public string local_headset_id = "";
 
 	// Start is called before the first frame update
@@ -34,7 +34,6 @@ public class DistanceCalculation : MonoBehaviour
 		cam = GameObject.Find("Main Camera");
 		//mapParent = GameObject.Find("Map_Spawn_Target"); // NOTE: this is returning null when object is inactive
 		headset_parent = GameObject.Find("EasyVizARHeadsetManager");
-		isFeet = true;
 		
 		cam_pos = cam.GetComponent<Transform>().position;
 		oldPos = cam_pos;
@@ -43,7 +42,7 @@ public class DistanceCalculation : MonoBehaviour
 		{
             if (this.name.Equals(headsetId))
             {
-                isLocal = true;
+                is_local = true;
                 local_headset_id = headsetId;
 				GameObject local = GameObject.Find("LocalHeadset");
 				local.transform.GetChild(0).name = headsetId;
@@ -110,9 +109,9 @@ public class DistanceCalculation : MonoBehaviour
 			//If our map marker is found, we manipulate it's position
 			if (mapMarker != null)
 			{
-                UnityEngine.Debug.Log(this.name + " is local?: " + isLocal);
+                UnityEngine.Debug.Log(this.name + " is local?: " + is_local);
 
-                if (isLocal)
+                if (is_local)
 				{
                     UnityEngine.Debug.Log("get into local: " + this.name);
 

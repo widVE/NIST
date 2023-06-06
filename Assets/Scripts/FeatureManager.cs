@@ -167,7 +167,8 @@ public class FeatureManager : MonoBehaviour
 
 #if UNITY_EDITOR
         // In editor mode, use the hard-coded location ID for testing.
-        ListFeatures(); // this populates all the features listed on the server currently
+        //I don't think this works correctly anymore so commenting out the list feature call
+        //ListFeatures(); // this populates all the features listed on the server currently
 #endif
 
         // Wait for a QR code to be scanned to fetch features from the correct location.
@@ -339,7 +340,8 @@ public class FeatureManager : MonoBehaviour
         EasyVizARServer.Instance.Get("locations/" + locationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
     }
     
-    void ListFeatureCallBack(string result) {
+    void ListFeatureCallBack(string result) 
+    {
         if (result != "error")
         {
             
