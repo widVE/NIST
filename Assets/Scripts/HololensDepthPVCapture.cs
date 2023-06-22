@@ -104,11 +104,15 @@ public class HololensDepthPVCapture : MonoBehaviour
 	bool _firstHeadsetSend = true;
 	
 	int _fileOutNumber = 0;
+
+	Camera _mainCamera;
 	
 	//float[] _pcTest = new float[6 * 320 * 288];
 	
     void Start()
     {
+		_mainCamera = Camera.main;
+
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
 #else
@@ -237,7 +241,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 	
     void LateUpdate()
     {
-		
+
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
 #else
@@ -367,8 +371,10 @@ public class HololensDepthPVCapture : MonoBehaviour
 									}
 								}
 								
-								pos = depthTrans.GetPosition();
-								rot = depthTrans.rotation;
+								pos = _mainCamera.transform.position;
+								rot = _mainCamera.transform.rotation;
+								//pos = depthTrans.GetPosition();
+								//rot = depthTrans.rotation;
 								
 								if(EasyVizARServer.Instance.PutImageQuad("image/png", sColor, sDepth, sPC, sI, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "photo", "depth", "geometry", "thermal"))
 								{
@@ -470,9 +476,11 @@ public class HololensDepthPVCapture : MonoBehaviour
 										depthTrans[i*4+j] = float.Parse(vals[j]);
 									}
 								}
-								
-								pos = depthTrans.GetPosition();
-								rot = depthTrans.rotation;
+
+								pos = _mainCamera.transform.position;
+								rot = _mainCamera.transform.rotation;
+								//pos = depthTrans.GetPosition();
+								//rot = depthTrans.rotation;
 								
 								if(EasyVizARServer.Instance.PutImageTriple("image/png", sColor, sDepth, sPC, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "photo", "depth", "geometry"))
 								{
@@ -549,8 +557,10 @@ public class HololensDepthPVCapture : MonoBehaviour
 									}
 								}
 								
-								pos = depthTrans.GetPosition();
-								rot = depthTrans.rotation;
+								pos = _mainCamera.transform.position;
+								rot = _mainCamera.transform.rotation;
+								//pos = depthTrans.GetPosition();
+								//rot = depthTrans.rotation;
 								
 								if(EasyVizARServer.Instance.PutImagePair("image/png", sColor, sDepth, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "photo", "depth"))
 								{
@@ -609,8 +619,10 @@ public class HololensDepthPVCapture : MonoBehaviour
 											}
 										}
 										
-										pos = depthTrans.GetPosition();
-										rot = depthTrans.rotation;
+										pos = _mainCamera.transform.position;
+										rot = _mainCamera.transform.rotation;
+										//pos = depthTrans.GetPosition();
+										//rot = depthTrans.rotation;
 										
 										if(EasyVizARServer.Instance.PutImage("image/png", sDepth, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "depth"))
 										{
@@ -694,8 +706,10 @@ public class HololensDepthPVCapture : MonoBehaviour
 											}
 										}
 										
-										pos = depthTrans.GetPosition();
-										rot = depthTrans.rotation;
+										pos = _mainCamera.transform.position;
+										rot = _mainCamera.transform.rotation;
+										//pos = depthTrans.GetPosition();
+										//rot = depthTrans.rotation;
 										
 										if(EasyVizARServer.Instance.PutImage("image/png", sColor, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID))
 										{
@@ -756,8 +770,10 @@ public class HololensDepthPVCapture : MonoBehaviour
 											}
 										}
 										
-										pos = depthTrans.GetPosition();
-										rot = depthTrans.rotation;
+										pos = _mainCamera.transform.position;
+										rot = _mainCamera.transform.rotation;
+										//pos = depthTrans.GetPosition();
+										//rot = depthTrans.rotation;
 										
 										if(EasyVizARServer.Instance.PutImage("image/png", sIntensity, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "thermal"))
 										{
@@ -821,8 +837,10 @@ public class HololensDepthPVCapture : MonoBehaviour
 									}
 								}
 								
-								pos = depthTrans.GetPosition();
-								rot = depthTrans.rotation;
+								pos = _mainCamera.transform.position;
+								rot = _mainCamera.transform.rotation;
+								//pos = depthTrans.GetPosition();
+								//rot = depthTrans.rotation;
 								
 								_lastColorPCName = sPC;
 								
@@ -1276,11 +1294,11 @@ public class HololensDepthPVCapture : MonoBehaviour
 		
 #endif
 #endif
-    }
+	}
 
-    #region Button Event Functions
-    
-    public void StopSensorsEvent()
+	#region Button Event Functions
+
+	public void StopSensorsEvent()
     {
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR

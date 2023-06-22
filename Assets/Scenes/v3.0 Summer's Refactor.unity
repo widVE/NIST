@@ -1212,7 +1212,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1517424694}
-  - {fileID: 891080481}
+  - {fileID: 1194257832}
   - {fileID: 3905784940121933185}
   - {fileID: 168399717}
   - {fileID: 1539913615}
@@ -7378,6 +7378,7 @@ MonoBehaviour:
   _meshCapture: {fileID: 1375559501}
   _photoCapture: {fileID: 404529389}
   followMovingQRCode: 1
+  _scanningMode: 0
   testQRCodeData: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/69e92dff-7138-4091-89c4-ed073035bfe6
   triggerQRCodeDetected: 0
 --- !u!82 &291935033
@@ -19838,93 +19839,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.032, y: 0.032, z: 0.016}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &891080479
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 891080481}
-  - component: {fileID: 891080482}
-  - component: {fileID: 891080483}
-  - component: {fileID: 891080480}
-  m_Layer: 0
-  m_Name: ResearchModeController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &891080480
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 891080479}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46e8290b42159fb4ea720c2937e00a8f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  depthPreviewPlane: {fileID: 0}
-  shortAbImagePreviewPlane: {fileID: 0}
-  longDepthPreviewPlane: {fileID: 0}
-  LFPreviewPlane: {fileID: 446940270}
-  RFPreviewPlane: {fileID: 0}
-  LRPreviewPlane: {fileID: 1968632944}
-  RRPreviewPlane: {fileID: 382997460}
-  _captureTime: 1
-  _colorRT: {fileID: 8400000, guid: 5a7ecc7d9f6de6843b3778389dad01ce, type: 2}
-  _colorCopyMaterial: {fileID: 2100000, guid: 748aaa792b540014dab1d631cface284, type: 2}
-  _depthCopyMaterial: {fileID: 2100000, guid: e2751f21b4f612748b9979193f5a11ad, type: 2}
-  _tsdfShader: {fileID: 0}
-  _pointRenderTexture: {fileID: 0}
-  _writeImagesToDisk: 0
-  _showImagesInView: 0
---- !u!4 &891080481
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 891080479}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 46054713}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &891080482
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 891080479}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9b3f9aa2cb4b6d4086f29da314172bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &891080483
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 891080479}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e8574c209f8a9742945c4681e9abeab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hostIPAddress: 127.0.0.1
-  port: 
 --- !u!1 &891683166
 GameObject:
   m_ObjectHideFlags: 0
@@ -24212,6 +24126,92 @@ Transform:
   m_Father: {fileID: 116590338}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1194257831
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1194257832}
+  - component: {fileID: 1194257835}
+  - component: {fileID: 1194257834}
+  - component: {fileID: 1194257833}
+  m_Layer: 0
+  m_Name: ResearchModeController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1194257832
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1194257831}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 46054713}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1194257833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1194257831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4815b0bb9b775ee41ac4c2fc745f0a44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _qrScanner: {fileID: 291935032}
+  _manager: {fileID: 561901448}
+  _startOnQRDetection: 1
+  _uploadToServer: 1
+  _captureColorPointCloud: 1
+  _captureHiResColorImages: 0
+  _captureRectifiedColorImages: 1
+  _captureDepthImages: 1
+  _captureBinaryDepth: 1
+  _captureTransforms: 1
+  _captureIntensity: 1
+  _captureVideo: 0
+  _rectifyAllImages: 1
+  _cubeTest: {fileID: 1231520190}
+--- !u!114 &1194257834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1194257831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e8574c209f8a9742945c4681e9abeab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hostIPAddress: 127.0.0.1
+  port: 
+--- !u!114 &1194257835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1194257831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9b3f9aa2cb4b6d4086f29da314172bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1201233031
 GameObject:
   m_ObjectHideFlags: 0
@@ -25020,6 +25020,107 @@ Transform:
   - {fileID: 920408655}
   m_Father: {fileID: 770635756}
   m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1231520187
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1231520191}
+  - component: {fileID: 1231520190}
+  - component: {fileID: 1231520189}
+  - component: {fileID: 1231520188}
+  m_Layer: 0
+  m_Name: CubeRenderer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!23 &1231520188
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1231520187}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 268d00bdc1a28cb4ab1893a0e9bb104e, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1231520189
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1231520187}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1231520190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1231520187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9627aa9a17f03134a956e328f0a5b2a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  instanceCount: 100000
+  instanceMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  instanceMaterial: {fileID: 2100000, guid: 268d00bdc1a28cb4ab1893a0e9bb104e, type: 2}
+  subMeshIndex: 0
+  _pcFileName: Assets/StreamingAssets/pc_test.txt
+--- !u!4 &1231520191
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1231520187}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1237807286
 GameObject:
@@ -50654,7 +50755,7 @@ MonoBehaviour:
   OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 891080480}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ResearchModeVideoStream, Assembly-CSharp
         m_MethodName: TogglePointCloudEvent
         m_Mode: 1
@@ -50856,7 +50957,7 @@ MonoBehaviour:
   OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 891080480}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ResearchModeVideoStream, Assembly-CSharp
         m_MethodName: StopSensorsEvent
         m_Mode: 1
@@ -51058,7 +51159,7 @@ MonoBehaviour:
   OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 891080480}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ResearchModeVideoStream, Assembly-CSharp
         m_MethodName: TogglePreviewEvent
         m_Mode: 1

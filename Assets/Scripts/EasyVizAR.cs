@@ -625,7 +625,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			}
 
 			h.camera_position = new EasyVizAR.Position();
-			h.camera_position.x = -position.x;//headset.transform.position.x;
+			h.camera_position.x = position.x;//headset.transform.position.x;
 			h.camera_position.y = position.y;//headset.transform.position.y;
 			h.camera_position.z = position.z;//headset.transform.position.z;
 
@@ -752,7 +752,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			}
 
 			h.camera_position = new EasyVizAR.Position();
-			h.camera_position.x = -position.x;//headset.transform.position.x;
+			h.camera_position.x = position.x;//headset.transform.position.x;
 			h.camera_position.y = position.y;//headset.transform.position.y;
 			h.camera_position.z = position.z;//headset.transform.position.z;
 
@@ -904,7 +904,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			}
 
 			h.camera_position = new EasyVizAR.Position();
-			h.camera_position.x = -position.x;//headset.transform.position.x;
+			h.camera_position.x = position.x;//headset.transform.position.x;
 			h.camera_position.y = position.y;//headset.transform.position.y;
 			h.camera_position.z = position.z;//headset.transform.position.z;
 
@@ -1082,7 +1082,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			}
 
 			h.camera_position = new EasyVizAR.Position();
-			h.camera_position.x = -position.x;//headset.transform.position.x;
+			h.camera_position.x = position.x;//headset.transform.position.x;
 			h.camera_position.y = position.y;//headset.transform.position.y;
 			h.camera_position.z = position.z;//headset.transform.position.z;
 
