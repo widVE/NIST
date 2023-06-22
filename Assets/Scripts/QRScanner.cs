@@ -5,6 +5,7 @@ using System;
 
 using Microsoft.MixedReality.QR;
 using Microsoft.Windows.Perception.Spatial;
+using Microsoft.Windows.Perception.Spatial.Preview;
 using Microsoft.MixedReality.OpenXR;
 using Microsoft.MixedReality.Toolkit.Utilities;
 
@@ -12,6 +13,12 @@ public class LocationChangedEventArgs
 {
 	public string Server;
 	public string LocationID;
+}
+
+public class QRTransformChangedEventArgs
+{
+	public Matrix4x4 NewTransform;
+	public Guid spatialNodeId;
 }
 
 [RequireComponent(typeof(AudioSource))]
@@ -23,6 +30,7 @@ public class QRScanner : MonoBehaviour
 		public float  size;
 		public string text;
 		public DateTimeOffset lastDetected;
+		public Guid spatialGraphNodeId;
 
 		public static QRData FromCode(QRCode qr)
 		{
@@ -36,7 +44,9 @@ public class QRScanner : MonoBehaviour
                 {
                     result.pose = result.pose.GetTransformedBy(CameraCache.Main.transform.parent);
                 }*/
-
+				
+				result.spatialGraphNodeId = qr.SpatialGraphNodeId;
+				
 				result.pose.rotation *= Quaternion.Euler(90, 0, 0);
 
 				// Move the anchor point to the *center* of the QR code
@@ -77,6 +87,10 @@ public class QRScanner : MonoBehaviour
 	[SerializeField]
 	[Tooltip("Whether we should continue to adjust the world coordinate system if the currently tracked QR code moves.")]
 	bool followMovingQRCode = false;
+	
+	[SerializeField]
+	[Tooltip("In scanning mode, we don't re-add QR codes from the Hololens 2 system memory, and we only update the QR code Axis once.")]
+	bool _scanningMode = false;
 	
 	bool _updatedServerFromQR = false;
 	string _currentLocationID = null;
@@ -137,10 +151,15 @@ public class QRScanner : MonoBehaviour
 		{
 			CodeAddedOrUpdated(e.Code);
 		};
-		watcher.Added += (sender, e) =>
+		
+		if(!_scanningMode)
 		{
-			CodeAddedOrUpdated(e.Code);
-		};
+			watcher.Added += (sender, e) =>
+			{
+				CodeAddedOrUpdated(e.Code);
+			};
+		}
+		
 		//watcher.Removed += (sender, e) => { };
 
 		watcher.Start();
@@ -148,6 +167,8 @@ public class QRScanner : MonoBehaviour
 
 	private void CodeAddedOrUpdated(QRCode qr)
     {
+		//check timestamps here...
+		//qrCode.LastDetectedTime;
 		bool isVizarScheme = false;
 		bool isLocation = false;
 
@@ -195,6 +216,10 @@ public class QRScanner : MonoBehaviour
                 {
 					// We may have a better estimate of the QR code location, so trigger an update of the world coordinate system.
 					isCoordinateSystemChanging = true;
+					if(_scanningMode)
+					{
+						followMovingQRCode = false;
+					}
 				}
             }
         }
@@ -295,12 +320,23 @@ public class QRScanner : MonoBehaviour
 
 			Matrix4x4 m = Matrix4x4.TRS(d.pose.position, d.pose.rotation, Vector3.one);
 			Matrix4x4 mInv = m.inverse;
+			
+			QRTransformChangedEventArgs args = new QRTransformChangedEventArgs();
+			//args.NewTransform = new Matrix4x4();
+			args.NewTransform = mInv;
+			args.spatialNodeId = d.spatialGraphNodeId;
+			
+			if(QRTransformChanged is not null)
+			{
+				QRTransformChanged(this, args);
+			}
+			
 			_qrPrefabParent.transform.SetPositionAndRotation(mInv.GetPosition(), mInv.rotation);
 
 			_qrPrefab.transform.localPosition = d.pose.position;
 			_qrPrefab.transform.localRotation = d.pose.rotation;
 
-			int cc = _qrPrefab.transform.childCount;
+			//int cc = _qrPrefab.transform.childCount;
 		}
 	}
 
@@ -370,4 +406,6 @@ public class QRScanner : MonoBehaviour
     }
 
 	public event EventHandler<LocationChangedEventArgs> LocationChanged;
+	
+	public event EventHandler<QRTransformChangedEventArgs> QRTransformChanged;
 }
