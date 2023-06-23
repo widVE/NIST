@@ -112,11 +112,24 @@ public class HololensDepthPVCapture : MonoBehaviour
 	
 	//float[] _pcTest = new float[6 * 320 * 288];
 	
+	private void RemoveOldFiles()
+    {
+		DirectoryInfo dir = new DirectoryInfo(Application.persistentDataPath);
+		var files = Directory.GetFiles(Application.persistentDataPath, "*")
+			.Where(path => path.EndsWith(".txt") || path.EndsWith(".png"));
+		foreach (var f in files)
+        {
+			File.Delete(f);
+        }
+	}
+
     void Start()
     {
 		_mainCamera = Camera.main;
 		_lastPosition = _mainCamera.transform.position;
 		_lastOrientation = _mainCamera.transform.rotation;
+
+		RemoveOldFiles();
 
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
