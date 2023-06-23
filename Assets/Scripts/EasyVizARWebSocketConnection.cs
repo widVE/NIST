@@ -105,7 +105,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     }
 
     // Update is called once per frame
-    async void Update()
+    void Update()
     {
 #if !UNITY_WEBGL || UNITY_EDITOR
         if (_ws is not null)
@@ -244,7 +244,6 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
                 }
             case "features:updated":
                 {
-                    UnityEngine.Debug.Log("updated initiated");// TODO: this line is not being called when changing feature name from server...
                     FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(event_body);
                     featureManager.GetComponent<FeatureManager>().UpdateFeatureFromServer(ev.current);
                     break;

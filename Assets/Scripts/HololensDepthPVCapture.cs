@@ -79,8 +79,11 @@ public class HololensDepthPVCapture : MonoBehaviour
 	string _lastDepthImageName = "";
 	string _lastIntensityImageName = "";
 	string _lastHiResColorName = "";
-	string _lastColorPCName = "";	//world space point cloud...
-	
+	string _lastColorPCName = "";   //world space point cloud...
+
+	Vector3 _lastPosition = Vector3.zero;
+	Quaternion _lastOrientation = Quaternion.identity;
+
 	static readonly float MaxRecordingTime = 5.0f;
 	VideoCapture m_VideoCapture = null;
     float m_stopRecordingTimer = float.MaxValue;
@@ -112,6 +115,8 @@ public class HololensDepthPVCapture : MonoBehaviour
     void Start()
     {
 		_mainCamera = Camera.main;
+		_lastPosition = _mainCamera.transform.position;
+		_lastOrientation = _mainCamera.transform.rotation;
 
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
@@ -164,8 +169,8 @@ public class HololensDepthPVCapture : MonoBehaviour
 		
 #endif
 #endif
-		
-    }
+
+	}
 
 	void StartVideoCaptureTest()
     {
@@ -371,12 +376,13 @@ public class HololensDepthPVCapture : MonoBehaviour
 									}
 								}
 								
-								pos = _mainCamera.transform.position;
-								rot = _mainCamera.transform.rotation;
-								//pos = depthTrans.GetPosition();
-								//rot = depthTrans.rotation;
-								
-								if(EasyVizARServer.Instance.PutImageQuad("image/png", sColor, sDepth, sPC, sI, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "photo", "depth", "geometry", "thermal"))
+								pos = depthTrans.GetPosition();
+								rot = depthTrans.rotation;
+
+                                // Important - send the geometry image before the color image
+                                // so that the image processing begins after both have been received.
+                                // The server marks the photo as ready after the color image has been received.
+								if(EasyVizARServer.Instance.PutImageQuad("image/png", sPC, sColor, sDepth, sI, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, _lastPosition, _lastOrientation, hsObject._headsetID, "geometry", "photo", "depth", "thermal"))
 								{
 									_lastDepthImageName = sDepth;
 									if(_captureRectifiedColorImages)
@@ -477,12 +483,10 @@ public class HololensDepthPVCapture : MonoBehaviour
 									}
 								}
 
-								pos = _mainCamera.transform.position;
-								rot = _mainCamera.transform.rotation;
-								//pos = depthTrans.GetPosition();
-								//rot = depthTrans.rotation;
+								pos = depthTrans.GetPosition();
+								rot = depthTrans.rotation;
 								
-								if(EasyVizARServer.Instance.PutImageTriple("image/png", sColor, sDepth, sPC, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "photo", "depth", "geometry"))
+								if(EasyVizARServer.Instance.PutImageTriple("image/png", sColor, sDepth, sPC, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, _lastPosition, _lastOrientation, hsObject._headsetID, "photo", "depth", "geometry"))
 								{
 									_lastDepthImageName = sDepth;
 									_lastRectColorName = sColor;
@@ -557,12 +561,10 @@ public class HololensDepthPVCapture : MonoBehaviour
 									}
 								}
 								
-								pos = _mainCamera.transform.position;
-								rot = _mainCamera.transform.rotation;
-								//pos = depthTrans.GetPosition();
-								//rot = depthTrans.rotation;
+								pos = depthTrans.GetPosition();
+								rot = depthTrans.rotation;
 								
-								if(EasyVizARServer.Instance.PutImagePair("image/png", sColor, sDepth, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "photo", "depth"))
+								if(EasyVizARServer.Instance.PutImagePair("image/png", sColor, sDepth, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, _lastPosition, _lastOrientation, hsObject._headsetID, "photo", "depth"))
 								{
 									_lastDepthImageName = sDepth;
 									_lastRectColorName = sColor;
@@ -619,12 +621,10 @@ public class HololensDepthPVCapture : MonoBehaviour
 											}
 										}
 										
-										pos = _mainCamera.transform.position;
-										rot = _mainCamera.transform.rotation;
-										//pos = depthTrans.GetPosition();
-										//rot = depthTrans.rotation;
+										pos = depthTrans.GetPosition();
+										rot = depthTrans.rotation;
 										
-										if(EasyVizARServer.Instance.PutImage("image/png", sDepth, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "depth"))
+										if(EasyVizARServer.Instance.PutImage("image/png", sDepth, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, _lastPosition, _lastOrientation, hsObject._headsetID, "depth"))
 										{
 											_lastDepthImageName = sDepth;
 										}
@@ -706,12 +706,10 @@ public class HololensDepthPVCapture : MonoBehaviour
 											}
 										}
 										
-										pos = _mainCamera.transform.position;
-										rot = _mainCamera.transform.rotation;
-										//pos = depthTrans.GetPosition();
-										//rot = depthTrans.rotation;
+										pos = depthTrans.GetPosition();
+										rot = depthTrans.rotation;
 										
-										if(EasyVizARServer.Instance.PutImage("image/png", sColor, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID))
+										if(EasyVizARServer.Instance.PutImage("image/png", sColor, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, _lastPosition, _lastOrientation, hsObject._headsetID))
 										{
 											_lastRectColorName = sColor;
 										}
@@ -770,12 +768,10 @@ public class HololensDepthPVCapture : MonoBehaviour
 											}
 										}
 										
-										pos = _mainCamera.transform.position;
-										rot = _mainCamera.transform.rotation;
-										//pos = depthTrans.GetPosition();
-										//rot = depthTrans.rotation;
+										pos = depthTrans.GetPosition();
+										rot = depthTrans.rotation;
 										
-										if(EasyVizARServer.Instance.PutImage("image/png", sIntensity, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "thermal"))
+										if(EasyVizARServer.Instance.PutImage("image/png", sIntensity, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, _lastPosition, _lastOrientation, hsObject._headsetID, "thermal"))
 										{
 											_lastIntensityImageName = sIntensity;
 										}
@@ -801,12 +797,20 @@ public class HololensDepthPVCapture : MonoBehaviour
 				{
 					_lastColorPCName = sPC;
 					isNewPC = true;
+
+					// Store pose at time the point cloud was aquired. Maybe this will fix staleness?
+					_lastPosition = _mainCamera.transform.position;
+					_lastOrientation = _mainCamera.transform.rotation;
 				}
 				else
 				{
 					if(sPC != _lastColorPCName)
 					{
-						isNewPC = true;		
+						isNewPC = true;
+
+						// Store pose at time the point cloud was aquired. Maybe this will fix staleness?
+						_lastPosition = _mainCamera.transform.position;
+						_lastOrientation = _mainCamera.transform.rotation;
 					}
 				}
 				
@@ -837,10 +841,8 @@ public class HololensDepthPVCapture : MonoBehaviour
 									}
 								}
 								
-								pos = _mainCamera.transform.position;
-								rot = _mainCamera.transform.rotation;
-								//pos = depthTrans.GetPosition();
-								//rot = depthTrans.rotation;
+								pos = depthTrans.GetPosition();
+								rot = depthTrans.rotation;
 								
 								_lastColorPCName = sPC;
 								
