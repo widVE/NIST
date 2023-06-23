@@ -7377,6 +7377,7 @@ MonoBehaviour:
   _headsetManager: {fileID: 1361342022}
   _meshCapture: {fileID: 1375559501}
   _photoCapture: {fileID: 404529389}
+  _researchModeManager: {fileID: 1194257831}
   followMovingQRCode: 1
   _scanningMode: 0
   testQRCodeData: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/69e92dff-7138-4091-89c4-ed073035bfe6

@@ -85,6 +85,9 @@ public class QRScanner : MonoBehaviour
 	GameObject _photoCapture;
 
 	[SerializeField]
+	GameObject _researchModeManager;
+
+	[SerializeField]
 	[Tooltip("Whether we should continue to adjust the world coordinate system if the currently tracked QR code moves.")]
 	bool followMovingQRCode = false;
 	
@@ -307,6 +310,18 @@ public class QRScanner : MonoBehaviour
             else
             {
 				script.EndContinuousCapture();
+            }
+        }
+
+        if (_researchModeManager) {
+            var script = _researchModeManager.GetComponent<HololensDepthPVCapture>();
+            if (location.headset_configuration.enable_extended_capture)
+            {
+                script.RunSensors();
+            }
+            else
+            {
+                script.StopSensorsEvent();
             }
         }
     }

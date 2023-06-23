@@ -229,6 +229,7 @@ namespace EasyVizAR
     {
 		public bool enable_mesh_capture;
 		public bool enable_photo_capture;
+        public bool enable_extended_capture;
     }
 
 	[System.Serializable]
