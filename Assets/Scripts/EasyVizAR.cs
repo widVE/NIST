@@ -638,7 +638,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		}
 		
 
-		UnityWebRequest www = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000/photos", "POST");
+		UnityWebRequest www = new UnityWebRequest(GetBaseURL() + "/photos", "POST");
 		www.SetRequestHeader("Content-Type", "application/json");
 
 		string ourJson = JsonUtility.ToJson(h);
@@ -679,7 +679,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType);
 		iUrl = iUrl + ".png";
 
-		UnityWebRequest www2 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www2 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -704,7 +704,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType2);
 		iUrl = iUrl + ".png";
 		
-		UnityWebRequest www3 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www3 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www3.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -767,7 +767,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		}
 
 
-		UnityWebRequest www = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000/photos", "POST");
+		UnityWebRequest www = new UnityWebRequest(GetBaseURL() + "/photos", "POST");
 		www.SetRequestHeader("Content-Type", "application/json");
 
 		string ourJson = JsonUtility.ToJson(h);
@@ -808,7 +808,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType);
 		iUrl = iUrl + ".png";
 
-		UnityWebRequest www2 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www2 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -833,7 +833,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType2);
 		iUrl = iUrl + ".png";
 
-		UnityWebRequest www3 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www3 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www3.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -858,7 +858,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType3);
 		iUrl = iUrl + ".png";
 
-		UnityWebRequest www4 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www4 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www4.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -923,7 +923,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		}
 		
 
-		UnityWebRequest www = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000/photos", "POST");
+		UnityWebRequest www = new UnityWebRequest(GetBaseURL() + "/photos", "POST");
 		www.SetRequestHeader("Content-Type", "application/json");
 
 		string ourJson = JsonUtility.ToJson(h);
@@ -964,7 +964,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType);
 		iUrl = iUrl + ".png";
 
-		UnityWebRequest www2 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www2 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -989,7 +989,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType2);
 		iUrl = iUrl + ".png";
 		
-		UnityWebRequest www3 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www3 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www3.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -1014,7 +1014,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType3);
 		iUrl = iUrl + ".png";
 		
-		UnityWebRequest www4 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www4 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www4.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -1039,7 +1039,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType4);
 		iUrl = iUrl + ".png";
 		
-		UnityWebRequest www5 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www5 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www5.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -1105,7 +1105,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		}
 		
 
-		UnityWebRequest www = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000/photos", "POST");
+		UnityWebRequest www = new UnityWebRequest(GetBaseURL() + "/photos", "POST");
 		www.SetRequestHeader("Content-Type", "application/json");
 
 		string ourJson = JsonUtility.ToJson(h);
@@ -1146,7 +1146,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType);
 		iUrl = iUrl + ".png";
 
-		UnityWebRequest www2 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www2 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
