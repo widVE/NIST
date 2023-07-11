@@ -46,7 +46,7 @@ public class PointCloudRenderer : MonoBehaviour
 			if(pcVals.Length == 6)
 			{
 				_positions[j].x = float.Parse(pcVals[0]);
-				_positions[j].y = float.Parse(pcVals[2]);
+				_positions[j].y = -float.Parse(pcVals[2]);
 				_positions[j].z = -float.Parse(pcVals[1]);
 
 				_colors[j].r = float.Parse(pcVals[3]);
