@@ -105,6 +105,8 @@ public class HololensDepthPVCapture : MonoBehaviour
 	
 	int _fileOutNumber = 0;
 	
+	[SerializeField]
+	PointCloudRenderer _pc;
 	//float[] _pcTest = new float[6 * 320 * 288];
 	
     void Start()
@@ -832,6 +834,12 @@ public class HololensDepthPVCapture : MonoBehaviour
 									_cubeTest._pcFileName = _lastColorPCName;
 									
 								}*/
+								
+								if(_pc != null)
+								{
+									_pc._lastPCFileName = _lastColorPCName;
+									_pc.UpdateMesh();
+								}
 								
 								/*if(EasyVizARServer.Instance.PutImage("image/png", sIntensity, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "thermal"))
 								{

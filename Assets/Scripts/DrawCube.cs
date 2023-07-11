@@ -2,7 +2,8 @@ using UnityEngine;
 using System.Collections;
 using System.IO;
 
-public class DrawCube : MonoBehaviour {
+public class DrawCube : MonoBehaviour 
+{
     public int instanceCount = 100000;
     public Mesh instanceMesh;
     public Material instanceMaterial;
@@ -17,11 +18,49 @@ public class DrawCube : MonoBehaviour {
 	
 	public string _pcFileName = "";
 	string _lastPCFileName = "";
-
-    void Start() {
+	Vector4[] positions;
+	Vector4[] colors;
+	
+    void Start() 
+	{
         argsBuffer = new ComputeBuffer(1, args.Length * sizeof(uint), ComputeBufferType.IndirectArguments);
+		positionBuffer = new ComputeBuffer(instanceCount, 16);
+		colorBuffer = new ComputeBuffer(instanceCount, 16);
+		positions = new Vector4[instanceCount];
+		colors = new Vector4[instanceCount];
+		
+		for(int i = 0; i < instanceCount; ++i)
+		{
+			positions[i] = Vector4.zero;
+			colors[i] = Vector4.zero;
+		}
+		
+		positionBuffer.SetData(positions);
+		colorBuffer.SetData(colors);
+		
+		instanceMaterial.SetBuffer("positionBuffer", positionBuffer);
+		instanceMaterial.SetBuffer("colorBuffer", colorBuffer);
+
         //UpdateBuffers();
     }
+	
+	void OnDestroy()
+	{
+        if (positionBuffer != null)
+            positionBuffer.Release();
+		
+        positionBuffer = null;
+		
+		if(colorBuffer != null)
+			colorBuffer.Release();
+		
+		colorBuffer = null;
+
+        if (argsBuffer != null)
+            argsBuffer.Release();
+		
+        argsBuffer = null;
+	}
 
     void Update() 
 	{
@@ -30,8 +69,8 @@ public class DrawCube : MonoBehaviour {
 			// Update starting position buffer
 			if (_lastPCFileName != _pcFileName)//cachedInstanceCount != instanceCount || cachedSubMeshIndex != subMeshIndex)
 			{
-				UpdateBuffers();
 				_lastPCFileName = _pcFileName;
+				UpdateBuffers();
 			}
 
 			// Pad input
@@ -50,31 +89,29 @@ public class DrawCube : MonoBehaviour {
 
     void UpdateBuffers() 
 	{
-		Debug.Log("Updating buffers");
+		//Debug.Log("Updating buffers");
         // Ensure submesh index is in range
         if (instanceMesh != null)
             subMeshIndex = Mathf.Clamp(subMeshIndex, 0, instanceMesh.subMeshCount - 1);
 
-        // Positions
-        if (positionBuffer != null)
-            positionBuffer.Release();
-		
-		if(colorBuffer != null)
-			colorBuffer.Release();
-		
-        positionBuffer = new ComputeBuffer(instanceCount, 16);
-		colorBuffer = new ComputeBuffer(instanceCount, 16);
-		
-        Vector4[] positions = new Vector4[instanceCount];
-		Vector4[] colors = new Vector4[instanceCount];
-		
-		string[] transLines = File.ReadAllLines(_pcFileName);
+		string[] transLines = File.ReadAllLines(_lastPCFileName);
 
+		int j = 0;
 		for (int i = 0; i < transLines.Length; i++)
 		{
 			string[] pcVals = transLines[i].Split(' ');
-			positions[i] = new Vector4(float.Parse(pcVals[0]), float.Parse(pcVals[1]), float.Parse(pcVals[2]), 1.0f);
-			colors[i] = new Vector4(float.Parse(pcVals[3]), float.Parse(pcVals[4]), float.Parse(pcVals[5]), 1.0f);
+			if(pcVals.Length == 6)
+			{
+				positions[j].x = float.Parse(pcVals[0]);
+				positions[j].y = float.Parse(pcVals[1]);
+				positions[j].z = float.Parse(pcVals[2]);
+				positions[j].w = 1.0f;
+				colors[j].x = float.Parse(pcVals[3]);
+				colors[j].y = float.Parse(pcVals[4]);
+				colors[j].z = float.Parse(pcVals[5]);
+				colors[j].w = 1.0f;
+				j++;
+			}
 			
 			//pointCloudVector3[i] = new Vector3(pointCloudBuffer[3 * i], pointCloudBuffer[3 * i + 1], pointCloudBuffer[3 * i + 2]);
 			/*if(_pcTest[i] != 0f && _pcTest[i+1] != 0f && _pcTest[i+2] != 0f)
@@ -83,7 +120,7 @@ public class DrawCube : MonoBehaviour {
 			}*/
 		}
 		
-		instanceCount = transLines.Length;
+		instanceCount = j;
 		/*for(int i = transLines.Length; i < instanceCount; ++i)
 		{
 			positions[i] = Vector4.zero;
@@ -101,9 +138,6 @@ public class DrawCube : MonoBehaviour {
         positionBuffer.SetData(positions);
 		colorBuffer.SetData(colors);
 		
-        instanceMaterial.SetBuffer("positionBuffer", positionBuffer);
-		instanceMaterial.SetBuffer("colorBuffer", colorBuffer);
-
         // Indirect args
         if (instanceMesh != null) {
             args[0] = (uint)instanceMesh.GetIndexCount(subMeshIndex);
@@ -120,23 +154,5 @@ public class DrawCube : MonoBehaviour {
 
         cachedInstanceCount = instanceCount;
         cachedSubMeshIndex = subMeshIndex;
-    }
-
-    void OnDisable() 
-	{
-        if (positionBuffer != null)
-            positionBuffer.Release();
-		
-        positionBuffer = null;
-		
-		if(colorBuffer != null)
-			colorBuffer.Release();
-		
-		colorBuffer = null;
-
-        if (argsBuffer != null)
-            argsBuffer.Release();
-		
-        argsBuffer = null;
     }
 }

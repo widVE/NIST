@@ -20,7 +20,7 @@ public class ElemRenderer : MonoBehaviour
     {
     }
 
-    public void UpdateMesh(Vector3[] arrVertices, int nPointsToRender, int nPointsRendered, Color pointColor)
+    public void UpdateMesh(Vector3[] arrVertices, int nPointsToRender, int nPointsRendered, Color[] pointColors)
     {
         int nPoints;
 
@@ -38,7 +38,7 @@ public class ElemRenderer : MonoBehaviour
         {
             //points[i] = arrVertices[nPointsRendered + i];
             indices[i] = i;
-            colors[i] = pointColor;
+            colors[i] = pointColors[i];
         }
 
         if (mesh != null)

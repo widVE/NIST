@@ -1027,11 +1027,10 @@ namespace winrt::HL2UnityPlugin::implementation
                 frame.VideoMediaFrame().CameraIntrinsics().ProjectManyOntoFrame(camPointsView, screenPointsView);
 
                 std::ofstream file;
+                std::wstring pcName = fullName + +L"\\" + m_datetime + L"_" + m_ms + L"_pc.txt";
                 if (pHL2ResearchMode->IsCapturingColoredPointCloud())
                 {
-                    std::wstring pcName = fullName + +L"\\" + m_datetime + L"_" + m_ms + L"_pc.txt";
                     file.open(pcName);
-                    pHL2ResearchMode->_lastPointCloudName = hstring(pcName);
                 }
                 
                 {
@@ -1144,6 +1143,8 @@ namespace winrt::HL2UnityPlugin::implementation
                     if (file.is_open() && pHL2ResearchMode->IsCapturingColoredPointCloud())
                     {
                         file.close();
+                        pHL2ResearchMode->_lastPointCloudName = hstring(pcName);
+                        //OutputDebugString(pcName.c_str());
                     }
 
                     if (pHL2ResearchMode->IsCapturingRectColor())
