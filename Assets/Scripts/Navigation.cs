@@ -102,6 +102,7 @@ public class Navigation : MonoBehaviour
 
 
     //MapPath will request the path from the server
+    // ***this isn't working right now
     public void RenderMapPath()
     {
         // Create a new line by deleting old points
@@ -141,6 +142,35 @@ public class Navigation : MonoBehaviour
             user_target_position = point;
         }
 
+
+        UnityEngine.Debug.Log("Successfully added world path line");
+    }
+
+    void RenderWorldPathOnFloor()
+    {
+        Ray surface_ray;
+        RaycastHit hit;
+
+        // Create a new line by deleting old points
+        if (world_line.positionCount > 0) world_line.positionCount = 0;
+
+        for (int i = 0; i < path.points.Length; i++)
+        {
+            EasyVizAR.Position EV_point = path.points[i];
+            Vector3 point = new Vector3(EV_point.x, EV_point.y, EV_point.z);
+
+            surface_ray = new Ray(point, Vector3.down);
+
+            if (Physics.Raycast(surface_ray, out hit))
+            {
+                //UnityEngine.Debug.Log(hit.point);
+                world_line.SetPosition(i, new Vector3(point.x, hit.point.y, point.z));
+            }
+            else world_line.SetPosition(i, new Vector3(point.x, point.y, point.z));
+
+            world_line.positionCount++;
+            user_target_position = EV_point;
+        }
 
         UnityEngine.Debug.Log("Successfully added world path line");
     }
