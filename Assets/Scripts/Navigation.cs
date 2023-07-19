@@ -34,6 +34,10 @@ public class Navigation : MonoBehaviour
     [SerializeField] string local_headset_id = "";
     public string last_target;
 
+
+    //MAGIC NUMBER Offseting the line render path 20cm above the mesh below it
+    [SerializeField] float raycast_floorpath_offset = 0.2f;
+
     // This holds the position data of the user's target
     EasyVizAR.Position user_target_position = new EasyVizAR.Position();
 
@@ -146,7 +150,7 @@ public class Navigation : MonoBehaviour
         UnityEngine.Debug.Log("Successfully added world path line");
     }
 
-    void RenderWorldPathOnFloor()
+    void RenderWorldPathRaycastFloor()
     {
         Ray surface_ray;
         RaycastHit hit;
@@ -162,17 +166,17 @@ public class Navigation : MonoBehaviour
             surface_ray = new Ray(point, Vector3.down);
 
             if (Physics.Raycast(surface_ray, out hit))
-            {
+            {                
+                world_line.SetPosition(i, new Vector3(point.x, hit.point.y + raycast_floorpath_offset, point.z));
                 //UnityEngine.Debug.Log(hit.point);
-                world_line.SetPosition(i, new Vector3(point.x, hit.point.y, point.z));
             }
-            else world_line.SetPosition(i, new Vector3(point.x, point.y, point.z));
+            else world_line.SetPosition(i, new Vector3(point.x, point.y + raycast_floorpath_offset, point.z));
 
             world_line.positionCount++;
             user_target_position = EV_point;
         }
 
-        UnityEngine.Debug.Log("Successfully added world path line");
+        UnityEngine.Debug.Log("Successfully added world path floor raycast line");
     }
 
     void GetPathCallback(string result)
