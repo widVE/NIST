@@ -192,7 +192,14 @@ public class Navigation : MonoBehaviour
             //UnityEngine.Debug.Log("the path is: " + path.points);
             //UnityEngine.Debug.Log("location id: " + location_id);
 
+            
+            
             RenderWorldPath();
+
+            RenderWorldPathRaycastFloor();
+
+            SphereBreadcrumbs();
+
             RenderMapPath();
 
 
@@ -223,6 +230,30 @@ public class Navigation : MonoBehaviour
 
         }
 
+    }
+
+    void SphereBreadcrumbs()
+    {
+        foreach (EasyVizAR.Position EV_point in path.points)
+        {
+            Vector3 point = new Vector3(EV_point.x, EV_point.y, EV_point.z);
+
+            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            sphere.transform.position = new Vector3(point.x, point.y, point.z);
+            sphere.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+
+            Ray surface_ray;
+            RaycastHit hit;
+
+            surface_ray = new Ray(point, Vector3.down);
+
+            if (Physics.Raycast(surface_ray, out hit))
+            {
+                sphere.transform.position = new Vector3(point.x, hit.point.y + raycast_floorpath_offset, point.z);
+                //UnityEngine.Debug.Log(hit.point);
+            }
+            else sphere.transform.position = new Vector3(point.x, point.y + raycast_floorpath_offset, point.z);
+        }
     }
 
     void PostTargetCallback(string resultData)
