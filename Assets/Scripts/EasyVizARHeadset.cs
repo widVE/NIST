@@ -418,18 +418,24 @@ public class EasyVizARHeadset : MonoBehaviour
         {
             UnityEngine.Debug.Log("path callback: " + result);
             path = JsonUtility.FromJson<EasyVizAR.Path>("{\"points\":" + result + "}");
-            int cnt = 0;
-            // making sure we are creating a new line
-            if (line.positionCount > 0) line.positionCount = 0;
-            EasyVizAR.Position target_pos = new EasyVizAR.Position();
-			foreach (EasyVizAR.Position points in path.points)
-            {
-                line.positionCount++;
-                line.SetPosition(cnt++, new Vector3(points.x, points.y, points.z)); // this draws the line 
-                //UnityEngine.Debug.Log("number of points in the path is: " + line.positionCount);
-                //UnityEngine.Debug.Log("points: " + points.x + ", " + points.y + ", " + points.z);
-                target_pos = points;
-            }
+
+            // I don't think this should happen here, we don't want the visuals tied to the data callback -B
+            bool BUG_TEST = false;
+            if (BUG_TEST)
+			{
+				int cnt = 0;
+				// making sure we are creating a new line
+				if (line.positionCount > 0) line.positionCount = 0;
+				EasyVizAR.Position target_pos = new EasyVizAR.Position();
+				foreach (EasyVizAR.Position points in path.points)
+				{
+					line.positionCount++;
+					line.SetPosition(cnt++, new Vector3(points.x, points.y, points.z)); // this draws the line 
+																						//UnityEngine.Debug.Log("number of points in the path is: " + line.positionCount);
+																						//UnityEngine.Debug.Log("points: " + points.x + ", " + points.y + ", " + points.z);
+					target_pos = points;
+				}
+			}
             UnityEngine.Debug.Log("Successfully added the points");
 
         }

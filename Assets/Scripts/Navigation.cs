@@ -111,14 +111,14 @@ public class Navigation : MonoBehaviour
     {
         // Create a new line by deleting old points
         map_line.positionCount = 0;
-        map_line.positionCount = path.points.Length;
+        //map_line.positionCount = path.points.Length;
 
         //??? B -> Something to do with the update new target for navigation?
         //EasyVizAR.Position target_pos = new EasyVizAR.Position();
 
         for (int i = 0; i < path.points.Length; i++)
         {
-
+            map_line.positionCount++;
             map_line.SetPosition(i, new Vector3(path.points[i].x, path.points[i].y, path.points[i].z)); // this draws the line 
             //UnityEngine.Debug.Log("number of points in the path is: " + line.positionCount);
             //UnityEngine.Debug.Log("points: " + points.x + ", " + points.y + ", " + points.z);
@@ -133,7 +133,7 @@ public class Navigation : MonoBehaviour
     void RenderWorldPath()
     {   
         // Create a new line by deleting old points
-        if (world_line.positionCount > 0) world_line.positionCount = 0;
+        world_line.positionCount = 0;
 
         int index = 0;
 
@@ -156,23 +156,33 @@ public class Navigation : MonoBehaviour
         RaycastHit hit;
 
         // Create a new line by deleting old points
-        if (world_line.positionCount > 0) world_line.positionCount = 0;
+        world_line.positionCount = 0;
+
+        //UnityEngine.Debug.Log("World path size : " + path.points.Length);
+
 
         for (int i = 0; i < path.points.Length; i++)
         {
+            //Allocate space in the line render vertex array
+            world_line.positionCount++;
+
             EasyVizAR.Position EV_point = path.points[i];
             Vector3 point = new Vector3(EV_point.x, EV_point.y, EV_point.z);
 
             surface_ray = new Ray(point, Vector3.down);
 
             if (Physics.Raycast(surface_ray, out hit))
-            {                
+            {
                 world_line.SetPosition(i, new Vector3(point.x, hit.point.y + raycast_floorpath_offset, point.z));
                 //UnityEngine.Debug.Log(hit.point);
             }
-            else world_line.SetPosition(i, new Vector3(point.x, point.y + raycast_floorpath_offset, point.z));
 
-            world_line.positionCount++;
+            else
+            {
+                //UnityEngine.Debug.Log("Added world path floor raycast line index : " + i);
+                world_line.SetPosition(i, new Vector3(point.x, point.y + raycast_floorpath_offset, point.z));
+            }
+
             user_target_position = EV_point;
         }
 
@@ -194,7 +204,7 @@ public class Navigation : MonoBehaviour
 
             
             
-            RenderWorldPath();
+            //RenderWorldPath();
 
             RenderWorldPathRaycastFloor();
 
