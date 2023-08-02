@@ -564,6 +564,83 @@ public class HololensDepthPVCapture : MonoBehaviour
 					}	
 				}
 			}
+			else if(_captureBinaryDepth && _captureRectifiedColorImages)
+			{
+				bool isNewBinaryDepth = false;
+				string sPC = researchMode.GetBinaryDepthName();
+				if(sPC.Length > 0)
+				{
+					if(_lastDepthBinaryName.Length == 0)
+					{
+						_lastDepthBinaryName = sPC;
+						isNewBinaryDepth = true;
+					}
+					else
+					{
+						if(sPC != _lastDepthBinaryName)
+						{
+							isNewBinaryDepth = true;		
+						}
+					}
+				}
+					
+				bool isNewColor = false;
+				string sColor = researchMode.GetRectColorName();
+				if(sColor.Length > 0)
+				{
+					if(_lastRectColorName.Length == 0)
+					{
+						_lastRectColorName = sColor;
+						isNewColor = true;
+					}
+					else
+					{
+						if(sColor != _lastRectColorName)
+						{
+							isNewColor = true;		
+						}
+					}
+				}
+						
+				if(isNewColor && isNewBinaryDepth)
+				{
+					if(_manager != null)
+					{
+						var headset = _manager.LocalHeadset;
+						if (headset != null)
+						{
+							var hsObject = headset.GetComponent<EasyVizARHeadset>();
+							if (hsObject != null)
+							{
+								Matrix4x4 depthTrans = Matrix4x4.identity;
+								string sTransform = researchMode.GetTransformName();
+								//load the transform... decompose to the position and rotation...
+								string[] transLines = File.ReadAllLines(sTransform);
+								Vector3 pos = Vector3.zero;
+								Quaternion rot = Quaternion.identity;
+								
+								for(int i = 0; i < 4; ++i)
+								{
+									string[] vals = transLines[i].Split(" ");
+									for(int j = 0; j < 4; ++j)
+									{
+										depthTrans[i*4+j] = float.Parse(vals[j]);
+									}
+								}
+								
+								pos = depthTrans.GetPosition();
+								rot = depthTrans.rotation;
+								
+								if(EasyVizARServer.Instance.PutImagePair("image/png", sColor, sPC, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "photo", "geometry"))
+								{
+									_lastDepthBinaryName = sPC;
+									_lastRectColorName = sColor;
+								}
+							}
+						}
+					}	
+				}
+			}
 			else
 			{
 				if(_captureDepthImages)

@@ -2072,7 +2072,7 @@ MonoBehaviour:
   _manager: {fileID: 561901448}
   _startOnQRDetection: 1
   _uploadToServer: 0
-  _captureColorPointCloud: 1
+  _captureColorPointCloud: 0
   _captureHiResColorImages: 0
   _captureRectifiedColorImages: 1
   _captureDepthImages: 0

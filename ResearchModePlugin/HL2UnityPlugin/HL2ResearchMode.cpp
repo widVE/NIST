@@ -1001,7 +1001,7 @@ namespace winrt::HL2UnityPlugin::implementation
                     for (UINT j = 0; j < resolution.Width; j++)
                     {
                         UINT idx = resolution.Width * i + j;
-                        //multiply depthPts by the QRTransform here...
+                        
                         XMFLOAT3 depthVec;
                         depthVec.x = pHL2ResearchMode->_depthPts[idx].x;
                         depthVec.y = pHL2ResearchMode->_depthPts[idx].y;
@@ -1078,15 +1078,6 @@ namespace winrt::HL2UnityPlugin::implementation
                                         dataInBytes[bufferLayout.StartIndex + bufferLayout.Stride * i + 4 * j + 3] = a;
                                     }
 
-                                    //XMFLOAT3 depthVec;
-                                    //depthVec.x = pHL2ResearchMode->_depthPts[idx].x;
-                                    //depthVec.y = pHL2ResearchMode->_depthPts[idx].y;
-                                    //depthVec.z = pHL2ResearchMode->_depthPts[idx].z;
-                                    //XMVECTOR pointInQR = XMVector3Transform(XMLoadFloat3(&depthVec), pHL2ResearchMode->m_QRMatrix);
-                                    //pointCloud.push_back(pointInQR.n128_f32[0]);
-                                    //pointCloud.push_back(pointInQR.n128_f32[1]);
-                                    //pointCloud.push_back(pointInQR.n128_f32[2]);
-
                                     pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].x);
                                     pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].y);
                                     pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].z);
@@ -1095,7 +1086,6 @@ namespace winrt::HL2UnityPlugin::implementation
                                     pointCloud.push_back((float)b / 255.0f);
                                     if (file.is_open() && pHL2ResearchMode->IsCapturingColoredPointCloud())
                                     {
-                                        //file << pointInQR.n128_f32[0] << " " << pointInQR.n128_f32[1] << " " << pointInQR.n128_f32[2] << " " << ((float)r / 255.0f) << " " << (float)g / 255.0f << " " << (float)b / 255.0f << std::endl;
                                         file << pHL2ResearchMode->_depthPts[idx].x << " " << pHL2ResearchMode->_depthPts[idx].y << " " << pHL2ResearchMode->_depthPts[idx].z << " " << ((float)r / 255.0f) << " " << (float)g / 255.0f << " " << (float)b / 255.0f << std::endl;
                                     }
                                 }
@@ -1119,6 +1109,7 @@ namespace winrt::HL2UnityPlugin::implementation
                             }
                             else
                             {
+                                //could keep the point cloud data here and assign arbitray color (as no color from high-res photo matches up with field of view from depth image).
                                 /*pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].x);
                                 pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].y);
                                 pointCloud.push_back(pHL2ResearchMode->_depthPts[idx].z);*/
