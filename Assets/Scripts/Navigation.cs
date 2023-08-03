@@ -208,7 +208,7 @@ public class Navigation : MonoBehaviour
 
             RenderWorldPathRaycastFloor();
 
-            SphereBreadcrumbs();
+            //SphereBreadcrumbs();
 
             RenderMapPath();
 
@@ -268,7 +268,7 @@ public class Navigation : MonoBehaviour
 
     void PostTargetCallback(string resultData)
     {
-        //Debug.Log(resultData);
+        UnityEngine.Debug.Log("Payload to server is: " + resultData);
 
         if (resultData != "error")
         {

@@ -79,11 +79,12 @@ public class DistanceCalculation : MonoBehaviour
 			x_distance = (float)(x_distance * 3.281);
 			z_distance = (float)(z_distance * 3.281);
 		}
+
 		float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
+
 		if (isFeet)
 		{
 			display_dist_text.text = headset_name + " : " + distance.ToString() + "ft";
-
 		}
 		else
 		{
@@ -129,6 +130,7 @@ public class DistanceCalculation : MonoBehaviour
 				{
                     mapMarker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
                 }
+
                 mapMarker.name = cur_prefab.name;
 				mapMarker.transform.Find("Feature_Text").GetComponent<TextMeshPro>().text = distance.ToString() + "ft";
 				//cur_prefab.GetComponent<EasyVizARHeadset>()
@@ -153,7 +155,6 @@ public class DistanceCalculation : MonoBehaviour
             else
 			{
 				UnityEngine.Debug.Log("Missing headset Map Marker");
-
 			}
 		}
 		
