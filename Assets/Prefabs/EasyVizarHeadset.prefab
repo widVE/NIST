@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 921069525072559175}
   - component: {fileID: 5003610570359901067}
   m_Layer: 0
-  m_Name: EasyVizarHeadset
+  m_Name: EasyVizARHeadset
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -60,7 +60,8 @@ MonoBehaviour:
   map_parent: {fileID: 0}
   headset_parent: {fileID: 0}
   local_headset_id: 
-  isLocal: 0
+  feature_parent: {fileID: 0}
+  line: {fileID: 0}
 --- !u!114 &5003610570359901067
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -111,7 +112,7 @@ MonoBehaviour:
       z: 0
     updated: 0
   headset_name: 
-  isLocal: 0
+  is_local: 0
   local_headset_id: 
 --- !u!1 &6732124109696385241
 GameObject:
@@ -296,7 +297,6 @@ GameObject:
   - component: {fileID: 502451607366571222}
   - component: {fileID: 6623056935919291814}
   - component: {fileID: 4821545658032759295}
-  - component: {fileID: 4997467485544731108}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Untagged
@@ -369,19 +369,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &4997467485544731108
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8231832368714168251}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19808b5b2e0e5184e9c9c512350b980d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  headset_icon: {fileID: 0}
 --- !u!1 &8343790515493500242
 GameObject:
   m_ObjectHideFlags: 0

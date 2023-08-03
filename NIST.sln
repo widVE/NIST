@@ -187,6 +187,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.MixedReality.Tool
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.MixedReality.QR.Editor", "Microsoft.MixedReality.QR.Editor.csproj", "{CBB5A096-AEFA-0F94-446E-88076D4F27E6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssetUsageDetector.Editor", "AssetUsageDetector.Editor.csproj", "{B63C8665-9B8F-E8FE-3369-A6BA60C37396}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityEngine.UI", "UnityEngine.UI.Player.csproj", "{9023BA69-B8DF-E673-ECC1-23794AA939FD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityEngine.TestRunner", "UnityEngine.TestRunner.Player.csproj", "{43F09299-AA7E-99DF-01C9-B39584536F67}"
@@ -657,6 +659,10 @@ Global
 		{CBB5A096-AEFA-0F94-446E-88076D4F27E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBB5A096-AEFA-0F94-446E-88076D4F27E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBB5A096-AEFA-0F94-446E-88076D4F27E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B63C8665-9B8F-E8FE-3369-A6BA60C37396}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B63C8665-9B8F-E8FE-3369-A6BA60C37396}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B63C8665-9B8F-E8FE-3369-A6BA60C37396}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B63C8665-9B8F-E8FE-3369-A6BA60C37396}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9023BA69-B8DF-E673-ECC1-23794AA939FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9023BA69-B8DF-E673-ECC1-23794AA939FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9023BA69-B8DF-E673-ECC1-23794AA939FD}.Release|Any CPU.ActiveCfg = Release|Any CPU

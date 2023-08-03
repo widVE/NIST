@@ -27,9 +27,13 @@ public class DistanceCalculation : MonoBehaviour
 	public string headset_name; // this is set in the EasyVizARHeadsetManager.cs script \
 	public bool is_local = false;
 	public string local_headset_id = "";
+    private bool Debug_Verbose = false;
 
-	// Start is called before the first frame update
-	void Start()
+    //GLOBAL FOR TESTING< SHOULD NOT STAY
+    float distance;
+
+    // Start is called before the first frame update
+    void Start()
     {
 		cam = GameObject.Find("Main Camera");
 		//mapParent = GameObject.Find("Map_Spawn_Target"); // NOTE: this is returning null when object is inactive
@@ -51,18 +55,18 @@ public class DistanceCalculation : MonoBehaviour
 
         }
 
-
+        CalculateHeadsetDistance();
         CalcHeadsetDist();
-		// get all the headset
-		//GetHeadsets();
-		StartCoroutine(HeadsetDistanceCalculate());
+        // get all the headset
+        //GetHeadsets();
+        StartCoroutine(HeadsetDistanceCalculate());
 
 	}
 
 	// Update is called once per frame
 	void Update()
     {
-
+        HeadsetMapIconVisualUpdate();
     }
 	// This function does 2 things: 1) calculate the distance 2) display the headset icon on palm map.
 	public void CalcHeadsetDist()
@@ -159,9 +163,105 @@ public class DistanceCalculation : MonoBehaviour
 		}
 		
 	}
-	
 
-	IEnumerator HeadsetDistanceCalculate()
+    public void CalculateHeadsetDistance()
+    {
+        cam_pos = cam.GetComponent<Transform>().position;
+
+        TextMeshPro display_dist_text = cur_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>(); ;
+        // if gameobject position doesn't work, then i might have to do a get() to get the position of the given headset
+        float x_distance = (float)Math.Pow(capsule.transform.position.x - cam_pos.x, 2);
+        float z_distance = (float)Math.Pow(capsule.gameObject.transform.position.z - cam_pos.z, 2);
+
+        if (isFeet)
+        {
+            x_distance = (float)(x_distance * 3.281);
+            z_distance = (float)(z_distance * 3.281);
+        }
+
+        float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
+
+        if (isFeet)
+        {
+            display_dist_text.text = headset_name + " : " + distance.ToString() + "ft";
+        }
+        else
+        {
+            display_dist_text.text = headset_name + " : " + distance.ToString() + "m";
+        } 
+    }
+
+    public void HeadsetMapIconVisualUpdate()
+    {        
+        if (mapParent != null)
+        {
+            GameObject headset_map_marker = null;
+
+            //If we don't have our headset on the map, we instantiate it, otherwise we get a reference to it
+            if (!mapParent.transform.Find(cur_prefab.name))
+            {
+                headset_map_marker = Instantiate(headset_icon, mapParent.transform, false); // This is where we instantiate the headset icon on the map --> need to change the reference of the headset_icon.
+                                                                                   // TODO: Add your local headset icon here
+            }
+            else
+            {
+                headset_map_marker = mapParent.transform.Find(cur_prefab.name).gameObject;
+            }
+
+            //If our map marker is found, we manipulate it's position
+            if (headset_map_marker != null)
+            {
+                if (is_local)
+                {
+                    if(Debug_Verbose) UnityEngine.Debug.Log("get into local: " + this.name);
+
+                    headset_map_marker.transform.localPosition = new Vector3(cam_pos.x, 0, cam_pos.z);
+
+                    // TODO: trying to get the rotation of the local headset --> since local headset's prefab is disabled
+                    headset_parent.transform.Find(local_headset_id).position = cam_pos;
+                    headset_parent.transform.Find(local_headset_id).eulerAngles = cam.transform.eulerAngles;
+                    
+                    if (Debug_Verbose) UnityEngine.Debug.Log("this is the local headset's rotation: " + headset_parent.transform.Find(local_headset_id).eulerAngles);
+                    if (Debug_Verbose) UnityEngine.Debug.Log("this is the real rotation: " + cam.transform.eulerAngles);
+                }
+                else
+                {
+                    headset_map_marker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
+                }
+
+                headset_map_marker.name = cur_prefab.name;
+                //This should be okay to remove because it caluclulates the distance from the local headset to the origin, which isn't that useful in this context
+                headset_map_marker.transform.Find("Feature_Text").GetComponent<TextMeshPro>().text = distance.ToString() + "ft";
+                //cur_prefab.GetComponent<EasyVizARHeadset>()
+                //GetHeadsets();
+                Color myColor = cur_prefab.GetComponent<EasyVizARHeadset>()._color;
+
+                //Find the icon components and set their color accordingly.
+                //NOTE: Transform.find is not recursive and only searches children of calling transform
+                headset_map_marker.transform.Find("Icon Visuals").Find("Icon").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+                headset_map_marker.transform.Find("Icon Visuals").Find("Arrow").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+
+                //TODO: add the rotation/quaterinion here --> z axis is where we would like to apply the rotation to, but I'm still figuring out how to determine the orientation               
+                //mapMarker.transform.rotation = Quaternion.Euler(-7, capsule.transform.rotation.x, capsule.transform.rotation.z);
+
+
+                //double radians = 200* Math.Atan2(capsule.transform.rotation.y, capsule.transform.rotation.w);
+                //double angle = radians * (180 / Math.PI);
+                //UnityEngine.Debug.Log("this is the angle: " + radians);
+                //mapMarker.transform.Find("Quad").Rotate(new Vector3(0, 0, (float)radians));
+
+            }
+            else
+            {
+                UnityEngine.Debug.Log("Missing headset Map Marker");
+            }
+        }
+
+    }
+
+
+
+    IEnumerator HeadsetDistanceCalculate()
 	{
 		while (true)
 		{
@@ -170,9 +270,10 @@ public class DistanceCalculation : MonoBehaviour
 			float change_x = (float)Math.Pow((newPos.x - oldPos.x), 2);
 			float change_z = (float)Math.Pow((newPos.z - oldPos.z), 2);
 			float change_dist = (float)Math.Sqrt(change_x + change_z);
-			if (change_dist > 0.05)
+			if (change_dist > 0.0)
 			{
-				CalcHeadsetDist();
+                ////CalcHeadsetDist();
+                //CalculateHeadsetDistance();
 				oldPos = newPos;
 			}
 			yield return new WaitForSeconds(1f);
