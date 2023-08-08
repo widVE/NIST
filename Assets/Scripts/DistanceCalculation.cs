@@ -8,22 +8,22 @@ using System.Diagnostics;
 
 public class DistanceCalculation : MonoBehaviour
 {
-	public GameObject cam;
-	public Vector3 cam_pos;
-	public GameObject distText;
+	public GameObject main_camera;
+	public Vector3 camera_position;
+	public GameObject distance_text;
 	public GameObject capsule;
 	public GameObject cur_prefab;
-	public bool isFeet = true;
+	public bool is_feet = true;
 
-	public Vector3 oldPos;
-	public Vector3 newPos;
+	public Vector3 old_position;
+	public Vector3 new_position;
 
 	//For displaying the headset icon on map 
 	public GameObject headset_icon;
-	public GameObject mapParent;
+	public GameObject map_parent;
 	public GameObject headset_parent;
 	public EasyVizAR.HeadsetList headset_list;
-	public EasyVizAR.Headset cur_headset;
+	public EasyVizAR.Headset current_headset;
 	public string headset_name; // this is set in the EasyVizARHeadsetManager.cs script \
 	public bool is_local = false;
 	public string local_headset_id = "";
@@ -35,12 +35,12 @@ public class DistanceCalculation : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-		cam = GameObject.Find("Main Camera");
+		main_camera = GameObject.Find("Main Camera");
 		//mapParent = GameObject.Find("Map_Spawn_Target"); // NOTE: this is returning null when object is inactive
 		headset_parent = GameObject.Find("EasyVizARHeadsetManager");
 		
-		cam_pos = cam.GetComponent<Transform>().position;
-		oldPos = cam_pos;
+		camera_position = main_camera.GetComponent<Transform>().position;
+		old_position = camera_position;
 
 		if (EasyVizARServer.Instance.TryGetHeadsetID(out string headsetId))
 		{
@@ -66,19 +66,19 @@ public class DistanceCalculation : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
-        HeadsetMapIconVisualUpdate();
+        HeadsetMapIconViewUpdate();
     }
 	// This function does 2 things: 1) calculate the distance 2) display the headset icon on palm map.
 	public void CalcHeadsetDist()
 	{
-		cam_pos = cam.GetComponent<Transform>().position;
+		camera_position = main_camera.GetComponent<Transform>().position;
 
 		TextMeshPro display_dist_text = cur_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>(); ;
 		// if gameobject position doesn't work, then i might have to do a get() to get the position of the given headset
-		float x_distance = (float)Math.Pow(capsule.transform.position.x - cam_pos.x, 2);
-		float z_distance = (float)Math.Pow(capsule.gameObject.transform.position.z - cam_pos.z, 2);
+		float x_distance = (float)Math.Pow(capsule.transform.position.x - camera_position.x, 2);
+		float z_distance = (float)Math.Pow(capsule.gameObject.transform.position.z - camera_position.z, 2);
 
-		if (isFeet)
+		if (is_feet)
 		{
 			x_distance = (float)(x_distance * 3.281);
 			z_distance = (float)(z_distance * 3.281);
@@ -86,7 +86,7 @@ public class DistanceCalculation : MonoBehaviour
 
 		float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
 
-		if (isFeet)
+		if (is_feet)
 		{
 			display_dist_text.text = headset_name + " : " + distance.ToString() + "ft";
 		}
@@ -96,19 +96,19 @@ public class DistanceCalculation : MonoBehaviour
 		}
 		
 		// displaying headset on map here --> below has nothing to do with distance calculation 
-		if (mapParent != null)
+		if (map_parent != null)
         {
 			GameObject mapMarker = null;
 
 			//If we don't have our headset on the map, we instantiate it, otherwise we get a reference to it
-			if (!mapParent.transform.Find(cur_prefab.name))
+			if (!map_parent.transform.Find(cur_prefab.name))
             {
-                mapMarker = Instantiate(headset_icon, mapParent.transform, false); // This is where we instantiate the headset icon on the map --> need to change the reference of the headset_icon.
+                mapMarker = Instantiate(headset_icon, map_parent.transform, false); // This is where we instantiate the headset icon on the map --> need to change the reference of the headset_icon.
 				// TODO: Add your local headset icon here
             }
             else
             {
-				mapMarker = mapParent.transform.Find(cur_prefab.name).gameObject;
+				mapMarker = map_parent.transform.Find(cur_prefab.name).gameObject;
 			}
 
 			//If our map marker is found, we manipulate it's position
@@ -120,13 +120,13 @@ public class DistanceCalculation : MonoBehaviour
 				{
                     UnityEngine.Debug.Log("get into local: " + this.name);
 
-                    mapMarker.transform.localPosition = new Vector3(cam_pos.x, 0, cam_pos.z);
+                    mapMarker.transform.localPosition = new Vector3(camera_position.x, 0, camera_position.z);
 					
 					// TODO: trying to get the rotation of the local headset --> since local headset's prefab is disabled
-                    headset_parent.transform.Find(local_headset_id).position = cam_pos;
-                    headset_parent.transform.Find(local_headset_id).eulerAngles = cam.transform.eulerAngles;
+                    headset_parent.transform.Find(local_headset_id).position = camera_position;
+                    headset_parent.transform.Find(local_headset_id).eulerAngles = main_camera.transform.eulerAngles;
 					UnityEngine.Debug.Log("this is the local headset's rotation: " + headset_parent.transform.Find(local_headset_id).eulerAngles);
-                    UnityEngine.Debug.Log("this is the real rotation: " + cam.transform.eulerAngles);
+                    UnityEngine.Debug.Log("this is the real rotation: " + main_camera.transform.eulerAngles);
 
 
                 }
@@ -166,14 +166,14 @@ public class DistanceCalculation : MonoBehaviour
 
     public void CalculateHeadsetDistance()
     {
-        cam_pos = cam.GetComponent<Transform>().position;
+        camera_position = main_camera.GetComponent<Transform>().position;
 
         TextMeshPro display_dist_text = cur_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>(); ;
         // if gameobject position doesn't work, then i might have to do a get() to get the position of the given headset
-        float x_distance = (float)Math.Pow(capsule.transform.position.x - cam_pos.x, 2);
-        float z_distance = (float)Math.Pow(capsule.gameObject.transform.position.z - cam_pos.z, 2);
+        float x_distance = (float)Math.Pow(capsule.transform.position.x - camera_position.x, 2);
+        float z_distance = (float)Math.Pow(capsule.gameObject.transform.position.z - camera_position.z, 2);
 
-        if (isFeet)
+        if (is_feet)
         {
             x_distance = (float)(x_distance * 3.281);
             z_distance = (float)(z_distance * 3.281);
@@ -181,7 +181,7 @@ public class DistanceCalculation : MonoBehaviour
 
         float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
 
-        if (isFeet)
+        if (is_feet)
         {
             display_dist_text.text = headset_name + " : " + distance.ToString() + "ft";
         }
@@ -190,22 +190,26 @@ public class DistanceCalculation : MonoBehaviour
             display_dist_text.text = headset_name + " : " + distance.ToString() + "m";
         } 
     }
-
-    public void HeadsetMapIconVisualUpdate()
+/*
+    This method will move the local user's headset icon on the map based on the main camera position,
+    which will have the same position and rotation as the current user's head.
+ 
+ */
+    public void HeadsetMapIconViewUpdate()
     {        
-        if (mapParent != null)
+        if (map_parent != null)
         {
             GameObject headset_map_marker = null;
 
             //If we don't have our headset on the map, we instantiate it, otherwise we get a reference to it
-            if (!mapParent.transform.Find(cur_prefab.name))
+            if (!map_parent.transform.Find(cur_prefab.name))
             {
-                headset_map_marker = Instantiate(headset_icon, mapParent.transform, false); // This is where we instantiate the headset icon on the map --> need to change the reference of the headset_icon.
+                headset_map_marker = Instantiate(headset_icon, map_parent.transform, false); // This is where we instantiate the headset icon on the map --> need to change the reference of the headset_icon.
                                                                                    // TODO: Add your local headset icon here
             }
             else
             {
-                headset_map_marker = mapParent.transform.Find(cur_prefab.name).gameObject;
+                headset_map_marker = map_parent.transform.Find(cur_prefab.name).gameObject;
             }
 
             //If our map marker is found, we manipulate it's position
@@ -215,14 +219,14 @@ public class DistanceCalculation : MonoBehaviour
                 {
                     if(Debug_Verbose) UnityEngine.Debug.Log("get into local: " + this.name);
 
-                    headset_map_marker.transform.localPosition = new Vector3(cam_pos.x, 0, cam_pos.z);
+                    headset_map_marker.transform.localPosition = new Vector3(camera_position.x, 0, camera_position.z);
 
                     // TODO: trying to get the rotation of the local headset --> since local headset's prefab is disabled
-                    headset_parent.transform.Find(local_headset_id).position = cam_pos;
-                    headset_parent.transform.Find(local_headset_id).eulerAngles = cam.transform.eulerAngles;
+                    headset_parent.transform.Find(local_headset_id).position = camera_position;
+                    headset_parent.transform.Find(local_headset_id).eulerAngles = main_camera.transform.eulerAngles;
                     
                     if (Debug_Verbose) UnityEngine.Debug.Log("this is the local headset's rotation: " + headset_parent.transform.Find(local_headset_id).eulerAngles);
-                    if (Debug_Verbose) UnityEngine.Debug.Log("this is the real rotation: " + cam.transform.eulerAngles);
+                    if (Debug_Verbose) UnityEngine.Debug.Log("this is the real rotation: " + main_camera.transform.eulerAngles);
                 }
                 else
                 {
@@ -265,16 +269,16 @@ public class DistanceCalculation : MonoBehaviour
 	{
 		while (true)
 		{
-			cam_pos = cam.GetComponent<Transform>().position;
-			newPos = cam.GetComponent<Transform>().position;
-			float change_x = (float)Math.Pow((newPos.x - oldPos.x), 2);
-			float change_z = (float)Math.Pow((newPos.z - oldPos.z), 2);
+			camera_position = main_camera.GetComponent<Transform>().position;
+			new_position = main_camera.GetComponent<Transform>().position;
+			float change_x = (float)Math.Pow((new_position.x - old_position.x), 2);
+			float change_z = (float)Math.Pow((new_position.z - old_position.z), 2);
 			float change_dist = (float)Math.Sqrt(change_x + change_z);
 			if (change_dist > 0.0)
 			{
                 ////CalcHeadsetDist();
                 //CalculateHeadsetDistance();
-				oldPos = newPos;
+				old_position = new_position;
 			}
 			yield return new WaitForSeconds(1f);
 		}

@@ -373,7 +373,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         EasyVizARHeadset hs = s.GetComponent<EasyVizARHeadset>();
 		// Getting the reference for displaying the headset
 		DistanceCalculation d_s = s.GetComponent<DistanceCalculation>();
-		d_s.mapParent = map_parent;
+		d_s.map_parent = map_parent;
 		d_s.headset_name = remoteHeadset.name;
 		hs.map_parent = map_parent;
 		hs.headset_parent = headsetManager;
