@@ -12,7 +12,7 @@ public class DistanceCalculation : MonoBehaviour
 	public Vector3 camera_position;
 	public GameObject distance_text;
 	public GameObject capsule;
-	public GameObject cur_prefab;
+	
 	public bool is_feet = true;
 
 	public Vector3 old_position;
@@ -27,7 +27,10 @@ public class DistanceCalculation : MonoBehaviour
 	public string headset_name; // this is set in the EasyVizARHeadsetManager.cs script \
 	public bool is_local = false;
 	public string local_headset_id = "";
-    private bool Debug_Verbose = false;
+    
+    public bool Debug_Verbose = false;
+
+    private GameObject current_prefab;
 
     //GLOBAL FOR TESTING< SHOULD NOT STAY
     float distance;
@@ -35,7 +38,10 @@ public class DistanceCalculation : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-		main_camera = GameObject.Find("Main Camera");
+        current_prefab = this.gameObject;
+        //This does correctly assign the refernce, but it can't figure out where it was originally being assigned from.
+        
+        main_camera = GameObject.Find("Main Camera");
 		//mapParent = GameObject.Find("Map_Spawn_Target"); // NOTE: this is returning null when object is inactive
 		headset_parent = GameObject.Find("EasyVizARHeadsetManager");
 		
@@ -73,7 +79,7 @@ public class DistanceCalculation : MonoBehaviour
 	{
 		camera_position = main_camera.GetComponent<Transform>().position;
 
-		TextMeshPro display_dist_text = cur_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>(); ;
+		TextMeshPro display_dist_text = current_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>(); ;
 		// if gameobject position doesn't work, then i might have to do a get() to get the position of the given headset
 		float x_distance = (float)Math.Pow(capsule.transform.position.x - camera_position.x, 2);
 		float z_distance = (float)Math.Pow(capsule.gameObject.transform.position.z - camera_position.z, 2);
@@ -101,14 +107,14 @@ public class DistanceCalculation : MonoBehaviour
 			GameObject mapMarker = null;
 
 			//If we don't have our headset on the map, we instantiate it, otherwise we get a reference to it
-			if (!map_parent.transform.Find(cur_prefab.name))
+			if (!map_parent.transform.Find(current_prefab.name))
             {
                 mapMarker = Instantiate(headset_icon, map_parent.transform, false); // This is where we instantiate the headset icon on the map --> need to change the reference of the headset_icon.
 				// TODO: Add your local headset icon here
             }
             else
             {
-				mapMarker = map_parent.transform.Find(cur_prefab.name).gameObject;
+				mapMarker = map_parent.transform.Find(current_prefab.name).gameObject;
 			}
 
 			//If our map marker is found, we manipulate it's position
@@ -135,11 +141,11 @@ public class DistanceCalculation : MonoBehaviour
                     mapMarker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
                 }
 
-                mapMarker.name = cur_prefab.name;
+                mapMarker.name = current_prefab.name;
 				mapMarker.transform.Find("Feature_Text").GetComponent<TextMeshPro>().text = distance.ToString() + "ft";
 				//cur_prefab.GetComponent<EasyVizARHeadset>()
 				//GetHeadsets();
-				Color myColor = cur_prefab.GetComponent<EasyVizARHeadset>()._color;
+				Color myColor = current_prefab.GetComponent<EasyVizARHeadset>()._color;
 
 				//Find the icon components and set their color accordingly.
 				//NOTE: Transform.find is not recursive and only searches children of calling transform
@@ -168,7 +174,7 @@ public class DistanceCalculation : MonoBehaviour
     {
         camera_position = main_camera.GetComponent<Transform>().position;
 
-        TextMeshPro display_dist_text = cur_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>(); ;
+        TextMeshPro display_dist_text = current_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>(); ;
         // if gameobject position doesn't work, then i might have to do a get() to get the position of the given headset
         float x_distance = (float)Math.Pow(capsule.transform.position.x - camera_position.x, 2);
         float z_distance = (float)Math.Pow(capsule.gameObject.transform.position.z - camera_position.z, 2);
@@ -202,14 +208,14 @@ public class DistanceCalculation : MonoBehaviour
             GameObject headset_map_marker = null;
 
             //If we don't have our headset on the map, we instantiate it, otherwise we get a reference to it
-            if (!map_parent.transform.Find(cur_prefab.name))
+            if (!map_parent.transform.Find(current_prefab.name))
             {
                 headset_map_marker = Instantiate(headset_icon, map_parent.transform, false); // This is where we instantiate the headset icon on the map --> need to change the reference of the headset_icon.
                                                                                    // TODO: Add your local headset icon here
             }
             else
             {
-                headset_map_marker = map_parent.transform.Find(cur_prefab.name).gameObject;
+                headset_map_marker = map_parent.transform.Find(current_prefab.name).gameObject;
             }
 
             //If our map marker is found, we manipulate it's position
@@ -233,12 +239,12 @@ public class DistanceCalculation : MonoBehaviour
                     headset_map_marker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
                 }
 
-                headset_map_marker.name = cur_prefab.name;
+                headset_map_marker.name = current_prefab.name;
                 //This should be okay to remove because it caluclulates the distance from the local headset to the origin, which isn't that useful in this context
                 headset_map_marker.transform.Find("Feature_Text").GetComponent<TextMeshPro>().text = distance.ToString() + "ft";
                 //cur_prefab.GetComponent<EasyVizARHeadset>()
                 //GetHeadsets();
-                Color myColor = cur_prefab.GetComponent<EasyVizARHeadset>()._color;
+                Color myColor = current_prefab.GetComponent<EasyVizARHeadset>()._color;
 
                 //Find the icon components and set their color accordingly.
                 //NOTE: Transform.find is not recursive and only searches children of calling transform
