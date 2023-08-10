@@ -39,16 +39,15 @@ public class DistanceCalculation : MonoBehaviour
     void Start()
     {
         current_prefab = this.gameObject;
-        //This does correctly assign the refernce, but it can't figure out where it was originally being assigned from.
         
         main_camera = GameObject.Find("Main Camera");
-		//mapParent = GameObject.Find("Map_Spawn_Target"); // NOTE: this is returning null when object is inactive
-		headset_parent = GameObject.Find("EasyVizARHeadsetManager");
-		
-		camera_position = main_camera.GetComponent<Transform>().position;
-		old_position = camera_position;
+        camera_position = main_camera.GetComponent<Transform>().position;
+        old_position = camera_position;
 
-		if (EasyVizARServer.Instance.TryGetHeadsetID(out string headsetId))
+        //mapParent = GameObject.Find("Map_Spawn_Target"); // NOTE: this is returning null when object is inactive
+        headset_parent = GameObject.Find("EasyVizARHeadsetManager");
+		
+        if (EasyVizARServer.Instance.TryGetHeadsetID(out string headsetId))
 		{
             if (this.name.Equals(headsetId))
             {
@@ -56,18 +55,11 @@ public class DistanceCalculation : MonoBehaviour
                 local_headset_id = headsetId;
 				GameObject local = GameObject.Find("LocalHeadset");
 				local.transform.GetChild(0).name = headsetId;
-
             }
-
         }
 
-        CalculateHeadsetDistance();
-        CalcHeadsetDist();
-        // get all the headset
-        //GetHeadsets();
         StartCoroutine(HeadsetDistanceCalculate());
-
-	}
+    }
 
 	// Update is called once per frame
 	void Update()
@@ -185,15 +177,15 @@ public class DistanceCalculation : MonoBehaviour
             z_distance = (float)(z_distance * 3.281);
         }
 
-        float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance) * 10f) / 10f;
+        float distance = (float)Math.Round((float)Math.Sqrt(x_distance + z_distance));
 
         if (is_feet)
         {
-            display_dist_text.text = headset_name + " : " + distance.ToString() + "ft";
+            display_dist_text.text = "AAAA " + headset_name + " : " + distance.ToString() + "ft";
         }
         else
         {
-            display_dist_text.text = headset_name + " : " + distance.ToString() + "m";
+            display_dist_text.text = "BBBB " + headset_name + " : " + distance.ToString() + "m";
         } 
     }
 /*
@@ -254,7 +246,6 @@ public class DistanceCalculation : MonoBehaviour
                 //TODO: add the rotation/quaterinion here --> z axis is where we would like to apply the rotation to, but I'm still figuring out how to determine the orientation               
                 //mapMarker.transform.rotation = Quaternion.Euler(-7, capsule.transform.rotation.x, capsule.transform.rotation.z);
 
-
                 //double radians = 200* Math.Atan2(capsule.transform.rotation.y, capsule.transform.rotation.w);
                 //double angle = radians * (180 / Math.PI);
                 //UnityEngine.Debug.Log("this is the angle: " + radians);
@@ -266,7 +257,6 @@ public class DistanceCalculation : MonoBehaviour
                 UnityEngine.Debug.Log("Missing headset Map Marker");
             }
         }
-
     }
 
 
@@ -280,10 +270,10 @@ public class DistanceCalculation : MonoBehaviour
 			float change_x = (float)Math.Pow((new_position.x - old_position.x), 2);
 			float change_z = (float)Math.Pow((new_position.z - old_position.z), 2);
 			float change_dist = (float)Math.Sqrt(change_x + change_z);
+
 			if (change_dist > 0.0)
 			{
-                ////CalcHeadsetDist();
-                //CalculateHeadsetDistance();
+                CalculateHeadsetDistance();
 				old_position = new_position;
 			}
 			yield return new WaitForSeconds(1f);
