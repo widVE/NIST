@@ -74,20 +74,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f672d2c131a58984ea91d94d6b031977, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cam: {fileID: 0}
-  cam_pos: {x: 0, y: 0, z: 0}
-  distText: {fileID: 7137453166730415838, guid: 5e47031368955594eb31473c19544fbd, type: 3}
+  main_camera: {fileID: 0}
+  camera_position: {x: 0, y: 0, z: 0}
+  distance_text: {fileID: 0}
   capsule: {fileID: 8231832368714168251}
-  cur_prefab: {fileID: 921069525072559227}
-  isFeet: 0
-  oldPos: {x: 0, y: 0, z: 0}
-  newPos: {x: 0, y: 0, z: 0}
+  is_feet: 1
+  old_position: {x: 0, y: 0, z: 0}
+  new_position: {x: 0, y: 0, z: 0}
   headset_icon: {fileID: 4402188086708784334, guid: b234550f30f629c41ba6c5c3b64682a6, type: 3}
-  mapParent: {fileID: 0}
+  map_parent: {fileID: 0}
   headset_parent: {fileID: 0}
   headset_list:
     headsets: []
-  cur_headset:
+  current_headset:
     color: 
     created: 0
     id: 
@@ -114,6 +113,8 @@ MonoBehaviour:
   headset_name: 
   is_local: 0
   local_headset_id: 
+  Debug_Verbose: 0
+  current_prefab: {fileID: 921069525072559227}
 --- !u!1 &6732124109696385241
 GameObject:
   m_ObjectHideFlags: 0

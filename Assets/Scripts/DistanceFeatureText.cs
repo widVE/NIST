@@ -54,7 +54,7 @@ public class DistanceFeatureText : MonoBehaviour
         */
 
         float x_distance = (float)Math.Pow(quad.transform.position.x - camera_position.x, 2);
-        float z_distance = (float)Math.Pow(quad.gameObject.transform.position.z - camera_position.z, 2);
+        float z_distance = (float)Math.Pow(quad.transform.position.z - camera_position.z, 2);
 
         if (is_feet)
         {

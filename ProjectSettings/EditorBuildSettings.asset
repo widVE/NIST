@@ -23,9 +23,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/v2.4 Headset_with_distance_indicator.unity
     guid: 8016a6e261698954188da215e91ace4f
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/v3.0 Summer's Refactor.unity
     guid: 3d010581ce1d4f642a11f8b3f120b6a4
+  - enabled: 1
+    path: Assets/Scenes/v3.1 Canvas Render Warning Remove.unity
+    guid: 6ac7110f885717a4784df732805a4e12
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 24efe516db1dbf446a155a698a288aae, type: 2}
     Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: 8ff3c7c77ccd00441a88cebd82b4144c, type: 2}

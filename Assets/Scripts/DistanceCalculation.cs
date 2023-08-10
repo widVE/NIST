@@ -181,11 +181,11 @@ public class DistanceCalculation : MonoBehaviour
 
         if (is_feet)
         {
-            display_dist_text.text = "AAAA " + headset_name + " : " + distance.ToString() + "ft";
+            display_dist_text.text = headset_name + " : " + distance.ToString() + "ft";
         }
         else
         {
-            display_dist_text.text = "BBBB " + headset_name + " : " + distance.ToString() + "m";
+            display_dist_text.text = headset_name + " : " + distance.ToString() + "m";
         } 
     }
 /*
