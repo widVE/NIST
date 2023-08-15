@@ -25,7 +25,7 @@ public class OffsetRotation : MonoBehaviour
     {
         if (local_headset)
         {
-            Vector3 euler_rotation_source = new Vector3();
+            Vector3 euler_rotation_source = this.transform.localEulerAngles;
 
             if (copy_x_rotation) euler_rotation_source.x = source_transform.transform.eulerAngles.x;
             if (copy_y_rotation) euler_rotation_source.y = source_transform.transform.eulerAngles.y;

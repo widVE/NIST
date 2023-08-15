@@ -384,6 +384,7 @@ public class QRScanner : MonoBehaviour
 	}
 
 	//This is getting called on play mode exit, but it doesn't seem to be enough to stop the crashes
+	// the crashes have stopped, but it takes a surprisingly long time for this to stop, sometimes over a minute
 	void OnApplicationQuit()
 	{
 		Debug.Log("Stopping QR Watcher");

@@ -241,7 +241,7 @@ public class DistanceCalculation : MonoBehaviour
                 //Find the icon components and set their color accordingly.
                 //NOTE: Transform.find is not recursive and only searches children of calling transform
                 headset_map_marker.transform.Find("Icon Visuals").Find("Icon").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
-                headset_map_marker.transform.Find("Icon Visuals").Find("Arrow").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+                //headset_map_marker.transform.Find("Icon Visuals").Find("Arrow").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
 
                 //TODO: add the rotation/quaterinion here --> z axis is where we would like to apply the rotation to, but I'm still figuring out how to determine the orientation               
                 //mapMarker.transform.rotation = Quaternion.Euler(-7, capsule.transform.rotation.x, capsule.transform.rotation.z);

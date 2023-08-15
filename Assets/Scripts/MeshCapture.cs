@@ -116,10 +116,18 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         CoreServices.SpatialAwarenessSystem.RegisterHandler<SpatialAwarenessHandler>(this);
     }
 
+    // I added a try catch block because I was getting a null reference error back during this call
     private void OnDisable()
     {
         // Unregister component from Mesh Observation events, typically done in OnDisable()
-        CoreServices.SpatialAwarenessSystem.UnregisterHandler<SpatialAwarenessHandler>(this);
+        try
+        {
+            CoreServices.SpatialAwarenessSystem.UnregisterHandler<SpatialAwarenessHandler>(this);
+        }
+        catch (System.Exception)
+        {
+            throw;
+        }    
     }
 
     public void OnObservationAdded(MixedRealitySpatialAwarenessEventData<SpatialAwarenessMeshObject> eventData)

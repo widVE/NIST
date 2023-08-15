@@ -607,7 +607,7 @@ GameObject:
   - component: {fileID: 759943075284539836}
   - component: {fileID: 7646916673337717204}
   m_Layer: 0
-  m_Name: Quad
+  m_Name: Icon Visuals
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -813,15 +813,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14cf7a2f492699c4594cd73beb00fc8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cam: {fileID: 0}
-  cam_pos: {x: 0, y: 0, z: 0}
+  main_camera: {fileID: 0}
+  camera_position: {x: 0, y: 0, z: 0}
   feature: {fileID: 5318789042369293505}
   feature_map: {fileID: 5318789042369293505, guid: 40f9c67d83a7bfb48b466cbac06b2f4f, type: 3}
   quad: {fileID: 8637939829010818463}
-  isFeet: 0
+  is_feet: 1
   parent: {fileID: 0}
-  oldPos: {x: 0, y: 0, z: 0}
-  newPos: {x: 0, y: 0, z: 0}
+  old_position: {x: 0, y: 0, z: 0}
+  new_position: {x: 0, y: 0, z: 0}
+  distance: 0
 --- !u!224 &8818822813719591145 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3790148274104345818, guid: 926fb805b03eb2040a9c62b0166977e5, type: 3}
