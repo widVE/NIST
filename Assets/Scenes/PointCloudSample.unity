@@ -2072,16 +2072,16 @@ MonoBehaviour:
   _manager: {fileID: 561901448}
   _startOnQRDetection: 1
   _uploadToServer: 0
-  _captureColorPointCloud: 0
+  _captureColorPointCloud: 1
   _captureHiResColorImages: 0
   _captureRectifiedColorImages: 1
-  _captureDepthImages: 0
+  _captureDepthImages: 1
   _captureBinaryDepth: 1
   _captureTransforms: 1
   _captureIntensity: 0
   _captureVideo: 0
   _rectifyAllImages: 1
-  _cubeTest: {fileID: 559651490}
+  _cubeTest: {fileID: 0}
   _pc: {fileID: 582901978}
 --- !u!1 &891683166
 GameObject:
@@ -2468,7 +2468,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1517424691}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.0508, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
