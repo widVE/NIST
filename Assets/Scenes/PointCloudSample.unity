@@ -2396,7 +2396,6 @@ MonoBehaviour:
   ipadDebugPrefab: {fileID: 3924963915668624178, guid: 347010cc5b91945b9b757fafa9a18b7a, type: 3}
   depthWidth: 320
   depthHeight: 288
-  negateZ: 0
 --- !u!1 &1208393620
 GameObject:
   m_ObjectHideFlags: 0
