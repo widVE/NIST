@@ -285,6 +285,7 @@ public class QRScanner : MonoBehaviour
 			}
 		}
 
+		//Calls into the manager when the QR code is detected. Spawns headsets for this location ID
 		if (_headsetManager is not null)
         {
 			var manager = _headsetManager.GetComponent<EasyVizARHeadsetManager>();

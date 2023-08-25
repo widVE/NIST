@@ -57,11 +57,17 @@ namespace EasyVizAR
 		public int updated;
 	};
 
-	/*
+    [System.Serializable]
+    public class HeadsetList
+    {
+        public Headset[] headsets;
+    }
+
+    /*
 	 * RegisteredHeadset is only received when creating a new headset.
 	 * It contains the authentication token that we need to save for future API calls.
 	 */
-	[System.Serializable]
+    [System.Serializable]
 	public class RegisteredHeadset
 	{
 		public string color;
@@ -76,7 +82,6 @@ namespace EasyVizAR
 		public int updated;
 		public string token;
 	};
-
 
     /*
 	 * HeadsetPositionUpdate contains a subset of the Headset class attributes
@@ -135,8 +140,6 @@ namespace EasyVizAR
 		public ViewBox viewBox;
 	}
 
-
-
 	[System.Serializable]
 	public class ViewBox
 	{
@@ -144,14 +147,6 @@ namespace EasyVizAR
 		public float left;
 		public float top;
 		public float width;
-	}
-
-
-
-	[System.Serializable]
-	public class HeadsetList
-	{
-		public Headset[] headsets;
 	}
 	
 	[System.Serializable]

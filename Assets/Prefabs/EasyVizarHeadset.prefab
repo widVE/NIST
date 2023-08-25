@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _updateFrequency: 3
-  _headsetName: ross_test
+  _headsetName: Editor_Test
   _isLocal: 0
   _showPositionChanges: 0
   _realTimeChanges: 0
@@ -114,7 +114,6 @@ MonoBehaviour:
   is_local: 0
   local_headset_id: 
   Debug_Verbose: 0
-  current_prefab: {fileID: 921069525072559227}
 --- !u!1 &6732124109696385241
 GameObject:
   m_ObjectHideFlags: 0

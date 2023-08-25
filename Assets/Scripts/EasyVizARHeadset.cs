@@ -16,11 +16,11 @@ public class EasyVizARHeadset : MonoBehaviour
 	public string Name => _headsetName;
 	
 	[SerializeField]
-	bool _isLocal = false;
+	bool _is_local;
 	public bool is_local
 	{
-		get { return _isLocal; }
-		set { _isLocal = value; }
+		get { return _is_local; }
+		set { _is_local = value; }
 	}
 	
 	[SerializeField]
@@ -79,9 +79,15 @@ public class EasyVizARHeadset : MonoBehaviour
 
     }
 
+	public bool IsLocal(bool value)
+	{
+		is_local = value;
+		return is_local;
+	}
+
     public void CreateLocalHeadset(string headsetName, string location, bool postChanges)
 	{
-		_isLocal = true;
+		_is_local = true;
 		_mainCamera = Camera.main;
 		_headsetName = headsetName;
 		_locationID = location;
@@ -115,7 +121,7 @@ public class EasyVizARHeadset : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		if(_isLocal)
+		if(_is_local)
 		{
 			if(_mainCamera && _postPositionChanges)
 			{
@@ -142,59 +148,55 @@ public class EasyVizARHeadset : MonoBehaviour
 	
 
 	//This might be a problem here? B I don't think this should be doing what it's doing /B
-	public void AssignValuesFromJson(EasyVizAR.Headset h)
+	public void AssignValuesFromJson(EasyVizAR.Headset json_headset_data)
 	{
-		Vector3 newPos = Vector3.zero;
-
-		newPos.x = h.position.x;
-		newPos.y = h.position.y;
-		newPos.z = h.position.z;	
-		
-		transform.position = newPos;
-		transform.rotation = new Quaternion(h.orientation.x, h.orientation.y, h.orientation.z, h.orientation.w);
-
-        _headsetID = h.id;
-		_headsetName = h.name;
-		_locationID = h.location_id;
-
-		
-		// Not sure if this is the right area to do the navigation
-        if (h.navigation_target.type != currentTarget.type || h.navigation_target.target_id != currentTarget.target_id) {
-            currentTarget = h.navigation_target;
-			if (currentTarget.type == "feature" || currentTarget.type == "headset" || currentTarget.type == "point")
-			{
-				FindPath(h.navigation_target.position);
-			}
-			else
-            {
-				// If target type is none, we should clear the navigation path,
-				// but there is no need to call the server for pathing.
-
-				//this line is throwing an null refernce error /B
-				//line.positionCount = 0;
-            }
-            
-        }
+        // this is where the color of the headset is assigned --> this field is populated 
         Color newColor;
-		if (ColorUtility.TryParseHtmlString(h.color, out newColor))
-			_color = newColor; // this is where the color of the headset is assigned --> this field is populated 
+        if (ColorUtility.TryParseHtmlString(json_headset_data.color, out newColor)) _color = newColor;
 
-        Transform cur_headset = headset_parent.transform.Find(h.id);
-        if (cur_headset)
+        _headsetID = json_headset_data.id;
+        _locationID = json_headset_data.location_id;
+        _headsetName = json_headset_data.name;
+
+        transform.rotation = new Quaternion(json_headset_data.orientation.x, json_headset_data.orientation.y, json_headset_data.orientation.z, json_headset_data.orientation.w);
+
+        transform.position = new Vector3(json_headset_data.position.x, json_headset_data.position.y, json_headset_data.position.z);
+
+        Transform cur_headset = headset_parent.transform.Find(json_headset_data.id);
+        
+		if (cur_headset)
         {
 			cur_headset.Find("Capsule").GetComponent<Renderer>().material.color = newColor;
-
         }
         else
 		{
             UnityEngine.Debug.Log("the cur_headset is not found");
-
         }
 
         if (_showPositionChanges)
 		{
 			GetPastPositions();
 		}
+
+
+        // Not sure if this is the right area to do the navigation
+        if (json_headset_data.navigation_target.type != currentTarget.type || json_headset_data.navigation_target.target_id != currentTarget.target_id)
+        {
+            currentTarget = json_headset_data.navigation_target;
+            if (currentTarget.type == "feature" || currentTarget.type == "headset" || currentTarget.type == "point")
+            {
+                FindPath(json_headset_data.navigation_target.position);
+            }
+            else
+            {
+                // If target type is none, we should clear the navigation path,
+                // but there is no need to call the server for pathing.
+
+                //this line is throwing an null refernce error /B
+                //line.positionCount = 0;
+            }
+
+        }
     }
 
     void RegisterHeadset()

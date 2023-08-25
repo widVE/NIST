@@ -35,7 +35,10 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		get { return _localHeadset; }
     }
 
-	[SerializeField]
+    [SerializeField]
+    string _local_headset_ID = "";
+
+    [SerializeField]
 	bool _shouldCreateHeadsets = false;
 	public bool ShouldCreateHeadsets => _shouldCreateHeadsets;
 
@@ -66,11 +69,12 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	public GameObject headsetManager;
 	public Color _color = Color.red;
 	public GameObject feature_parent;
+    private bool verbose_debug_log;
 
 
 
-	// Start is called before the first frame update
-	void Start()
+    // Start is called before the first frame update
+    void Start()
 	{
 		if (_qrScanner)
 		{
@@ -86,7 +90,11 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 					h._locationID = _locationId;
 				}
 
-				if (_shouldCreateHeadsets) {
+
+
+                //The QR scanner code will also call the create all headsets funciton
+                //I'm going to disabled this via boolean, but leave it here for now
+                if (_shouldCreateHeadsets) {
 					CreateAllHeadsets();
 				}
 			};
@@ -104,8 +112,10 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	
 	void OnEnable()
 	{
-		
-	}
+        //Get the local headsetID if we've registered on the server
+
+        //EasyVizARServer.Instance.TryGetHeadsetID(out string _local_headset_ID);
+    }
 	
 	void OnDisable()
 	{
@@ -114,10 +124,15 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 	
 	[ContextMenu("CreateAllHeadsets")]
 	public void CreateAllHeadsets()
-	{
-		if(!_headsetsCreated)
+    {
+        //Get the local headsetID if we've registered on the server
+
+        EasyVizARServer.Instance.TryGetHeadsetID(out string _registered_headset_ID);
+		_local_headset_ID = _registered_headset_ID;
+
+        if (!_headsetsCreated)
 		{
-			CreateLocalHeadset();
+			//CreateLocalHeadset();
 			CreateHeadsets();
 			
 			_headsetsCreated = true;
@@ -338,71 +353,101 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		}				
 	}
 
-	void CreateLocalHeadset()
-	{
-		if(!_visualizePreviousLocal)
-		{
-			_localHeadset = Instantiate(_headsetPrefab, transform);
-			
-			if(_localHeadset != null)
-			{
-				EasyVizARHeadset local_headset = _localHeadset.GetComponent<EasyVizARHeadset>();
-				if(_localMaterial != null)
-				{
-					_localHeadset.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
-				}
-				
-				if(_makeUniqueLocalHeadset)
-				{
-					string s = System.DateTime.Now.ToString();
-					
-					local_headset.CreateLocalHeadset(_localHeadsetName+"_"+s, _locationId, !_visualizePreviousLocal);
-				}
-				else
-				{
-					local_headset.CreateLocalHeadset(_localHeadsetName, _locationId, !_visualizePreviousLocal);
-				}
-				Debug.Log("this is the local headset name: " + local_headset.name);
-			}
-		}
-	}
-	// This is where we are instantiating the GameObject of Headset in Unity
-    public void CreateRemoteHeadset(EasyVizAR.Headset remoteHeadset)
+    void CreateLocalHeadset()
     {
-        GameObject s = Instantiate(_headsetPrefab, transform);
-        EasyVizARHeadset hs = s.GetComponent<EasyVizARHeadset>();
-		// Getting the reference for displaying the headset
-		DistanceCalculation d_s = s.GetComponent<DistanceCalculation>();
-		d_s.map_parent = map_parent;
-		d_s.headset_name = remoteHeadset.name;
-		hs.map_parent = map_parent;
-		hs.headset_parent = headsetManager;
-		hs.feature_parent = feature_parent;
+        _localHeadset = Instantiate(_headsetPrefab, transform);
 
-		if (hs != null)
+        if (_localHeadset != null)
         {
-            s.name = remoteHeadset.id;
-			hs.AssignValuesFromJson(remoteHeadset);
-            _activeHeadsets.Add(hs);
+            EasyVizARHeadset local_headset = _localHeadset.GetComponent<EasyVizARHeadset>();
 
+            if (_localMaterial != null)
+            {
+                _localHeadset.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
+            }
+
+            if (_makeUniqueLocalHeadset)
+            {
+                string s = System.DateTime.Now.ToString();
+
+                local_headset.CreateLocalHeadset(_localHeadsetName + "_" + s, _locationId, !_visualizePreviousLocal);
+            }
+            else
+            {
+                local_headset.CreateLocalHeadset(_localHeadsetName, _locationId, !_visualizePreviousLocal);
+            }
+            Debug.Log("Create local headset says this is the local headset name: " + local_headset.name);
+        }
+    }
+
+    void OLD_CreateLocalHeadset()
+    {
+        if (!_visualizePreviousLocal)
+        {
+            _localHeadset = Instantiate(_headsetPrefab, transform);
+
+            if (_localHeadset != null)
+            {
+                EasyVizARHeadset local_headset = _localHeadset.GetComponent<EasyVizARHeadset>();
+
+                if (_localMaterial != null)
+                {
+                    _localHeadset.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
+                }
+
+                if (_makeUniqueLocalHeadset)
+                {
+                    string s = System.DateTime.Now.ToString();
+
+                    local_headset.CreateLocalHeadset(_localHeadsetName + "_" + s, _locationId, !_visualizePreviousLocal);
+                }
+                else
+                {
+                    local_headset.CreateLocalHeadset(_localHeadsetName, _locationId, !_visualizePreviousLocal);
+                }
+                Debug.Log("Create local headset says this is the local headset name: " + local_headset.name);
+            }
+        }
+    }
+    
+	
+	// This is where we are instantiating the GameObject of Headset in Unity
+    public void CreateRemoteHeadset(EasyVizAR.Headset remote_headset)
+    {
+        GameObject headset_game_object = Instantiate(_headsetPrefab, transform);
+        headset_game_object.name = remote_headset.id;
+
+        EasyVizARHeadset headset_class_data = headset_game_object.GetComponent<EasyVizARHeadset>();
+		// Getting the reference for displaying the headset
+		DistanceCalculation distance_calculation_script = headset_game_object.GetComponent<DistanceCalculation>();
+
+		distance_calculation_script.map_parent = map_parent;
+		distance_calculation_script.headset_name = remote_headset.name;
+		headset_class_data.map_parent = map_parent;
+		headset_class_data.headset_parent = headsetManager;
+		headset_class_data.feature_parent = feature_parent;
+
+		if (headset_class_data != null)
+        {
+			headset_class_data.AssignValuesFromJson(remote_headset);
+            _activeHeadsets.Add(headset_class_data);
         }
     }
 
     public void UpdateRemoteHeadset(string previous_id, EasyVizAR.Headset remoteHeadset)
     {
-        foreach(var hs in _activeHeadsets)
+        foreach (var hs in _activeHeadsets)
         {
             // We should be matching on headset ID because names can change and
             // are also not guaranteed to be unique, though they should be.
-            if(hs._headsetID == previous_id)
+            if (hs._headsetID == previous_id)
             {
                 hs.AssignValuesFromJson(remoteHeadset);
 
-				//Debug.Log("the id: " + hs.Name + " new color: " +  remoteHeadset.color);				
-				return;
+                //Debug.Log("the id: " + hs.Name + " new color: " +  remoteHeadset.color);				
+                return;
             }
         }
-
         // The updated headset was not in our list, so make a new one.
         CreateRemoteHeadset(remoteHeadset);
     }
@@ -410,87 +455,160 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     public void DeleteRemoteHeadset(string id)
     {
         int i = 0;
-        foreach(var hs in _activeHeadsets)
+        foreach (var hs in _activeHeadsets)
         {
             // Definitely should be matching on ID rather than name.--> changed 
-            if(hs._headsetID == id)
+            if (hs._headsetID == id)
             {
                 //Destroy(hs.gameObject); //this wasn't working for some unkn
-				Transform cur_headset = headsetManager.transform.Find(hs._headsetID);
-				if (cur_headset)
+                Transform cur_headset = headsetManager.transform.Find(hs._headsetID);
+                if (cur_headset)
                 {
-					Destroy(cur_headset.gameObject);
+                    Destroy(cur_headset.gameObject);
                 }
 
                 _activeHeadsets.RemoveAt(i);
-				// TODO: if this works, delete the DeleteIcon() from MapIconSpawn.cs
-				
-				if (map_parent != null)
-                {
-					//Debug.Log("the delete name: " + name);
-					Transform delete_headset = map_parent.transform.Find(hs._headsetID);
-					if (delete_headset)
-                    {
-						Debug.Log("Found and Destroyed the headset");
-						Destroy(delete_headset.gameObject);
+                // TODO: if this works, delete the DeleteIcon() from MapIconSpawn.cs
 
-					}
-				}
-				
-				
-				
+                if (map_parent != null)
+                {
+                    //Debug.Log("the delete name: " + name);
+                    Transform delete_headset = map_parent.transform.Find(hs._headsetID);
+                    if (delete_headset)
+                    {
+                        Debug.Log("Found and Destroyed the headset");
+                        Destroy(delete_headset.gameObject);
+
+                    }
+                }
                 break;
             }
-
             i++;
         }
     }
 
-	void CreateHeadsetsCallback(string resultData)
-	{
-		Debug.Log(resultData);
-		
-		if(resultData != "error" && resultData.Length > 2)
+    void CreateHeadsetsCallback(string result_data)
+    {
+        if (verbose_debug_log) Debug.Log(result_data);
+
+        //Data validation check
+        if (result_data == "error" || string.IsNullOrEmpty(result_data) || result_data.Length <= 2)
+        {
+            Debug.LogError("Error in data payload: " + result_data);
+            return;
+        }
+
+        //parse list of headsets for this location and create...
+        //the key to parsing the array - the text we add here has to match the name of the variable in the array wrapper class (headsets).
+        EasyVizAR.HeadsetList headset_list = JsonUtility.FromJson<EasyVizAR.HeadsetList>("{\"headsets\":" + result_data + "}");
+
+        Debug.Log("Local should be " + _local_headset_ID);
+		//EasyVizARServer.Instance.TryGetHeadsetID(out string _registered_headset_ID);
+        Debug.Log("Local should be " + _local_headset_ID);
+
+        // why are we pre-incrementing i???
+        //Only one local headset and we know the ID. Find and spawn local, otherwise remote
+        for (int i = 0; i < headset_list.headsets.Length; ++i)
+        {
+            if (headset_list.headsets[i].id == _local_headset_ID)
+            {
+                Debug.Log("Found Local " + headset_list.headsets[i].id);
+
+                CreateLocalHeadset(headset_list.headsets[i]);
+            }
+            else
+            {
+                Debug.Log("No Local " + headset_list.headsets[i].id);
+                CreateRemoteHeadset(headset_list.headsets[i]);
+            }
+        }
+    }
+
+    private void CreateLocalHeadset(EasyVizAR.Headset local_headset)
+    {
+        GameObject headset_game_object = Instantiate(_headsetPrefab, transform);
+        headset_game_object.name = local_headset.id;
+
+        EasyVizARHeadset headset_class_data = headset_game_object.GetComponent<EasyVizARHeadset>();
+
+        if (headset_class_data != null)
+        {
+            Debug.Log("Is it NULL?? " + headset_class_data);
+
+
+            headset_class_data.map_parent = map_parent;
+            headset_class_data.headset_parent = headsetManager; //This needs to be assigned before JSON!!!!!!!!!!!!!!!
+            headset_class_data.feature_parent = feature_parent;
+
+            headset_class_data.AssignValuesFromJson(local_headset);
+
+			headset_class_data.IsLocal(true);
+			Debug.Log("Is it local?? " + headset_class_data.is_local);
+            headset_class_data.LocationID = local_headset.location_id;
+            headset_class_data.local_headset_id = local_headset.id;
+
+            if (_localMaterial != null)
+            {
+                headset_game_object.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
+            }
+
+
+            _activeHeadsets.Add(headset_class_data);
+        }
+		else
 		{
-			//parse list of headsets for this location and create...
-			//the key to parsing the array - the text we add here has to match the name of the variable in the array wrapper class (headsets).
-			EasyVizAR.HeadsetList headset_list = JsonUtility.FromJson<EasyVizAR.HeadsetList>("{\"headsets\":" + resultData + "}");
-			
-			// why are we pre-incrementing i???
-			for(int i = 0; i < headset_list.headsets.Length; ++i)
-			{
-				if(headset_list.headsets[i].name != _localHeadsetName || _visualizePreviousLocal)
-				{
-					if(headset_list.headsets[i].name == _localHeadsetName)
-					{
-						GameObject headset_game_object = Instantiate(_headsetPrefab, transform);
+            Debug.Log("WHY NULL?? " + headset_class_data);
+        }
+    }
 
-						EasyVizARHeadset headset = headset_game_object.GetComponent<EasyVizARHeadset>();
-						if(headset != null)
-						{
-							//s.name = h.headsets[i].name;
-							headset_game_object.name = headset_list.headsets[i].id;
+    void OLD_CreateHeadsetsCallback(string resultData)
+    {
+        if (verbose_debug_log) Debug.Log(resultData);
 
-							if (_localMaterial != null)
-							{
-								headset_game_object.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
-							}
-							headset.AssignValuesFromJson(headset_list.headsets[i]);
-							headset.is_local = true;
-							headset.LocationID = headset_list.headsets[i].location_id;
-							_activeHeadsets.Add(headset);
-						}
-					}
-					else
-					{
+        if (resultData != "error" && resultData.Length > 2)
+        {
+            //parse list of headsets for this location and create...
+            //the key to parsing the array - the text we add here has to match the name of the variable in the array wrapper class (headsets).
+            EasyVizAR.HeadsetList headset_list = JsonUtility.FromJson<EasyVizAR.HeadsetList>("{\"headsets\":" + resultData + "}");
+
+            // why are we pre-incrementing i???
+            for (int i = 0; i < headset_list.headsets.Length; ++i)
+            {
+                Debug.Log("LOKAL NAMER OVEN " + _localHeadsetName);
+
+
+                if (headset_list.headsets[i].name != _localHeadsetName || _visualizePreviousLocal)
+                {
+                    if (headset_list.headsets[i].name == _localHeadsetName)
+                    {
+                        GameObject headset_game_object = Instantiate(_headsetPrefab, transform);
+
+                        EasyVizARHeadset headset = headset_game_object.GetComponent<EasyVizARHeadset>();
+                        if (headset != null)
+                        {
+                            //s.name = h.headsets[i].name;
+                            headset_game_object.name = headset_list.headsets[i].id;
+
+                            if (_localMaterial != null)
+                            {
+                                headset_game_object.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
+                            }
+                            headset.AssignValuesFromJson(headset_list.headsets[i]);
+                            headset.is_local = true;
+                            headset.LocationID = headset_list.headsets[i].location_id;
+                            _activeHeadsets.Add(headset);
+                        }
+                    }
+                    else
+                    {
                         CreateRemoteHeadset(headset_list.headsets[i]);
-					}
-				}
-			}
-		}
-	}
-	
-	void CreateHeadsets()
+                    }
+                }
+            }
+        }
+    }
+
+    void CreateHeadsets()
 	{
 		//list headsets from server for our location, create a prefab of each...
 		EasyVizARServer.Instance.Get("headsets?location_id="+_locationId, EasyVizARServer.JSON_TYPE, CreateHeadsetsCallback);
