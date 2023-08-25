@@ -12,14 +12,16 @@ public class ImagePointCloud : MonoBehaviour
     Matrix4x4 _modelTransform;
 
     Bounds _pointCloudBounds = new Bounds(Vector3.zero, new Vector3(64f, 64f, 64f));
+	
+	const int SUBSAMPLE = 1;
 
     [SerializeField]
     Material _pointMaterial;
 
     public Material PointMaterial => _pointMaterial;
     
-	public List<Vector4> _featurePoints;
-	public List<ulong> _featurePointIDs;
+	//public List<Vector4> _featurePoints;
+	//public List<ulong> _featurePointIDs;
 	
     public Matrix4x4 CameraIntrinsics {
         get { return _cameraIntrinsics;}
@@ -44,7 +46,7 @@ public class ImagePointCloud : MonoBehaviour
 			_pointMaterial = new Material(_pointShader);
 		}
 		 
-        CreatePointMesh(256, 192);
+        //CreatePointMesh(256, 192);
     }
 
     void Awake()
@@ -67,25 +69,31 @@ public class ImagePointCloud : MonoBehaviour
 		GetComponent<MeshFilter>().sharedMesh.name = "ipadImage";
 		
 		uint resolution = width * height;
+		uint subSampledResolution = width * height / SUBSAMPLE;
 		
 		//using currPoint here skips the zero points.
-		Vector3[] verts = new Vector3[resolution];
-		Color[] colors = new Color[resolution];
+		Vector3[] verts = new Vector3[subSampledResolution];
+		Color[] colors = new Color[subSampledResolution];
 		
-		int[] indices = new int[resolution];
+		int[] indices = new int[subSampledResolution];
 		
 		for(int j = 0; j < resolution; ++j)
 		{
-			indices[j] = j;
-			verts[j] = Vector3.zero;
-			//verts[j].x = pointsInMemory[j].xPos;
-			//verts[j].y = pointsInMemory[j].yPos;
-			//verts[j].z = pointsInMemory[j].zPos;
-			
-			colors[j] = Color.black;
-			//colors[j].r = (float)colorsInMemory[j].red/255f;
-			//colors[j].g = (float)colorsInMemory[j].green/255f;
-			//colors[j].b = (float)colorsInMemory[j].blue/255f;
+			if(j % SUBSAMPLE == 0)
+			{
+				int idx = j / SUBSAMPLE;
+
+				indices[idx] = idx;
+				verts[idx] = Vector3.zero;
+				//verts[j].x = pointsInMemory[j].xPos;
+				//verts[j].y = pointsInMemory[j].yPos;
+				//verts[j].z = pointsInMemory[j].zPos;
+				
+				colors[idx] = Color.black;
+				//colors[j].r = (float)colorsInMemory[j].red/255f;
+				//colors[j].g = (float)colorsInMemory[j].green/255f;
+				//colors[j].b = (float)colorsInMemory[j].blue/255f;
+			}
 		}
 		
 		GetComponent<MeshFilter>().sharedMesh.vertices = verts;
@@ -106,6 +114,7 @@ public class ImagePointCloud : MonoBehaviour
 			 _pointMaterial = new Material(_pointShader);
 		}
 		
+		_pointMaterial.SetInt("_SubSample", SUBSAMPLE);
         _pointMaterial.SetMatrix("_ViewProj", _viewProj);
         _pointMaterial.SetMatrix("_ModelTransform", _modelTransform);
         _pointMaterial.SetMatrix("_CameraIntrinsics", _cameraIntrinsics);
