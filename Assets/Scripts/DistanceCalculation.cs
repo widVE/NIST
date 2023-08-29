@@ -28,9 +28,11 @@ public class DistanceCalculation : MonoBehaviour
 	public bool is_local = false;
 	public string local_headset_id = "";
     
-    public bool Debug_Verbose = false;
+    public bool Debug_Verbose = true;
 
     private GameObject current_prefab;
+
+    GameObject headset_map_marker = null;
 
     //GLOBAL FOR TESTING< SHOULD NOT STAY
     float distance;
@@ -58,11 +60,35 @@ public class DistanceCalculation : MonoBehaviour
             }
         }
 
+        SpawnHeasetIcon();
+
         StartCoroutine(HeadsetDistanceCalculate());
     }
 
-	// Update is called once per frame
-	void Update()
+    private void SpawnHeasetIcon()
+    {
+        if (Debug_Verbose) UnityEngine.Debug.Log("Map Parent" + map_parent);
+
+        Transform headset_map_transform = null;
+
+        if (map_parent != null)
+        {
+            headset_map_transform = map_parent.transform.Find(current_prefab.name);
+
+            if (Debug_Verbose) UnityEngine.Debug.Log("Dist Calc says map marker is at " + headset_map_transform);
+
+            //If we don't have our headset on the map, we instantiate it, otherwise we get a reference to it
+            if (headset_map_transform == null)
+            {
+                headset_map_marker = Instantiate(headset_icon, map_parent.transform, false); // This is where we instantiate the headset icon on the map --> need to change the reference of the headset_icon.
+                                                                                             // TODO: Add your local headset icon here
+                if (Debug_Verbose) UnityEngine.Debug.Log("Dist Calc no marker!, but made one");
+            }
+        }
+    }
+
+    // Update is called once per frame
+    void Update()
     {
         HeadsetMapIconViewUpdate();
     }
@@ -188,75 +214,60 @@ public class DistanceCalculation : MonoBehaviour
             display_dist_text.text = headset_name + " : " + distance.ToString() + "m";
         } 
     }
-/*
-    This method will move the local user's headset icon on the map based on the main camera position,
-    which will have the same position and rotation as the current user's head.
- 
- */
+    /*
+        This method will move the local user's headset icon on the map based on the main camera position,
+        which will have the same position and rotation as the current user's head.
+
+     */
     public void HeadsetMapIconViewUpdate()
-    {        
-        if (map_parent != null)
+    {
+        //If our map marker is found, we manipulate it's position
+        if (headset_map_marker != null)
         {
-            GameObject headset_map_marker = null;
-
-            //If we don't have our headset on the map, we instantiate it, otherwise we get a reference to it
-            if (!map_parent.transform.Find(current_prefab.name))
+            if (is_local)
             {
-                headset_map_marker = Instantiate(headset_icon, map_parent.transform, false); // This is where we instantiate the headset icon on the map --> need to change the reference of the headset_icon.
-                                                                                   // TODO: Add your local headset icon here
+                if (Debug_Verbose) UnityEngine.Debug.Log("Dist Calc get into local: " + this.name);
+
+                headset_map_marker.transform.localPosition = new Vector3(camera_position.x, 0, camera_position.z);
+
+                // TODO: trying to get the rotation of the local headset --> since local headset's prefab is disabled
+                headset_parent.transform.Find(local_headset_id).position = camera_position;
+                headset_parent.transform.Find(local_headset_id).eulerAngles = main_camera.transform.eulerAngles;
+
+                if (Debug_Verbose) UnityEngine.Debug.Log("this is the local headset's rotation: " + headset_parent.transform.Find(local_headset_id).eulerAngles);
+                if (Debug_Verbose) UnityEngine.Debug.Log("this is the real rotation: " + main_camera.transform.eulerAngles);
             }
             else
             {
-                headset_map_marker = map_parent.transform.Find(current_prefab.name).gameObject;
+                headset_map_marker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
             }
 
-            //If our map marker is found, we manipulate it's position
-            if (headset_map_marker != null)
-            {
-                if (is_local)
-                {
-                    if(Debug_Verbose) UnityEngine.Debug.Log("get into local: " + this.name);
+            headset_map_marker.name = current_prefab.name;
+            //This should be okay to remove because it caluclulates the distance from the local headset to the origin, which isn't that useful in this context
+            headset_map_marker.transform.Find("Feature_Text").GetComponent<TextMeshPro>().text = distance.ToString() + "ft";
+            //cur_prefab.GetComponent<EasyVizARHeadset>()
+            //GetHeadsets();
+            Color myColor = current_prefab.GetComponent<EasyVizARHeadset>()._color;
 
-                    headset_map_marker.transform.localPosition = new Vector3(camera_position.x, 0, camera_position.z);
+            //Find the icon components and set their color accordingly.
+            //NOTE: Transform.find is not recursive and only searches children of calling transform
+            headset_map_marker.transform.Find("Icon Visuals").Find("Icon").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+            //headset_map_marker.transform.Find("Icon Visuals").Find("Arrow").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
 
-                    // TODO: trying to get the rotation of the local headset --> since local headset's prefab is disabled
-                    headset_parent.transform.Find(local_headset_id).position = camera_position;
-                    headset_parent.transform.Find(local_headset_id).eulerAngles = main_camera.transform.eulerAngles;
-                    
-                    if (Debug_Verbose) UnityEngine.Debug.Log("this is the local headset's rotation: " + headset_parent.transform.Find(local_headset_id).eulerAngles);
-                    if (Debug_Verbose) UnityEngine.Debug.Log("this is the real rotation: " + main_camera.transform.eulerAngles);
-                }
-                else
-                {
-                    headset_map_marker.transform.localPosition = new Vector3(capsule.transform.position.x, 0, capsule.transform.position.z);
-                }
+            //TODO: add the rotation/quaterinion here --> z axis is where we would like to apply the rotation to, but I'm still figuring out how to determine the orientation               
+            //mapMarker.transform.rotation = Quaternion.Euler(-7, capsule.transform.rotation.x, capsule.transform.rotation.z);
 
-                headset_map_marker.name = current_prefab.name;
-                //This should be okay to remove because it caluclulates the distance from the local headset to the origin, which isn't that useful in this context
-                headset_map_marker.transform.Find("Feature_Text").GetComponent<TextMeshPro>().text = distance.ToString() + "ft";
-                //cur_prefab.GetComponent<EasyVizARHeadset>()
-                //GetHeadsets();
-                Color myColor = current_prefab.GetComponent<EasyVizARHeadset>()._color;
+            //double radians = 200* Math.Atan2(capsule.transform.rotation.y, capsule.transform.rotation.w);
+            //double angle = radians * (180 / Math.PI);
+            //UnityEngine.Debug.Log("this is the angle: " + radians);
+            //mapMarker.transform.Find("Quad").Rotate(new Vector3(0, 0, (float)radians));
 
-                //Find the icon components and set their color accordingly.
-                //NOTE: Transform.find is not recursive and only searches children of calling transform
-                headset_map_marker.transform.Find("Icon Visuals").Find("Icon").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
-                //headset_map_marker.transform.Find("Icon Visuals").Find("Arrow").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
-
-                //TODO: add the rotation/quaterinion here --> z axis is where we would like to apply the rotation to, but I'm still figuring out how to determine the orientation               
-                //mapMarker.transform.rotation = Quaternion.Euler(-7, capsule.transform.rotation.x, capsule.transform.rotation.z);
-
-                //double radians = 200* Math.Atan2(capsule.transform.rotation.y, capsule.transform.rotation.w);
-                //double angle = radians * (180 / Math.PI);
-                //UnityEngine.Debug.Log("this is the angle: " + radians);
-                //mapMarker.transform.Find("Quad").Rotate(new Vector3(0, 0, (float)radians));
-
-            }
-            else
-            {
-                UnityEngine.Debug.Log("Missing headset Map Marker");
-            }
         }
+        else
+        {
+            UnityEngine.Debug.Log("Missing headset Map Marker");
+        }
+
     }
 
 

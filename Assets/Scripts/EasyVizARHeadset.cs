@@ -52,8 +52,8 @@ public class EasyVizARHeadset : MonoBehaviour
 	
 	//if local, we set this to the MainCamera (the Hololens 2's camera)
 	Camera _mainCamera;
-	public GameObject map_parent; // This will get populated by EasyVizARHeadsetManager.cs
-	public GameObject headset_parent; // This will get populated by EasyVizARHeadsetManager.cs
+	public GameObject map_parent; // This will get populated by the map's spawn target
+	public GameObject parent_headset_manager; // This will get populated by EasyVizARHeadsetManager.cs
     public string local_headset_id = "";
 	//public bool is_local = false;
 	
@@ -73,10 +73,9 @@ public class EasyVizARHeadset : MonoBehaviour
 		_lastTime = UnityEngine.Time.time;
         line = GameObject.Find("Main Camera").GetComponent<LineRenderer>();
 
-        //Debug.Log("In start");
-        //CreateHeadset();
-        //RegisterHeadset();
-
+		//I think this should perhaps be set in the constructor, with the calling
+		//manager passing a reference, but this will work for now.
+		parent_headset_manager = GameObject.Find("EasyVizARHeadsetManager");
     }
 
 	public bool IsLocal(bool value)
@@ -162,7 +161,7 @@ public class EasyVizARHeadset : MonoBehaviour
 
         transform.position = new Vector3(json_headset_data.position.x, json_headset_data.position.y, json_headset_data.position.z);
 
-        Transform cur_headset = headset_parent.transform.Find(json_headset_data.id);
+        Transform cur_headset = parent_headset_manager.transform.Find(json_headset_data.id);
         
 		if (cur_headset)
         {

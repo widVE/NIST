@@ -76,7 +76,10 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
 	{
-		if (_qrScanner)
+		//The EasyVizARHeadsetManager script componenet should be attached to the corresponding GameObject
+		headsetManager = this.gameObject;
+
+        if (_qrScanner)
 		{
 			var scanner = _qrScanner.GetComponent<QRScanner>();
 			scanner.LocationChanged += (o, ev) =>
@@ -424,7 +427,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 		distance_calculation_script.map_parent = map_parent;
 		distance_calculation_script.headset_name = remote_headset.name;
 		headset_class_data.map_parent = map_parent;
-		headset_class_data.headset_parent = headsetManager;
+		headset_class_data.parent_headset_manager = headsetManager;
 		headset_class_data.feature_parent = feature_parent;
 
 		if (headset_class_data != null)
@@ -454,17 +457,18 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
     public void DeleteRemoteHeadset(string id)
     {
-        int i = 0;
-        foreach (var hs in _activeHeadsets)
+		//foreach (var headset in _activeHeadsets)
+		for (int i = 0; i < _activeHeadsets.Count; i++)
         {
             // Definitely should be matching on ID rather than name.--> changed 
-            if (hs._headsetID == id)
+            if (_activeHeadsets[i]._headsetID == id)
             {
-                //Destroy(hs.gameObject); //this wasn't working for some unkn
-                Transform cur_headset = headsetManager.transform.Find(hs._headsetID);
-                if (cur_headset)
+                //Destroy(_activeHeadsets[i].gameObject); //this wasn't working for some unkn
+                Transform current_headset = headsetManager.transform.Find(_activeHeadsets[i]._headsetID);
+
+                if (current_headset)
                 {
-                    Destroy(cur_headset.gameObject);
+                    Destroy(current_headset.gameObject);
                 }
 
                 _activeHeadsets.RemoveAt(i);
@@ -473,17 +477,16 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                 if (map_parent != null)
                 {
                     //Debug.Log("the delete name: " + name);
-                    Transform delete_headset = map_parent.transform.Find(hs._headsetID);
+                    Transform delete_headset = map_parent.transform.Find(_activeHeadsets[i]._headsetID);
                     if (delete_headset)
                     {
                         Debug.Log("Found and Destroyed the headset");
                         Destroy(delete_headset.gameObject);
-
                     }
                 }
+
                 break;
             }
-            i++;
         }
     }
 
@@ -501,10 +504,6 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         //parse list of headsets for this location and create...
         //the key to parsing the array - the text we add here has to match the name of the variable in the array wrapper class (headsets).
         EasyVizAR.HeadsetList headset_list = JsonUtility.FromJson<EasyVizAR.HeadsetList>("{\"headsets\":" + result_data + "}");
-
-        Debug.Log("Local should be " + _local_headset_ID);
-		//EasyVizARServer.Instance.TryGetHeadsetID(out string _registered_headset_ID);
-        Debug.Log("Local should be " + _local_headset_ID);
 
         // why are we pre-incrementing i???
         //Only one local headset and we know the ID. Find and spawn local, otherwise remote
@@ -533,11 +532,18 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
         if (headset_class_data != null)
         {
+			//This is needed right now because the map parent is used to spawn the icon in the map, but 
+			//it really shouldn't be there. it should probably be in this class or a view manager
+            DistanceCalculation distance_calculation_script = headset_game_object.GetComponent<DistanceCalculation>();
+
+            distance_calculation_script.map_parent = map_parent;
+            distance_calculation_script.headset_name = local_headset.name;
+
             Debug.Log("Is it NULL?? " + headset_class_data);
 
 
             headset_class_data.map_parent = map_parent;
-            headset_class_data.headset_parent = headsetManager; //This needs to be assigned before JSON!!!!!!!!!!!!!!!
+            headset_class_data.parent_headset_manager = headsetManager; //This needs to be assigned before JSON!!!!!!!!!!!!!!!
             headset_class_data.feature_parent = feature_parent;
 
             headset_class_data.AssignValuesFromJson(local_headset);

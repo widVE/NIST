@@ -45,6 +45,8 @@ public class Navigation : MonoBehaviour
     void Start()
     {
         markerSpawnParent = this.transform.parent.gameObject.GetComponent<MapIconSpawn>().feature_parent;
+        
+        //IDK if this is a safe assumption -B
         map_parent = this.transform.parent.gameObject;
         last_target = map_parent.GetComponent<MapIconSpawn>().last_clicked_target;
 
