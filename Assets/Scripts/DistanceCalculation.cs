@@ -9,7 +9,6 @@ using System.Diagnostics;
 public class DistanceCalculation : MonoBehaviour
 {
 	public GameObject main_camera;
-	public Vector3 camera_position;
 	public GameObject distance_text;
 	public GameObject capsule;
 	
@@ -32,6 +31,8 @@ public class DistanceCalculation : MonoBehaviour
 
     private GameObject current_prefab;
 
+    private TextMeshPro distance_text_TMP;
+
     GameObject headset_map_marker = null;
 
     //GLOBAL FOR TESTING< SHOULD NOT STAY
@@ -43,21 +44,22 @@ public class DistanceCalculation : MonoBehaviour
         current_prefab = this.gameObject;
         
         main_camera = GameObject.Find("Main Camera");
-        camera_position = main_camera.GetComponent<Transform>().position;
-        old_position = camera_position;
+        old_position = main_camera.transform.position;
 
         //mapParent = GameObject.Find("Map_Spawn_Target"); // NOTE: this is returning null when object is inactive
         headset_parent = GameObject.Find("EasyVizARHeadsetManager");
 		
-        if (EasyVizARServer.Instance.TryGetHeadsetID(out string headsetId))
+        //Assign the Headset ID
+        if (EasyVizARServer.Instance.TryGetHeadsetID(out string headset_ID))
 		{
-            if (this.name.Equals(headsetId))
+            if (this.name.Equals(headset_ID))
             {
                 is_local = true;
-                local_headset_id = headsetId;
-				GameObject local = GameObject.Find("LocalHeadset");
-				local.transform.GetChild(0).name = headsetId;
             }
+
+            local_headset_id = headset_ID;
+            GameObject local = GameObject.Find("LocalHeadset");
+            local.transform.GetChild(0).name = headset_ID;
         }
 
         SpawnHeasetIcon();
@@ -65,6 +67,11 @@ public class DistanceCalculation : MonoBehaviour
         StartCoroutine(HeadsetDistanceCalculate());
     }
 
+
+    /*
+     * Checks to see if the current object has been spawned as an icon on the map
+     * If not it's instantiated onto the map
+     */
     private void SpawnHeasetIcon()
     {
         if (Debug_Verbose) UnityEngine.Debug.Log("Map Parent" + map_parent);
@@ -81,7 +88,6 @@ public class DistanceCalculation : MonoBehaviour
             if (headset_map_transform == null)
             {
                 headset_map_marker = Instantiate(headset_icon, map_parent.transform, false); // This is where we instantiate the headset icon on the map --> need to change the reference of the headset_icon.
-                                                                                             // TODO: Add your local headset icon here
                 if (Debug_Verbose) UnityEngine.Debug.Log("Dist Calc no marker!, but made one");
             }
         }
@@ -93,7 +99,8 @@ public class DistanceCalculation : MonoBehaviour
         HeadsetMapIconViewUpdate();
     }
 	// This function does 2 things: 1) calculate the distance 2) display the headset icon on palm map.
-	public void CalcHeadsetDist()
+	/*
+	 * public void CalcHeadsetDist()
 	{
 		camera_position = main_camera.GetComponent<Transform>().position;
 
@@ -187,12 +194,33 @@ public class DistanceCalculation : MonoBehaviour
 		}
 		
 	}
-
+*/
     public void CalculateHeadsetDistance()
     {
-        camera_position = main_camera.GetComponent<Transform>().position;
+        Vector3 camera_position = main_camera.GetComponent<Transform>().position;
 
-        TextMeshPro display_dist_text = current_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>(); ;
+        distance_text_TMP = current_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>(); ;
+        // if gameobject position doesn't work, then i might have to do a get() to get the position of the given headset
+
+        double distance = Vector3.Distance(main_camera.transform.position, capsule.gameObject.transform.position);
+
+        if (is_feet)
+        {
+            distance *= 3.281;
+            distance_text_TMP.text = headset_name + " : " + distance.ToString() + "ft";
+        }
+        else
+        {
+            distance_text_TMP.text = headset_name + " : " + distance.ToString() + "m";
+        } 
+    }
+    
+    //Old implmentation
+    public void CalculateHeadsetDistanceHand()
+    {
+        Vector3 camera_position = main_camera.GetComponent<Transform>().position;
+
+        distance_text_TMP = current_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>(); ;
         // if gameobject position doesn't work, then i might have to do a get() to get the position of the given headset
         float x_distance = (float)Math.Pow(capsule.transform.position.x - camera_position.x, 2);
         float z_distance = (float)Math.Pow(capsule.gameObject.transform.position.z - camera_position.z, 2);
@@ -207,13 +235,15 @@ public class DistanceCalculation : MonoBehaviour
 
         if (is_feet)
         {
-            display_dist_text.text = headset_name + " : " + distance.ToString() + "ft";
+            distance_text_TMP.text = headset_name + " : " + distance.ToString() + "ft";
         }
         else
         {
-            display_dist_text.text = headset_name + " : " + distance.ToString() + "m";
-        } 
+            distance_text_TMP.text = headset_name + " : " + distance.ToString() + "m";
+        }
     }
+
+
     /*
         This method will move the local user's headset icon on the map based on the main camera position,
         which will have the same position and rotation as the current user's head.
@@ -226,6 +256,8 @@ public class DistanceCalculation : MonoBehaviour
         {
             if (is_local)
             {
+                Vector3 camera_position = main_camera.transform.position;
+
                 if (Debug_Verbose) UnityEngine.Debug.Log("Dist Calc get into local: " + this.name);
 
                 headset_map_marker.transform.localPosition = new Vector3(camera_position.x, 0, camera_position.z);
@@ -276,8 +308,7 @@ public class DistanceCalculation : MonoBehaviour
 	{
 		while (true)
 		{
-			camera_position = main_camera.GetComponent<Transform>().position;
-			new_position = main_camera.GetComponent<Transform>().position;
+			new_position = main_camera.transform.position;
 			float change_x = (float)Math.Pow((new_position.x - old_position.x), 2);
 			float change_z = (float)Math.Pow((new_position.z - old_position.z), 2);
 			float change_dist = (float)Math.Sqrt(change_x + change_z);
