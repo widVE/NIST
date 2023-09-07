@@ -1,3 +1,4 @@
+using EasyVizAR;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -84,6 +85,31 @@ public class EasyVizARHeadset : MonoBehaviour
 		return is_local;
 	}
 
+    public EasyVizARHeadset(float updateFrequency, string headsetName, bool is_local, bool is_local, bool showPositionChanges, bool realTimeChanges, bool postPositionChanges, string headsetID, Color color, string locationID, string locationID, float lastTime, bool isRegisteredWithServer, Camera mainCamera, GameObject map_parent, GameObject parent_headset_manager, string local_headset_id, GameObject feature_parent, LineRenderer line, EasyVizAR.Path path, NavigationTarget currentTarget)
+    {
+        _updateFrequency = updateFrequency;
+        _headsetName = headsetName;
+        this.is_local = is_local;
+        this.is_local = is_local;
+        _showPositionChanges = showPositionChanges;
+        _realTimeChanges = realTimeChanges;
+        _postPositionChanges = postPositionChanges;
+        _headsetID = headsetID;
+        _color = color;
+        LocationID = locationID;
+        LocationID = locationID;
+        _lastTime = lastTime;
+        _isRegisteredWithServer = isRegisteredWithServer;
+        _mainCamera = mainCamera;
+        this.map_parent = map_parent;
+        this.parent_headset_manager = parent_headset_manager;
+        this.local_headset_id = local_headset_id;
+        this.feature_parent = feature_parent;
+        this.line = line;
+        this.path = path;
+        this.currentTarget = currentTarget;
+    }
+
     public void CreateLocalHeadset(string headsetName, string location, bool postChanges)
 	{
 		_is_local = true;
@@ -122,27 +148,29 @@ public class EasyVizARHeadset : MonoBehaviour
     {
 		if(_is_local)
 		{
-			if(_mainCamera && _postPositionChanges)
-			{
-				transform.position = _mainCamera.transform.position;
-				transform.rotation = _mainCamera.transform.rotation;
-			}
-			
 			float t = UnityEngine.Time.time;
+
 			if(t - _lastTime > _updateFrequency)
 			{
-				if(_isRegisteredWithServer && _postPositionChanges)
+                if (_mainCamera && _postPositionChanges)
+                {
+                    transform.position = _mainCamera.transform.position;
+                    transform.rotation = _mainCamera.transform.rotation;
+                }
+
+                if (_isRegisteredWithServer && _postPositionChanges)
 				{
 					PostPosition();
-				}
-				_lastTime = t;
-				
-				if(_realTimeChanges && _showPositionChanges)
-				{
-					GetPastPositions();
-				}
+				}				
 			}
-		}
+
+            _lastTime = t;
+
+            if (_realTimeChanges && _showPositionChanges)
+            {
+                GetPastPositions();
+            }
+        }
     }
 	
 
