@@ -89,8 +89,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 				// Update the location ID in the headset object, which will be sent with pose updates to the server.
 				if (_localHeadset is not null)
                 {
-					EasyVizARHeadset h = _localHeadset.GetComponent<EasyVizARHeadset>();
-					h._locationID = _locationId;
+					EasyVizARHeadset headset = _localHeadset.GetComponent<EasyVizARHeadset>();
+					headset.LocationID = this.LocationID;
 				}
 
 
@@ -437,6 +437,32 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         }
     }
 
+	//Working on the constructor implementation. There are still some values that need to be passed
+	// by reference to the constructor.
+	//I will also need to build a constructor for DistanceCalculation
+    public void CreateRemoteHeadsetConstructor(EasyVizAR.Headset remote_headset)
+    {
+        GameObject headset_game_object = Instantiate(_headsetPrefab, transform);
+        headset_game_object.name = remote_headset.id;
+		EasyVizARHeadset headset_class_data = new EasyVizARHeadset(remote_headset);
+
+        // Getting the reference for displaying the headset
+        DistanceCalculation distance_calculation_script = headset_game_object.GetComponent<DistanceCalculation>();
+
+        headset_class_data.map_parent = map_parent;
+        headset_class_data.parent_headset_manager = headsetManager;
+        headset_class_data.feature_parent = feature_parent;
+
+        distance_calculation_script.map_parent = map_parent;
+        distance_calculation_script.headset_name = remote_headset.name;
+
+		if (headset_class_data != null)
+        {
+            headset_class_data.AssignValuesFromJson(remote_headset);
+            _activeHeadsets.Add(headset_class_data);
+        }
+    }
+
     public void UpdateRemoteHeadset(string previous_id, EasyVizAR.Headset remoteHeadset)
     {
         foreach (var hs in _activeHeadsets)
@@ -548,8 +574,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
             headset_class_data.AssignValuesFromJson(local_headset);
 
-			headset_class_data.IsLocal(true);
-			Debug.Log("Is it local?? " + headset_class_data.is_local);
+			headset_class_data.Is_local = true;
+			Debug.Log("Is it local?? " + headset_class_data.Is_local);
             headset_class_data.LocationID = local_headset.location_id;
             headset_class_data.local_headset_id = local_headset.id;
 
@@ -600,7 +626,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                                 headset_game_object.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
                             }
                             headset.AssignValuesFromJson(headset_list.headsets[i]);
-                            headset.is_local = true;
+                            headset.Is_local = true;
                             headset.LocationID = headset_list.headsets[i].location_id;
                             _activeHeadsets.Add(headset);
                         }

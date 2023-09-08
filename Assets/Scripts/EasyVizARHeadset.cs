@@ -10,7 +10,7 @@ using UnityEngine;
 public class EasyVizARHeadset : MonoBehaviour
 {
 	[SerializeField]
-	float _updateFrequency;
+	double _updateFrequency;
 	
 	[SerializeField]
 	string _headsetName;
@@ -18,7 +18,7 @@ public class EasyVizARHeadset : MonoBehaviour
 	
 	[SerializeField]
 	bool _is_local;
-	public bool is_local
+	public bool Is_local
 	{
 		get { return _is_local; }
 		set { _is_local = value; }
@@ -39,7 +39,7 @@ public class EasyVizARHeadset : MonoBehaviour
 	public string _headsetID;
 	public Color _color = Color.red;
 	
-	public string _locationID;// will change this back to just string w/o public
+	private string _locationID;// will change this back to just string w/o public
 	
 	public string LocationID
 	{
@@ -63,40 +63,45 @@ public class EasyVizARHeadset : MonoBehaviour
     public LineRenderer line;
     EasyVizAR.Path path = new EasyVizAR.Path(); // this stores the path of points 
 
+    //private EasyVizAR.NavigationTarget currentTarget;
     private EasyVizAR.NavigationTarget currentTarget = new EasyVizAR.NavigationTarget();
 
+    public EasyVizARHeadset(Headset headset_class_data)
+    {
+		AssignValuesFromJson(headset_class_data);
+		//_color = headset_class_data.color;
+        //headset_class_data.map_parent = map_parent;
+        //headset_class_data.parent_headset_manager = headsetManager;
+        //headset_class_data.feature_parent = feature_parent;
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-		currentTarget.type = "none";
+		currentTarget = new EasyVizAR.NavigationTarget();
+        currentTarget.type = "uninitialized";
+		currentTarget.target_id = "uninitialized";
 
-		_lastTime = UnityEngine.Time.time;
+        _lastTime = UnityEngine.Time.time;
         line = GameObject.Find("Main Camera").GetComponent<LineRenderer>();
 
 		//I think this should perhaps be set in the constructor, with the calling
 		//manager passing a reference, but this will work for now.
 		parent_headset_manager = GameObject.Find("EasyVizARHeadsetManager");
+
+		if(_is_local) StartCoroutine(PositionPostingUpdate(_updateFrequency));
     }
-
-	public bool IsLocal(bool value)
-	{
-		is_local = value;
-		return is_local;
-	}
-
-    public EasyVizARHeadset(float updateFrequency, string headsetName, bool is_local, bool is_local, bool showPositionChanges, bool realTimeChanges, bool postPositionChanges, string headsetID, Color color, string locationID, string locationID, float lastTime, bool isRegisteredWithServer, Camera mainCamera, GameObject map_parent, GameObject parent_headset_manager, string local_headset_id, GameObject feature_parent, LineRenderer line, EasyVizAR.Path path, NavigationTarget currentTarget)
+/*
+    public EasyVizARHeadset(float updateFrequency, string headsetName, bool is_local, bool showPositionChanges, bool realTimeChanges, bool postPositionChanges, string headsetID, Color color, string locationID, float lastTime, bool isRegisteredWithServer, Camera mainCamera, GameObject map_parent, GameObject parent_headset_manager, string local_headset_id, GameObject feature_parent, LineRenderer line, EasyVizAR.Path path, NavigationTarget currentTarget)
     {
         _updateFrequency = updateFrequency;
         _headsetName = headsetName;
-        this.is_local = is_local;
-        this.is_local = is_local;
+        this.Is_local = is_local;
         _showPositionChanges = showPositionChanges;
         _realTimeChanges = realTimeChanges;
         _postPositionChanges = postPositionChanges;
         _headsetID = headsetID;
         _color = color;
-        LocationID = locationID;
         LocationID = locationID;
         _lastTime = lastTime;
         _isRegisteredWithServer = isRegisteredWithServer;
@@ -109,6 +114,7 @@ public class EasyVizARHeadset : MonoBehaviour
         this.path = path;
         this.currentTarget = currentTarget;
     }
+*/
 
     public void CreateLocalHeadset(string headsetName, string location, bool postChanges)
 	{
@@ -129,7 +135,7 @@ public class EasyVizARHeadset : MonoBehaviour
 				UnityEngine.Debug.Log("Reloading headset: " + headsetId);
                 UnityEngine.Debug.Log("This is the local headset: " + headsetId);
 				local_headset_id = headsetId;
-				is_local= true;
+                Is_local = true;
 				distance_calculator.is_local = true;
                 LoadHeadset(headsetId);
             } 
@@ -172,6 +178,11 @@ public class EasyVizARHeadset : MonoBehaviour
             }
         }
     }
+
+    IEnumerator PositionPostingUpdate(double update_rate_in_seconds)
+	{
+        yield return new WaitForSeconds((float)update_rate_in_seconds);
+    }
 	
 
 	//This might be a problem here? B I don't think this should be doing what it's doing /B
@@ -207,9 +218,15 @@ public class EasyVizARHeadset : MonoBehaviour
 
 
         // Not sure if this is the right area to do the navigation
-        if (json_headset_data.navigation_target.type != currentTarget.type || json_headset_data.navigation_target.target_id != currentTarget.target_id)
+
+		//Getting errors here becuase of trying to access uninitialized class memebers
+		//we should have a constructor for these classes that are used in comparison to
+		//prevent null strings from being used in comparisons -B
+
+        if (currentTarget.target_id == null || json_headset_data.navigation_target.target_id != currentTarget.target_id)
         {
             currentTarget = json_headset_data.navigation_target;
+
             if (currentTarget.type == "feature" || currentTarget.type == "headset" || currentTarget.type == "point")
             {
                 FindPath(json_headset_data.navigation_target.position);
