@@ -444,7 +444,11 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     {
         GameObject headset_game_object = Instantiate(_headsetPrefab, transform);
         headset_game_object.name = remote_headset.id;
-		EasyVizARHeadset headset_class_data = new EasyVizARHeadset(remote_headset);
+
+		//There'
+        EasyVizARHeadset headset_class_data = headset_game_object.GetComponent<EasyVizARHeadset>();
+
+        headset_class_data = new EasyVizARHeadset(remote_headset);
 
         // Getting the reference for displaying the headset
         DistanceCalculation distance_calculation_script = headset_game_object.GetComponent<DistanceCalculation>();
@@ -546,6 +550,50 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                 Debug.Log("No Local " + headset_list.headsets[i].id);
                 CreateRemoteHeadset(headset_list.headsets[i]);
             }
+        }
+    }
+
+    private void CreateLocalHeadsetConstructor(EasyVizAR.Headset local_headset)
+    {
+        GameObject headset_game_object = Instantiate(_headsetPrefab, transform);
+        headset_game_object.name = local_headset.id;
+
+        EasyVizARHeadset headset_class_data = headset_game_object.GetComponent<EasyVizARHeadset>();
+
+        if (headset_class_data != null)
+        {
+            //This is needed right now because the map parent is used to spawn the icon in the map, but 
+            //it really shouldn't be there. it should probably be in this class or a view manager
+            DistanceCalculation distance_calculation_script = headset_game_object.GetComponent<DistanceCalculation>();
+
+            distance_calculation_script.map_parent = map_parent;
+            distance_calculation_script.headset_name = local_headset.name;
+
+            Debug.Log("Is it NULL?? " + headset_class_data);
+
+
+            headset_class_data.map_parent = map_parent;
+            headset_class_data.parent_headset_manager = headsetManager; //This needs to be assigned before JSON!!!!!!!!!!!!!!!
+            headset_class_data.feature_parent = feature_parent;
+
+            headset_class_data.AssignValuesFromJson(local_headset);
+
+            headset_class_data.Is_local = true;
+            Debug.Log("Is it local?? " + headset_class_data.Is_local);
+            headset_class_data.LocationID = local_headset.location_id;
+            headset_class_data.local_headset_id = local_headset.id;
+
+            if (_localMaterial != null)
+            {
+                headset_game_object.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
+            }
+
+
+            _activeHeadsets.Add(headset_class_data);
+        }
+        else
+        {
+            Debug.Log("WHY NULL?? " + headset_class_data);
         }
     }
 

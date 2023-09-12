@@ -56,11 +56,11 @@ public class EasyVizARHeadset : MonoBehaviour
 	public GameObject map_parent; // This will get populated by the map's spawn target
 	public GameObject parent_headset_manager; // This will get populated by EasyVizARHeadsetManager.cs
     public string local_headset_id = "";
-	//public bool is_local = false;
-	
-	// This is for navigation
-	public GameObject feature_parent;
-    public LineRenderer line;
+    //public bool is_local = false;
+
+    // This is for navigation
+    public GameObject feature_parent;
+    public LineRenderer navigation_line;
     EasyVizAR.Path path = new EasyVizAR.Path(); // this stores the path of points 
 
     //private EasyVizAR.NavigationTarget currentTarget;
@@ -83,7 +83,7 @@ public class EasyVizARHeadset : MonoBehaviour
 		currentTarget.target_id = "uninitialized";
 
         _lastTime = UnityEngine.Time.time;
-        line = GameObject.Find("Main Camera").GetComponent<LineRenderer>();
+        navigation_line = GameObject.Find("Main Camera").GetComponent<LineRenderer>();
 
 		//I think this should perhaps be set in the constructor, with the calling
 		//manager passing a reference, but this will work for now.
@@ -223,7 +223,7 @@ public class EasyVizARHeadset : MonoBehaviour
 		//we should have a constructor for these classes that are used in comparison to
 		//prevent null strings from being used in comparisons -B
 
-        if (currentTarget.target_id == null || json_headset_data.navigation_target.target_id != currentTarget.target_id)
+        if (currentTarget == null || json_headset_data.navigation_target.target_id != currentTarget.target_id)
         {
             currentTarget = json_headset_data.navigation_target;
 
@@ -237,7 +237,7 @@ public class EasyVizARHeadset : MonoBehaviour
                 // but there is no need to call the server for pathing.
 
                 //this line is throwing an null refernce error /B
-                //line.positionCount = 0;
+                navigation_line.positionCount = 0;
             }
 
         }
@@ -471,12 +471,12 @@ public class EasyVizARHeadset : MonoBehaviour
 			{
 				int cnt = 0;
 				// making sure we are creating a new line
-				if (line.positionCount > 0) line.positionCount = 0;
+				if (navigation_line.positionCount > 0) navigation_line.positionCount = 0;
 				EasyVizAR.Position target_pos = new EasyVizAR.Position();
 				foreach (EasyVizAR.Position points in path.points)
 				{
-					line.positionCount++;
-					line.SetPosition(cnt++, new Vector3(points.x, points.y, points.z)); // this draws the line 
+					navigation_line.positionCount++;
+					navigation_line.SetPosition(cnt++, new Vector3(points.x, points.y, points.z)); // this draws the line 
 																						//UnityEngine.Debug.Log("number of points in the path is: " + line.positionCount);
 																						//UnityEngine.Debug.Log("points: " + points.x + ", " + points.y + ", " + points.z);
 					target_pos = points;

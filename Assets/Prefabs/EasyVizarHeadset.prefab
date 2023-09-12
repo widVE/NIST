@@ -50,18 +50,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _updateFrequency: 3
   _headsetName: Editor_Test
-  _isLocal: 0
+  _is_local: 0
   _showPositionChanges: 0
   _realTimeChanges: 0
   _postPositionChanges: 1
   _headsetID: 
   _color: {r: 1, g: 0, b: 0, a: 1}
-  _locationID: 
   map_parent: {fileID: 0}
-  headset_parent: {fileID: 0}
+  parent_headset_manager: {fileID: 0}
   local_headset_id: 
   feature_parent: {fileID: 0}
-  line: {fileID: 0}
+  navigation_line: {fileID: 0}
 --- !u!114 &5003610570359901067
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75,7 +74,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   main_camera: {fileID: 0}
-  camera_position: {x: 0, y: 0, z: 0}
   distance_text: {fileID: 0}
   capsule: {fileID: 8231832368714168251}
   is_feet: 1
