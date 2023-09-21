@@ -5,12 +5,15 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System;
 using System.Runtime.InteropServices;
-using Microsoft.Windows.Perception.Spatial.Preview;
-using Microsoft.Windows.Perception.Spatial;
 using System.IO;
 using UnityEngine.Windows.WebCam;
 using System.Linq;
-//using Microsoft.MixedReality.Toolkit;
+
+// Prevent compiler errors when developing and testing on non-Windows machines.
+#if (UNITY_EDITOR_WIN || UNITY_WSA || WINDOWS_UWP)
+using Microsoft.Windows.Perception.Spatial.Preview;
+using Microsoft.Windows.Perception.Spatial;
+#endif
 
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR

@@ -4,10 +4,14 @@ using UnityEngine;
 using System;
 
 using Microsoft.MixedReality.QR;
-using Microsoft.Windows.Perception.Spatial;
-using Microsoft.Windows.Perception.Spatial.Preview;
 using Microsoft.MixedReality.OpenXR;
 using Microsoft.MixedReality.Toolkit.Utilities;
+
+// Prevent compiler errors when developing and testing on non-Windows machines.
+#if (UNITY_EDITOR_WIN || UNITY_WSA || WINDOWS_UWP)
+using Microsoft.Windows.Perception.Spatial;
+using Microsoft.Windows.Perception.Spatial.Preview;
+#endif
 
 public class LocationChangedEventArgs
 {
