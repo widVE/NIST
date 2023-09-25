@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 public class DistanceCalculation : MonoBehaviour
 {
-	public GameObject main_camera;
+	public Camera main_camera;
 	public GameObject distance_text;
 	public GameObject capsule;
 	
@@ -38,12 +38,16 @@ public class DistanceCalculation : MonoBehaviour
     //GLOBAL FOR TESTING< SHOULD NOT STAY
     float distance;
 
+    private void Awake()
+    {
+        main_camera = Camera.main;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         current_prefab = this.gameObject;
         
-        main_camera = GameObject.Find("Main Camera");
         old_position = main_camera.transform.position;
 
         //mapParent = GameObject.Find("Map_Spawn_Target"); // NOTE: this is returning null when object is inactive
@@ -65,6 +69,13 @@ public class DistanceCalculation : MonoBehaviour
         SpawnHeasetIcon();
 
         StartCoroutine(HeadsetDistanceCalculate());
+    }
+
+    public void Initialize(String headset_name, GameObject map_parent)
+    {
+        this.headset_name = headset_name;
+
+        this.map_parent = map_parent;
     }
 
 
@@ -197,9 +208,7 @@ public class DistanceCalculation : MonoBehaviour
 */
     public void CalculateHeadsetDistance()
     {
-        Vector3 camera_position = main_camera.GetComponent<Transform>().position;
-
-        distance_text_TMP = current_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>(); ;
+        distance_text_TMP = current_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>();
         // if gameobject position doesn't work, then i might have to do a get() to get the position of the given headset
 
         double distance = Vector3.Distance(main_camera.transform.position, capsule.gameObject.transform.position);
@@ -301,8 +310,6 @@ public class DistanceCalculation : MonoBehaviour
         }
 
     }
-
-
 
     IEnumerator HeadsetDistanceCalculate()
 	{

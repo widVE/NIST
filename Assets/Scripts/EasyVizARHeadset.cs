@@ -75,51 +75,77 @@ public class EasyVizARHeadset : MonoBehaviour
         //headset_class_data.feature_parent = feature_parent;
     }
 
+    void Awake()
+	{
+        currentTarget = new EasyVizAR.NavigationTarget();
+        currentTarget.type = "uninitialized";
+        currentTarget.target_id = "uninitialized";
+
+        _mainCamera = Camera.main;
+
+        navigation_line = _mainCamera.GetComponent<LineRenderer>();
+
+        _lastTime = UnityEngine.Time.time;
+
+        parent_headset_manager = EasyVizARHeadsetManager.EasyVizARManager.gameObject;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-		currentTarget = new EasyVizAR.NavigationTarget();
-        currentTarget.type = "uninitialized";
-		currentTarget.target_id = "uninitialized";
-
-        _lastTime = UnityEngine.Time.time;
-        navigation_line = GameObject.Find("Main Camera").GetComponent<LineRenderer>();
-
 		//I think this should perhaps be set in the constructor, with the calling
 		//manager passing a reference, but this will work for now.
-		parent_headset_manager = GameObject.Find("EasyVizARHeadsetManager");
+		//parent_headset_manager = GameObject.Find("EasyVizARHeadsetManager");
+		
+        if (_is_local) StartCoroutine(PositionPostingUpdate(_updateFrequency));
+    }
 
-		if(_is_local) StartCoroutine(PositionPostingUpdate(_updateFrequency));
-    }
-/*
-    public EasyVizARHeadset(float updateFrequency, string headsetName, bool is_local, bool showPositionChanges, bool realTimeChanges, bool postPositionChanges, string headsetID, Color color, string locationID, float lastTime, bool isRegisteredWithServer, Camera mainCamera, GameObject map_parent, GameObject parent_headset_manager, string local_headset_id, GameObject feature_parent, LineRenderer line, EasyVizAR.Path path, NavigationTarget currentTarget)
+    public void Initialize(Headset headset_class_data)
     {
-        _updateFrequency = updateFrequency;
-        _headsetName = headsetName;
-        this.Is_local = is_local;
-        _showPositionChanges = showPositionChanges;
-        _realTimeChanges = realTimeChanges;
-        _postPositionChanges = postPositionChanges;
-        _headsetID = headsetID;
-        _color = color;
-        LocationID = locationID;
-        _lastTime = lastTime;
-        _isRegisteredWithServer = isRegisteredWithServer;
-        _mainCamera = mainCamera;
-        this.map_parent = map_parent;
-        this.parent_headset_manager = parent_headset_manager;
-        this.local_headset_id = local_headset_id;
-        this.feature_parent = feature_parent;
-        this.line = line;
-        this.path = path;
-        this.currentTarget = currentTarget;
+        AssignValuesFromJson(headset_class_data);
     }
-*/
+
+    public void Initialize(Headset headset_class_data, GameObject map_parent, GameObject parent_headset_manager, GameObject feature_parent)
+    {        
+        this.map_parent = map_parent;
+        //this.parent_headset_manager = parent_headset_manager;
+        this.feature_parent = feature_parent;
+		
+		//JSON values can only be assigned after the headset manager is set
+        AssignValuesFromJson(headset_class_data);
+    }
+    /*
+        public EasyVizARHeadset(float updateFrequency, string headsetName, bool is_local, bool showPositionChanges, bool realTimeChanges, bool postPositionChanges, string headsetID, Color color, string locationID, float lastTime, bool isRegisteredWithServer, Camera mainCamera, GameObject map_parent, GameObject parent_headset_manager, string local_headset_id, GameObject feature_parent, LineRenderer line, EasyVizAR.Path path, NavigationTarget currentTarget)
+        {
+            ~~~~_headsetID = headsetID;
+            ~~~~_color = color;
+            ~~~~LocationID = locationID;
+            ~~~~_headsetName = headsetName;
+
+            @@@@_lastTime = lastTime;
+            @@@@this.line = line;
+
+
+            _updateFrequency = updateFrequency; 
+            this.Is_local = is_local;
+            _showPositionChanges = showPositionChanges;
+            _realTimeChanges = realTimeChanges;
+            _postPositionChanges = postPositionChanges;
+
+            _isRegisteredWithServer = isRegisteredWithServer;
+            _mainCamera = mainCamera;
+            this.map_parent = map_parent;
+            this.parent_headset_manager = parent_headset_manager;
+            this.local_headset_id = local_headset_id;
+            this.feature_parent = feature_parent;
+            this.path = path;
+            this.currentTarget = currentTarget;
+        }
+    */
 
     public void CreateLocalHeadset(string headsetName, string location, bool postChanges)
 	{
 		_is_local = true;
-		_mainCamera = Camera.main;
 		_headsetName = headsetName;
 		_locationID = location;
 		
@@ -188,7 +214,7 @@ public class EasyVizARHeadset : MonoBehaviour
 	//This might be a problem here? B I don't think this should be doing what it's doing /B
 	public void AssignValuesFromJson(EasyVizAR.Headset json_headset_data)
 	{
-        // this is where the color of the headset is assigned --> this field is populated 
+        // this is where the _color of the headset is assigned --> this field is populated 
         Color newColor;
         if (ColorUtility.TryParseHtmlString(json_headset_data.color, out newColor)) _color = newColor;
 
