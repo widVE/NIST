@@ -107,8 +107,6 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                     headset.LocationID = this.LocationID;
                 }
 
-
-
                 //The QR scanner code will also call the create all headsets funciton
                 //I'm going to disabled this via boolean, but leave it here for now
                 if (_shouldCreateHeadsets)
