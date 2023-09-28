@@ -14,7 +14,11 @@ public class EasyVizARHeadset : MonoBehaviour
 	
 	[SerializeField]
 	string _headsetName;
-	public string Name => _headsetName;
+	public string Name
+	{
+		get { return _headsetName;}
+		set { _headsetName = value; }
+	}
 	
 	[SerializeField]
 	bool _is_local;
@@ -65,6 +69,11 @@ public class EasyVizARHeadset : MonoBehaviour
 
     //private EasyVizAR.NavigationTarget currentTarget;
     private EasyVizAR.NavigationTarget currentTarget = new EasyVizAR.NavigationTarget();
+
+    public EasyVizARHeadset()
+    {
+        
+    }
 
     public EasyVizARHeadset(Headset headset_class_data)
     {
@@ -269,18 +278,24 @@ public class EasyVizARHeadset : MonoBehaviour
         }
     }
 
-    void RegisterHeadset()
+    public void RegisterHeadset()
 	{
 		//register the headset with the server, first checking if it exists there already or not...
 		EasyVizARServer.Instance.Get("headsets/"+_headsetID, EasyVizARServer.JSON_TYPE, RegisterCallback);
 	}
-	
-	void RegisterCallback(string resultData)
+
+    public bool HeadsetRegistrationCheck(String headset_ID)
+    {
+        //register the headset with the server, first checking if it exists there already or not...
+        EasyVizARServer.Instance.Get("headsets/" + headset_ID, EasyVizARServer.JSON_TYPE, RegisterCallback);
+    }
+
+    void RegisterCallback(string resultData)
 	{
 		if(resultData != "error")
 		{
 			//Debug.Log(resultData);
-			EasyVizAR.Headset h = JsonUtility.FromJson<EasyVizAR.Headset>(resultData);
+			EasyVizAR.Headset h = JsonUtility.FromJson<Headset>(resultData);
 			//fill in any local data here from the server...
 			AssignValuesFromJson(h);
 		}
@@ -290,19 +305,87 @@ public class EasyVizARHeadset : MonoBehaviour
 			CreateHeadset();
 		}
 	}
-	
-	void CreateHeadset()
+
+	//This is a special case, where the headset is not registered to the server yet, so 
+	//there is also no game object associated with this class. It is being used as a data
+	//container to regiseter the headset with the server to recieve a UID. It needs to have
+	//a special case because there are game object componenets that will recieve data after it
+	//has been registered
+    public void CreateHeadsetToRegister()
+    {
+        EasyVizAR.Headset h = new EasyVizAR.Headset();
+        h.position = new EasyVizAR.Position();
+        h.orientation = new EasyVizAR.Orientation();
+
+        h.position.x = 0;
+        h.position.y = 0;
+        h.position.z = 0;
+
+        h.orientation.x = 0;
+        h.orientation.y = 0;
+        h.orientation.z = 0;
+        h.orientation.w = 0;
+
+
+        h.name = _headsetName;
+        h.location_id = _locationID;
+
+        EasyVizARServer.Instance.Post("headsets", EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), CreateRegisterCallback);
+    }
+
+    void CreateRegisterCallback(string resultData)
+    {
+        if (resultData != "error")
+        {
+            _isRegisteredWithServer = true;
+
+            EasyVizAR.RegisteredHeadset h = JsonUtility.FromJson<EasyVizAR.RegisteredHeadset>(resultData);
+/*            Vector3 newPos = Vector3.zero;
+
+            newPos.x = h.position.x;
+            newPos.y = h.position.y;
+            newPos.z = h.position.z;
+
+            transform.position = newPos;
+            transform.rotation = new Quaternion(h.orientation.x, h.orientation.y, h.orientation.z, h.orientation.w);
+*/
+            _headsetID = h.id;
+            _headsetName = h.name;
+            _locationID = h.location_id;
+
+            Color newColor;
+            if (ColorUtility.TryParseHtmlString(h.color, out newColor))
+                _color = newColor;
+
+            EasyVizARServer.Instance.SaveRegistration(h.id, h.token);
+
+            UnityEngine.Debug.Log("Successfully connected headset: " + h.name);
+        }
+        else
+        {
+            UnityEngine.Debug.Log("Received an error when creating headset");
+        }
+    }
+
+
+    void CreateHeadset()
 	{
 		EasyVizAR.Headset h = new EasyVizAR.Headset();
 		h.position = new EasyVizAR.Position();
-		h.position.x = transform.position.x;
-		h.position.y = transform.position.y;
-		h.position.z = transform.position.z;
-		h.orientation = new EasyVizAR.Orientation();
-		h.orientation.x = transform.rotation[0];
-		h.orientation.y = transform.rotation[1];
-		h.orientation.z = transform.rotation[2];
-		h.orientation.w = transform.rotation[3];
+        h.orientation = new EasyVizAR.Orientation();
+
+		// If this script is not attached to a game object we want to avoid a null
+		// refrence siutaiton
+
+            h.position.x = transform.position.x;
+            h.position.y = transform.position.y;
+            h.position.z = transform.position.z;
+
+            h.orientation.x = transform.rotation[0];
+            h.orientation.y = transform.rotation[1];
+            h.orientation.z = transform.rotation[2];
+            h.orientation.w = transform.rotation[3];
+
 		
 		h.name = _headsetName;
 		h.location_id = _locationID;

@@ -73,6 +73,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     public GameObject feature_parent;
     private bool verbose_debug_log;
 
+    private bool callback_headset_registered = false;
+
     private void Awake()
     {
         // If there is an instance, and it's not me, delete myself.
@@ -138,20 +140,89 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
     }
 
+    public void HeadsetRegistrationCheck(String headset_ID)
+    {
+        EasyVizARServer.Instance.Get("headsets/" + headset_ID, EasyVizARServer.JSON_TYPE, RegisterCheckCallback);
+    }
+
+    void RegisterCheckCallback(string resultData)
+    {
+        // The result data can be many things
+        // If there's no match, it will be a list of all the headsets
+        // If there is a match it will be a single headset
+        // I don't know how to figure that out. Perhaps a size based thing? but we
+        // can't deserialze the JSON if we don't know what it is??
+        if (resultData != "error")
+        {
+            EasyVizAR.Headset h = JsonUtility.FromJson<EasyVizAR.Headset>(resultData);
+
+            if (h.id == _local_headset_ID) callback_headset_registered = true;
+        }
+    }
+
     [ContextMenu("CreateAllHeadsets")]
     public void CreateAllHeadsets()
     {
-        //Get the local headsetID if we've registered on the server
-
-        EasyVizARServer.Instance.TryGetHeadsetID(out string _registered_headset_ID);
-        _local_headset_ID = _registered_headset_ID;
-
-        if (!_headsetsCreated)
+        //Tryget HeadsetID looks to see if there's a registration file locally
+        if (! EasyVizARServer.Instance.TryGetHeadsetID(out string _registered_headset_ID))
         {
-            //CreateLocalHeadset();
-            CreateHeadsets();
+            EasyVizARHeadset new_registration = new EasyVizARHeadset();
+            new_registration.LocationID = this.LocationID;
+            new_registration.Name = _localHeadsetName;
+            new_registration.CreateHeadsetToRegister();
+        }
+        else
+        {
+            //If there is a UID check it against the server
+            HeadsetRegistrationCheck(_registered_headset_ID);
+            // I DONT THINK THIS WORKS< RACE CONDITION
+            //BUT I CAN"T GET THE DATA OUTOF THE CALLBACK
+            // I need the callback to finish before i can evaluate this, so maybe this has to be
+            //in the callback???? but it's sooo messy with callbacks
+            //If the UID is on the server, we set the local headset id to the regestered and\
+            //just update its data. otherwise we will create a new headset
+            if (callback_headset_registered)
+            {
+                _local_headset_ID = _registered_headset_ID;
+            }
+            else
+            {
+                EasyVizARHeadset new_registration = new EasyVizARHeadset();
+                new_registration.LocationID = this.LocationID;
+                new_registration.Name = _localHeadsetName;
+                new_registration.CreateHeadsetToRegister();
+            }
+        }
 
-            _headsetsCreated = true;
+
+       /* //Tryget HeadsetID looks to see if there's a registration file locally
+        if (EasyVizARServer.Instance.TryGetHeadsetID(out string _registered_headset_ID))
+        {
+            _local_headset_ID = _registered_headset_ID;
+
+            //check to see if the local headset ID in the registration file is on the server
+
+        }
+        //If not, we need to register to the server. Create a new headset
+        else
+        {
+            EasyVizARHeadset new_registration = new EasyVizARHeadset();
+            new_registration.LocationID = this.LocationID;
+            new_registration.Name = _localHeadsetName;
+            new_registration.CreateHeadsetToRegister();
+        }*/
+
+        if (EasyVizARServer.Instance.TryGetHeadsetID(out string new_registered_headset_ID))
+        {
+            _local_headset_ID = new_registered_headset_ID;
+
+            if (!_headsetsCreated)
+            {
+                //CreateLocalHeadset();
+                CreateHeadsets();
+
+                _headsetsCreated = true;
+            }
         }
     }
 
