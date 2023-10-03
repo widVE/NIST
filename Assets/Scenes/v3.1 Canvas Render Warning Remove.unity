@@ -25086,7 +25086,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   instanceCount: 100000
-  instanceMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  instanceMesh: {fileID: 3753271082598850803, guid: 2fd42e15ce124cb4395fac0e10cca964, type: 3}
   instanceMaterial: {fileID: 2100000, guid: 268d00bdc1a28cb4ab1893a0e9bb104e, type: 2}
   subMeshIndex: 0
   _pcFileName: Assets/StreamingAssets/pc_test.txt

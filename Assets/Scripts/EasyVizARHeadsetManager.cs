@@ -174,7 +174,11 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         else
         {
             //If there is a UID check it against the server
-            HeadsetRegistrationCheck(_registered_headset_ID);
+            
+            
+            //HeadsetRegistrationCheck(_registered_headset_ID);
+            
+            
             // I DONT THINK THIS WORKS< RACE CONDITION
             //BUT I CAN"T GET THE DATA OUTOF THE CALLBACK
             // I need the callback to finish before i can evaluate this, so maybe this has to be

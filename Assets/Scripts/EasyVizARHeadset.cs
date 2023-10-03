@@ -283,13 +283,13 @@ public class EasyVizARHeadset : MonoBehaviour
 		//register the headset with the server, first checking if it exists there already or not...
 		EasyVizARServer.Instance.Get("headsets/"+_headsetID, EasyVizARServer.JSON_TYPE, RegisterCallback);
 	}
-
+/*
     public bool HeadsetRegistrationCheck(String headset_ID)
     {
         //register the headset with the server, first checking if it exists there already or not...
         EasyVizARServer.Instance.Get("headsets/" + headset_ID, EasyVizARServer.JSON_TYPE, RegisterCallback);
     }
-
+*/
     void RegisterCallback(string resultData)
 	{
 		if(resultData != "error")
