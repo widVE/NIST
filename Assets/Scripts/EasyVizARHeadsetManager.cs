@@ -30,8 +30,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     [SerializeField]
     string _localHeadsetName;
     public string LocalHeadsetName => _localHeadsetName;
-    GameObject _localHeadset;
 
+    GameObject _localHeadset;
     public GameObject LocalHeadset
     {
         get { return _localHeadset; }
@@ -71,7 +71,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     public GameObject headsetManager;
     public Color _color = Color.red;
     public GameObject feature_parent;
-    private bool verbose_debug_log;
+    public bool verbose_debug_log;
 
     private bool callback_headset_registered = false;
 
@@ -166,6 +166,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         //Tryget HeadsetID looks to see if there's a registration file locally
         if (! EasyVizARServer.Instance.TryGetHeadsetID(out string _registered_headset_ID))
         {
+            if (verbose_debug_log) Debug.Log("No Registration: " + _registered_headset_ID);
             EasyVizARHeadset new_registration = new EasyVizARHeadset();
             new_registration.LocationID = this.LocationID;
             new_registration.Name = _localHeadsetName;
@@ -173,18 +174,21 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         }
         else
         {
+            if (verbose_debug_log) Debug.Log("Found Registration: " + _registered_headset_ID);
             //If there is a UID check it against the server
-            
-            
+
+
             //HeadsetRegistrationCheck(_registered_headset_ID);
-            
-            
+
+
             // I DONT THINK THIS WORKS< RACE CONDITION
             //BUT I CAN"T GET THE DATA OUTOF THE CALLBACK
             // I need the callback to finish before i can evaluate this, so maybe this has to be
             //in the callback???? but it's sooo messy with callbacks
             //If the UID is on the server, we set the local headset id to the regestered and\
             //just update its data. otherwise we will create a new headset
+            
+            // TODO This needs to be checked, this is never set to true
             if (callback_headset_registered)
             {
                 _local_headset_ID = _registered_headset_ID;

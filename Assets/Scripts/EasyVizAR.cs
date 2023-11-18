@@ -254,7 +254,9 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	
 	void Start()
     {
+		
 		_hasRegistration = TryLoadRegistration(out _registration);
+
     }
 
 	// Return server base URL without an ending slash, e.g. "http://easyvizar.wing.cs.wisc.edu:5000"
