@@ -63,7 +63,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     {
         if (!featureManager)
         {
-            featureManager = GameObject.Find("SummonMenu");
+            featureManager = GameObject.Find("FeatureManager");
         }
         
         if (!headsetManager)
