@@ -7459,7 +7459,7 @@ MonoBehaviour:
   _researchModeManager: {fileID: 1194257831}
   followMovingQRCode: 1
   _scanningMode: 0
-  testQRCodeData: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/69e92dff-7138-4091-89c4-ed073035bfe6
+  testQRCodeData: vizar://128.105.22.228:5000/locations/69e92dff-7138-4091-89c4-ed073035bfe6
   triggerQRCodeDetected: 0
 --- !u!82 &291935033
 AudioSource:
@@ -19972,8 +19972,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39ca0599f5d6b404f833ec79c87e4327, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _webSocketURL: ws://easyvizar.wings.cs.wisc.edu:5000/ws
-  _locationId: 1cc48e8d-890d-413a-aa66-cabaaa6e5458
+  _webSocketURL: ws://128.105.22.228:5000/ws
+  _locationId: 69e92dff-7138-4091-89c4-ed073035bfe6
   featureManager: {fileID: 935252631}
   headsetManager: {fileID: 1361342022}
   map_parent: {fileID: 335883421}

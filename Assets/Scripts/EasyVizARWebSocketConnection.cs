@@ -73,15 +73,6 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
         _mainCamera = Camera.main;
 
-#if UNITY_EDITOR
-        // In editor mode, use the default server and location ID.
-        _ws = initializeWebSocket();
-
-        // Connect returns a Task that only completes after the connection closes.
-        // If we 'await' it here, it will prevent the code below from running as we might expect.
-        var _ = _ws.Connect();
-#endif
-
         // Otherwise, wait for a QR code to be scanned.
         if (_qrScanner)
         {

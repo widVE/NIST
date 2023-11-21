@@ -40,10 +40,6 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     [SerializeField]
     string _local_headset_ID = "";
 
-    [SerializeField]
-    bool _shouldCreateHeadsets = false;
-    public bool ShouldCreateHeadsets => _shouldCreateHeadsets;
-
     public List<EasyVizARHeadset> _activeHeadsets = new List<EasyVizARHeadset>();
 
     bool _headsetsCreated = false;
@@ -108,13 +104,6 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                     EasyVizARHeadset headset = _localHeadset.GetComponent<EasyVizARHeadset>();
                     headset.LocationID = this.LocationID;
                 }
-
-                //The QR scanner code will also call the create all headsets funciton
-                //I'm going to disabled this via boolean, but leave it here for now
-                if (_shouldCreateHeadsets)
-                {
-                    CreateAllHeadsets();
-                }
             };
         }
 
@@ -152,6 +141,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         // If there is a match it will be a single headset
         // I don't know how to figure that out. Perhaps a size based thing? but we
         // can't deserialze the JSON if we don't know what it is??
+        if (verbose_debug_log) Debug.Log("Registration Callback Check: " + resultData);
+
         if (resultData != "error")
         {
             EasyVizAR.Headset h = JsonUtility.FromJson<EasyVizAR.Headset>(resultData);

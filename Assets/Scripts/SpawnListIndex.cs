@@ -60,7 +60,12 @@ public class SpawnListIndex : MonoBehaviour
         feature_type_dictionary.Add("stairs", stairs_icon);
         feature_type_dictionary.Add("user", user_icon);
         feature_type_dictionary.Add("warning", warning_icon);
-        feature_manager.ListFeatures();
+        
+        // BS 11-21 I don't think this should be here anymoore? We want to list features after we scan the
+        //QR code not at start of application. that is handeled in the feature manager
+        //feature_manager.ListFeatures();
+        
+        
         //DisplayAllFeatureGameObjects();
 
 
