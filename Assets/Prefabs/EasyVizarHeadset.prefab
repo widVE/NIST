@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 921069525072559175}
   - component: {fileID: 5003610570359901067}
   m_Layer: 0
-  m_Name: EasyVizARHeadset
+  m_Name: EasyVizarHeadset
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -52,7 +52,7 @@ MonoBehaviour:
   _headsetName: Editor_Test
   _is_local: 0
   _showPositionChanges: 0
-  _realTimeChanges: 0
+  _realTimeChanges: 1
   _postPositionChanges: 1
   _headsetID: 
   _color: {r: 1, g: 0, b: 0, a: 1}
@@ -112,6 +112,7 @@ MonoBehaviour:
   is_local: 0
   local_headset_id: 
   Debug_Verbose: 0
+  current_prefab: {fileID: 0}
 --- !u!1 &6732124109696385241
 GameObject:
   m_ObjectHideFlags: 0

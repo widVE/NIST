@@ -707,6 +707,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             Debug.Log("Is it local?? " + headset_class_data.Is_local);
             headset_class_data.LocationID = local_headset.location_id;
             headset_class_data.local_headset_id = local_headset.id;
+            headset_class_data.PostPositionChanges = true;
 
             if (_localMaterial != null)
             {

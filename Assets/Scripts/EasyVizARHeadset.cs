@@ -33,13 +33,21 @@ public class EasyVizARHeadset : MonoBehaviour
 	public bool ShowPositionChanges => _showPositionChanges;
 	
 	[SerializeField]
-	bool _realTimeChanges = false;
-	public bool RealTimeChanges => _realTimeChanges;
-	
-	[SerializeField]
+	public bool _realTimeChanges = true;
+    //public bool RealTimeChanges
+    //{
+    //    get { return _realTimeChanges; }
+    //    set { _realTimeChanges = value; }
+    //}
+
+    [SerializeField]
 	bool _postPositionChanges = false;
-	public bool PostPositionChanges => _postPositionChanges;
-	
+	public bool PostPositionChanges
+    {
+        get { return _postPositionChanges; }
+        set { _postPositionChanges = value; }
+    }
+
 	public string _headsetID;
 	public Color _color = Color.red;
 	
@@ -158,7 +166,7 @@ public class EasyVizARHeadset : MonoBehaviour
 		_headsetName = headsetName;
 		_locationID = location;
 		
-		if(postChanges)
+		if(_postPositionChanges)
 		{
 			_realTimeChanges = true;
 
@@ -187,7 +195,9 @@ public class EasyVizARHeadset : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		if(_is_local)
+        PostPosition();
+
+        if (_is_local)
 		{
 			float t = UnityEngine.Time.time;
 
@@ -488,7 +498,9 @@ public class EasyVizARHeadset : MonoBehaviour
 	void PostPosition()
 	{
 		EasyVizAR.HeadsetPositionUpdate h = new EasyVizAR.HeadsetPositionUpdate();
-		h.position = new EasyVizAR.Position();
+        h.location_id = _locationID;
+
+        h.position = new EasyVizAR.Position();
 		h.position.x = transform.position.x;
 		h.position.y = transform.position.y;
 		h.position.z = transform.position.z;
@@ -497,7 +509,6 @@ public class EasyVizARHeadset : MonoBehaviour
 		h.orientation.y = transform.rotation[1];
 		h.orientation.z = transform.rotation[2];
 		h.orientation.w = transform.rotation[3];
-		h.location_id = _locationID;
 		
 		EasyVizARServer.Instance.Patch("headsets/"+_headsetID, EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), PostPositionCallback);
 	}
@@ -513,7 +524,7 @@ public class EasyVizARHeadset : MonoBehaviour
 		}
 		else
 		{
-			
+			UnityEngine.Debug.Log("Received an error when posting position");
 		}
 	}
 	
