@@ -639,11 +639,13 @@ public class FeatureManager : MonoBehaviour
         // It is easiest to delete and recreate the feature, because
         // its display settings such as the feature type may have changed.
         DeleteFeatureFromServer(feature.id);
-        UnityEngine.Debug.Log("Update is called when feature changed from server");
         AddFeatureFromServer(feature);
-                // Add the name of the feature to DistanceFeatureText.cs 
+
+        UnityEngine.Debug.Log("Update is called when feature changed from server");
+
+        // Add the name of the feature to DistanceFeatureText.cs 
         //spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("Feature_Text").GetComponent<DistanceFeatureText>().feature_name = feature.name;
-       //UnityEngine.Debug.Log("the feature name is in feature manager: " + spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("Feature_Text").GetComponent<DistanceFeatureText>().feature_name);
+        //UnityEngine.Debug.Log("the feature name is in feature manager: " + spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("Feature_Text").GetComponent<DistanceFeatureText>().feature_name);
 
 
         isChanged = true;

@@ -102,10 +102,10 @@ public class EasyVizARHeadset : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-		//I think this should perhaps be set in the constructor, with the calling
-		//manager passing a reference, but this will work for now.
-		//parent_headset_manager = GameObject.Find("EasyVizARHeadsetManager");
-		
+        //I think this should perhaps be set in the constructor, with the calling
+        //manager passing a reference, but this will work for now.
+        parent_headset_manager = EasyVizARHeadsetManager.EasyVizARManager.gameObject;
+
         if (_is_local) StartCoroutine(PositionPostingUpdate(_updateFrequency));
     }
 
@@ -340,7 +340,9 @@ public class EasyVizARHeadset : MonoBehaviour
             _isRegisteredWithServer = true;
 
             EasyVizAR.RegisteredHeadset h = JsonUtility.FromJson<EasyVizAR.RegisteredHeadset>(resultData);
-/*            Vector3 newPos = Vector3.zero;
+/*            
+ *            
+ *         Vector3 newPos = Vector3.zero;
 
             newPos.x = h.position.x;
             newPos.y = h.position.y;
@@ -358,6 +360,9 @@ public class EasyVizARHeadset : MonoBehaviour
                 _color = newColor;
 
             EasyVizARServer.Instance.SaveRegistration(h.id, h.token);
+
+            //This calls back to the inital registration check so that the local ID can be checked and initialized
+            EasyVizARHeadsetManager.EasyVizARManager.gameObject.GetComponent<EasyVizARHeadsetManager>().LocalRegistrationSetup();
 
             UnityEngine.Debug.Log("Successfully connected headset: " + h.name);
         }

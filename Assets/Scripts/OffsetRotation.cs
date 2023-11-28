@@ -37,20 +37,16 @@ public class OffsetRotation : MonoBehaviour
 
     private void Start()
     {
-        GameObject headset_manager_GO = GameObject.Find(headset_manager_name);
-        if (verbose) Debug.Log("LOOK AT " + headset_manager_GO);
-        EasyVizARHeadsetManager headset_manager_script = null;
-        headset_manager_script = headset_manager_GO.GetComponent<EasyVizARHeadsetManager>();
+        EasyVizARHeadsetManager headset_manager_script = EasyVizARHeadsetManager.EasyVizARManager.gameObject.GetComponent<EasyVizARHeadsetManager>();
 
-        if(headset_manager_script != null)
+        if (headset_manager_script != null)
         {
-            if (verbose) Debug.Log("Found Script!!!");
+            if (verbose) Debug.Log("Found Manger");
         }
         else
         {
             if (verbose) Debug.Log("No Manager");
         }
-        //List<EasyVizARHeadset> active_headsets = headset_manager_script._activeHeadsets;
 
         foreach (EasyVizARHeadset headset in headset_manager_script._activeHeadsets)
         {
@@ -59,7 +55,7 @@ public class OffsetRotation : MonoBehaviour
                 //check against the name of the connected headset;
                 if (this.transform.parent.name == headset.name)
                 {
-                    if (verbose) Debug.Log("Found headset: " + this.transform.parent.name + " is active, and matches " + headset.name);
+                    if (verbose) Debug.Log("Found local headset: " + this.transform.parent.name + " is active, and matches " + headset.name);
                     local_headset = true;
                     this.transform.Find("Star").gameObject.SetActive(true);
                 }

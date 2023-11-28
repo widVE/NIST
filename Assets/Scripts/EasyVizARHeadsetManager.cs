@@ -69,8 +69,6 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     public GameObject feature_parent;
     public bool verbose_debug_log;
 
-    private bool callback_headset_registered = false;
-
     private void Awake()
     {
         // If there is an instance, and it's not me, delete myself.
@@ -133,38 +131,51 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     {
         EasyVizARServer.Instance.Get("headsets/" + headset_ID, EasyVizARServer.JSON_TYPE, RegisterCheckCallback);
     }
-    //BS 27 RACE CONDITION RACE CONDITION RACE CONDITION
+
     void RegisterCheckCallback(string resultData)
     {
-        // The result data can be many things
-        // If there's no match, it will be a list of all the headsets
-        // If there is a match it will be a single headset
-        // I don't know how to figure that out. Perhaps a size based thing? but we
-        // can't deserialze the JSON if we don't know what it is??
+
         if (verbose_debug_log) Debug.Log("Registration Callback Check: " + resultData);
 
+        //Returns error if no headset with ID on server
         if (resultData != "error")
         {
             EasyVizAR.Headset h = JsonUtility.FromJson<EasyVizAR.Headset>(resultData);
 
-            if (h.id == _local_headset_ID) callback_headset_registered = true;
+            //If the ID is on the server, the local headset ID is registered and we can create the headsets
+            if (h.id == _local_headset_ID)
+            {
+                if (verbose_debug_log) Debug.Log("Registraiton ID is on server");
+
+                //callback_headset_registered = true;
+            }
+            else
+            {
+                //If the ID is not on the server, we need to create a new registration and post it to the server. This might not get reached ever, but I'm not sure atm
+                if (verbose_debug_log) Debug.Log("Registraiton ID is NOT on server INNER");
+                CreateNewRegistration();
+            }
+        }
+        else
+        {
+            if (verbose_debug_log) Debug.Log("Registraiton ID is NOT on server");
+            CreateNewRegistration();
         }
     }
 
     [ContextMenu("CreateAllHeadsets")]
-    public void CreateAllHeadsets()
+    public void LocalRegistrationSetup()
     {
         //Tryget HeadsetID looks to see if there's a registration file locally
+        
+        //False case, there is no local registration, so we need to create a new headset, post it's data, and save that registration
         if (! EasyVizARServer.Instance.TryGetHeadsetID(out string _registered_headset_ID))
         {
             if (verbose_debug_log) Debug.Log("No Registration: " + _registered_headset_ID);
-            EasyVizARHeadset new_registration = new EasyVizARHeadset();
-            new_registration.LocationID = this.LocationID;
-            new_registration.Name = _localHeadsetName;
-            new_registration.CreateHeadsetToRegister();
 
-            //TODO Post headset to server
+            CreateNewRegistration();
         }
+        //True case, there is a local registration, so we need to check if it's on the server too
         else
         {
             _local_headset_ID = _registered_headset_ID;
@@ -172,50 +183,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             if (verbose_debug_log) Debug.Log("Found Registration: " + _registered_headset_ID);
             //If there is a UID check it against the server
 
-            HeadsetRegistrationCheck(_registered_headset_ID);
-
-            // I DONT THINK THIS WORKS< RACE CONDITION
-            //BUT I CAN"T GET THE DATA OUTOF THE CALLBACK
-            // I need the callback to finish before i can evaluate this, so maybe this has to be
-            //in the callback???? but it's sooo messy with callbacks
-            //If the UID is on the server, we set the local headset id to the regestered and\
-            //just update its data. otherwise we will create a new headset
-
-            // TODO This needs to be checked, this is never set to true
-
-            //BS 27 RACE CONDITION RACE CONDITION RACE CONDITION
-            if (callback_headset_registered)
-            {
-                _local_headset_ID = _registered_headset_ID;
-                if (verbose_debug_log) Debug.Log("Passed Registration Check ID: " + _registered_headset_ID);
-            }
-            else
-            {
-                if (verbose_debug_log) Debug.Log("Failed Registration Check ID: " + _registered_headset_ID);
-                EasyVizARHeadset new_registration = new EasyVizARHeadset();
-                new_registration.LocationID = this.LocationID;
-                new_registration.Name = _localHeadsetName;
-                new_registration.CreateHeadsetToRegister();
-            }
+            HeadsetRegistrationCheck(_local_headset_ID);
         }
-
-
-       /* //Tryget HeadsetID looks to see if there's a registration file locally
-        if (EasyVizARServer.Instance.TryGetHeadsetID(out string _registered_headset_ID))
-        {
-            _local_headset_ID = _registered_headset_ID;
-
-            //check to see if the local headset ID in the registration file is on the server
-
-        }
-        //If not, we need to register to the server. Create a new headset
-        else
-        {
-            EasyVizARHeadset new_registration = new EasyVizARHeadset();
-            new_registration.LocationID = this.LocationID;
-            new_registration.Name = _localHeadsetName;
-            new_registration.CreateHeadsetToRegister();
-        }*/
 
         if (EasyVizARServer.Instance.TryGetHeadsetID(out string new_registered_headset_ID))
         {
@@ -229,6 +198,21 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                 _headsetsCreated = true;
             }
         }
+    }
+
+    void CreateNewRegistration()
+    {
+        //EasyVizAR.Headset new_registration = new EasyVizAR.Headset();
+        // new_registration.location_id = this.LocationID;
+        // new_registration.name = _localHeadsetName;
+        //EasyVizARHeadset new_registration.CreateHeadsetToRegister();
+
+
+
+        EasyVizARHeadset new_registration = new EasyVizARHeadset();
+        new_registration.LocationID = this.LocationID;
+        new_registration.Name = _localHeadsetName;
+        new_registration.CreateHeadsetToRegister();
     }
 
     public void DisplayMapCallback(Texture resultTexture)

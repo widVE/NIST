@@ -986,7 +986,7 @@ MonoBehaviour:
   copy_x_rotation: 0
   copy_y_rotation: 1
   copy_z_rotation: 0
-  verbose: 1
+  verbose: 0
   rotation_source_name: Main Camera
   headset_manager_name: EasyVizARHeadsetManager
 --- !u!1 &4402188086708784334
