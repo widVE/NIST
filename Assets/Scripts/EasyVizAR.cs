@@ -241,8 +241,8 @@ namespace EasyVizAR
 
 public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 {
-	private string _authority = "easyvizar.wings.cs.wisc.edu:5000";
-	private string _baseURL = "http://easyvizar.wings.cs.wisc.edu:5000/";
+	private string _authority = null;
+	private string _baseURL = null;
 	private bool _hasRegistration = false;
 	private EasyVizAR.Registration _registration;
 
@@ -254,8 +254,10 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	
 	void Start()
     {
+		//BS Commented this out on 11-27 IDK why this is here before we know the location ID
+		// might havebeen for RACE CONDITION
 		
-		_hasRegistration = TryLoadRegistration(out _registration);
+		//_hasRegistration = TryLoadRegistration(out _registration);
 
     }
 
@@ -1177,14 +1179,21 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		// Colon is not allowed in filenames, so we replace with a hash sign.
 		string filename = _authority.Replace(":", "#") + ".json";
 		string filePath = System.IO.Path.Combine(Application.persistentDataPath, "registrations", filename);
+        Debug.Log("Is there a Registration named: " + filename);
 
-		if (!File.Exists(filePath))
+        Debug.Log("Is there a Registration at FP: " + filePath);
+
+        if (!File.Exists(filePath))
         {
-			registration = new EasyVizAR.Registration();
+            Debug.Log("NO Registration at FP: " + filePath);
+
+            registration = new EasyVizAR.Registration();
 			return false;
         }
 
-		var reader = new StreamReader(filePath);
+        Debug.Log("YES Registration at FP: " + filePath);
+
+        var reader = new StreamReader(filePath);
 		var data = reader.ReadToEnd();
 		reader.Close();
 

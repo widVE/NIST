@@ -29,7 +29,7 @@ public class DistanceCalculation : MonoBehaviour
     
     public bool Debug_Verbose = true;
 
-    private GameObject current_prefab;
+    public GameObject current_prefab;
 
     private TextMeshPro distance_text_TMP;
 

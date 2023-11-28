@@ -133,7 +133,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     {
         EasyVizARServer.Instance.Get("headsets/" + headset_ID, EasyVizARServer.JSON_TYPE, RegisterCheckCallback);
     }
-
+    //BS 27 RACE CONDITION RACE CONDITION RACE CONDITION
     void RegisterCheckCallback(string resultData)
     {
         // The result data can be many things
@@ -162,15 +162,17 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             new_registration.LocationID = this.LocationID;
             new_registration.Name = _localHeadsetName;
             new_registration.CreateHeadsetToRegister();
+
+            //TODO Post headset to server
         }
         else
         {
+            _local_headset_ID = _registered_headset_ID;
+
             if (verbose_debug_log) Debug.Log("Found Registration: " + _registered_headset_ID);
             //If there is a UID check it against the server
 
-
-            //HeadsetRegistrationCheck(_registered_headset_ID);
-
+            HeadsetRegistrationCheck(_registered_headset_ID);
 
             // I DONT THINK THIS WORKS< RACE CONDITION
             //BUT I CAN"T GET THE DATA OUTOF THE CALLBACK
@@ -178,14 +180,18 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             //in the callback???? but it's sooo messy with callbacks
             //If the UID is on the server, we set the local headset id to the regestered and\
             //just update its data. otherwise we will create a new headset
-            
+
             // TODO This needs to be checked, this is never set to true
+
+            //BS 27 RACE CONDITION RACE CONDITION RACE CONDITION
             if (callback_headset_registered)
             {
                 _local_headset_ID = _registered_headset_ID;
+                if (verbose_debug_log) Debug.Log("Passed Registration Check ID: " + _registered_headset_ID);
             }
             else
             {
+                if (verbose_debug_log) Debug.Log("Failed Registration Check ID: " + _registered_headset_ID);
                 EasyVizARHeadset new_registration = new EasyVizARHeadset();
                 new_registration.LocationID = this.LocationID;
                 new_registration.Name = _localHeadsetName;
@@ -612,7 +618,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         //Data validation check
         if (result_data == "error" || string.IsNullOrEmpty(result_data) || result_data.Length <= 2)
         {
-            Debug.LogError("Error in data payload: " + result_data);
+            Debug.LogError("Error in data payload CreateHeadsetsCallback");
             return;
         }
 
@@ -776,6 +782,10 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                     }
                 }
             }
+        }
+        else
+        {
+            Debug.Log("LOKAL OLD_CreateHeadsetsCallback  ERROR ");
         }
     }
 

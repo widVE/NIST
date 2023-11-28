@@ -44804,6 +44804,10 @@ PrefabInstance:
       value: Unity_Editor_Alieware
       objectReference: {fileID: 0}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
+      propertyPath: verbose_debug_log
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: _shouldCreateHeadsets
       value: 0
       objectReference: {fileID: 0}
@@ -45094,58 +45098,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: PalmMap
-      value: 
-      objectReference: {fileID: 873797678}
-    - target: {fileID: 0}
-      propertyPath: manager
-      value: 
-      objectReference: {fileID: 561901448}
-    - target: {fileID: 0}
-      propertyPath: _qrScanner
-      value: 
-      objectReference: {fileID: 291935030}
-    - target: {fileID: 0}
-      propertyPath: spawn_root
-      value: 
-      objectReference: {fileID: 1208393620}
-    - target: {fileID: 0}
-      propertyPath: curr_headset
-      value: 
-      objectReference: {fileID: 1517424691}
-    - target: {fileID: 0}
-      propertyPath: spawn_parent
-      value: 
-      objectReference: {fileID: 1968206798}
-    - target: {fileID: 0}
-      propertyPath: distance_text
-      value: 
-      objectReference: {fileID: 415639110}
-    - target: {fileID: 0}
-      propertyPath: headset_parent
-      value: 
-      objectReference: {fileID: 1361342022}
-    - target: {fileID: 0}
-      propertyPath: distance_parent
-      value: 
-      objectReference: {fileID: 1661586568}
-    - target: {fileID: 0}
-      propertyPath: map_headset_icon
-      value: 
-      objectReference: {fileID: 4402188086708784334, guid: b234550f30f629c41ba6c5c3b64682a6, type: 3}
-    - target: {fileID: 0}
-      propertyPath: map_message_icon
-      value: 
-      objectReference: {fileID: 288360056468445405, guid: ff93914915aabee42b48e3aaa39ca108, type: 3}
-    - target: {fileID: 0}
-      propertyPath: palm_map_spawn_target
-      value: 
-      objectReference: {fileID: 335883421}
-    - target: {fileID: 0}
-      propertyPath: floating_map_spawn_target
-      value: 
-      objectReference: {fileID: 1467670412}
     - target: {fileID: 1854928437424279054, guid: 905f5ec265c7ec6419a3a994f767ec61, type: 3}
       propertyPath: cam
       value: 
