@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61f61d549a118094cab1c3adbfe4399e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _updateFrequency: 3
+  _updateFrequency: 0.5
   _headsetName: Editor_Test
   _is_local: 0
   _showPositionChanges: 0

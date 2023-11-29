@@ -114,7 +114,8 @@ public class EasyVizARHeadset : MonoBehaviour
         //manager passing a reference, but this will work for now.
         parent_headset_manager = EasyVizARHeadsetManager.EasyVizARManager.gameObject;
 
-        if (_is_local) StartCoroutine(PositionPostingUpdate(_updateFrequency));
+        //if (_is_local) StartCoroutine(PositionPostingUpdate(_updateFrequency));
+        StartCoroutine(PositionPostingUpdate(_updateFrequency));
     }
 
     public void Initialize(Headset headset_class_data)
@@ -194,12 +195,12 @@ public class EasyVizARHeadset : MonoBehaviour
 	
     // Update is called once per frame
     void Update()
-    {
-        PostPosition();
-
+    {        
         if (_is_local)
 		{
-			float t = UnityEngine.Time.time;
+            //PostPosition();
+
+            float t = UnityEngine.Time.time;
 
 			if(t - _lastTime > _updateFrequency)
 			{
@@ -209,7 +210,7 @@ public class EasyVizARHeadset : MonoBehaviour
                     transform.rotation = _mainCamera.transform.rotation;
                 }
 
-                if (_isRegisteredWithServer && _postPositionChanges)
+                //if (_isRegisteredWithServer && _postPositionChanges)
 				{
 					PostPosition();
 				}				
@@ -226,6 +227,30 @@ public class EasyVizARHeadset : MonoBehaviour
 
     IEnumerator PositionPostingUpdate(double update_rate_in_seconds)
 	{
+		if (_is_local)
+		{
+			while (true)
+			{
+				transform.position = _mainCamera.transform.position;
+				transform.rotation = _mainCamera.transform.rotation;
+				//PostPosition();
+
+				if (_mainCamera && _postPositionChanges)
+				{
+					transform.position = _mainCamera.transform.position;
+					transform.rotation = _mainCamera.transform.rotation;
+					PostPosition();
+				}
+
+				if (_isRegisteredWithServer && _postPositionChanges)
+				{
+					//PostPosition();
+				}
+
+                yield return new WaitForSeconds((float)update_rate_in_seconds);
+            }
+        }
+
         yield return new WaitForSeconds((float)update_rate_in_seconds);
     }
 	
@@ -498,25 +523,27 @@ public class EasyVizARHeadset : MonoBehaviour
 	void PostPosition()
 	{
 		EasyVizAR.HeadsetPositionUpdate h = new EasyVizAR.HeadsetPositionUpdate();
-        h.location_id = _locationID;
 
+		h.location_id = _locationID;
         h.position = new EasyVizAR.Position();
-		h.position.x = transform.position.x;
-		h.position.y = transform.position.y;
-		h.position.z = transform.position.z;
+		h.position.x = (float)transform.position.x;
+		h.position.y = (float)transform.position.y;
+		h.position.z = (float)transform.position.z;
 		h.orientation = new EasyVizAR.Orientation();
-		h.orientation.x = transform.rotation[0];
-		h.orientation.y = transform.rotation[1];
-		h.orientation.z = transform.rotation[2];
-		h.orientation.w = transform.rotation[3];
-		
-		EasyVizARServer.Instance.Patch("headsets/"+_headsetID, EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), PostPositionCallback);
+		h.orientation.x = (float)transform.rotation[0];
+		h.orientation.y = (float)transform.rotation[1];
+		h.orientation.z = (float)transform.rotation[2];
+		h.orientation.w = (float)transform.rotation[3];
+        JsonUtility.ToJson(h);
+
+
+        EasyVizARServer.Instance.Patch("headsets/"+_headsetID, EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), PostPositionCallback);
 	}
 	
 	
 	void PostPositionCallback(string resultData)
 	{
-		//Debug.Log(resultData);
+		UnityEngine.Debug.Log(resultData);
 		
 		if(resultData != "error")
 		{

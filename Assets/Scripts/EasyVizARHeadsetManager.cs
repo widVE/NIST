@@ -42,7 +42,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
     public List<EasyVizARHeadset> _activeHeadsets = new List<EasyVizARHeadset>();
 
-    bool _headsetsCreated = false;
+    private bool _headsetsCreated = false;
 
     [SerializeField]
     Material _localMaterial;
