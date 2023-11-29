@@ -212,7 +212,7 @@ public class EasyVizARHeadset : MonoBehaviour
 
                 //if (_isRegisteredWithServer && _postPositionChanges)
 				{
-					PostPosition();
+					//PostPosition();
 				}				
 			}
 
@@ -244,7 +244,7 @@ public class EasyVizARHeadset : MonoBehaviour
 
 				if (_isRegisteredWithServer && _postPositionChanges)
 				{
-					//PostPosition();
+					PostPosition();
 				}
 
                 yield return new WaitForSeconds((float)update_rate_in_seconds);
