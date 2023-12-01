@@ -241,6 +241,7 @@ public class QRScanner : MonoBehaviour
 				// Example: http://easyvizar.wings.cs.wisc.edu:5000/
 				string base_url = "http://" + uri.Authority + "/";
 				Debug.Log("Detected URL from QR code: " + base_url);
+				//Lance question here, does this matter if it fails and is never re-called? It seems to be the original place that _hasRegistration is set to true, but that only works if a registration exsists on the device. If a new one is required then I've set _hasRegistration to true in the Save Registration function, but that might not be the correct way to use it.
 				EasyVizARServer.Instance.SetBaseURL(base_url);
 				_updatedServerFromQR = true;
 			}
