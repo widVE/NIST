@@ -1,6 +1,0 @@
-EasyVizARHeadset.get_Name()
-EasyVizARHeadset.set_Name(System.String)
-EasyVizARHeadset.get_Is_local()
-EasyVizARHeadset.set_Is_local(System.Boolean)
-EasyVizARHeadset.get_ShowPositionChanges()
-EasyVizARHeadset.get_PostPositionChanges()

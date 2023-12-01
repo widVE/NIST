@@ -50,6 +50,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _updateFrequency: 0.5
   _headsetName: Editor_Test
+  verbose_debug: 0
   _is_local: 0
   _showPositionChanges: 0
   _realTimeChanges: 1

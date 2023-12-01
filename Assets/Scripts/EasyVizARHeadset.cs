@@ -20,6 +20,8 @@ public class EasyVizARHeadset : MonoBehaviour
 		set { _headsetName = value; }
 	}
 	
+	public bool verbose_debug = false;
+
 	[SerializeField]
 	bool _is_local;
 	public bool Is_local
@@ -244,7 +246,7 @@ public class EasyVizARHeadset : MonoBehaviour
 
 				if (_isRegisteredWithServer && _postPositionChanges)
 				{
-					PostPosition();
+					//PostPosition();
 				}
 
                 yield return new WaitForSeconds((float)update_rate_in_seconds);
@@ -543,7 +545,7 @@ public class EasyVizARHeadset : MonoBehaviour
 	
 	void PostPositionCallback(string resultData)
 	{
-		UnityEngine.Debug.Log(resultData);
+		if(verbose_debug)UnityEngine.Debug.Log(resultData);
 		
 		if(resultData != "error")
 		{

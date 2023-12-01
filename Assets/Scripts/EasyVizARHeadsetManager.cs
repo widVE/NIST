@@ -208,11 +208,14 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         //EasyVizARHeadset new_registration.CreateHeadsetToRegister();
 
 
+        GameObject registration_setup_holder = new GameObject();
 
-        EasyVizARHeadset new_registration = new EasyVizARHeadset();
+        EasyVizARHeadset new_registration = registration_setup_holder.AddComponent<EasyVizARHeadset>();
         new_registration.LocationID = this.LocationID;
         new_registration.Name = _localHeadsetName;
         new_registration.CreateHeadsetToRegister();
+
+        Destroy(registration_setup_holder);
     }
 
     public void DisplayMapCallback(Texture resultTexture)

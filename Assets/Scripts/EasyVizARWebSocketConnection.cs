@@ -48,6 +48,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
     [SerializeField]
     float _updateInterval = 0.2f;
+    public bool post_data = false;
 
     [SerializeField]
     bool _echoMessages = true;
@@ -105,7 +106,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
         }
 #endif
 
-        if (isConnected)
+        if (isConnected && post_data)
         {
             float t = UnityEngine.Time.time;
             if (t - _lastUpdated > _updateInterval)

@@ -249,8 +249,10 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	public const string JSON_TYPE = "application/json";
 	public const string JPEG_TYPE = "image/jpeg";
 	public const string PNG_TYPE = "image/png";
-	
-	bool _isUploadingImage = false;
+
+    public bool verbose_debug = false;
+
+    bool _isUploadingImage = false;
 	
 	void Start()
     {
@@ -1179,9 +1181,9 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		// Colon is not allowed in filenames, so we replace with a hash sign.
 		string filename = _authority.Replace(":", "#") + ".json";
 		string filePath = System.IO.Path.Combine(Application.persistentDataPath, "registrations", filename);
-        Debug.Log("Is there a Registration named: " + filename);
+        if(verbose_debug) Debug.Log("Is there a Registration named: " + filename);
 
-        Debug.Log("Is there a Registration at FP: " + filePath);
+        if(verbose_debug) Debug.Log("Is there a Registration at FP: " + filePath);
 
         if (!File.Exists(filePath))
         {
@@ -1223,7 +1225,10 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		writer.Close();
 
 		_registration = reg;
-		_hasRegistration = true;
+
+        //Lance Questions??? Should this be here? It seems like the 				EasyVizARServer.Instance.SetBaseURL(base_url); is supposed to updated the registration boolean, but if there's no file locally it will never suceed becuse the QR scanner is only calle once in the headset
+
+        _hasRegistration = true;
 	}
 
 }
