@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using System;
 using UnityEngine.InputSystem;
+//using System.Diagnostics;
 //using Color = UnityEngine.Color;
 
 
@@ -16,7 +17,7 @@ public class FeatureManager : MonoBehaviour
 
     // Each GameObject now contains a field call obj_feature (in the script MarkerObject.cs) so that feature is now one of the fields of the GameObject 
     //public Dictionary<int, GameObject> feature_gameobj_dictionary = new Dictionary<int, GameObject>(); // a seperate dictionary for keeping track of Gameobject in the scene
-    
+    public bool mirror_map_axis = false;
     
     public EasyVizAR.FeatureList feature_list = new EasyVizAR.FeatureList();
     public EasyVizAR.Feature featureHolder = null;
@@ -98,6 +99,7 @@ public class FeatureManager : MonoBehaviour
 
     string location_id = "";
 
+
     // Attach QRScanner GameObject so we can listen for location change events.
     [SerializeField]
     GameObject _qrScanner;
@@ -165,7 +167,8 @@ public class FeatureManager : MonoBehaviour
 
 #if UNITY_EDITOR
         // In editor mode, use the hard-coded location ID for testing.
-        ListFeatures(); // this populates all the features listed on the server currently
+        //I don't think this works correctly anymore so commenting out the list feature call
+        //ListFeatures(); // this populates all the features listed on the server currently
 #endif
 
         // Wait for a QR code to be scanned to fetch features from the correct location.
@@ -211,13 +214,13 @@ public class FeatureManager : MonoBehaviour
     // This will display the distance indicator on the map
     public void showMapIconDistance()
     {
-        if (!PalmMap.activeSelf)
+        if (PalmMap.activeSelf)
         {
-            palm_map_spawn_target.SetActive(false);
+            //palm_map_spawn_target.SetActive(true);
         }
         else
         {
-            palm_map_spawn_target.SetActive(true);
+            //palm_map_spawn_target.SetActive(false);
         }
 
         foreach (Transform child in palm_map_spawn_target.transform)
@@ -253,7 +256,6 @@ public class FeatureManager : MonoBehaviour
         EasyVizAR.FeatureDisplayStyle style = new EasyVizAR.FeatureDisplayStyle();
         style.placement = "point";
         feature_to_post.style = style;
-
         
         //Serialize the feature into JSON
         var data = JsonUtility.ToJson(feature_to_post);
@@ -330,7 +332,7 @@ public class FeatureManager : MonoBehaviour
     public void ListFeatures() 
     {
         EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
-        Debug.Log("ListFeatures Called");
+        //Debug.Log("ListFeatures Called");
     }
 
     public void ListFeaturesFromLocation(string locationID)
@@ -338,7 +340,8 @@ public class FeatureManager : MonoBehaviour
         EasyVizARServer.Instance.Get("locations/" + locationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
     }
     
-    void ListFeatureCallBack(string result) {
+    void ListFeatureCallBack(string result) 
+    {
         if (result != "error")
         {
             
@@ -389,7 +392,7 @@ public class FeatureManager : MonoBehaviour
         
         if (this.feature_dictionary.ContainsKey(id))
         {
-            Debug.Log("in the if statement");
+            //Debug.Log("in the if statement");
             //creating new feature
             //EasyVizAR.Feature feature_to_patch = feature_gameobj_dictionary[id].GetComponent<MarkerObject>().feature;
             EasyVizAR.Feature feature_to_patch = feature_dictionary[id];
@@ -405,7 +408,7 @@ public class FeatureManager : MonoBehaviour
                 feature_to_patch.type = name;
             }
 
-            Debug.Log("feature name: " + feature_to_patch.name);
+            //Debug.Log("feature name: " + feature_to_patch.name);
             //eature_to_patch.name = "Updated name: ";
             // Main: updating the position
 
@@ -502,10 +505,11 @@ public class FeatureManager : MonoBehaviour
     
     public void InputSpawnObjectAtIndex(InputAction.CallbackContext context)
     {
-        //GameObject feature_to_spawn = feature_type_dictionary[feature_type];
+        //GameObject world_feature_to_spawn = feature_type_dictionary[feature_type];
         // billboarding effect
-        Debug.Log(context);
-        Debug.Log("spawned using input phase: " + context.phase); 
+
+        //Debug.Log(context);
+        //Debug.Log("spawned using input phase: " + context.phase); 
         if (context.performed) // there are 3 phases started, performed, and canceled 
         {
             string feature_type = "biohazard"; // initialize to biohazard
@@ -524,9 +528,9 @@ public class FeatureManager : MonoBehaviour
     //Added from SpawnListIndex
     public void InputSpawnObjectAtIndex(string feature_type, InputAction.CallbackContext context)
     {
-        GameObject feature_to_spawn = feature_type_dictionary[feature_type];
+        GameObject world_feature_to_spawn = feature_type_dictionary[feature_type];
         // billboarding effect
-        GameObject cloned_feature = Instantiate(feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
+        GameObject cloned_feature = Instantiate(world_feature_to_spawn, spawn_root.transform.position, spawn_root.transform.rotation, spawn_parent.transform);
 
         cloned_feature.name = "feature-local";
         CreateNewFeature(feature_type, cloned_feature);
@@ -550,72 +554,84 @@ public class FeatureManager : MonoBehaviour
     {
         feature_dictionary.Add(feature.id, feature);
 
-        GameObject feature_to_spawn;
+        GameObject world_feature_to_spawn;
         GameObject map_icon_to_spawn;
+
         if (feature_type_dictionary.ContainsKey(feature.type))
         {
-            feature_to_spawn = feature_type_dictionary[feature.type];
+            world_feature_to_spawn = feature_type_dictionary[feature.type];
             map_icon_to_spawn = map_icon_dictionary[feature.type];
         }
         else
         {
             Debug.Log("Feature type dictionary does not contain " + feature.type);
-            feature_to_spawn = warning_icon;
+            world_feature_to_spawn = warning_icon;
             map_icon_to_spawn = warning_icon;
         }
 
-        Vector3 pos = Vector3.zero;
-        pos.x = feature.position.x;
-        pos.y = feature.position.y;
-        pos.z = feature.position.z;
-
+        Vector3 world_position = Vector3.zero;
+        world_position.x = feature.position.x;
+        world_position.y = feature.position.y;
+        world_position.z = feature.position.z;
 
         //This is where the world markers happen I think.
-        GameObject world_marker = Instantiate(feature_to_spawn, pos, spawn_root.transform.rotation, spawn_parent.transform);
+        GameObject world_marker = Instantiate(world_feature_to_spawn, world_position, spawn_root.transform.rotation, spawn_parent.transform);
         world_marker.name = string.Format("feature-{0}", feature.id);
+        world_marker.transform.Find("ID").GetChild(0).name = feature.id.ToString(); // this helps keeping track of feature id
         
-        Debug.Log("Palm is active?: " + PalmMap.activeSelf);
-
-        float y_offset = -1f * (feature.id / 100f);
-
         //I'm trying to add in the marker icon spawning to the floating map. I think this is where it happens!
+        GameObject palm_map_marker = Instantiate(map_icon_to_spawn, palm_map_spawn_target.transform, false);       
+        
+        Vector3 map_coordinate_position = Vector3.zero;
+        map_coordinate_position.x = world_position.x;
+        map_coordinate_position.y = world_position.y;
 
-        GameObject palm_map_marker = Instantiate(map_icon_to_spawn, palm_map_spawn_target.transform, false);        
-        palm_map_marker.transform.localPosition = new Vector3(pos.x, y_offset, pos.z);
-       //mapMarker.transform.localPosition = new Vector3(pos.x, 0, pos.z);
+        float y_offset = (feature.id / 1000f);
+        if (mirror_map_axis) y_offset *= -1;
+
+        //WARNING: When we mirror the map to have it look like what it is on the server we need to negat the z values of the position of the icons because of the coordinate space inversion
+        if (mirror_map_axis) map_coordinate_position.z = -1 * world_position.z;
+        else map_coordinate_position.z = world_position.z;
+
+        palm_map_marker.transform.localPosition = new Vector3(map_coordinate_position.x, y_offset, map_coordinate_position.z);
         palm_map_marker.name = string.Format("feature-{0}", feature.id);
 
+        //Adding the rotation to the map marker, we want it specifically for the headsets, but the other icons might look weird
+/*        Vector3 map_rotation = Vector3.zero;
+        map_rotation.x = feature.position.x;
+        map_rotation.y = feature.position.y;
+        map_rotation.z = feature.position.z;
+*/
 
         GameObject floating_map_marker = Instantiate(map_icon_to_spawn, floating_map_spawn_target.transform, false);
-        floating_map_marker.transform.localPosition = new Vector3(pos.x, y_offset, pos.z);
+        floating_map_marker.transform.localPosition = new Vector3(world_position.x, y_offset, map_coordinate_position.z);
         floating_map_marker.name = string.Format("feature-{0}", feature.id);
+         
+        //GameObject mapMarker = Instantiate(world_feature_to_spawn, mapParent.transform, false);
 
-
-        //GameObject mapMarker = Instantiate(feature_to_spawn, mapParent.transform, false);
-
+        // Add the name of the feature to DistanceFeatureText.cs 
+        world_marker.transform.Find("type").GetChild(0).name = feature.name;
+        //UnityEngine.Debug.Log("the feature name is in feature manager: " + spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("type").GetChild(0).name);
 
         Color myColor;
         if (ColorUtility.TryParseHtmlString(feature.color, out myColor))
         {
-            world_marker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
-            //marker.transform.Find("Quad").GetComponent<Renderer>().material.color = myColor;
-            palm_map_marker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
-            floating_map_marker.transform.Find("Quad").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
-
+            world_marker.transform.Find("Icon Visuals").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+            //marker.transform.Find("Icon Visuals").GetComponent<Renderer>().material.color = myColor;
+            palm_map_marker.transform.Find("Icon Visuals").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+            floating_map_marker.transform.Find("Icon Visuals").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
         }
-
 
         MarkerObject new_marker_object = world_marker.GetComponent<MarkerObject>();
         if (new_marker_object is not null)
         {
             new_marker_object.feature_ID = feature.id;
             new_marker_object.manager_script = this;
-        } else
+        } 
+        else
         {
             Debug.Log("Warning: MarkerObject component is missing");
         }
-
-        
     }
 
     public void UpdateFeatureFromServer(EasyVizAR.Feature feature)
@@ -624,6 +640,14 @@ public class FeatureManager : MonoBehaviour
         // its display settings such as the feature type may have changed.
         DeleteFeatureFromServer(feature.id);
         AddFeatureFromServer(feature);
+
+        UnityEngine.Debug.Log("Update is called when feature changed from server");
+
+        // Add the name of the feature to DistanceFeatureText.cs 
+        //spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("Feature_Text").GetComponent<DistanceFeatureText>().feature_name = feature.name;
+        //UnityEngine.Debug.Log("the feature name is in feature manager: " + spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("Feature_Text").GetComponent<DistanceFeatureText>().feature_name);
+
+
         isChanged = true;
     }
 
@@ -636,8 +660,6 @@ public class FeatureManager : MonoBehaviour
 
         Transform feature_object = spawn_parent.transform.Find(string.Format("feature-{0}", id));
         Transform map_icon = palm_map_spawn_target.transform.Find(string.Format("feature-{0}", id));
-        Debug.Log("Got into the delete method");
-        Debug.Log("deleting feature-"+id);
         if (feature_object)
         {
             Debug.Log("deleted feature: " + id);

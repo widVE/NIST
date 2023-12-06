@@ -1,0 +1,518 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="@InputActions" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="3" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACgCCAASVAABMAAAAEKBAJAAAEAWAGAAAgAABQAAA=</HashCode>
+      <FileName>Assets\InputSystem\InputActions.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="SpawnMarkerAction" Collapsed="true">
+    <Position X="15.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAECAAAAABAAAIAAAAABAAQACAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\InputSystem\SpawnMarkerAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BillboardingFeatureMarker" Collapsed="true">
+    <Position X="4.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAACAAAAAABAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\BillboardingFeatureMarker.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DistanceCalculation" Collapsed="true">
+    <Position X="11.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AASIBAIAACkgAAAAEAEABAIQABACAAAAACAAAACABAE=</HashCode>
+      <FileName>Assets\Scripts\DistanceCalculation.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DistanceFeatureText" Collapsed="true">
+    <Position X="13.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQABAAIACEAAADAAAAABAAAAAACAAAIAQAAAAAABAE=</HashCode>
+      <FileName>Assets\Scripts\DistanceFeatureText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizARServer" Collapsed="true">
+    <Position X="0.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AhAgwABCgCAQgQhEAAgAAAAACIEAYAgQBAIAAAAAAIg=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizARHeadset" Collapsed="true">
+    <Position X="15.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAUAAEAACiIMAYRBCIMjAYYAABIgAsNEkAAAAAAAACA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizARHeadset.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizARHeadsetManager" Collapsed="true">
+    <Position X="17" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AGQAAQwASCQJAAgAACACAAFIAIAggwEciACEAQACCAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizARHeadsetManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FeaturesEvent" Collapsed="true">
+    <Position X="13.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizARWebSocketConnection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HeadsetsEvent" Collapsed="true">
+    <Position X="10" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizARWebSocketConnection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizARWebSocketConnection" Collapsed="true">
+    <Position X="3" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAABAACCAAAAQBAAAAQABAAgiAEwBEAACRAAAAgAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizARWebSocketConnection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ElemRenderer" Collapsed="true">
+    <Position X="4.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAQAAACAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Assets\Scripts\ElemRenderer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FeatureManager" Collapsed="true">
+    <Position X="11.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IASYWGIAFDMM7hDkQBKCBVBNY1I8SECCscXAIDAJkik=</HashCode>
+      <FileName>Assets\Scripts\FeatureManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HandMenu" Collapsed="true">
+    <Position X="15.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAACAAAAAAAAAAAAAAIAAAAAAAQAAAACAAAAA=</HashCode>
+      <FileName>Assets\Scripts\HandMenu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HandTracking" Collapsed="true">
+    <Position X="17" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAQAAAACAAAABAAAADAAAgAgAAAABCBAAAAAAIAIg=</HashCode>
+      <FileName>Assets\Scripts\HandTracking.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HololensDepthPVCapture" Collapsed="true">
+    <Position X="15.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IBADEIAgFCAAAAQABCAAICAAACQABBBEAAAICABgAAA=</HashCode>
+      <FileName>Assets\Scripts\HololensDepthPVCapture.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ImagePointCloud" Collapsed="true">
+    <Position X="17" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QgQACIACATAAAAAAAAAAAEAAAIIAAAAAAEAMAAAACEA=</HashCode>
+      <FileName>Assets\Scripts\ImagePointCloud.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="KeyboardCommand" Collapsed="true">
+    <Position X="6.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAACACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\KeyboardCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ListObjectActivator" Collapsed="true">
+    <Position X="8.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQAAAEAAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\ListObjectActivator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MapController" Collapsed="true">
+    <Position X="13.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAQAAAIAACAIEQgAAAAAAABCAIABAAEAgAAIAAAACEE=</HashCode>
+      <FileName>Assets\Scripts\MapController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MapText" Collapsed="true">
+    <Position X="3" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAADCAAAAAAEAAAAAAEAAAAAAAAAAAAAAAAASA=</HashCode>
+      <FileName>Assets\Scripts\MapText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MarkerObject" Collapsed="true">
+    <Position X="4.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAAAAAAACAAIAAAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\MarkerObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MeshCapture" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQQAAABAESAAAAAAAACIAABCAACEAQAIAIAAAAAACEA=</HashCode>
+      <FileName>Assets\Scripts\MeshCapture.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NavigationTargetUpdate" Collapsed="true">
+    <Position X="11.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Navigation.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Navigation" Collapsed="true">
+    <Position X="8.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAUAAAAABCAAKAAAAAQCAQIAAAIAAIAMAAAAEAAAAAg=</HashCode>
+      <FileName>Assets\Scripts\Navigation.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OffsetRotation" Collapsed="true">
+    <Position X="15.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAgAAAQCAAAACgAAAAAAEAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\OffsetRotation.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PointCloudRenderer" Collapsed="true">
+    <Position X="4.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAJAAACCAAAAAAAAAAAAgAAgAAAABAABAAAAAAAAQ=</HashCode>
+      <FileName>Assets\Scripts\PointCloudRenderer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LocationChangedEventArgs" Collapsed="true">
+    <Position X="11.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAA=</HashCode>
+      <FileName>Assets\Scripts\QRScanner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QRScanner" Collapsed="true">
+    <Position X="13.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gYQBBBAAACACCAAAABEAAAAQAFIEEBQgAgQAAAAJAwA=</HashCode>
+      <FileName>Assets\Scripts\QRScanner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ResearchModeVideoStream" Collapsed="true">
+    <Position X="3" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>MNlDm5QxhrwQdo5I6FLFc4yy50bMXBDVgIPIpJigMzo=</HashCode>
+      <FileName>Assets\Scripts\ResearchModeVideoStream.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Rotation" Collapsed="true">
+    <Position X="4.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQABAAAICAAAAAAAAAQAAAAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Rotation.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Rotator" Collapsed="true">
+    <Position X="8.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Rotator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SingletonWIDVE&lt;T&gt;" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAEA=</HashCode>
+      <FileName>Assets\Scripts\SingletonWIDVE.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SpawnListIndex" Collapsed="true">
+    <Position X="13.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQIAEAAACAExACCACACAQAMAAAoQAAAEEDAACAAAiA=</HashCode>
+      <FileName>Assets\Scripts\SpawnListIndex.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TakeColorPhoto" Collapsed="true">
+    <Position X="4.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>hAQAEAAAAGAAgoYiAAEACAgAAAARAgAAAAAAAAABAQA=</HashCode>
+      <FileName>Assets\Scripts\TakeColorPhoto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TCPClient" Collapsed="true">
+    <Position X="6.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAAAAAAAAAAAAAAAABgACAAAAAAAAEA=</HashCode>
+      <FileName>Assets\Scripts\TCPClient.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ToggleActive" Collapsed="true">
+    <Position X="8.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAEAAAAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\ToggleActive.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WebcamPanel" Collapsed="true">
+    <Position X="11.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAEAAAAiAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAA=</HashCode>
+      <FileName>Assets\Scripts\WebcamPanel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WorldToMapHeadsetRotate" Collapsed="true">
+    <Position X="13.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQIgBAAACAAAAAAAAAAAAAAAAgAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\WorldToMapHeadsetRotate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.MixedReality.Toolkit.Examples.Demos.DisablePointersExample" Collapsed="true">
+    <Position X="10" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQQAQAAAiABACAAAAAAAAAAQAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>Assets\Samples\Mixed Reality Toolkit Examples\2.7.3\Demos - Input\Scenes\DisablePointers\DisablePointersExample.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.MixedReality.Toolkit.Examples.Demos.Rotator" Collapsed="true">
+    <Position X="6.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>Assets\Samples\Mixed Reality Toolkit Examples\2.7.3\Demos - Input\Scenes\InputActions\Rotator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.MixedReality.Toolkit.Examples.Demos.InputDataExample" Collapsed="true">
+    <Position X="3" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQQAAAAACAAAAAAAAAAAAAAAAAAAAAACAAAAAEAAAA=</HashCode>
+      <FileName>Assets\Samples\Mixed Reality Toolkit Examples\2.7.3\Demos - Input\Scenes\InputData\InputDataExample.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.MixedReality.Toolkit.Examples.Demos.InputDataExampleGizmo" Collapsed="true">
+    <Position X="4.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAACAAAAAIAg=</HashCode>
+      <FileName>Assets\Samples\Mixed Reality Toolkit Examples\2.7.3\Demos - Input\Scenes\InputData\InputDataExampleGizmo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.MixedReality.Toolkit.Examples.Demos.SpawnOnPointerEvent" Collapsed="true">
+    <Position X="17" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAECAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Samples\Mixed Reality Toolkit Examples\2.7.3\Demos - Input\Scenes\PointerResult\SpawnOnPointerEvent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.MixedReality.Toolkit.Examples.Demos.PrimaryPointerHandlerExample" Collapsed="true">
+    <Position X="11.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAIAAAAACAACAA=</HashCode>
+      <FileName>Assets\Samples\Mixed Reality Toolkit Examples\2.7.3\Demos - Input\Scenes\PrimaryPointer\PrimaryPointerHandlerExample.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.MixedReality.Toolkit.Examples.Demos.ClearSpatialObservations" Collapsed="true">
+    <Position X="6.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Samples\Mixed Reality Toolkit Examples\2.8.3\Demos - SpatialAwareness\Scripts\ClearSpatialObservations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.MixedReality.Toolkit.Examples.Demos.ShowPlaneFindingInstructions" Collapsed="true">
+    <Position X="10" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Samples\Mixed Reality Toolkit Examples\2.8.3\Demos - SpatialAwareness\Scripts\ShowPlaneFindingInstructions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.MixedReality.Toolkit.Experimental.SceneUnderstanding.DemoSceneUnderstandingController" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="8.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BMALEAAwEDcgQAEAQoSeAAAAggAMAAgIAKCBAgAAiAA=</HashCode>
+      <FileName>Assets\Samples\Mixed Reality Toolkit Examples\2.8.3\Experimental - SceneUnderstanding\Scripts\DemoSceneUnderstandingController.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EasyVizAR.Orientation" Collapsed="true">
+    <Position X="17" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhgAQAAAAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.Position" Collapsed="true">
+    <Position X="10" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAQAAAAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.NavigationTarget" Collapsed="true">
+    <Position X="10" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAAAAAAAAAIAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.Headset" Collapsed="true">
+    <Position X="3" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABACIABAAAAAAAAAAAIAAABAAEAACAAAAAAEAAAgA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.RegisteredHeadset" Collapsed="true">
+    <Position X="15.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEBACIABAAAAAAAAAAAIAAABAAEAACAAAAAAEAAAgA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.HeadsetPositionUpdate" Collapsed="true">
+    <Position X="8.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAABAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.Hololens2PhotoPost" Collapsed="true">
+    <Position X="11.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAwAAABAAAAAQEABAAAAAAAEAAAgA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.Hololens2PhotoPut" Collapsed="true">
+    <Position X="13.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAwAAAAAAAAAAAABAAAAAAAAAAAkA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.MapInfo" Collapsed="true">
+    <Position X="17" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAQAEAAAAgAAAAAAABAAFABAAAAAAAEAAAkA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.ViewBox" Collapsed="true">
+    <Position X="10" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAQAAAAAgAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.HeadsetList" Collapsed="true">
+    <Position X="6.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.PoseChange" Collapsed="true">
+    <Position X="6.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.PoseChanges" Collapsed="true">
+    <Position X="8.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.MapField" Collapsed="true">
+    <Position X="15.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.FeatureList" Collapsed="true">
+    <Position X="10" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.Path" Collapsed="true">
+    <Position X="3" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.Feature" Collapsed="true">
+    <Position X="6.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAAAAAAAAIAAABAAFAACAAAAAAEAAAgA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.FeatureDisplayStyle" Collapsed="true">
+    <Position X="8.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAAAAAAAAAAAAAAIAAAAAAAACEAAAAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.Registration" Collapsed="true">
+    <Position X="17" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAIAAAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.NewCheckIn" Collapsed="true">
+    <Position X="13.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.HeadsetConfiguration" Collapsed="true">
+    <Position X="4.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EasyVizAR.Location" Collapsed="true">
+    <Position X="10" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAQIAAAAAAAAAAEAgABAAAAAAAAAgA=</HashCode>
+      <FileName>Assets\Scripts\EasyVizAR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QRTracking.Singleton&lt;T&gt;" Collapsed="true">
+    <Position X="11.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQABABAAAAAAAAAAAAAAAAAAAAAAAAAIUAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Singleton.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HoloToolkit.Unity.SphereBasedTagalong" Collapsed="true">
+    <Position X="3" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAQEFAAAACgAARAAAAEAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\SphereBasedTagalong.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="MeshConversionResult" Collapsed="true">
+    <Position X="3" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAAAAAAAAAgAAAAAAAAIAAAACAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\MeshCapture.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

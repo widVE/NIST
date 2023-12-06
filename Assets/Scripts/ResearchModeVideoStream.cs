@@ -2093,7 +2093,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 		//h.imagePath = h2Location;
 		//h.imageUrl = null;
 		
-		UnityWebRequest www = new UnityWebRequest("http://halo05.wings.cs.wisc.edu:5000/photos", "POST");
+		UnityWebRequest www = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000/photos", "POST");
 		www.SetRequestHeader("Content-Type", "application/json");
 		
 		string ourJson = JsonUtility.ToJson(h);
@@ -2125,7 +2125,7 @@ public class ResearchModeVideoStream : MonoBehaviour
 		//Debug.Log(photoJson);
 		//Debug.Log(h2.imageUrl);
 		
-		UnityWebRequest www2 = new UnityWebRequest("http://halo05.wings.cs.wisc.edu:5000"+h2.imageUrl, "PUT");
+		UnityWebRequest www2 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000"+h2.imageUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");
 		
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);

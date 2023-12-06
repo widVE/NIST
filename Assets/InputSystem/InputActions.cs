@@ -106,6 +106,34 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""HandMenu"",
+            ""id"": ""f336398c-7db0-48b9-87be-1e3f0073ef56"",
+            ""actions"": [
+                {
+                    ""name"": ""Activate Menu"",
+                    ""type"": ""Button"",
+                    ""id"": ""bd288543-7c49-4f5f-bd18-5a0e530b20fe"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""f898dd0e-4774-4353-b788-1dca8792be4b"",
+                    ""path"": ""<Keyboard>/x"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Activate Menu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -119,6 +147,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         // Map
         m_Map = asset.FindActionMap("Map", throwIfNotFound: true);
         m_Map_Toggle = m_Map.FindAction("Toggle", throwIfNotFound: true);
+        // HandMenu
+        m_HandMenu = asset.FindActionMap("HandMenu", throwIfNotFound: true);
+        m_HandMenu_ActivateMenu = m_HandMenu.FindAction("Activate Menu", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -273,6 +304,39 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         }
     }
     public MapActions @Map => new MapActions(this);
+
+    // HandMenu
+    private readonly InputActionMap m_HandMenu;
+    private IHandMenuActions m_HandMenuActionsCallbackInterface;
+    private readonly InputAction m_HandMenu_ActivateMenu;
+    public struct HandMenuActions
+    {
+        private @InputActions m_Wrapper;
+        public HandMenuActions(@InputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @ActivateMenu => m_Wrapper.m_HandMenu_ActivateMenu;
+        public InputActionMap Get() { return m_Wrapper.m_HandMenu; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(HandMenuActions set) { return set.Get(); }
+        public void SetCallbacks(IHandMenuActions instance)
+        {
+            if (m_Wrapper.m_HandMenuActionsCallbackInterface != null)
+            {
+                @ActivateMenu.started -= m_Wrapper.m_HandMenuActionsCallbackInterface.OnActivateMenu;
+                @ActivateMenu.performed -= m_Wrapper.m_HandMenuActionsCallbackInterface.OnActivateMenu;
+                @ActivateMenu.canceled -= m_Wrapper.m_HandMenuActionsCallbackInterface.OnActivateMenu;
+            }
+            m_Wrapper.m_HandMenuActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @ActivateMenu.started += instance.OnActivateMenu;
+                @ActivateMenu.performed += instance.OnActivateMenu;
+                @ActivateMenu.canceled += instance.OnActivateMenu;
+            }
+        }
+    }
+    public HandMenuActions @HandMenu => new HandMenuActions(this);
     public interface IMarkersActions
     {
         void OnPlaceMarker(InputAction.CallbackContext context);
@@ -284,5 +348,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     public interface IMapActions
     {
         void OnToggle(InputAction.CallbackContext context);
+    }
+    public interface IHandMenuActions
+    {
+        void OnActivateMenu(InputAction.CallbackContext context);
     }
 }

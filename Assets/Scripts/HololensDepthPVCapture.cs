@@ -5,12 +5,15 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System;
 using System.Runtime.InteropServices;
-using Microsoft.Windows.Perception.Spatial.Preview;
-using Microsoft.Windows.Perception.Spatial;
 using System.IO;
 using UnityEngine.Windows.WebCam;
 using System.Linq;
-//using Microsoft.MixedReality.Toolkit;
+
+// Prevent compiler errors when developing and testing on non-Windows machines.
+#if (UNITY_EDITOR_WIN || UNITY_WSA || WINDOWS_UWP)
+using Microsoft.Windows.Perception.Spatial.Preview;
+using Microsoft.Windows.Perception.Spatial;
+#endif
 
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
@@ -79,8 +82,11 @@ public class HololensDepthPVCapture : MonoBehaviour
 	string _lastDepthImageName = "";
 	string _lastIntensityImageName = "";
 	string _lastHiResColorName = "";
-	string _lastColorPCName = "";	//world space point cloud...
-	
+	string _lastColorPCName = "";   //world space point cloud...
+
+	Vector3 _lastPosition = Vector3.zero;
+	Quaternion _lastOrientation = Quaternion.identity;
+
 	static readonly float MaxRecordingTime = 5.0f;
 	VideoCapture m_VideoCapture = null;
     float m_stopRecordingTimer = float.MaxValue;
@@ -104,13 +110,32 @@ public class HololensDepthPVCapture : MonoBehaviour
 	bool _firstHeadsetSend = true;
 	
 	int _fileOutNumber = 0;
+
+	Camera _mainCamera;
 	
 	[SerializeField]
 	PointCloudRenderer _pc;
 	//float[] _pcTest = new float[6 * 320 * 288];
 	
+	private void RemoveOldFiles()
+    {
+		DirectoryInfo dir = new DirectoryInfo(Application.persistentDataPath);
+		var files = Directory.GetFiles(Application.persistentDataPath, "*")
+			.Where(path => path.EndsWith(".txt") || path.EndsWith(".png"));
+		foreach (var f in files)
+        {
+			File.Delete(f);
+        }
+	}
+
     void Start()
     {
+		_mainCamera = Camera.main;
+		_lastPosition = _mainCamera.transform.position;
+		_lastOrientation = _mainCamera.transform.rotation;
+
+		RemoveOldFiles();
+
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
 #else
@@ -144,7 +169,9 @@ public class HololensDepthPVCapture : MonoBehaviour
 					researchMode.SetReferenceCoordinateSystem(ev.spatialNodeId);
 					researchMode.SetQRTransform(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);					
 					researchMode.SetQRCodeDetected();
-					RunSensors();
+
+                    // Wait for external signal to start sensing based on location configuration.
+					//RunSensors();
 				};
 			}
 		}
@@ -162,8 +189,8 @@ public class HololensDepthPVCapture : MonoBehaviour
 		
 #endif
 #endif
-		
-    }
+
+	}
 
 	void StartVideoCaptureTest()
     {
@@ -239,7 +266,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 	
     void LateUpdate()
     {
-		
+
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
 #else
@@ -371,8 +398,11 @@ public class HololensDepthPVCapture : MonoBehaviour
 								
 								pos = depthTrans.GetPosition();
 								rot = depthTrans.rotation;
-								
-								if(EasyVizARServer.Instance.PutImageQuad("image/png", sColor, sDepth, sPC, sI, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "photo", "depth", "geometry", "thermal"))
+
+                                // Important - send the geometry image before the color image
+                                // so that the image processing begins after both have been received.
+                                // The server marks the photo as ready after the color image has been received.
+								if(EasyVizARServer.Instance.PutImageQuad("image/png", sPC, sColor, sDepth, sI, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, _lastPosition, _lastOrientation, hsObject._headsetID, "geometry", "photo", "depth", "thermal"))
 								{
 									_lastDepthImageName = sDepth;
 									if(_captureRectifiedColorImages)
@@ -472,11 +502,11 @@ public class HololensDepthPVCapture : MonoBehaviour
 										depthTrans[i*4+j] = float.Parse(vals[j]);
 									}
 								}
-								
+
 								pos = depthTrans.GetPosition();
 								rot = depthTrans.rotation;
 								
-								if(EasyVizARServer.Instance.PutImageTriple("image/png", sColor, sDepth, sPC, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "photo", "depth", "geometry"))
+								if(EasyVizARServer.Instance.PutImageTriple("image/png", sColor, sDepth, sPC, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, _lastPosition, _lastOrientation, hsObject._headsetID, "photo", "depth", "geometry"))
 								{
 									_lastDepthImageName = sDepth;
 									_lastRectColorName = sColor;
@@ -554,7 +584,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 								pos = depthTrans.GetPosition();
 								rot = depthTrans.rotation;
 								
-								if(EasyVizARServer.Instance.PutImagePair("image/png", sColor, sDepth, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "photo", "depth"))
+								if(EasyVizARServer.Instance.PutImagePair("image/png", sColor, sDepth, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, _lastPosition, _lastOrientation, hsObject._headsetID, "photo", "depth"))
 								{
 									_lastDepthImageName = sDepth;
 									_lastRectColorName = sColor;
@@ -691,7 +721,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 										pos = depthTrans.GetPosition();
 										rot = depthTrans.rotation;
 										
-										if(EasyVizARServer.Instance.PutImage("image/png", sDepth, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "depth"))
+										if(EasyVizARServer.Instance.PutImage("image/png", sDepth, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, _lastPosition, _lastOrientation, hsObject._headsetID, "depth"))
 										{
 											_lastDepthImageName = sDepth;
 										}
@@ -776,7 +806,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 										pos = depthTrans.GetPosition();
 										rot = depthTrans.rotation;
 										
-										if(EasyVizARServer.Instance.PutImage("image/png", sColor, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID))
+										if(EasyVizARServer.Instance.PutImage("image/png", sColor, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, _lastPosition, _lastOrientation, hsObject._headsetID))
 										{
 											_lastRectColorName = sColor;
 										}
@@ -838,7 +868,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 										pos = depthTrans.GetPosition();
 										rot = depthTrans.rotation;
 										
-										if(EasyVizARServer.Instance.PutImage("image/png", sIntensity, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "thermal"))
+										if(EasyVizARServer.Instance.PutImage("image/png", sIntensity, _manager.LocationID, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, _lastPosition, _lastOrientation, hsObject._headsetID, "thermal"))
 										{
 											_lastIntensityImageName = sIntensity;
 										}
@@ -864,12 +894,20 @@ public class HololensDepthPVCapture : MonoBehaviour
 				{
 					_lastColorPCName = sPC;
 					isNewPC = true;
+
+					// Store pose at time the point cloud was aquired. Maybe this will fix staleness?
+					_lastPosition = _mainCamera.transform.position;
+					_lastOrientation = _mainCamera.transform.rotation;
 				}
 				else
 				{
 					if(sPC != _lastColorPCName)
 					{
-						isNewPC = true;		
+						isNewPC = true;
+
+						// Store pose at time the point cloud was aquired. Maybe this will fix staleness?
+						_lastPosition = _mainCamera.transform.position;
+						_lastOrientation = _mainCamera.transform.rotation;
 					}
 				}
 				
@@ -1361,11 +1399,11 @@ public class HololensDepthPVCapture : MonoBehaviour
 		
 #endif
 #endif
-    }
+	}
 
-    #region Button Event Functions
-    
-    public void StopSensorsEvent()
+	#region Button Event Functions
+
+	public void StopSensorsEvent()
     {
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR
@@ -1375,7 +1413,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 #endif
     }
 	
-	void RunSensors()
+	public void RunSensors()
 	{
 #if ENABLE_WINMD_SUPPORT
 #if UNITY_EDITOR

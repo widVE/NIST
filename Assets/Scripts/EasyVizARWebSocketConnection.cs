@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 using NativeWebSocket;
+using System.Diagnostics;
 
 [System.Serializable]
 public class FeaturesEvent
@@ -21,7 +23,7 @@ public class HeadsetsEvent
 public class EasyVizARWebSocketConnection : MonoBehaviour
 {
     [SerializeField]
-    private string _webSocketURL = "ws://halo05.wings.cs.wisc.edu:5000/ws";
+    private string _webSocketURL = "ws://easyvizar.wings.cs.wisc.edu:5000/ws";
     public string WebSocketURL
     {
         get { return _webSocketURL; }
@@ -44,15 +46,25 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     [SerializeField]
     GameObject _qrScanner = null;
 
+    [SerializeField]
+    float _updateInterval = 0.2f;
+    public bool post_data = false;
+
+    [SerializeField]
+    bool _echoMessages = true;
+
     private WebSocket _ws = null;
     private bool isConnected = false;
+    
+    private Camera _mainCamera;
+    private float _lastUpdated = 0;
 
     // Start is called before the first frame update
     void Start()
     {
         if (!featureManager)
         {
-            featureManager = GameObject.Find("HandMenu_Large_AutoWorldLock_On_HandDrop_Marker_Array");
+            featureManager = GameObject.Find("FeatureManager");
         }
         
         if (!headsetManager)
@@ -60,14 +72,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
             headsetManager = GameObject.Find("EasyVizARHeadsetManager");
         }
 
-#if UNITY_EDITOR
-        // In editor mode, use the default server and location ID.
-        _ws = initializeWebSocket();
-
-        // Connect returns a Task that only completes after the connection closes.
-        // If we 'await' it here, it will prevent the code below from running as we might expect.
-        var _ = _ws.Connect();
-#endif
+        _mainCamera = Camera.main;
 
         // Otherwise, wait for a QR code to be scanned.
         if (_qrScanner)
@@ -100,6 +105,22 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
             _ws.DispatchMessageQueue();
         }
 #endif
+
+        if (isConnected && post_data)
+        {
+            float t = UnityEngine.Time.time;
+            if (t - _lastUpdated > _updateInterval)
+            {
+                var pos = _mainCamera.transform.position;
+                var rot = _mainCamera.transform.rotation;
+
+                object[] parts = { "move", pos[0], pos[1], pos[2], rot[0], rot[1], rot[2], rot[3] };
+                string message = string.Join(" ", parts);
+
+                Task.Run(() => _ws.SendText(message));
+                _lastUpdated = t;
+            }
+        }
     }
 
     private async void OnApplicationQuit()
@@ -113,9 +134,9 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
     private WebSocket initializeWebSocket()
     {
-        // This is just a placeholder. We may need to set authorization headers later on.
         var headers = new Dictionary<string, string>
         {
+            { "Authorization", EasyVizARServer.Instance.GetAuthorizationHeader() },
             { "X-Ignore", "ignore" }
         };
 
@@ -128,7 +149,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
         ws.OnError += (error) =>
         {
-            Debug.Log("WS Error: " + error);
+            UnityEngine.Debug.Log("WS Error: " + error);
         };
 
         ws.OnOpen += this.onConnected;
@@ -139,19 +160,30 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
     private async void onConnected()
     {
-        Debug.Log("WS Connected: " + _webSocketURL);
+        UnityEngine.Debug.Log("WS Connected: " + _webSocketURL);
+
+        // Suppress event messages that were triggered by this user.
+        // Note: this feature would prevent us from receiving a notification from the server
+        // when the headset navigation target should be changed.
+        if (!_echoMessages)
+        {
+            await _ws.SendText("echo off");
+        }
+
+        // Tell the server to filter events pertaining to the current location.
+        var event_uri = $"/locations/{_locationId}/*";
 
         if (headsetManager)
         {
-            await _ws.SendText("subscribe headsets:created");
-            await _ws.SendText("subscribe headsets:updated");
-            await _ws.SendText("subscribe headsets:deleted");
+            await _ws.SendText("subscribe location-headsets:created " + event_uri);
+            await _ws.SendText("subscribe location-headsets:updated " + event_uri);
+            await _ws.SendText("subscribe location-headsets:deleted " + event_uri);
         }
 
         if (featureManager) {
-            await _ws.SendText(string.Format("subscribe features:created /locations/{0}/*", _locationId));
-            await _ws.SendText(string.Format("subscribe features:updated /locations/{0}/*", _locationId));
-            await _ws.SendText(string.Format("subscribe features:deleted /locations/{0}/*", _locationId));
+            await _ws.SendText("subscribe features:created " + event_uri);
+            await _ws.SendText("subscribe features:updated " + event_uri);
+            await _ws.SendText("subscribe features:deleted " + event_uri);
         }
 
         isConnected = true;
@@ -167,7 +199,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
         var parts = message.Split(" ", 3);
         if (parts.Length < 3)
         {
-            Debug.Log("Warning: received malformed websocket message from server");
+            UnityEngine.Debug.Log("Warning: received malformed websocket message from server");
             return;
         }
 
@@ -177,19 +209,19 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
         switch (event_type)
         {
-            case "headsets:created":
+            case "location-headsets:created":
                 {
                     HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
                     headsetManager.GetComponent<EasyVizARHeadsetManager>().CreateRemoteHeadset(ev.current);
                     break;
                 }
-            case "headsets:updated":
+            case "location-headsets:updated":
                 {
                     HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
                     headsetManager.GetComponent<EasyVizARHeadsetManager>().UpdateRemoteHeadset(ev.previous.id, ev.current);
                     break;
                 }
-            case "headsets:deleted":
+            case "location-headsets:deleted":
                 {
                     HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
                     headsetManager.GetComponent<EasyVizARHeadsetManager>().DeleteRemoteHeadset(ev.previous.id);
@@ -216,7 +248,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
                 }
             default:
                 {
-                    Debug.Log("Event: " + event_type + " " + event_uri);
+                    UnityEngine.Debug.Log("Event: " + event_type + " " + event_uri);
                     break;
                 }
         }

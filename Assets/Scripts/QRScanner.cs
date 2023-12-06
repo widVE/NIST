@@ -4,10 +4,14 @@ using UnityEngine;
 using System;
 
 using Microsoft.MixedReality.QR;
-using Microsoft.Windows.Perception.Spatial;
-using Microsoft.Windows.Perception.Spatial.Preview;
 using Microsoft.MixedReality.OpenXR;
 using Microsoft.MixedReality.Toolkit.Utilities;
+
+// Prevent compiler errors when developing and testing on non-Windows machines.
+#if (UNITY_EDITOR_WIN || UNITY_WSA || WINDOWS_UWP)
+using Microsoft.Windows.Perception.Spatial;
+using Microsoft.Windows.Perception.Spatial.Preview;
+#endif
 
 public class LocationChangedEventArgs
 {
@@ -79,6 +83,15 @@ public class QRScanner : MonoBehaviour
 	GameObject _headsetManager;
 
 	[SerializeField]
+	GameObject _meshCapture;
+
+	[SerializeField]
+	GameObject _photoCapture;
+
+	[SerializeField]
+	GameObject _researchModeManager;
+
+	[SerializeField]
 	[Tooltip("Whether we should continue to adjust the world coordinate system if the currently tracked QR code moves.")]
 	bool followMovingQRCode = false;
 	
@@ -95,7 +108,7 @@ public class QRScanner : MonoBehaviour
 	 */
 	[Header("Manual Trigger")]
 	[Tooltip("Set the QR code data and click the checkbox to trigger a fake QR code detection.")]
-	public string testQRCodeData = "vizar://halo05.wings.cs.wisc.edu:5000/locations/66a4e9f2-e978-4405-988e-e168a9429030";
+	public string testQRCodeData = "vizar://easyvizar.wings.cs.wisc.edu:5000/locations/66a4e9f2-e978-4405-988e-e168a9429030";
 	public bool triggerQRCodeDetected = false;
 
 	/*
@@ -105,7 +118,7 @@ public class QRScanner : MonoBehaviour
 	 */
 	Dictionary<Guid, QRData> originCodes = new Dictionary<Guid, QRData>();
 	Guid currentOriginId = Guid.Empty;
-	DateTimeOffset lastDetectedTime = DateTimeOffset.MinValue;
+	DateTimeOffset lastDetectedTime = DateTimeOffset.Now;
 	bool isOriginChanging = false;
 	bool isCoordinateSystemChanging = false;
 
@@ -170,7 +183,7 @@ public class QRScanner : MonoBehaviour
         {
 			if (uri.Scheme == "vizar")
 			{
-				// Example: http://halo05.wings.cs.wisc.edu:5000/
+				// Example: http://easyvizar.wings.cs.wisc.edu:5000/
 				string base_url = "http://" + uri.Authority + "/";
 				Debug.Log("Detected URL from QR code: " + base_url);
 				//EasyVizARServer.Instance._baseURL = base_url;
@@ -188,7 +201,7 @@ public class QRScanner : MonoBehaviour
 			}
 		}
 
-		// Example: vizar://halo05.wings.cs.wisc.edu:5000/locations/69e92dff-7138-4091-89c4-ed073035bfe6
+		// Example: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/69e92dff-7138-4091-89c4-ed073035bfe6
 		// This QR code marks a location origin. Add it to the appropriate dictionary, and we will
 		// take care of the rest on the next Update cycle.
 		if (isVizarScheme && isLocation)
@@ -225,9 +238,10 @@ public class QRScanner : MonoBehaviour
 		{
 			if (uri.Scheme == "vizar")
 			{
-				// Example: http://halo05.wings.cs.wisc.edu:5000/
+				// Example: http://easyvizar.wings.cs.wisc.edu:5000/
 				string base_url = "http://" + uri.Authority + "/";
 				Debug.Log("Detected URL from QR code: " + base_url);
+				//Lance question here, does this matter if it fails and is never re-called? It seems to be the original place that _hasRegistration is set to true, but that only works if a registration exsists on the device. If a new one is required then I've set _hasRegistration to true in the Save Registration function, but that might not be the correct way to use it.
 				EasyVizARServer.Instance.SetBaseURL(base_url);
 				_updatedServerFromQR = true;
 			}
@@ -240,6 +254,17 @@ public class QRScanner : MonoBehaviour
 			// Expected path segments: "/", "locations/", and "<location-id>"
 			if (uri.Segments.Length == 3 && uri.Segments[1] == "locations/")
 			{
+				/* 
+				 * Added this redundant logic to solve a race condition with the MeshCapture script,
+				 * which would start sending data with the new location ID but unaligned coordinate system.
+				 * Ideally, we want to set the coordinate system and location ID as an atomic operation.
+				 */
+				if (isCoordinateSystemChanging)
+				{
+					ChangeCoordinateSystemFromCode(d);
+					isCoordinateSystemChanging = false;
+				}
+
 				string loc = uri.Segments[2];
 				Debug.Log("Detected location ID from QR code: " + loc);
 				if (loc != _currentLocationID)
@@ -254,16 +279,58 @@ public class QRScanner : MonoBehaviour
 					}
 
 					_currentLocationID = loc;
+
+					// Fetch location information from the server and apply any applicable configuration.
+					EasyVizARServer.Instance.Get("/locations/" + loc, EasyVizARServer.JSON_TYPE, delegate (string result)
+					{
+						var location = JsonUtility.FromJson<EasyVizAR.Location>(result);
+						ApplyLocationConfiguration(location);
+					});
 				}
 			}
 		}
 
+		//Calls into the manager when the QR code is detected. Checks the status of the system's registration and the called function then calls the headsets spawner for this location ID
 		if (_headsetManager is not null)
         {
 			var manager = _headsetManager.GetComponent<EasyVizARHeadsetManager>();
-			manager.CreateAllHeadsets();
+			manager.LocalRegistrationSetup();
 		}
 	}
+
+	// Enable or disable certain features based on the configuration values from the server.
+	void ApplyLocationConfiguration(EasyVizAR.Location location)
+    {
+		if (_meshCapture)
+        {
+			_meshCapture.SetActive(location.headset_configuration.enable_mesh_capture);
+        }
+
+		if (_photoCapture)
+        {
+			var script = _photoCapture.GetComponent<TakeColorPhoto>();
+			if (location.headset_configuration.enable_photo_capture)
+            {
+				script.BeginContinuousCapture();
+            }
+            else
+            {
+				script.EndContinuousCapture();
+            }
+        }
+
+        if (_researchModeManager) {
+            var script = _researchModeManager.GetComponent<HololensDepthPVCapture>();
+            if (location.headset_configuration.enable_extended_capture)
+            {
+                script.RunSensors();
+            }
+            else
+            {
+                script.StopSensorsEvent();
+            }
+        }
+    }
 
 	void ChangeCoordinateSystemFromCode(QRData d)
     {
@@ -323,6 +390,7 @@ public class QRScanner : MonoBehaviour
 	}
 
 	//This is getting called on play mode exit, but it doesn't seem to be enough to stop the crashes
+	// the crashes have stopped, but it takes a surprisingly long time for this to stop, sometimes over a minute
 	void OnApplicationQuit()
 	{
 		Debug.Log("Stopping QR Watcher");

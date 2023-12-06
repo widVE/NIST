@@ -48,16 +48,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61f61d549a118094cab1c3adbfe4399e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _updateFrequency: 3
-  _headsetName: ross_test
-  _isLocal: 0
-  _showPositionChanges: 1
-  _realTimeChanges: 0
+  _updateFrequency: 0.5
+  _headsetName: Editor_Test
+  verbose_debug: 0
+  _is_local: 0
+  _showPositionChanges: 0
+  _realTimeChanges: 1
   _postPositionChanges: 1
   _headsetID: 
   _color: {r: 1, g: 0, b: 0, a: 1}
-  _locationID: 
   map_parent: {fileID: 0}
+  parent_headset_manager: {fileID: 0}
+  local_headset_id: 
+  feature_parent: {fileID: 0}
+  navigation_line: {fileID: 0}
 --- !u!114 &5003610570359901067
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70,26 +74,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f672d2c131a58984ea91d94d6b031977, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cam: {fileID: 0}
-  cam_pos: {x: 0, y: 0, z: 0}
-  distText: {fileID: 7137453166730415838, guid: 5e47031368955594eb31473c19544fbd, type: 3}
+  main_camera: {fileID: 0}
+  distance_text: {fileID: 0}
   capsule: {fileID: 8231832368714168251}
-  cur_prefab: {fileID: 921069525072559227}
-  isFeet: 0
-  oldPos: {x: 0, y: 0, z: 0}
-  newPos: {x: 0, y: 0, z: 0}
-  headset_icon: {fileID: 4402188086708784334, guid: d8bfdd92541e05d438e4d0d1945df5aa, type: 3}
-  mapParent: {fileID: 0}
+  is_feet: 1
+  old_position: {x: 0, y: 0, z: 0}
+  new_position: {x: 0, y: 0, z: 0}
+  headset_icon: {fileID: 4402188086708784334, guid: b234550f30f629c41ba6c5c3b64682a6, type: 3}
+  map_parent: {fileID: 0}
   headset_parent: {fileID: 0}
   headset_list:
     headsets: []
-  cur_headset:
+  current_headset:
     color: 
     created: 0
     id: 
     location_id: 
     mapId: 
     name: 
+    navigation_target:
+      type: 
+      target_id: 
+      position:
+        x: 0
+        y: 0
+        z: 0
     orientation:
       w: 0
       x: 0
@@ -101,6 +110,10 @@ MonoBehaviour:
       z: 0
     updated: 0
   headset_name: 
+  is_local: 0
+  local_headset_id: 
+  Debug_Verbose: 0
+  current_prefab: {fileID: 0}
 --- !u!1 &6732124109696385241
 GameObject:
   m_ObjectHideFlags: 0
@@ -284,7 +297,6 @@ GameObject:
   - component: {fileID: 502451607366571222}
   - component: {fileID: 6623056935919291814}
   - component: {fileID: 4821545658032759295}
-  - component: {fileID: 4997467485544731108}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Untagged
@@ -357,19 +369,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &4997467485544731108
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8231832368714168251}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19808b5b2e0e5184e9c9c512350b980d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  headset_icon: {fileID: 0}
 --- !u!1 &8343790515493500242
 GameObject:
   m_ObjectHideFlags: 0

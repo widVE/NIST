@@ -33,7 +33,15 @@ namespace EasyVizAR
 		public float y;
 		public float z;
 	}
-	
+
+	[System.Serializable]
+	public class NavigationTarget
+	{
+		public string type;			// One of (none|point|feature|headset)
+		public string target_id;    // May be set to headset_id or feature_id depending on type
+		public Position position;
+	}
+
 	[System.Serializable]
 	public class Headset
 	{
@@ -43,16 +51,23 @@ namespace EasyVizAR
 		public string location_id;
 		public string mapId;
 		public string name;
+		public NavigationTarget navigation_target;
 		public Orientation orientation;
 		public Position position;
 		public int updated;
 	};
 
-	/*
+    [System.Serializable]
+    public class HeadsetList
+    {
+        public Headset[] headsets;
+    }
+
+    /*
 	 * RegisteredHeadset is only received when creating a new headset.
 	 * It contains the authentication token that we need to save for future API calls.
 	 */
-	[System.Serializable]
+    [System.Serializable]
 	public class RegisteredHeadset
 	{
 		public string color;
@@ -61,18 +76,19 @@ namespace EasyVizAR
 		public string location_id;
 		public string mapId;
 		public string name;
+		public NavigationTarget navigation_target;
 		public Orientation orientation;
 		public Position position;
 		public int updated;
 		public string token;
 	};
 
-	/*
+    /*
 	 * HeadsetPositionUpdate contains a subset of the Headset class attributes
 	 * that we send with position updates. Sending this instead of the full
 	 * Headset object can avoid clobbering other fields such as color.
 	 */
-	[System.Serializable]
+    [System.Serializable]
 	public class HeadsetPositionUpdate
     {
 		public string location_id;
@@ -124,8 +140,6 @@ namespace EasyVizAR
 		public ViewBox viewBox;
 	}
 
-
-
 	[System.Serializable]
 	public class ViewBox
 	{
@@ -133,14 +147,6 @@ namespace EasyVizAR
 		public float left;
 		public float top;
 		public float width;
-	}
-
-
-
-	[System.Serializable]
-	public class HeadsetList
-	{
-		public Headset[] headsets;
 	}
 	
 	[System.Serializable]
@@ -168,6 +174,12 @@ namespace EasyVizAR
 	public class FeatureList
 	{
 		public Feature[] features;
+	}
+
+	[System.Serializable]
+	public class Path
+	{
+		public Position[] points;
 	}
 
 	[System.Serializable]
@@ -201,27 +213,66 @@ namespace EasyVizAR
 		public string auth_token;
     }
 
+	[System.Serializable]
+	public class NewCheckIn
+	{
+		public string location_id;
+	}
+
+	[System.Serializable]
+	public class HeadsetConfiguration
+    {
+		public bool enable_mesh_capture;
+		public bool enable_photo_capture;
+        public bool enable_extended_capture;
+    }
+
+	[System.Serializable]
+	public class Location
+    {
+		public string id;
+		public string name;
+		public string description;
+		public string model_path;
+		public string model_url;
+		public HeadsetConfiguration headset_configuration;
+    }
 }
 
 public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 {
-	private string _authority = "halo05.wings.cs.wisc.edu:5000";
-	private string _baseURL = "http://halo05.wings.cs.wisc.edu:5000/";
+	private string _authority = null;
+	private string _baseURL = null;
 	private bool _hasRegistration = false;
 	private EasyVizAR.Registration _registration;
 
 	public const string JSON_TYPE = "application/json";
 	public const string JPEG_TYPE = "image/jpeg";
 	public const string PNG_TYPE = "image/png";
-	
-	bool _isUploadingImage = false;
+
+    public bool verbose_debug = false;
+
+    bool _isUploadingImage = false;
 	
 	void Start()
     {
-		_hasRegistration = TryLoadRegistration(out _registration);
+		//BS Commented this out on 11-27 IDK why this is here before we know the location ID
+		// might havebeen for RACE CONDITION
+		
+		//_hasRegistration = TryLoadRegistration(out _registration);
+
     }
 
-	// Change the server base URL, which will affect all future API calls, e.g. "http://halo05.wing.cs.wisc.edu:5000/".
+	// Return server base URL without an ending slash, e.g. "http://easyvizar.wing.cs.wisc.edu:5000"
+	public string GetBaseURL()
+    {
+		if (_baseURL.EndsWith('/'))
+			return _baseURL.Substring(0, _baseURL.Length - 1);
+		else
+			return _baseURL;
+    }
+
+	// Change the server base URL, which will affect all future API calls, e.g. "http://easyvizar.wing.cs.wisc.edu:5000/".
 	public void SetBaseURL(string url)
     {
 		if (Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
@@ -269,7 +320,6 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		StartCoroutine(DoDELETE(_baseURL + url, contentType, jsonData, callBack));
 	}
 
-
 	public void Texture(string url, string contentType, string width, System.Action<Texture> callBack)
 	{
 		StartCoroutine(GetTexture(_baseURL+url, contentType, width, callBack));
@@ -277,7 +327,20 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	
 	public void Put(string url, string contentType, string jsonData, System.Action<string> callBack)
 	{
-		
+		StartCoroutine(DoRequest("PUT", _baseURL + url, contentType, jsonData, callBack));
+	}
+	
+	public string GetAuthorizationHeader()
+	{
+		if (_hasRegistration)
+		{
+			return "Bearer " + _registration.auth_token;
+
+		}
+		else
+        {
+			return "";
+        }
 	}
 	
 	public bool PutImage(string contentType, string pathToFile, string locationID, int width, int height, System.Action<string> callBack, 
@@ -459,6 +522,43 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		callBack(result);
 	}
 
+	public IEnumerator DoRequest(string method, string url, string contentType, string jsonData, System.Action<string> callBack)
+	{
+		if (url.StartsWith("/"))
+        {
+			url = _baseURL + url.Substring(1);
+		}
+
+		UnityWebRequest www = new UnityWebRequest(url, method);
+
+		www.SetRequestHeader("Content-Type", contentType);
+		if (_hasRegistration)
+		{
+			www.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+
+		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(jsonData);
+		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
+		www.downloadHandler = new DownloadHandlerBuffer();
+
+		yield return www.SendWebRequest();
+
+		string result = "";
+		if (www.result != UnityWebRequest.Result.Success)
+		{
+			result = "error";
+			//Debug.Log(www.error);
+		}
+		else
+		{
+			result = www.downloadHandler.text;
+			//Debug.Log("Form upload complete!");
+		}
+
+		www.Dispose();
+		callBack(result);
+	}
+
 
 	IEnumerator GetTexture(string url, string contentType, string width, System.Action<Texture> callBack)
 	{
@@ -527,7 +627,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			}
 
 			h.camera_position = new EasyVizAR.Position();
-			h.camera_position.x = -position.x;//headset.transform.position.x;
+			h.camera_position.x = position.x;//headset.transform.position.x;
 			h.camera_position.y = position.y;//headset.transform.position.y;
 			h.camera_position.z = position.z;//headset.transform.position.z;
 
@@ -539,7 +639,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		}
 		
 
-		UnityWebRequest www = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000/photos", "POST");
+		UnityWebRequest www = new UnityWebRequest(GetBaseURL() + "/photos", "POST");
 		www.SetRequestHeader("Content-Type", "application/json");
 
 		string ourJson = JsonUtility.ToJson(h);
@@ -580,7 +680,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType);
 		iUrl = iUrl + ".png";
 
-		UnityWebRequest www2 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www2 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -605,7 +705,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType2);
 		iUrl = iUrl + ".png";
 		
-		UnityWebRequest www3 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www3 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www3.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -631,13 +731,15 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		www3.Dispose();
 		
 		_isUploadingImage = false;
-		
+
+		File.Delete(path);
+		File.Delete(path2);
 	}
-	
-	
-	IEnumerator UploadImageTriple(string contentType, string path, string path2, string path3, string locationID, int width, int height, System.Action<string> callBack, 
-				Vector3 position, Quaternion orientation, string headsetID = "", string imageType="photo", string imageType2="depth", string imageType3="geometry")
-    {
+
+
+	IEnumerator UploadImageTriple(string contentType, string path, string path2, string path3, string locationID, int width, int height, System.Action<string> callBack,
+				Vector3 position, Quaternion orientation, string headsetID = "", string imageType = "photo", string imageType2 = "depth", string imageType3 = "geometry")
+	{
 		EasyVizAR.Hololens2PhotoPost h = new EasyVizAR.Hololens2PhotoPost();
 		h.width = width;
 		h.height = height;
@@ -646,15 +748,15 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 
 		//var headset = headsetManager.LocalHeadset;
 		//if (headset != null)
-        {
+		{
 			//var hsObject = headset.GetComponent<EasyVizARHeadset>();
 			//if (hsObject != null)
-            {
+			{
 				h.created_by = headsetID;//hsObject._headsetID;
 			}
 
 			h.camera_position = new EasyVizAR.Position();
-			h.camera_position.x = -position.x;//headset.transform.position.x;
+			h.camera_position.x = position.x;//headset.transform.position.x;
 			h.camera_position.y = position.y;//headset.transform.position.y;
 			h.camera_position.z = position.z;//headset.transform.position.z;
 
@@ -664,9 +766,9 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			h.camera_orientation.z = orientation.z;
 			h.camera_orientation.w = orientation.w;
 		}
-		
 
-		UnityWebRequest www = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000/photos", "POST");
+
+		UnityWebRequest www = new UnityWebRequest(GetBaseURL() + "/photos", "POST");
 		www.SetRequestHeader("Content-Type", "application/json");
 
 		string ourJson = JsonUtility.ToJson(h);
@@ -689,9 +791,9 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		}
 
 		string resultText = www.downloadHandler.text;
-		
+
 		System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "path.txt"), path);
-		
+
 		System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "result.txt"), resultText);
 		//Debug.Log(resultText);
 
@@ -701,13 +803,13 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		//string photoJson = JsonUtility.ToJson(h2);
 		//Debug.Log(photoJson);
 		//Debug.Log(h2.imageUrl);
-		
+
 		//instead let's add "photo.png" or "depth.png" to the end of the image URL...
 		string iUrl = h2.imageUrl;
 		iUrl = iUrl.Replace("image", imageType);
 		iUrl = iUrl + ".png";
 
-		UnityWebRequest www2 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www2 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -731,8 +833,8 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = h2.imageUrl;
 		iUrl = iUrl.Replace("image", imageType2);
 		iUrl = iUrl + ".png";
-		
-		UnityWebRequest www3 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+
+		UnityWebRequest www3 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www3.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -752,12 +854,12 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			//Debug.Log("Photo upload complete!");
 			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOut3.txt"), iUrl);
 		}
-		
+
 		iUrl = h2.imageUrl;
 		iUrl = iUrl.Replace("image", imageType3);
 		iUrl = iUrl + ".png";
-		
-		UnityWebRequest www4 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+
+		UnityWebRequest www4 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www4.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -777,12 +879,16 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			//Debug.Log("Photo upload complete!");
 			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOut3.txt"), iUrl);
 		}
-		
+
 		www.Dispose();
 		www2.Dispose();
 		www3.Dispose();
 		www4.Dispose();
-		
+
+		File.Delete(path);
+		File.Delete(path2);
+		File.Delete(path3);
+
 		_isUploadingImage = false;
 	}
 	
@@ -806,7 +912,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			}
 
 			h.camera_position = new EasyVizAR.Position();
-			h.camera_position.x = -position.x;//headset.transform.position.x;
+			h.camera_position.x = position.x;//headset.transform.position.x;
 			h.camera_position.y = position.y;//headset.transform.position.y;
 			h.camera_position.z = position.z;//headset.transform.position.z;
 
@@ -818,7 +924,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		}
 		
 
-		UnityWebRequest www = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000/photos", "POST");
+		UnityWebRequest www = new UnityWebRequest(GetBaseURL() + "/photos", "POST");
 		www.SetRequestHeader("Content-Type", "application/json");
 
 		string ourJson = JsonUtility.ToJson(h);
@@ -859,7 +965,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType);
 		iUrl = iUrl + ".png";
 
-		UnityWebRequest www2 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www2 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -884,7 +990,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType2);
 		iUrl = iUrl + ".png";
 		
-		UnityWebRequest www3 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www3 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www3.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -909,7 +1015,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType3);
 		iUrl = iUrl + ".png";
 		
-		UnityWebRequest www4 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www4 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www4.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -934,7 +1040,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType4);
 		iUrl = iUrl + ".png";
 		
-		UnityWebRequest www5 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www5 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www5.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -960,9 +1066,13 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		www3.Dispose();
 		www4.Dispose();
 		www5.Dispose();
-		
+
+		File.Delete(path);
+		File.Delete(path2);
+		File.Delete(path3);
+		File.Delete(path4);
+
 		_isUploadingImage = false;
-		
 	}
 
 	IEnumerator UploadImage(string contentType, string path, string locationID, int width, int height, System.Action<string> callBack, 
@@ -984,7 +1094,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			}
 
 			h.camera_position = new EasyVizAR.Position();
-			h.camera_position.x = -position.x;//headset.transform.position.x;
+			h.camera_position.x = position.x;//headset.transform.position.x;
 			h.camera_position.y = position.y;//headset.transform.position.y;
 			h.camera_position.z = position.z;//headset.transform.position.z;
 
@@ -996,7 +1106,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		}
 		
 
-		UnityWebRequest www = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000/photos", "POST");
+		UnityWebRequest www = new UnityWebRequest(GetBaseURL() + "/photos", "POST");
 		www.SetRequestHeader("Content-Type", "application/json");
 
 		string ourJson = JsonUtility.ToJson(h);
@@ -1037,7 +1147,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl.Replace("image", imageType);
 		iUrl = iUrl + ".png";
 
-		UnityWebRequest www2 = new UnityWebRequest("http://easyvizar.wings.cs.wisc.edu:5000" + iUrl, "PUT");
+		UnityWebRequest www2 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
@@ -1067,18 +1177,25 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	// Try to load a previous registration (headset ID, auth token) from file.
 	public bool TryLoadRegistration(out EasyVizAR.Registration registration)
     {
-		// Extract just the host and port from the baseUrl, e.g. "halo05.wings.cs.wisc.edu:5000"
+		// Extract just the host and port from the baseUrl, e.g. "easyvizar.wings.cs.wisc.edu:5000"
 		// Colon is not allowed in filenames, so we replace with a hash sign.
 		string filename = _authority.Replace(":", "#") + ".json";
 		string filePath = System.IO.Path.Combine(Application.persistentDataPath, "registrations", filename);
+        if(verbose_debug) Debug.Log("Is there a Registration named: " + filename);
 
-		if (!File.Exists(filePath))
+        if(verbose_debug) Debug.Log("Is there a Registration at FP: " + filePath);
+
+        if (!File.Exists(filePath))
         {
-			registration = new EasyVizAR.Registration();
+            Debug.Log("NO Registration at FP: " + filePath);
+
+            registration = new EasyVizAR.Registration();
 			return false;
         }
 
-		var reader = new StreamReader(filePath);
+        Debug.Log("YES Registration at FP: " + filePath);
+
+        var reader = new StreamReader(filePath);
 		var data = reader.ReadToEnd();
 		reader.Close();
 
@@ -1089,7 +1206,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	// Save a new registration (headset ID, auth token) to file.
 	public void SaveRegistration(string headset_id, string auth_token)
     {
-		// Extract just the host and port from the baseUrl, e.g. "halo05.wings.cs.wisc.edu:5000"
+		// Extract just the host and port from the baseUrl, e.g. "easyvizar.wings.cs.wisc.edu:5000"
 		// Colon is not allowed in filenames, so we replace with a hash sign.
 		string filename = _authority.Replace(":", "#") + ".json";
 		string parentDir = System.IO.Path.Combine(Application.persistentDataPath, "registrations");
@@ -1108,7 +1225,10 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		writer.Close();
 
 		_registration = reg;
-		_hasRegistration = true;
+
+        //Lance Questions??? Should this be here? It seems like the 				EasyVizARServer.Instance.SetBaseURL(base_url); is supposed to updated the registration boolean, but if there's no file locally it will never suceed becuse the QR scanner is only calle once in the headset
+
+        _hasRegistration = true;
 	}
 
 }

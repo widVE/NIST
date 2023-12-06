@@ -13,6 +13,9 @@ public class MarkerObject : MonoBehaviour
     public void UpdatedWithID()
     {
         //StartCoroutine(waiter());
+        //manager_script = GameObject.Find("HandMenu_Large_AutoWorldLock_On_HandDrop_Marker_Array").GetComponent<FeatureManager>();
+        manager_script = GameObject.Find("FeatureManager").GetComponent<FeatureManager>();
+
         manager_script.UpdateFeature(feature_ID);
     }
 
