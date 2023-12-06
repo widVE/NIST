@@ -108,7 +108,9 @@ public class FeatureManager : MonoBehaviour
 
     void Start()
     {
-        headset_parent = GameObject.Find("EasyVizARHeadsetManager");
+        headset_parent = EasyVizARHeadsetManager.EasyVizARManager.gameObject;
+
+        DeleteAll();
 
         //Added from SpawnListIndex
         //populating the feature types dictionary 
@@ -292,6 +294,8 @@ public class FeatureManager : MonoBehaviour
 
     }
 
+
+    //TODO Remove I think this is no longer needed
     [ContextMenu("GetFeature")]
     public void GetFeature() //takes in id as parameter, for some reason Unity doesn't accept that convention
     {

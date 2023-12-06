@@ -544,23 +544,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         {
             CreateRemoteHeadset(remoteHeadset);
         }
+        else if (matched_headset.Is_local) return;
         else matched_headset.AssignValuesFromJson(remoteHeadset);
-
-        /*foreach (var headset in _activeHeadsets)
-        {
-            // We should be matching on headset ID because names can change and
-            // are also not guaranteed to be unique, though they should be.
-            if (headset._headsetID == previous_id)
-            {
-                headset.AssignValuesFromJson(remoteHeadset);
-
-                //Debug.Log("the id: " + hs.Name + " new color: " +  remoteHeadset.color);				
-                return;
-            }
-        }
-        // The updated headset was not in our list, so make a new one.
-        CreateRemoteHeadset(remoteHeadset);
-        */
     }
 
     public void DeleteRemoteHeadset(string id)

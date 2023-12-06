@@ -127,7 +127,9 @@ public class QRScanner : MonoBehaviour
 	/// is an async call, so you could re-arrange this code to be non-blocking!
 	async void Start()
 	{
-		audioSource = GetComponent<AudioSource>();
+        _headsetManager = EasyVizARHeadsetManager.EasyVizARManager.gameObject;
+
+        audioSource = GetComponent<AudioSource>();
 
 		if (!QRCodeWatcher.IsSupported())
         {
@@ -291,7 +293,10 @@ public class QRScanner : MonoBehaviour
 		}
 
 		//Calls into the manager when the QR code is detected. Checks the status of the system's registration and the called function then calls the headsets spawner for this location ID
-		if (_headsetManager is not null)
+		//!! This was failing silently! Even though assigned in the editor, the _headsetManager was null at runtime. I added an assignment in the start function to fix this. We should be throwing an error, but this wasn't implemented.
+		//I removed the null check because it is better for it to thorw an error than to fail silently.
+		//TODO Either a throw catch error that is handeled and alerts the user, or find the manager it is looking for and assign it.
+		//if (_headsetManager is not null)
         {
 			var manager = _headsetManager.GetComponent<EasyVizARHeadsetManager>();
 			manager.LocalRegistrationSetup();

@@ -117,7 +117,7 @@ public class EasyVizARHeadset : MonoBehaviour
         parent_headset_manager = EasyVizARHeadsetManager.EasyVizARManager.gameObject;
 
         //if (_is_local) StartCoroutine(PositionPostingUpdate(_updateFrequency));
-        StartCoroutine(PositionPostingUpdate(_updateFrequency));
+        if(_postPositionChanges) StartCoroutine(PositionPostingUpdate(_updateFrequency));
     }
 
     public void Initialize(Headset headset_class_data)
@@ -169,7 +169,7 @@ public class EasyVizARHeadset : MonoBehaviour
 		_headsetName = headsetName;
 		_locationID = location;
 		
-		if(_postPositionChanges)
+		//if(_postPositionChanges)
 		{
 			_realTimeChanges = true;
 
