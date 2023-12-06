@@ -578,6 +578,7 @@ public class FeatureManager : MonoBehaviour
         GameObject world_marker = Instantiate(feature_to_spawn, world_position, spawn_root.transform.rotation, spawn_parent.transform);
         world_marker.name = string.Format("feature-{0}", feature.id);
         world_marker.transform.Find("ID").GetChild(0).name = feature.id.ToString(); // this helps keeping track of feature id
+        world_marker.tag = "Feature";
         float y_offset = (feature.id / 100f);
         if (mirror_map_axis) y_offset *= -1;
 
@@ -630,6 +631,7 @@ public class FeatureManager : MonoBehaviour
         MarkerObject new_marker_object = world_marker.GetComponent<MarkerObject>();
         if (new_marker_object is not null)
         {
+            new_marker_object.name = feature.name;
             new_marker_object.feature_ID = feature.id;
             new_marker_object.manager_script = this;
         } else

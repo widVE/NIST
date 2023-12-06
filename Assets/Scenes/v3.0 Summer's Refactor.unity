@@ -9148,6 +9148,51 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &380237256
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 380237258}
+  - component: {fileID: 380237257}
+  m_Layer: 0
+  m_Name: Signboards
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &380237257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 380237256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c218de86c9c2740a38d79806db1ae1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  signboardPrefab: {fileID: 8408373422054202666, guid: 92132b8155808b24c94c812eed0ab3e1, type: 3}
+--- !u!4 &380237258
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 380237256}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.0800253, y: -0.14203963, z: 0.45332384}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 16
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &382997460
 GameObject:
   m_ObjectHideFlags: 0
@@ -25040,7 +25085,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &1231520188
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -25104,7 +25149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   instanceCount: 100000
-  instanceMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  instanceMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 3}
   instanceMaterial: {fileID: 2100000, guid: 268d00bdc1a28cb4ab1893a0e9bb104e, type: 2}
   subMeshIndex: 0
   _pcFileName: Assets/StreamingAssets/pc_test.txt

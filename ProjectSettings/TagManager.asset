@@ -6,6 +6,11 @@ TagManager:
   tags:
   - Icon
   - Headset
+  - dest_info
+  - Direction
+  - Distance
+  - signboard
+  - Feature
   layers:
   - Default
   - TransparentFX
