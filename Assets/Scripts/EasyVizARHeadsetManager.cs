@@ -47,8 +47,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     [SerializeField]
     Material _localMaterial;
 
-    [SerializeField]
-    bool _visualizePreviousLocal = false;
+    //[SerializeField]
+    //bool _visualizePreviousLocal = false;
 
     [SerializeField]
     bool _makeUniqueLocalHeadset = false;
@@ -449,17 +449,17 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             {
                 string s = System.DateTime.Now.ToString();
 
-                local_headset.CreateLocalHeadset(_localHeadsetName + "_" + s, _locationId, !_visualizePreviousLocal);
+                local_headset.CreateLocalHeadset(_localHeadsetName + "_" + s, _locationId);
             }
             else
             {
-                local_headset.CreateLocalHeadset(_localHeadsetName, _locationId, !_visualizePreviousLocal);
+                local_headset.CreateLocalHeadset(_localHeadsetName, _locationId);
             }
             Debug.Log("Create local headset says this is the local headset name: " + local_headset.name);
         }
     }
 
-    void OLD_CreateLocalHeadset()
+/*    void OLD_CreateLocalHeadset()
     {
         if (!_visualizePreviousLocal)
         {
@@ -487,7 +487,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                 Debug.Log("Create local headset says this is the local headset name: " + local_headset.name);
             }
         }
-    }
+    }*/
 
 
     // This is where we are instantiating the GameObject of Headset in Unity
@@ -710,7 +710,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             Debug.Log("WHY NULL?? " + headset_class_data);
         }
     }
-
+/*
     void OLD_CreateHeadsetsCallback(string resultData)
     {
         if (verbose_debug_log) Debug.Log(resultData);
@@ -761,7 +761,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             Debug.Log("LOKAL OLD_CreateHeadsetsCallback  ERROR ");
         }
     }
-
+*/
     void CreateHeadsets()
     {
         //list headsets from server for our location, create a prefab of each...

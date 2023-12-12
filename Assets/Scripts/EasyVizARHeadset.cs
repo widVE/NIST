@@ -42,6 +42,7 @@ public class EasyVizARHeadset : MonoBehaviour
     //    set { _realTimeChanges = value; }
     //}
 
+	//This should be true if we want to use the PATCH method to update the server with position changes instead of the websockets. Generally assumed to be false unless testing is being done.
     [SerializeField]
 	bool _postPositionChanges = false;
 	public bool PostPositionChanges
@@ -163,7 +164,7 @@ public class EasyVizARHeadset : MonoBehaviour
         }
     */
 
-    public void CreateLocalHeadset(string headsetName, string location, bool postChanges)
+    public void CreateLocalHeadset(string headsetName, string location)
 	{
 		_is_local = true;
 		_headsetName = headsetName;
@@ -192,7 +193,7 @@ public class EasyVizARHeadset : MonoBehaviour
             }
 		}
 		
-		_postPositionChanges = postChanges;
+		//_postPositionChanges = postChanges;
 	}
 	
     // Update is called once per frame
@@ -237,7 +238,7 @@ public class EasyVizARHeadset : MonoBehaviour
 				transform.rotation = _mainCamera.transform.rotation;
 				//PostPosition();
 
-				if (_mainCamera && _postPositionChanges)
+				if (_mainCamera && _postPositionChanges && _isRegisteredWithServer)
 				{
 					transform.position = _mainCamera.transform.position;
 					transform.rotation = _mainCamera.transform.rotation;
@@ -377,17 +378,7 @@ public class EasyVizARHeadset : MonoBehaviour
             _isRegisteredWithServer = true;
 
             EasyVizAR.RegisteredHeadset h = JsonUtility.FromJson<EasyVizAR.RegisteredHeadset>(resultData);
-/*            
- *            
- *         Vector3 newPos = Vector3.zero;
 
-            newPos.x = h.position.x;
-            newPos.y = h.position.y;
-            newPos.z = h.position.z;
-
-            transform.position = newPos;
-            transform.rotation = new Quaternion(h.orientation.x, h.orientation.y, h.orientation.z, h.orientation.w);
-*/
             _headsetID = h.id;
             _headsetName = h.name;
             _locationID = h.location_id;
