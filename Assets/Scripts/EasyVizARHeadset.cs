@@ -118,7 +118,7 @@ public class EasyVizARHeadset : MonoBehaviour
         parent_headset_manager = EasyVizARHeadsetManager.EasyVizARManager.gameObject;
 
         //if (_is_local) StartCoroutine(PositionPostingUpdate(_updateFrequency));
-        if(_postPositionChanges) StartCoroutine(PositionPostingUpdate(_updateFrequency));
+        if(_postPositionChanges && _is_local) StartCoroutine(PositionPostingUpdate(_updateFrequency));
     }
 
     public void Initialize(Headset headset_class_data)
@@ -238,7 +238,7 @@ public class EasyVizARHeadset : MonoBehaviour
 				transform.rotation = _mainCamera.transform.rotation;
 				//PostPosition();
 
-				if (_mainCamera && _postPositionChanges && _isRegisteredWithServer)
+				if (_mainCamera && _postPositionChanges)
 				{
 					transform.position = _mainCamera.transform.position;
 					transform.rotation = _mainCamera.transform.rotation;

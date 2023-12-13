@@ -232,6 +232,10 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         EasyVizARServer.Instance.Texture("locations/" + _locationId + "/layers/1/image", "image/png", "1200", DisplayMapCallback);
     }
 
+//a DisplayHandMap function that takes a list of maps and gets the images for each one, indexed by the map number
+
+
+
 
 
     public void ToggleBreadcrumbs()

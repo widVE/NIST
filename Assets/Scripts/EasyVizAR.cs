@@ -140,7 +140,13 @@ namespace EasyVizAR
 		public ViewBox viewBox;
 	}
 
-	[System.Serializable]
+    [System.Serializable]
+    public class MapLayerInfoList
+	{
+        public MapInfo[] layers;
+    }
+
+    [System.Serializable]
 	public class ViewBox
 	{
 		public float height;

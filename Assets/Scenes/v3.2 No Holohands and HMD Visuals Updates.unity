@@ -20003,7 +20003,7 @@ MonoBehaviour:
   headsetManager: {fileID: 1361342022}
   map_parent: {fileID: 335883421}
   _qrScanner: {fileID: 291935030}
-  _updateInterval: 0.5
+  _updateInterval: 0.3
   post_data: 1
   _echoMessages: 1
 --- !u!1 &920408654

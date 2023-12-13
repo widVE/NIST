@@ -16,6 +16,11 @@ public class MapController : MonoBehaviour
     public bool mirror_axis = false;
     public string last_clicked_target = "";
 
+    private GameObject Easy_Viz_Manager;
+
+    private EasyVizAR.MapLayerInfoList map_layer_info_list;
+    private List<Material> map_layer_images;
+
     [SerializeField] String map_location_ID;
     [SerializeField] int map_resolution = 1200;
 
@@ -23,6 +28,7 @@ public class MapController : MonoBehaviour
     // for disabled game objects until they are enabled.
     void Start()
     {
+        Easy_Viz_Manager = EasyVizARHeadsetManager.EasyVizARManager.gameObject;
         //map_location_ID = currHeadset.GetComponent<EasyVizARHeadsetManager>().LocationID;
     }
 
@@ -37,11 +43,9 @@ public class MapController : MonoBehaviour
     void OnEnable()
     {
         map_location_ID = currHeadset.GetComponent<EasyVizARHeadsetManager>().LocationID;
-        UpdateMapImage();
+        GetMapImage();
         MapAspectRatioAndOrigin();
     }
-
-
 
     // Update is called once per frame
     void Update()
@@ -50,22 +54,32 @@ public class MapController : MonoBehaviour
     }
 
     [ContextMenu("Map Image")]
-    public void UpdateMapImage()
+    void GetMapImage()
     {
-        EasyVizARServer.Instance.Texture("locations/" + map_location_ID + "/layers/1/image", "image/png", map_resolution.ToString(), UpdateMapImageCallback);
+        EasyVizARServer.Instance.Texture("locations/" + map_location_ID + "/layers/1/image", "image/png", map_resolution.ToString(), GetMapImageCallback);
     }
 
-
-    public void UpdateMapImageCallback(Texture resultTexture)
+    public void GetMapImage(int index)
     {
-        //Debug.Log("In map callback");
+        EasyVizARServer.Instance.Texture("locations/" + map_location_ID + "/layers/" + index + "/image", "image/png", map_resolution.ToString(), GetMapImageIndexCallback);
+    }
+
+    //How do I pass the index of the map layer to the callback?
+    private void GetMapImageCallback(Texture map_image)
+    {
         foreach (var map_layout in map_lines)
         {
-            map_layout.GetComponent<Renderer>().material.mainTexture = resultTexture;
+            map_layout.GetComponent<Renderer>().material.mainTexture = map_image;
         }
     }
 
-    //ADDED FOR NEW MAP
+    private void GetMapImageIndexCallback(Texture texture)
+    {
+        throw new NotImplementedException();
+    }
+
+
+    //This probably doesn't need to have a web request anymore because we are storing the map info locally now. Though this will need to be updated to account for both single layer and multi-layer maps
     [ContextMenu("Map Aspect Ratio and Icon Origin")]
     public void MapAspectRatioAndOrigin()
     {
@@ -105,5 +119,48 @@ public class MapController : MonoBehaviour
             Debug.Log("ERROR: " + results);
         }
     }
-    
+
+    //Get list of map layers, and extract the metadata for each layer
+    void GetMapLayers()
+    {
+        //Get list of map layers
+        EasyVizARServer.Instance.Get("locations/" + map_location_ID + "/layers/", EasyVizARServer.JSON_TYPE, GetMapLayersCallback);
+    }
+
+    void GetMapLayersCallback(string results)
+    {
+        if(results != "error")
+        {
+            //Store the layer info
+            map_layer_info_list = JsonUtility.FromJson<EasyVizAR.MapLayerInfoList>(results);
+
+            GetMapLayerImages();
+        }
+        else
+        {
+            Debug.Log("ERROR: " + results);
+        }
+    }
+
+    //Iterate though list of map layers and request each image for the layer
+    void GetMapLayerImages()
+    {
+        //Get the image for each layer
+        for (int i = 0; i < map_layer_info_list.layers.Length; i++)
+        {
+            GetMapImage(i);
+
+            //Somehow store the image in a list of images
+        }
+
+        SetMapLayerImages();
+    }
+
+    //Assign each image to the appropriate map layer on map visualization and aspect ratio and origin of each map layer
+    private void SetMapLayerImages()
+    {
+        throw new NotImplementedException();
+    }
+
+
 }
