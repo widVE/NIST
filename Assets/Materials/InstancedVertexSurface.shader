@@ -37,6 +37,8 @@ Shader "Instanced/InstancedVertexShader" {
                 //float3 worldNormal = v.normal;
                                
                 v2f o;
+				o.vertex = float4(0,0,0,0);
+				o.color = float4(0,0,0,0);
 				UNITY_SETUP_INSTANCE_ID(o);
 			    UNITY_INITIALIZE_OUTPUT(v2f, o);
 			    //UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
