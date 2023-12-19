@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using EasyVizAR;
 
 public class MapController : MonoBehaviour
 {
@@ -19,7 +20,10 @@ public class MapController : MonoBehaviour
     private GameObject Easy_Viz_Manager;
 
     private EasyVizAR.MapLayerInfoList map_layer_info_list;
-    private List<Material> map_layer_images;
+    private Dictionary<int,Texture2D> map_layer_images = new Dictionary<int, Texture2D>();
+
+    public Texture2D[] map_layer_images_array = new Texture2D[10];
+    public int texture_index = 0;
 
     [SerializeField] String map_location_ID;
     [SerializeField] int map_resolution = 1200;
@@ -59,9 +63,9 @@ public class MapController : MonoBehaviour
         EasyVizARServer.Instance.Texture("locations/" + map_location_ID + "/layers/1/image", "image/png", map_resolution.ToString(), GetMapImageCallback);
     }
 
-    public void GetMapImage(int index)
+    public void GetMapImage(int map_ID)
     {
-        EasyVizARServer.Instance.Texture("locations/" + map_location_ID + "/layers/" + index + "/image", "image/png", map_resolution.ToString(), GetMapImageIndexCallback);
+        EasyVizARServer.Instance.TextureMapID("locations/" + map_location_ID + "/layers/" + map_ID + "/image", "image/png", map_resolution.ToString(), map_ID, GetMapImageIDCallback);
     }
 
     //How do I pass the index of the map layer to the callback?
@@ -73,9 +77,32 @@ public class MapController : MonoBehaviour
         }
     }
 
-    private void GetMapImageIndexCallback(Texture texture)
+    private void GetMapImageIDCallback(Texture texture, int map_ID)
     {
-        throw new NotImplementedException();
+        //If the map layer image is already in the dictionary, update the texture, or add the new key value pair
+        //I'm not sure if casting to Texture2D is actually necessary, but the Unity documentation says to use it to represent textures in scripting
+        if (map_layer_images.ContainsKey(map_ID))
+        {
+            //Updating the texture requires the metadata of the image to scale correctly
+            //Texture2D updated_map_image = new Texture2D(texture.width, texture.height);
+            Texture2D updated_map_image = (Texture2D)texture;
+            map_layer_images[map_ID] = updated_map_image;
+
+            map_layer_images_array[texture_index] = updated_map_image;
+            texture_index++;
+        }
+        else
+        {
+            //Texture2D new_map_image = new Texture2D(texture.width, texture.height);
+            Texture2D new_map_image = (Texture2D)texture;
+            map_layer_images.Add(map_ID, new_map_image);
+
+            map_layer_images_array[texture_index] = new_map_image;
+            texture_index++;
+
+        }
+
+        if (verbose_debug) Debug.Log("Map ID Callback: " + map_ID);
     }
 
 
@@ -121,10 +148,34 @@ public class MapController : MonoBehaviour
     }
 
     //Get list of map layers, and extract the metadata for each layer
+    [ContextMenu("Map Layer Loop Test")]
+    void ImageLoopTest()
+    {
+        GetMapLayers();
+        StartCoroutine(ImageLoop());
+    }
+
+    IEnumerator ImageLoop()
+    {
+        yield return new WaitForSeconds(4);
+
+        while (true)
+        {
+            foreach(Texture2D image_only in map_layer_images.Values)
+            { 
+                foreach (GameObject map_layout in map_lines)
+                {
+                    map_layout.GetComponent<Renderer>().material.mainTexture = image_only;
+                }
+                yield return new WaitForSeconds(2);
+            }
+        }   
+    }
+
     void GetMapLayers()
     {
         //Get list of map layers
-        EasyVizARServer.Instance.Get("locations/" + map_location_ID + "/layers/", EasyVizARServer.JSON_TYPE, GetMapLayersCallback);
+        EasyVizARServer.Instance.Get("locations/" + map_location_ID + "/layers/?envelope=layers", EasyVizARServer.JSON_TYPE, GetMapLayersCallback);
     }
 
     void GetMapLayersCallback(string results)
@@ -133,6 +184,13 @@ public class MapController : MonoBehaviour
         {
             //Store the layer info
             map_layer_info_list = JsonUtility.FromJson<EasyVizAR.MapLayerInfoList>(results);
+
+            for (int i = 0; i < map_layer_info_list.layers.Length; i++)
+            {
+                //Get the metadata for each layer
+                if(verbose_debug) Debug.Log("Map Layer Info ID" + map_layer_info_list.layers[i].id);
+            }
+
 
             GetMapLayerImages();
         }
@@ -146,14 +204,18 @@ public class MapController : MonoBehaviour
     void GetMapLayerImages()
     {
         //Get the image for each layer
+        //TODO use ID's not indexes
+
+
+
         for (int i = 0; i < map_layer_info_list.layers.Length; i++)
         {
-            GetMapImage(i);
+            GetMapImage(map_layer_info_list.layers[i].id);
 
             //Somehow store the image in a list of images
         }
 
-        SetMapLayerImages();
+        //SetMapLayerImages();
     }
 
     //Assign each image to the appropriate map layer on map visualization and aspect ratio and origin of each map layer
