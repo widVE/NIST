@@ -240,8 +240,21 @@ public class QRScanner : MonoBehaviour
 		{
 			if (uri.Scheme == "vizar")
 			{
+                string base_url;
+
+                // Try to infer whether we should use HTTP or HTTPS for the
+                // connection.  It should work if we use this convention: if
+                // the URI explicitly specifies a port other than 443, such as
+                // 5000, then use HTTP; otherwise, default to HTTPS.
+                if (uri.Port == -1 || uri.Port == 443) {
+                    // Example: vizar://example.org/locations/xyz
+                    base_url = "https://" + uri.Authority + "/";
+                } else {
+                    // Example: vizar://1.2.3.4:5000/locations/xyz
+                    base_url = "http://" + uri.Authority + "/";
+                }
+
 				// Example: http://easyvizar.wings.cs.wisc.edu:5000/
-				string base_url = "http://" + uri.Authority + "/";
 				Debug.Log("Detected URL from QR code: " + base_url);
 				//Lance question here, does this matter if it fails and is never re-called? It seems to be the original place that _hasRegistration is set to true, but that only works if a registration exsists on the device. If a new one is required then I've set _hasRegistration to true in the Save Registration function, but that might not be the correct way to use it.
 				EasyVizARServer.Instance.SetBaseURL(base_url);
