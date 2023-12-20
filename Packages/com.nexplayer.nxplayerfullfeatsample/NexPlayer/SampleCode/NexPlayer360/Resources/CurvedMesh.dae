@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <asset>
+    <contributor>
+      <author>Blender User</author>
+      <authoring_tool>Blender 2.91.2 commit date:2021-01-19, commit time:16:15, hash:5be9ef417703</authoring_tool>
+    </contributor>
+    <created>2021-03-24T16:51:39</created>
+    <modified>2021-03-24T16:51:39</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_images/>
+  <library_geometries>
+    <geometry id="CurvedMesh-mesh" name="CurvedMesh">
+      <mesh>
+        <source id="CurvedMesh-mesh-positions">
+          <float_array id="CurvedMesh-mesh-positions-array" count="78">337.4984 164.6977 -29.91516 395.6472 164.6977 -56.50665 395.6472 -164.6977 -56.50665 337.4984 -164.6977 -29.91516 272.5121 164.6977 -5.922119 272.5121 -164.6977 -5.922119 205.8343 164.6977 12.86511 205.8343 -164.6977 12.86511 137.9504 164.6977 26.35638 137.9504 -164.6977 26.35638 69.21997 164.6977 34.50268 69.21997 -164.6977 34.50268 3.33786e-6 164.6977 37.23962 3.33786e-6 -164.6977 37.23962 -69.21995 164.6977 34.50268 -69.21995 -164.6977 34.50268 -137.9504 164.6977 26.35638 -137.9504 -164.6977 26.35638 -205.8343 164.6977 12.86511 -205.8343 -164.6977 12.86511 -272.5121 164.6977 -5.922058 -272.5121 -164.6977 -5.922058 -337.4984 164.6977 -29.91516 -337.4984 -164.6977 -29.91516 -395.6472 164.6977 -56.50665 -395.6472 -164.6977 -56.50665</float_array>
+          <technique_common>
+            <accessor source="#CurvedMesh-mesh-positions-array" count="26" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="CurvedMesh-mesh-normals">
+          <float_array id="CurvedMesh-mesh-normals-array" count="78">-0.4158785 0 -0.9094202 -0.3800281 0 -0.924975 -0.3800281 0 -0.9249749 -0.3090172 0 -0.9510565 -0.3090171 0 -0.9510565 -0.2332442 0 -0.9724182 -0.2332442 0 -0.9724182 -0.1564344 0 -0.9876884 -0.1564343 0 -0.9876884 -0.07866573 0 -0.9969011 -0.07866567 0 -0.9969011 0 0 -1 0 0 -1 0.07866567 0 -0.9969012 0.07866573 0 -0.9969012 0.1564344 0 -0.9876884 0.1564344 0 -0.9876884 0.2332438 0 -0.9724183 0.2332438 0 -0.9724184 0.3090171 0 -0.9510565 0.3090171 0 -0.9510565 0.3799822 0 -0.9249939 0.3799887 -5.7859e-7 -0.9249913 0.4158784 0 -0.9094203 0.4158784 0 -0.9094203 -0.4158785 0 -0.9094201</float_array>
+          <technique_common>
+            <accessor source="#CurvedMesh-mesh-normals-array" count="26" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="CurvedMesh-mesh-map-0">
+          <float_array id="CurvedMesh-mesh-map-0-array" count="144">0 0.9999999 0.07853049 0 0.07853049 0.9999999 0.07853049 0.9999999 0.1596526 0 0.1596526 0.9999999 0.1596526 0.9999999 0.2428892 0 0.2428892 0.9999999 0.2428892 0.9999999 0.3277118 0 0.3277118 0.9999999 0.3277118 0.9999999 0.4135916 0 0.4135916 0.9999999 0.4135916 0.9999999 0.5000001 0 0.5000001 0.9999999 0.5000001 0.9999999 0.5864085 0 0.5864085 0.9999999 0.5864085 0.9999999 0.6722883 0 0.6722883 0.9999999 0.6722883 0.9999999 0.7571108 0 0.7571108 0.9999999 0.7571108 0.9999999 0.8403475 0 0.8403475 1 0.8403475 1 0.9214695 0 0.9214695 0.9999999 1 0.9999999 0.9214695 0 1 0 0 0.9999999 0 0 0.07853049 0 0.07853049 0.9999999 0.07853049 0 0.1596526 0 0.1596526 0.9999999 0.1596526 0 0.2428892 0 0.2428892 0.9999999 0.2428892 0 0.3277118 0 0.3277118 0.9999999 0.3277118 0 0.4135916 0 0.4135916 0.9999999 0.4135916 0 0.5000001 0 0.5000001 0.9999999 0.5000001 0 0.5864085 0 0.5864085 0.9999999 0.5864085 0 0.6722883 0 0.6722883 0.9999999 0.6722883 0 0.7571108 0 0.7571108 0.9999999 0.7571108 0 0.8403475 0 0.8403475 1 0.8403475 0 0.9214695 0 1 0.9999999 0.9214695 0.9999999 0.9214695 0</float_array>
+          <technique_common>
+            <accessor source="#CurvedMesh-mesh-map-0-array" count="72" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="CurvedMesh-mesh-vertices">
+          <input semantic="POSITION" source="#CurvedMesh-mesh-positions"/>
+        </vertices>
+        <triangles count="24">
+          <input semantic="VERTEX" source="#CurvedMesh-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#CurvedMesh-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#CurvedMesh-mesh-map-0" offset="2" set="0"/>
+          <p>1 0 0 3 1 1 0 2 2 0 2 3 5 3 4 4 4 5 4 4 6 7 5 7 6 6 8 6 6 9 9 7 10 8 8 11 8 8 12 11 9 13 10 10 14 10 10 15 13 11 16 12 12 17 12 12 18 15 13 19 14 14 20 14 14 21 17 15 22 16 16 23 16 16 24 19 17 25 18 18 26 18 18 27 21 19 28 20 20 29 20 20 30 23 21 31 22 22 32 24 23 33 23 21 34 25 24 35 1 0 36 2 25 37 3 1 38 0 2 39 3 1 40 5 3 41 4 4 42 5 3 43 7 5 44 6 6 45 7 5 46 9 7 47 8 8 48 9 7 49 11 9 50 10 10 51 11 9 52 13 11 53 12 12 54 13 11 55 15 13 56 14 14 57 15 13 58 17 15 59 16 16 60 17 15 61 19 17 62 18 18 63 19 17 64 21 19 65 20 20 66 21 19 67 23 21 68 24 23 69 22 22 70 23 21 71</p>
+        </triangles>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene">
+      <node id="CurvedMesh" name="CurvedMesh" type="NODE">
+        <matrix sid="transform">0.01 0 0 0 0 -1.62921e-9 -0.01 0 0 0.01 -1.62921e-9 0 0 0 0 1</matrix>
+        <instance_geometry url="#CurvedMesh-mesh" name="CurvedMesh"/>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>

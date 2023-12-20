@@ -1,0 +1,3797 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NexPlayerUnityDLL</name>
+    </assembly>
+    <members>
+        <member name="T:NexPlayerAPI.VerimatrixDRMCommand">
+            <summary>
+            Used as an async init command for NexPlayer
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.VerimatrixDRMCommand.SetPlaybackToken(NexPlayerAPI.NexPlayerBehaviour,System.Action)">
+            <summary>
+             Within this function will fetch the playback token
+             and insert that token into the header information.
+            </summary>
+            <param name="resourceID"></param>
+            <returns></returns>
+        </member>
+        <member name="T:NexPlayerAPI.VerimatrixDRMCommand.TokenResponse">
+            <summary>
+            Token response for deserializing json
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerAndroid.SetDRMSecretKey(System.String)">
+            <summary>
+            Set the DRM secret key, it only for use alticast
+            </summary>
+            <param name="secretKey">DRM secret key</param>
+        </member>
+        <member name="T:NexPlayerAPI.EventNotify">
+            <summary>
+            Use this delegate to receive events from NexPlayer
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.EventNotifyAudioPCM">
+            <summary>
+            Use this delegate to receive events from NexPlayer PCM (pulse-code modification)
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerBase">
+            <summary>
+            NexPlayerBase abstract class that determines the available methods for all the supported platforms. Use this with the NexPlayerFactory.GetNexPlayer();
+            </summary>
+        </member>
+        <member name="P:NexPlayerAPI.NexPlayerBase.OnEvent">
+            <summary>
+            Obsolete: Use <see cref="M:NexPlayerAPI.NexPlayerBase.AddEventListener(NexPlayerAPI.EventNotify)"/> and <see cref="M:NexPlayerAPI.NexPlayerBase.RemoveEventListener(NexPlayerAPI.EventNotify)"/> instead
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBase.mute">
+            <summary>
+            Turn off the volume
+            </summary>
+        </member>
+        <member name="P:NexPlayerAPI.NexPlayerBase.audioVolume">
+            <summary>
+            Adjusts the NexPlayer software audio volume
+            </summary>
+        </member>
+        <member name="P:NexPlayerAPI.NexPlayerBase.loop">
+            <summary>
+            When the playback reaches the end position it jumps to the start and plays again
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBase.autoPlayback">
+            <summary>
+            Start playback automatically after video is buffered
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBase.firstFrame">
+            <summary>
+            The Nexplayer waits for playback with first video frame
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBase.bOnSubtitle">
+            <summary>
+            Setting subtitle On/Off only use windowEditor
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBase.logLevelForDebugging">
+            <summary>
+            Setting log level for debugging
+            </summary>
+        </member>
+        <member name="P:NexPlayerAPI.NexPlayerBase.renderMode">
+            <summary>
+            Setting the Nexplayer's render mode
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBase.targetTextures">
+            <summary>
+            Obsolete: use <see cref="F:NexPlayerAPI.NexPlayerBase.multiRenderTextures"/> instead
+            </summary>
+        </member>
+        <member name="P:NexPlayerAPI.NexPlayerBase.targetMaterialRenderer">
+            <summary>
+            Sets which Material Renderer to use when the Nexplayer sets the rendermode to MaterialOverride mode
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBase.targetRawImage">
+            <summary>
+            Sets which RawImage to use when the Nexplayer sets the rendermode to RawImage mode
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBase.maxScreenImage">
+            <summary>
+            Sets the RawImage to use for a maximized screen.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBase.isInitializedFirstTime">
+            <summary>
+            Boolean set to true only when the player is initialized for the first time.
+            This is used only on Android to avoid transparency when using linear color space
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.Init">
+            <summary>
+            Initializes the player
+            </summary>	
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.Init(System.Int32)">
+            <summary>
+            Initializes the player , it set the logLevel
+            </summary>	
+            <param name="logLevel">If set to <c>true</c> use extended logs</param>
+            <returns>If returns to <c>0</c> The NexPlayer initialization is successful <c>-1</c> The rendering failed <c>-2</c> The Nexplayer initialization failed</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.Init(System.Int32,System.String)">
+            <summary>
+            Initializes the player , it set logLevel and a Widevine DRM key server URI. This method is not available for all the platforms
+            </summary>
+            <param name="logLevel">If set to <c>true</c> use extended logs</param>
+            <param name="KeyServerURI">Widevine Key server URI</param>
+            <returns>If returns to <c>0</c> The NexPlayer initialization is successful <c>-1</c> The rendering failed <c>-2</c> The Nexplayer initialization failed</returns>        
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.Init(System.Int32,System.String,System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            Initializes the player , it set logLevel, a Widevine DRM key server URI and HTTP Header data. This method is not available for all the platforms
+            </summary>
+            <param name="logLevel">If set to <c>true</c> use extended logs</param>
+            <param name="keyServerURI">Widevine Key server URI</param>
+            <param name="headerData">DRM HTTP Header Data</param>
+            <returns>If returns to <c>0</c> The NexPlayer initialization is successful <c>-1</c> The rendering failed <c>-2</c> The Nexplayer initialization failed</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetWVDRMConfig(System.String,System.Collections.Generic.Dictionary{System.String,System.String},System.Int32)">
+            <summary>
+            Set DRM keyserver, HTTP header data and license request time
+            </summary>
+            <param name="keyServer">DRM key server URI </param>
+            <param name="headerData">DRM HTTP Header Data</param>
+            <param name="licenseRequestTimeout">DRM key server request timeout</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetLowLatency(System.Boolean,System.Int32)">
+            <summary>
+            Set Lowlatency
+            </summary>
+            <param name="enable">whether to use lowlatency or not</param>
+            <param name="value">set latency value</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.OpenWithPath(System.String,System.String)">
+            <summary>
+            Open the player with an URI and subtitleURI, when playmode is StreamingPlay or LocalPlay
+            </summary>
+            <param name="URI">URI of the video to play</param>  
+            <param name="subtitleURI">URI of the subtitle</param>
+            <returns>If set to <c>0</c> open success </returns> 
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.OpenWithFD(System.String,System.String)">
+            <summary>
+            Open the player with an URI and subtitleURI, when playmode is AssetPlay
+            </summary>
+            <param name="URI">URI of the video to play</param>  
+            <param name="subtitleURI">URI of the subtitle</param>
+            <returns>If set to <c>0</c> open success </returns> 
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.StartPlayBack">
+            <summary>
+            Starts the video playback. Call this after the event NEXPLAYER_EVENT_INIT_COMPLETE if auto play is disabled
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.Stop">
+            <summary>
+            Stop the playback
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.Resume">
+            <summary>
+            Resumes the playback
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.Pause">
+            <summary>
+            Pauses the playback
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.Close">
+            <summary>
+            Close the Nexplayer
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.Release">
+            <summary>
+            Release the Nexplayer
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.Seek(System.Int32)">
+            <summary>
+            Seeks in the playback, moving the playback to the specified millisecond
+            </summary>
+            <param name="milliseconds">Milliseconds where the playback will seek</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.CoroutineEndOfTheFrame">
+            <summary>
+            Coroutine that needs to be started after player is initialized, and stopped before setting the player to null. Using this in this way it's mandatory and extremely important
+            </summary>
+            <returns>The IEnumerator that allows the player properly play the video</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.CoroutineTextureUpdate">
+            <summary>
+            Obsolete: this coroutine no longer needs to be called
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.CoroutineOnTime">
+            <summary>
+            Coroutine for macOS and Windows that starts after player is initialized and stopped before setting the player to null.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.Update">
+            <summary>
+            This Update method should be called on the Update callback of a Unity MonoBehaviour. Using this in this way it's mandatory and extremely important
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetTexture">
+            <summary>
+            Returns a Unity Texture that is updated with the video frames. Update this on your Unity Objects when the event NEXPLAYER_EVENT_TEXTURE_CHANGED is triggered 
+            </summary>
+            <returns>The texture updated with the video frames</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetPlayerStatus">
+            <summary>
+            Returns the status player
+            </summary>
+            <returns>The status player</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetVersion">
+            <summary>
+            Retrieves the version of the specific platform SDK
+            </summary>
+            <returns>Return Version of SDK or Unknown version</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetCurrentTime">
+            <summary>
+            Returns the current time of the playback
+            </summary>
+            <returns>The current time of the playback in millisecond</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetTotalTime">
+            <summary>
+            Returns the total time of the of the playback
+            </summary>
+            <returns>The total time of the playback in millisecond</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetVideoHeight">
+            <summary>
+            Returns the current height of the video. This changes when the event NEXPLAYER_EVENT_TRACK_CHANGED is triggered
+            </summary>
+            <returns>The video height in pixels</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetVideoWidth">
+            <summary>
+            Returns the current width of the video. This changes when the event NEXPLAYER_EVENT_TRACK_CHANGED is triggered
+            </summary>
+            <returns>The video width.</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetBufferedEnd">
+            <summary>
+            Returns the last millisecond buffered on the player. This is useful to display a seek bar with a secondary progress, indicating the buffered content
+            </summary>
+            <returns>The last millisecond buffered.</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetCurrentAudioStream">
+            <summary>
+            Returns the current audio stream. This method is not available for all the platforms
+            </summary>
+            <returns>The current audio stream. The id will be -1 in case the platform doesn't support it</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetAudioStreams">
+            <summary>
+            Returns an array of all the available audio streams. This method is not available for all the platforms
+            </summary>
+            <returns>An array of all the possible audio streams or null if the platform doesn't support it</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetAudioStreamCount">
+            <summary>
+            Returns the number of streams
+            </summary>
+            <returns>The number of streams</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetAudioStream(NexPlayerAPI.NexPlayerAudioStream)">
+            <summary>
+            Set a stream to be used. The possible audio streams can be obtained from the method GetAudioStreams. This method is not available for all the platforms
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetCaptionStream(NexPlayerAPI.NexPlayerCaptionStream)">
+            <summary>
+            Set a caption stream to be used. This method is not available for all the platforms
+            </summary>
+            <param name="captionStreamInfo"></param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetCurrentTrack">
+            <summary>
+            Returns information about the current track. This method is not available for all the platforms
+            </summary>
+            <returns>Information about the current track. The id will be -1 in case the platform doesn't support it</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetTracks">
+            <summary>
+            Returns information about all the possible tracks. This method is not available for all the platforms
+            </summary>
+            <returns>Information about all the possible tracks or null if the platform doesn't support it</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetTracksCount">
+            <summary>
+            Returns the number of tracks
+            </summary>
+            <returns>The number of tracks</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetTrack(NexPlayerAPI.NexPlayerTrack)">
+            <summary>
+            Set a track to be used. Using this disables ABR. The possible tracks can be obtained from the method GetTracks. This method is not available for all the platforms
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetBitrate(System.Int32)">
+            <summary>
+            Set the bitrate to be used. Using this disables ABR. The possible bitrates can be obtained from the tracks from the method GetTracks. This method is not available for all the platforms
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetMute(System.Boolean)">
+            <summary>
+            Set the Nexplayer mute property
+            </summary>
+            <param name="isMute">Whether to mute or not</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:NexPlayerAPI.NexPlayerBase.SetPitch(System.Int32)" -->
+        <!-- Badly formed XML comment ignored for member "M:NexPlayerAPI.NexPlayerBase.SetSpeedControl(System.Single)" -->
+        <!-- Badly formed XML comment ignored for member "M:NexPlayerAPI.NexPlayerBase.SetVolume(System.Single)" -->
+        <member name="M:NexPlayerAPI.NexPlayerBase.ShowFirstFrame(System.Boolean)">
+            <summary>
+            Show first frame when playing video
+            </summary>
+            <param name="showOrNot">whether to show first frame or not</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetDRMSecretKey(System.String)">
+            <summary>
+            Set the DRM secret key, it only for use alticast
+            </summary>
+            <param name="secretKey">DRM secret key</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetAdditionalHttpHeaders(System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            Set Additional HTTP Headers
+            </summary>
+            <param name="additionalHeaders">Additional Header Fields</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetMultiHttpHeaders(System.Collections.Generic.Dictionary{System.String,System.String},System.Int32)">
+            <summary>
+            Set Additional HTTP Header Fields per video player
+            </summary>
+            <param name="multiHeaders"></param>
+            <param name="multiHeadersIndex"></param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.UseLicenseCacheMode(System.Boolean)">
+            <summary>
+            Set the DRM license Cache
+            </summary>
+            <param name="useCache">whether to set drm cache or not</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetSubtitleFromPath(System.String)">
+            <summary>
+             Set the path of the subtitle file
+            </summary>
+             <param name="subtitlePath">The subtitle file path</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.ChangeSubtitleFromPath(System.String)">
+            <summary>
+            Change the path of the subtitle file
+            </summary>
+            <param name="subtitlePath">The subtitle file path</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetSubtitleFromFD(System.String)">
+            <summary>
+             Sets the path of the subtitle file for Asset Playback mode
+            </summary>
+             <param name="subtitleFD">The subtitle file path</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetCaptionStreamList">
+            <summary>
+            Gets the subtitles in content
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.cleanTexture">
+            <summary>
+            Destroy current texture
+            </summary>
+            <summary>
+            Destroy current texture
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetTextureColor(UnityEngine.Color,UnityEngine.GameObject)">
+            <summary>
+            set to texture's color while content is opening.
+            this api must be called before content is open
+            </summary>
+            <param name="color">Texture color to set</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetPlayerProperty(NexPlayerAPI.NexPlayerProperty,System.Int32)">
+            <summary>
+            Sets the value of an individual Nexplayer property
+            </summary>
+            <param name="property">The property to set</param>
+            <param name="value">The new value for the propert</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.OnOffSubtitle(System.Boolean)">
+            <summary>
+            Toggles On/Off the current subtitle
+            </summary>
+            <param name="bOnOff">If set to <c>true</c> shows the current subtitle <c>false</c> Hides the current subtitle</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetCurrentSubtitleElement">
+            <summary>
+            Returns current subtitle information
+            </summary>
+            <returns>Current subtitle information</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetPlayerOutputPosition(NexPlayerAPI.VideoAspectRatio,UnityEngine.Vector2)">
+            <summary>
+            Sets video to VideoAspectRatio mode in the target area
+            </summary>
+            <param name="scaleMode">Sets the which VideoAspectRatio mode to use</param>
+            <param name="rendererSize">Size of Renderer</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetLicenseFile(System.String)">
+            <summary>
+            Sets the path to the specific license file included with the NexPlayerSDK
+            </summary>
+            <param name="filePath">Path to the license file</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.AddMaterialRenderer(System.String,UnityEngine.Renderer)">
+            <summary>
+            Adds Extra MaterialRenderer which try to apply video texture
+            </summary>
+            <param name="materialRenderer">Add new MaterialRenderer</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.RemoveMaterialRenderer(System.String)">
+            <summary>
+            Removes texture which apply the material renderer.
+            </summary>
+            <param name="key">Distinguish the renderer</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.GetTimedMetadata">
+            <summary>
+            Get TimedMetadata.
+            </summary>
+            <param name="key">Distinguish the renderer</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SetCustomTags(System.String)">
+            <summary>
+            Set Custom Tags for Timed Metadata.
+            </summary>
+            <param name="customTags">ID3 Tags in Timed Metadata</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.CheckValidity">
+            <summary>
+            check validate of SDK(just only for windows)
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.RequiresColorCorrection">
+            <summary>
+            Returns true if the render output requires color correction when using linear color space.
+            </summary>
+            <remarks>
+            This method is used internally to enable or disable the shader keyword COLOR_CORRECTION.
+            </remarks>
+            <returns>Whether the render output requires to be color corrected</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.PlayAsync">
+            <summary>
+            Use this instead of Play
+            </summary>
+            <returns>AsyncToken that will be updated when completed.</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.SeekAsync(System.Int32)">
+            <summary>
+            Use this instead of Seek
+            </summary>
+            <returns>AsyncToken that will be updated when completed.</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.PauseAsync">
+            <summary>
+            Use this instead of Pause
+            </summary>
+            <returns>AsyncToken that will be updated when completed.</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.StopAsync">
+            <summary>
+            Use this instead of Stop
+            </summary>
+            <returns>AsyncToken that will be updated when completed.</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.OpenWithFDAsync(System.String,System.String)">
+            <summary>
+            Use this instead of OpenWithFD
+            </summary>
+            <returns>AsyncToken that will be updated when completed.</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.OpenWithPathAsync(System.String,System.String)">
+            <summary>
+            Use this instead of OpenWithFD
+            </summary>
+            <returns>AsyncToken that will be updated when completed.</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBase.CloseAsync">
+            <summary>
+            Use this instead of Close
+            </summary>
+            <returns>AsyncToken that will be updated when completed.</returns>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerFactory">
+            <summary>
+            NexPlayer factory that creates NexPlayerBase instances.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerFactory.GetNexPlayer">
+            <summary>
+            Creates an instance of NexPlayerBase for the currently selected platform. This allows to use one API for all the supported platforms. 
+            It's recommended to use this and not instantiate directly a class that extends NexPlayerBase.
+            </summary>
+            <returns>A NexPlayerBase instance.</returns>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayeriOS.NXLogLevel">
+            <summary>
+            Available log levels for the iOS native player
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayeriOS.NXLogLevel.Error">
+            <summary>
+            Enables error level log only
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayeriOS.NXLogLevel.Warning">
+            <summary>
+            Enables warning level log and below
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayeriOS.NXLogLevel.Disabled">
+            <summary>
+            Log disabled
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayeriOS.NXLogLevel.Information">
+            <summary>
+            Enables information level log and below (default)
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayeriOS.NXLogLevel.Debug">
+            <summary>
+            Enables debug level log and below
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayeriOS.NXLogLevel.Verbose">
+            <summary>
+            Enables verbose level log and below
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayeriOS.NXLogLevel.AboveVerbose">
+            <summary>
+            Enables above verbose level log and below. This will have more logs than the verbose level
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayeriOS.NXLogLevel.ExtraVerbose">
+            <summary>
+            Enables extra verbose level log and below. This will have more logs than the above verbose level
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayeriOS.SetDRMSecretKey(System.String)">
+            <summary>
+            Set the DRM secret key, it only for use alticast
+            </summary>
+            <param name="secretKey">DRM secret key</param>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerMacOSX">
+             <summary>
+             NexPlayer for MacOSX
+             </summary>
+            
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerWindows">
+            <summary>
+            NexPlayer for Windows
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.captionStreamDictionary">
+            <summary>
+            Dictionary with all the caption tracks received from the native player.
+            </summary>
+            <remarks>
+            Using a dictionary instead of a list to avoid adding duplicates, which is fairly common in windows.
+            </remarks>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.WindowsInstancesByPtrs">
+            <summary>
+            The purpose of this dictionary is accessing member variables and methods from the static callbacks
+            </summary>
+            <remarks>
+            Warning: Changing the callbacks to member methods compiles, but accessing any member variables or methods causes a runtime crash
+            </remarks>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerWindows.WMP_State">
+            <summary>
+            Different states defined inside the native Windows Media Player
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerWindows.HRESULT">
+            <summary>
+            Basic HRESULT values. See:
+            <see href="https://docs.microsoft.com/en-us/windows/win32/seccrypto/common-hresult-values">Common HRESULT Values</see>
+            /
+            <see href="https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/705fb797-2175-4a90-b5a3-3918024b10b8">More HRESULT Values</see>
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.HRESULT.S_OK">
+            <summary>
+            Operation successful.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.HRESULT.E_FILE_BAD_ACCESS">
+            <summary>
+            The system cannot find the local file specified.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.HRESULT.E_ERROR_PATH_NOT_FOUND">
+            <summary>
+            The system cannot find the local path specified.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.HRESULT.E_SYNTAX_IS_INCORRECT">
+            <summary>
+            The filename or directory name syntax is incorrect
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.HRESULT.NS_E_FILE_NOT_FOUND">
+            <summary>
+            The system cannot find the file specified.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.HRESULT.E_CONTENT_INTERNAL">
+            <summary>
+            Content not supported, internal issue.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.HRESULT.NS_E_INTERNAL">
+            <summary>
+            An unknown error occurred.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.HRESULT.NS_E_SERVER_NOT_FOUND">
+            <summary>
+            The specified server could not be found.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.HRESULT.MF_E_UNSUPPORTED_BYTESTREAM_TYPE">
+            <summary>
+            This byte stream is not supported.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.HRESULT.NS_E_RESOURCE_GONE">
+            <summary>
+            The Publishing Point or file on the Windows Media Server is no longer available.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.HRESULT.NS_E_BAD_REQUEST">
+            <summary>
+            The request could not be understood by the server.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.HRESULT.E_FAIL_CONNECT_SERVER">
+            <summary>
+            Cannot connect to the server
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.HRESULT.MF_E_UNSUPPORTED_FORMAT">
+            <summary>
+            The Media format is recognized but not supported.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.HRESULT.E_APPLICATION_TRIAL_LICENSE_EXPIRED">
+            <summary>
+            This app failed to launch because its trial license has expired.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerWindows.HRESULT.E_APPLICATION_INVALID_APP_ID">
+            <summary>
+            This app failed to launch because its Steam App ID is invalid.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerWindows.SetNativeLogLevel(System.Boolean)">
+            <summary>
+            Enables or disables full logs of the native player
+            </summary>
+            <remarks>
+            Calls <see cref="M:NexPlayerAPI.NexPlayerWindows.SetNativeLogLevel(NexPlayerAPI.NexPlayerWindows.InternalLogLevel)"/> internally
+            </remarks>
+            <param name="fullLogsEnabled"></param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerWindows.SetNativeLogLevel(NexPlayerAPI.NexPlayerWindows.InternalLogLevel)">
+            <summary>
+            Sets a specific <see cref="T:NexPlayerAPI.NexPlayerWindows.InternalLogLevel"/> for the native player
+            </summary>
+            <remarks>
+            For debuging. For release, use <see cref="M:NexPlayerAPI.NexPlayerWindows.SetNativeLogLevel(System.Boolean)"/> instead
+            </remarks>
+            <param name="logLevel"></param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerWindows.SetAutoPlayback(System.Boolean)">
+            <summary>
+            Sets the autoplayback of the native player. Needs to be called before opening the content
+            </summary>
+            <param name="autoPlay"></param>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerWindowsEditor">
+            <summary>
+            NexPlayer for Windows
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerRenderControllerInternal">
+            <summary>
+            Add this script to your player to control rendering
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.URL">
+            <summary>
+            URL or Path of the video content
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.nexContentType">
+            <summary>
+            The content type of the source as a <see cref="T:NexPlayerAPI.NexContentType"/>
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.isLiveStream">
+            <summary>
+            Enable when the video to be opened is a live stream.
+            </summary>
+            <remarks>
+            Takes effect when <see cref="M:NexPlayerAPI.NexPlayerBehaviour.Open"/> is called
+            </remarks>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.keyServerURI">
+            <summary>
+            DRM key server URI
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.licenseRequestTimeout">
+            <summary>
+            DRM key server request timeout
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.drmCache">
+            <summary>
+            DRM license cache
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.widevineHeaderKeys">
+            <summary>
+            Optional header keys
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.widevineHeaderValues">
+            <summary>
+            Optional header values
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.httpHeaderKeys">
+            <summary>
+            HTTP header keys
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.httpHeaderValues">
+            <summary>
+            HTTP header values
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.httpHeaderSize">
+            <summary>
+            Number of additional HTTP headers
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.multiHttpHeaderKeys">
+            <summary>
+            HTTP header keys per video player
+            <remarks>
+            <para>This is used for Multistream/Multiview functionality</para>
+            </remarks>
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.multiHttpHeaderValues">
+            <summary>
+            HTTP header values per video player
+            <remarks>
+            <para>This is used for Multistream/Multiview functionality</para>
+            </remarks>
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.multiHttpHeaderIndex">
+            <summary>
+            Video players' indexes
+            <remarks>
+            <para>This is used for Multistream/Multiview functionality</para>
+            </remarks>
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.multiHttpHeaderSize">
+            <summary>
+            Number of additional HTTP headers per video player
+            <remarks>
+            <para>This is used for Multistream/Multiview functionality</para>
+            </remarks>
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.autoPlay">
+            <summary>
+            If this value is true, the player will pause just after buffering and before playing
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.loop">
+            <summary>
+            If this value is true, the player will replay the video just after finishing
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.mutePlay">
+            <summary>
+            If this value is true, the player will turn off the volume before playing
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.pitchControl">
+            <summary>
+            Pitch value of the player from -12 (mute) to 12 (maximum volume)
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:NexPlayerAPI.NexPlayerBehaviour.enablePCMData" -->
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.volume">
+            <summary>
+            Volume of the player from 0 (mute) to 1 (maximum volume)
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.supportABR">
+            <summary>
+            If this value is true, the player will support adaptive bitrate
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.totalTime">
+            <summary>
+            Variable to Store the initial total time
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.debugLogs">
+            <summary>
+            Enables debug logs
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:NexPlayerAPI.NexPlayerBehaviour.SynchronizationEnable" -->
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.DelayTime">
+            <summary>
+            Presentation delay in milliseconds to synchronize end users, it sets a latency between the original stream and the player's arrival.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:NexPlayerAPI.NexPlayerBehaviour.SpeedUpSyncTime" -->
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.JumpSyncTime">
+            <summary>
+            Maximum time in milliseconds that the playback is allowed to be out of synchronization before the player jumps to synchronized the video.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.bLicensingError">
+            <summary>
+            Boolean that checks when the sdk got an error with license
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.corePlayer">
+            <summary>
+            The player object instance created depending on platform.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.nexAspectRatio">
+            <summary>
+            Video aspect ratio
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.nexRendererSize">
+            <summary>
+            Current size of the renderer (container of the video)
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.nexOriginalRendererSize">
+            <summary>
+            Original size of the renderer (container of the video)
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.nexScreenSize">
+            <summary>
+            Screen size
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.statisticsInfo">
+            <summary>
+            Statistics of the playback
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.contentInfo">
+            <summary>
+            Information about the media content
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:NexPlayerAPI.NexPlayerBehaviour.originalScene" -->
+        <member name="P:NexPlayerAPI.NexPlayerBehaviour.MultistreamController">
+            <summary>
+            Control mulistream functionality
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.Reset">
+            <summary>
+            Monobehaviour method.
+            Reset is called when the user hits the Reset button in the Inspector's context menu or when adding the component the first time.
+            This function is only called in editor mode. 
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.Awake">
+            <summary>
+            Monobehaviour method. Base method creates and initialize the player.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.OnEnable">
+            <summary>
+            Monobehaviour method. Gives the player the basic properties.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.Start">
+            <summary>
+            MonoBehaviour method.
+            Starts the player.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.Update">
+            <summary>
+            MonoBehaviour method.
+            Updates the player.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.OnDisable">
+            <summary>
+            MonoBehaviour method.
+            Close and releases the player.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.OnDestroy">
+            <summary>
+            MonoBehaviour method.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.OnApplicationFocus(System.Boolean)">
+            <summary>
+            To maintain the player during open / close of the app.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.OnApplicationPause(System.Boolean)">
+            <summary>
+            To maintain the player during open / close of the app.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.OnValidate">
+            <summary>
+            MonoBehaviour method, this is called whenever script is loaded or a value changes in the Inspector.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.CreatePlayer">
+            <summary>
+            Creates the player with basic features
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.Open">
+            <summary>
+            This method initializes the media (video content) specified in the SetPreInitConfiguration() method
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.PrintVersionInfo">
+            <summary>
+            Prints info regarding the nexPlayer SDK version.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.Close(System.Boolean)">
+            <summary>
+            This method ends all the work on the content currently open and terminates the SDK work.
+            The content must be stopped before calling this method.
+            The correct way to finish playing content is to either wait for the end of content
+            or to call stop and wait for the stop operation to complete, then call close.
+            </summary>
+            <param name="forceSync">Use forceSync to run on current thread.</param>
+            <returns></returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.Release">
+            <summary>
+            Completely release all data related to the player.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:NexPlayerAPI.NexPlayerBehaviour.ChangeVideoContent(System.String)" -->
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.SetPlayerStatus(System.String)">
+            <summary>
+            Sets the player status to the one specified on the param. This is just for the UI.
+            </summary>
+            <param name="playerStatus">The status for the player to show</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.Log(System.String)">
+            <summary>
+            Prints a Log with the desired msg if debugLogs are enabled.
+            </summary>
+            <param name="str">The log to print</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.StartPlayerCoroutine(System.Collections.IEnumerator)">
+            <summary>
+            Starts a Coroutine inside the CoroutineHelper's scope
+            </summary>
+            <param name="routine">Routine to start from CoroutineHelper's scope</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.IsPlayerCreated">
+            <summary>
+            Returns a bool depending on the player is created or not.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.IsInitialized">
+            <summary>
+            Returns a bool depending on player being initialized or not.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.SetVolume01(System.Single)">
+            <summary>
+            Changes the volume during playback
+            </summary>
+            <param name="_volumeSize">The target volume from 0 to 1</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.CheckVolume">
+            <summary>
+            Checks audio volume is applied correctly.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.UpdateContentInfo">
+            <summary>
+            Update Content Info when video is initialized(for codec type, video width,height etc..)
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.UpdateContentStatisticInfo">
+            <summary>
+            Update Content statistic information every interval(for average fps, render count, decode count etc..)
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.Stop">
+            <summary>
+            Stops the video content, when resumed it will start from the beggining.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.Seek(System.Int32)">
+            <summary>
+            Seek the video content to the desired time between 0 and content total time.
+            </summary>
+            <param name="milliseconds">The objective time to seek in milliseconds</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.SeekAsync(System.Int32)">
+            <summary>
+            Seek the video content to the desired time between 0 and content total time.
+            Only available for single playback, not supported on multistream.
+            Async methods can be queued, called one after another.
+            </summary>
+            <param name="timeMS">The objective time to seek in milliseconds</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.PauseAsync">
+            <summary>
+            Pause the content in the current time.
+            Only available for single playback, not supported on multistream.
+            Async methods can be queued, called one after another.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.PlayAsync">
+            <summary>
+            Play the content from the beggining.
+            Only available for single playback, not supported on multistream.
+            Async methods can be queued, called one after another.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.StopAsync">
+            <summary>
+            Stops the video content, when resumed it will start from the beggining.
+            Only available for single playback, not supported on multistream.
+            Async methods can be queued, called one after another.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.GetIsSeeking">
+            <summary>
+            Returns if the player is seeking or not
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.OpenContentAsync(System.String,System.String)">
+            <summary>
+            Opens the selected url.
+            Only available for single playback, not supported on multistream.
+            Async methods can be queued, called one after another.
+            </summary>
+            <param name="url">The content url to play</param>
+            <param name="subtitle_url">The subtitles url default value is ""</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.Init">
+            <summary>
+            Init the basic features of the player.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.InitControllers">
+            <summary>
+            Init the controllers of the video player.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.UpdatePlayer">
+            <summary>
+            Updates the player.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.SetLicenseKeyWebGL(System.String)">
+            <remarks>
+            Make sure to call this method before opening the content.
+            </remarks>
+            <param name="licenseKey">The license key provided by the customer</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.SetPreInitConfiguration">
+            <summary>
+            Configuration to be set prior to player base init
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.SetPostInitConfiguration">
+            <summary>
+            Configuration to be set post player base init
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.GetMultistreamURL">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.IsMultistream">
+            <summary>
+            Returns if using multiStream.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.GetSubtitleURL">
+            <summary>
+            This method is not supported yet.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.checkInternet">
+            <summary>
+            Check if the device has internet connection
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.StopAllPlayerCoroutines">
+            <summary>
+            Stops all coroutines started inside the CoroutineHelper's scope
+            </summary>
+            <remarks>
+            Only applies when the player is initialized
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.GetPlayerStatus">
+            <summary>
+            This method retrieves the current state of the player
+            </summary>
+            <remarks>
+            Calling methods such as <see cref="M:NexPlayerAPI.NexPlayerBehaviour.OpenPlayer"/> does not immediately change the state. The state changes asynchronously, and the new state goes into effect at the same time. Overrride the different event methods in <see cref="T:NexPlayerAPI.NexPlayerBehaviour"/> to detect this changes
+            </remarks>
+            <returns> <see cref="T:NexPlayerAPI.NexPlayerStatus"/> indicating the current state, or <see cref="F:NexPlayerAPI.NexPlayerStatus.NEXPLAYER_STATUS_NONE"/> if the player is uninitialized</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.GetVersion">
+            <summary>
+            Show Version of SDK
+            </summary>
+            <returns>Return Version of SDK or platform do not support</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.GetCurrentTime">
+            <summary>
+            Retrieves the current play position in milliseconds
+            </summary>
+            <remarks>
+            <para> This value updated once per second when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_ON_TIME"/> is triggered </para>
+            <para> Override the method <see cref="M:NexPlayerAPI.NexPlayerBehaviour.EventTrackChanged"/> to execute custom code when receiving this event </para>
+            </remarks>
+            <returns>The time in milliseconds, or -1 if the player is uninitialized</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.GetBufferedEnd">
+            <summary>
+            Returns the timestamp of the last frame in buffer
+            </summary>
+            <remarks>
+            This is useful to display a seek bar with a secondary progress, indicating the buffered content
+            </remarks>
+            <returns>The timestamp in milliseconds, or -1 if the player is uninitialized</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.GetTotalTime">
+            <summary>
+            Retrieves the media duration of the current video content
+            </summary>
+            <returns>The duration in milliseconds, or -1 if the player is uninitialized</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.GetMaxScreenImage">
+            <summary>
+            Gets the RawImage to use for a maximized screen
+            </summary>
+            <returns>The RawImage to use for maximized screen, or null if the player is uninitialized</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.SetMaxScreenImage(UnityEngine.UI.RawImage)">
+            <summary>
+            Specifies the RawImage to use RawImage to use for a maximized screen
+            </summary>
+            <remarks>
+            Only applies when the player is initialized
+            </remarks>
+            <param name="rawImage">RawImage to use for a maximized screen</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.SetPlayerOutputPosition(NexPlayerAPI.VideoAspectRatio,UnityEngine.Vector2)">
+            <summary>
+            Sets video to VideoAspectRatio mode in the target area
+            </summary>
+            <remarks>
+            Only applies when the player is initialized
+            </remarks>
+            <param name="scaleMode">Which VideoAspectRatio mode to use</param>
+            <param name="rendererSize">The size of the renderer</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.SetPlayerProperty(NexPlayerAPI.NexPlayerProperty,System.Int32)">
+            <summary>
+            Sets the value of an individual <see cref="T:NexPlayerAPI.NexPlayerProperty"/>
+            </summary>
+            <remarks>
+            Only applies when the player is initialized
+            </remarks>
+            <param name="property">The property to set</param>
+            <param name="value">The new value for the propert</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.SetMultiProperty(System.Int32,NexPlayerAPI.MultiStreamProperties,System.Int32)">
+            <summary>
+            Sets the value of an individual <see cref="T:NexPlayerAPI.MultiStreamProperties"/>
+            </summary>
+            <remarks>
+            Only applies when the player is initialized
+            </remarks>
+            <param name="index">The index of the target MultiStream instance</param>
+            <param name="property">The property to set</param>
+            <param name="value">The new value for the propert</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.SetMultiProperty(System.Int32,NexPlayerAPI.MultiStreamProperties,System.Boolean)">
+            <summary>
+            Sets the value of an individual <see cref="T:NexPlayerAPI.MultiStreamProperties"/>
+            </summary>
+            <remarks>
+            Only applies when the player is initialized
+            </remarks>
+            <param name="index">The index of the target MultiStream instance</param>
+            <param name="property">The property to set</param>
+            <param name="value">The new value for the propert</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.DownloadStream(System.String,System.String)">
+            <summary>
+            Starts to download the desired media.
+            </summary>
+            <remarks>
+            To use this method in Android External Storage Write permission must be set to true.
+            <para>Check the permision using <c>Permission.HasUserAuthorizedPermission(Permission.ExternalStorageWrite)</c> before calling this method.</para>
+            </remarks>
+            <param name="url">Desired media path.</param>
+            <param name="keyServer">Desired media key server for Widevine protected content.</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.TogglePlayPause">
+            <summary>
+            <para>Pauses the playback when the status is resumed (<see cref="F:NexPlayerAPI.NexPlayerStatus.NEXPLAYER_STATUS_PLAY"/>)</para>
+            <para>Resumes the playback when the status is paused (<see cref="F:NexPlayerAPI.NexPlayerStatus.NEXPLAYER_STATUS_PAUSE"/>) or stopped (<see cref="F:NexPlayerAPI.NexPlayerStatus.NEXPLAYER_STATUS_STOP"/>).</para>
+            </summary>
+            <remarks>
+            Only applies when the player is initialized and the GameObject is active
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.GetCaptionStreamList">
+            <summary>
+            Obtains the list of text (subtitle or Close Captions) streams that are available for the current media
+            </summary>
+            <remarks>
+            This method is not available for all the platforms
+            </remarks>
+            <returns>The list of text streams, or null if the player is uninitialized</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.GetAudioStreamList">
+            <summary>
+            Obtains the list of audio streams that are available for the current media
+            </summary>
+            <remarks>
+            This method is not available for all the platforms
+            </remarks>
+            <returns>The list of audio streams, or null if the player is uninitialized</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.SetCaptionStream(NexPlayerAPI.NexPlayerCaptionStream)">
+            <summary>
+            For media with multiple streams, this method selects the text stream that will be presented to the user.
+            </summary>
+            <remarks>
+            <para> This method is not available for all the platforms</para>
+            <para> Only applies when the player is initialized</para>
+            <para> The full list of available text streams (if any) can be obtained with the method <see cref="M:NexPlayerAPI.NexPlayerBehaviour.GetCaptionStreamList"/></para>
+            </remarks>
+            <param name="captionInfo">The target subtitle (or Close Captions) stream</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.SetAudioStream(NexPlayerAPI.NexPlayerAudioStream)">
+            <summary>
+            For media with multiple streams, this method selects the audio stream that will be presented to the user
+            </summary>
+            <remarks>
+            <para> This method is not available for all the platforms</para>
+            <para>The full list of available audio streams (if any) can be obtained with the method <see cref="M:NexPlayerAPI.NexPlayerBehaviour.GetAudioStreamList"/></para>
+            </remarks>
+            <param name="audioInfo">The target audio stream</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.SetLogLevelForDebugging">
+            <summary>
+            Applies the value set in <see cref="F:NexPlayerAPI.NexPlayerBehaviour.debugLogs"/> to the player, enabling or disabling debug logs
+            </summary>
+            <remarks>
+            Only applies when the player is initialized
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.StartPlayBack">
+            <summary>
+            Starts the video playback. Call this at any time after the event <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_INIT_COMPLETE"/>
+            </summary>
+            <remarks>
+            <para> This is useful when disabling autoplay </para>
+            <para> Only applies when the player is initialized </para>
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.Pause">
+            <summary>
+            Pauses the playback
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.Resume">
+            <summary>
+            Resumes the playback
+            </summary>
+            <remarks>
+            Only applies when the player is initialized
+            </remarks>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:NexPlayerAPI.NexPlayerBehaviour.SetSpeedControl(System.Single)" -->
+        <!-- Badly formed XML comment ignored for member "M:NexPlayerAPI.NexPlayerBehaviour.SetPitch(System.Int32)" -->
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.GetVideoHeight">
+            <summary>
+            Returns the current height of the video content. This changes when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TRACK_CHANGED"/> is triggered
+            </summary>
+            <remarks>
+            Override the method <see cref="M:NexPlayerAPI.NexPlayerBehaviour.EventTrackChanged"/> to execute custom code when receiving this event
+            </remarks>
+            <returns>The video content height, or -1 if the player is uninitialized</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.GetVideoWidth">
+            <summary>
+            Returns the current width of the video content. This changes when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TRACK_CHANGED"/> is triggered
+            </summary>
+            <remarks>
+            Override the method <see cref="M:NexPlayerAPI.NexPlayerBehaviour.EventTrackChanged"/> to execute custom code when receiving this event
+            </remarks>
+            <returns>The video content width, or -1 if the player is uninitialized</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.RequiresColorCorrection">
+            <summary>
+            Returns true if the render output requires color correction when using linear color space.
+            </summary>
+            <remarks>
+            This method is used internally to enable or disable the shader keyword COLOR_CORRECTION.
+            </remarks>
+            <returns>Whether the render output requires to be color corrected</returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.SetWidevineHeaders(System.String[],System.String[])">
+            <summary>
+            Set DRM Optional Headers
+            This method sets optional parameters when sending requests to the Key Server
+            </summary>
+            <param name="keys"></param>
+            <param name="values"></param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.UpdateWidevineHeaderValue(System.String,System.String)">
+            <summary>
+            Will return true if the key was found and succesfully set.
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.UpdateHttpHeaders">
+            <summary>
+            Clear and set HTTP headers
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerBehaviour.nexInitResult">
+            <summary>
+            Result of the initialization of the player
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.Error(NexPlayerAPI.NexErrorCode)">
+            <summary>
+            Internal method that raises an error answer depending on which <see cref="T:NexPlayerAPI.NexErrorCode"/> is received.
+            </summary>
+            <param name="error"> Error code received from the player</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorTimeLocked">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.PLAYER_ERROR_TIME_LOCKED"/> is triggered.
+            </summary>
+            <remarks>
+            Error because the SDK has expired.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorNotActivateAppID">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.PLAYER_ERROR_NOT_ACTIVATED_APP_ID"/> is triggered.
+            </summary>
+            <remarks>
+            Error while creating or initializing NexPlayer.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorNetwork">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.ERROR_NETWORK_PROTOCOL"/> or <see cref="F:NexPlayerAPI.NexErrorCode.NXErrorProtocolNetDNSFail"/> are triggered.
+            </summary>
+            <remarks>
+            Network related error such as socket errors.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorHasNoEffect">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.HAS_NO_EFFECT"/> is triggered.
+            </summary>
+            <remarks>
+            The same command has been called already in the same state or the command is invalid.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorInvalidSubtitle">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.NEXPLAYER_INVALID_SUBTITLE"/> is triggered.
+            </summary>
+            <remarks>
+            The subtitles for the video are either invalid or in an unsupported format.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorInvalidSDK">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.PLAYER_ERROR_INVALID_SDK"/> is triggered.
+            </summary>
+            <remarks>
+            Error while creating or initializing NexPlayer.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorInit">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.PLAYER_ERROR_INIT"/> is triggered.
+            </summary>
+            <remarks>
+            Error while creating or initializing NexPlayer. ANDROID ONLY
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorNoLicenseFile">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.PLAYER_ERROR_NO_LICENSE_FILE"/> is triggered.
+            </summary>
+            <remarks>
+            Error while creating or initializing NexPlayer.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorMediaNotFound">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.ERROR_MEDIA_NOT_FOUND"/> is triggered.
+            </summary>
+            <remarks>
+            The content media was not found on the server.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorSrcNotFound">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.NEXPLAYER_ERROR_SRC_NOT_FOUND"/> is triggered.
+            </summary>
+            <remarks>
+            The URI is not supported or not found. Make sure the URI actually exists and check that necessary permissions are set.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorDRMInit">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.DRM_INIT_FAILED"/> is triggered.
+            </summary>
+            <remarks>
+            The content DRM Initialization Failed.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorUnknown">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.UNKNOWN"/> is triggered.
+            </summary>
+            <remarks>
+            This error is a kind of internal error such as "system failure".
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorURL">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.NEXPLAYER_ERROR_URL"/> is triggered.
+            </summary>
+            <remarks>
+            The URL was not found.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorTimeOut">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.SOURCE_OPEN_TIMEOUT"/> is triggered.
+            </summary>
+            <remarks>
+            There is no response from the server within the set time of SOURCE_OPEN_TIMEOUT property while calling open().
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorInvalidURL">
+            <summary>
+            Override this mehod to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.ERROR_INVALID_URL"/> is triggered.
+            </summary>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorNotSupportMedia">
+            <summary>
+            Override this mehod to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.NOT_SUPPORT_MEDIA"/> is triggered.
+            </summary>
+            <remarks>
+            The format of the content is not supported.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorCodecNotSupported">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexErrorCode.NOT_SUPPORT_VIDEO_CODEC"/> is triggered.
+            </summary>
+            /// <remarks>
+            The codec is not supported
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.ErrorUnhandled(NexPlayerAPI.NexErrorCode)">
+            <summary>
+            Override this method to add custom logic when an error with no specific answer method occurs.
+            </summary>
+            <param name="error">Error code of the unhandled error</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventNotify(NexPlayerAPI.NexPlayerEvent,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            This method takes the events raised by the internal player and notifies them to Unity
+            </summary>
+            <param name="paramEvent">internal event number</param>
+            <param name="param1">additional optional parameter of the internal event</param>
+            <param name="param2">additional optional parameter of the internal event</param>
+            <param name="param3">additional optional parameter of the internal event</param>
+            <param name="param4">additional optional parameter of the internal event</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.NotifyError(NexPlayerAPI.NexErrorCode)">
+            <summary>
+            This method takes the errors raised by the internal player and notifies them to Unity
+            </summary>
+            <param name="errorResult">Error code received</param>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventTextureChanged">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TEXTURE_CHANGED"/> is triggered.
+            </summary>
+            <remarks>
+            This event occurs whenever the reference to the internal texture has changed.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventOnTime">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_ON_TIME"/> is triggered.
+            </summary>
+            <remarks>
+            This event occurs once per second.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventTrackChanged">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TRACK_CHANGED"/> is triggered.
+            </summary>
+            <remarks>
+            This event occurs whenever the track of the playback has changed.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventInitComplete">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_INIT_COMPLETE"/> is triggered.
+            </summary>
+            <remarks>
+            This event occurs whenever the player has opened a video content.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventPlaybackStarted">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_PLAYBACK_STARTED"/> is triggered.
+            </summary>
+            <remarks>
+            This event occurs whenever the player has started the playback or has resumed.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventPlaybackPaused">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_PLAYBACK_PAUSED"/> is triggered.
+            </summary>
+            <remarks>
+            This event occurs whenever the playback has paused.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventEndOfContent">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_END_OF_CONTENT"/> is triggered.
+            </summary>
+            <remarks>
+            This event occurs when the player reaches the end of the video content.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventBufferingStarted(System.Int32)">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_BUFFERING_STARTED"/> is triggered.
+            </summary>
+            <param name="percent"> The current buffering percentage </param>
+            <remarks>
+            This event occurs whenever the player has started buffering.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventBuffering(System.Int32)">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_BUFFERING"/> is triggered.
+            </summary>
+            <param name="percent"> The current buffering percentage </param>
+            <remarks>
+            This event occurs while the player is buffering.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventBufferingEnded">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_BUFFERING_ENDED"/> is triggered.
+            </summary>
+            <remarks>
+            This event occurs whenever the player has finished buffering.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventStopped">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_STOPPED"/> is triggered.
+            </summary>
+            <remarks>
+            This event occurs whenever the playback has stopped.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventClosed">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_CLOSED"/> is triggered.
+            </summary>
+            <remarks>
+            This event occurs whenever the player has closed.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventSeeked">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_SEEKED"/> is triggered.
+            </summary>
+            <remarks>
+            This event occurs whenever the playback has seeked.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventLoading">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_LOADING"/> is triggered.
+            </summary>
+            <remarks>
+            This event occurs whenever the player is loading.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventTextRender">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TEXT_RENDER"/> is triggered.
+            </summary>
+            <remarks>
+            This event occurs whenever playback reaches a point in time where subtitles on any track need to be displayed or cleared.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventTextInit">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TEXT_INIT"/> is triggered.
+            </summary>
+            <remarks>
+            This event occurs when the subtitle parsing is complete.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventTimedMetadataRender">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TIMED_METADATA_RENDER"/> is triggered.
+            </summary>
+            <remarks>
+            This event is called when new timed metadata is ready to display in HLS.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventTotalTimeChanged">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_ON_TOTAL_TIME_CHANGED"/> is triggered.
+            </summary>
+            <remarks>
+            This event occurs whenever the total time is changed during the playback.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventHandleAudioPCM(System.Int32,System.Single[])">
+            <summary>
+            Override this method to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_ON_HANDLE_EXTERNAL_PCM"/> is triggered.
+            </summary>
+            <param name="ts"> The audio presentation time </param>
+            <param name="buff"> The audio PCM buffer ranging from -1.0f to 1.0f </param>
+            <remarks>
+            This event occurs whenever there is new audio PCM data during the playback.
+            </remarks>
+        </member>
+        <member name="M:NexPlayerAPI.NexPlayerBehaviour.EventHandleAudioTrackChanged(System.Int32,System.Int32)">
+            <summary>
+            Override this mehod to add custom logic when <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_AUDIO_TRACK_CHANGED"/> is triggered.
+            </summary>
+            <remarks>
+            This event occurs whenever the audio track of the playback has changed.
+            </remarks>
+        </member>
+        <member name="T:NexPlayerAPI.NexErrorCode">
+            <summary>
+            Possible values of param1 when an error event is generated
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NONE">
+            <summary>
+            No error.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.HAS_NO_EFFECT">
+            <summary>
+            The same command has been called already in the same state or the command is invalid.
+            E.g. If an open API is called while processing an open API, the engine does not regard it as an error.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.INVALID_PARAMETER">
+            <summary>
+            This error will be called if the UI has wrong parameters such as \c NULL.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorInvalidInfo">
+            <summary>
+            One or more of the information passed in is invalid.
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.INVALID_STATE">
+            <summary>
+            The command is invalid at the current state.
+            E.g. pause() is called when the current state is NEXPLAYER_STATE_STOP.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorMemoryOperation">
+            <summary>
+            The memory operation failed. E.g. Heap memory allocation.
+            iOS only error.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorFileOperation">
+            <summary>
+            The file operation failed. E.g. File seek, file open.
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.INVALID_MEDIA">
+            <summary>
+            The content file contains invalid syntax.
+            It should be checked whether or not the content is a normal DRM file.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NOT_SUPPORT_AUDIO_CODEC">
+            <summary>
+            NexPlayer does not support the audio codec of the content.
+            E.g. The content is not yet supported by NexPlayer or a customer could not include codecs of NexPlayer SDK due to licensing issues.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NOT_SUPPORT_VIDEO_CODEC">
+            <summary>
+            NexPlayer does not support the video codec of the content.
+            E.g. The content is not yet supported by NexPlayer or the customer did not include codecs of NexPlayer SDK due to licensing issues.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NOT_SUPPORT_VIDEO_RESOLUTION">
+            <summary>
+            The resolution of the content is too high to play back.
+            E.g. The device has a resolution limit of 1080P but the content is 4K.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NOT_SUPPORT_MEDIA">
+            <summary>
+            The format of the content is not supported.
+            The content has unavailable protocol(HLS,DASH, etc) or no playable A/V track which has audio or video codecs that are not supported.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorInvalidCodec">
+            <summary>
+            The content includes unknown audio or video codec type.
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.CODEC_DECODING_ERROR">
+            <summary>
+            Audio or video decoding error.
+            E.g. NexPlayer get a failure during parsing the content for playback or during decoding the audio or video bitstreams.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorPartialSuccess">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorAlreadyCreateAsyncProc">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorInvalidAsyncCmd">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorAsyncOthercmdPrcessing">
+            <summary>
+            The command queue for processing invoked Async functions was full.
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorRTCPByeReceived">
+            <summary>
+            An error occurred in receiving RTCP BYE message from streaming server.
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorUserTerminated">
+            <summary>
+            Terminated by the user.
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorSystemFail">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorNoDataInBuffer">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.UNKNOWN">
+            <summary>
+            This error is a kind of internal error such as "system failure".
+            E.g. NexPlayer returns this when memory allocation is failed for unknown reasons. It's mostly an error that the user can not handle.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NOT_SUPPORT_TO_SEEK">
+            <summary>
+            The media source does not support seeking.
+            The only Iframe content(Content is composed of I, B, and P frames), chunked mode based PD content, or live content with an wide interval between each Iframe cannot be seeked.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorNotSupportAVCodec">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NOT_SUPPORT_TEXT">
+            <summary>
+            The content has an unsupported text type.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.SOURCE_OPEN_TIMEOUT">
+            <summary>
+            There is no response from the server within the set time of SOURCE_OPEN_TIMEOUT property while calling open().
+            The default value of the SOURCE_OPEN_TIMEOUT property is 300 seconds.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.DATA_INACTIVITY_TIMEOUT">
+            <summary>
+            There is no response from the server within the set time of DATA_INACTIVITY_TIMEOUT property.
+            The default value of the DATA_INACTIVITY_TIMEOUT property is 60 seconds.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.ERROR_NETWORK_PROTOCOL">
+            <summary>
+            Network related error such as socket errors.  
+            E.g. Socket open fail, connect fail, bind fail,...
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.ERROR_MEDIA_NOT_FOUND">
+            <summary>
+            The content media was not found on the server.         
+            E.g. 403 forbidden, 404 not found,....
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.DRM_DECRYPT_FAILED">
+            <summary>
+            The default error of content DRM Decrypt Fail.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.DRM_INIT_FAILED">
+            <summary>
+            The content DRM Initialization Failed.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.DRM_INSUFFICIENT_HDCP_LEVEL">
+            <summary>
+            The content DRM Inital Fail.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.DRM_NOT_SUPPORT_HDCP">
+            <summary>
+            The content DRM Inital Fail.
+            Android only
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.DRM_DECRYPT_NO_KEY">
+            <summary>
+            The content DRM Decrypt Fail.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.DRM_DECRYPT_KEY_EXPIRED">
+            <summary>
+            The content DRM Decrypt Fail.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.DRM_DECRYPT_RESOURCE_BUSY">
+            <summary>
+            The content DRM Decrypt Fail.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.DRM_DECRYPT_SESSION_NOT_OPENED">
+            <summary>
+            The content DRM Decrypt Fail.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.DRM_DECRYPT_UNSUPPORTED_OPERATION">
+            <summary>
+            The content DRM Decrypt Fail.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.DRM_DECRYPT_INSUFFICIENT_SECURITY">
+            <summary>
+            The content DRM Decrypt Fail.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.DRM_DECRYPT_FRAME_TOO_LARGE">
+            <summary>
+            The content DRM Decrypt Fail.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.DRM_DECRYPT_LOST_STATE">
+            <summary>
+            The content DRM Decrypt Fail.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.MEDIACODEC_INSUFFICIENT_RESOURCE">
+            <summary>
+            MediaCodec API Exception.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.MEDIACODEC_RECLAIMED">
+            <summary>
+            MediaCodec API Exception.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorNotSupportFeature">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.ERROR_INVALID_URL">
+            <summary>
+            The URL of content is invalid.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.ERROR_INVALID_RESPONSE">
+            <summary>
+            The syntax of the response is invalid.
+            E.g. Mandatory header is missed in the response.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.ERROR_CONTENTINFO_PARSING_FAIL">
+            <summary>
+            ContentInfo parse fail. (SDP, ASF Header, Playlist...)
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorProtocolNoProtocol">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorProtocolNoMedia">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorProtocolNetOpenFail">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorProtocolNetConnectFail">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorProtocolNetBindFail">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorProtocolNetDNSFail">
+            <summary>
+            DNS lookup failed. iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.ERROR_NET_CONNECTION_CLOSED">
+            <summary>
+            Socket connection closed.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorProtocolNetSendFail">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorProtocolNetRecvFail">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.ERROR_NET_REQUEST_TIMEOUT">
+            <summary>
+            Response is not arrived until timeout.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorProtocolNotSupportAESEncryption">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorProtocolNetSSLCertFail">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.ERROR_DISABLED_MEDIA">
+            <summary>
+            No track to play due to a bitrate/resolution limit.
+            E.g. he MIN_BW property is set to 2 Mbps and the playlist of playing contain has only 500 Kbps and 1 Mbps tracks.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.ERROR_AES_KEY_RECV_FAIL">
+            <summary>
+            Failed to download the key file to decrypt the file that has been encrypted with AES. (HLS)
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.ERROR_INVALID_SERVER_STATUSCODE">
+            <summary>
+            The HTTP response data recevied from the Server is error. It's not 200 in HTTP response.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorInternalBase">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorExternalBase">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorExternalDescrambleTimeout">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDownloaderInvalidParameter">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDownloaderInvalidState">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDownloaderMemoryOperation">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDownloaderFileOperation">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDownloaderConnectionFail">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDownloaderConnectionClosed">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDownloaderPVXdownFail">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDownloaderPVXparsingFail">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDownloaderNotMultiparts">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDownloaderHTTPparsingFail">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorTimeshiftBase">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorTimeshiftWrite">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorTimeshiftRead">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorTimeshiftFindIframe">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDivXDRMBase">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDivXDRMNotAuthorized">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDivXDRMNotRegistered">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDivXDRMRentalExpired">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDivXDRMGeneralError">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDivXDRMNeverRegistered">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorThumbnailBase">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorThumbnailCreateFail">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorThumbnailProcessFail">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorThumbnailDRMContents">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorRecordBase">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorAddframeSizeFull">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorAddframeTimeFull">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorAddframeMemFull">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorAddframeError">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.HTTPDOWNLOADER_ERROR_FAIL">
+            <summary>
+            NexPlayer met some errors when creating HTTP Downloader.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.HTTPDOWNLOADER_ERROR_UNINIT_ERROR">
+            <summary>
+            The user called a part of HTTP Downloader before creating or initializing.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.HTTPDOWNLOADER_ERROR_INVALID_PARAMETER">
+            <summary>
+            A parameter from the UI is \c null or an incorrect value when HTTP downloader sends the message.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.HTTPDOWNLOADER_ERROR_MEMORY_FAIL">
+            <summary>
+            Http downloader failed to allocate or free memory.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.HTTPDOWNLOADER_ERROR_SYSTEM_FAIL">
+            <summary>
+            System related error.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.HTTPDOWNLOADER_ERROR_HAS_NO_EFFEECT">
+            <summary>
+            The user attempted to call the same method many times.
+            All duplicates(except the first one) will be regarded as an error.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.HTTPDOWNLOADER_ERROR_NETWORK">
+            <summary>
+            Http downloader failed to connect to a network.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.HTTPDOWNLOADER_ERROR_NETWORK_RECV_FAIL">
+            <summary>
+            Http downloader received an invalid response from the server.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.HTTPDOWNLOADER_ERROR_NETWORK_INVALID_RESPONSE">
+            <summary>
+            Http downloader received an invalid response from the server.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.HTTPDOWNLOADER_ERROR_PARSE_URL">
+            <summary>
+            Http downloader detected an incorrect URL.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.HTTPDOWNLOADER_ERROR_ALREADY_DOWNLOADED">
+            <summary>
+            Http downloader requested an already downloaded content file.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorAPIBase">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorAPICannotCreateDownloader">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorAPIInvalidInfo">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorCommandResult">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorCreateRFC">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorRTSPCommandTimeout">
+            <summary>
+            An unhandled NXPlayerDelegate::nexPlayerRTSPCommandTimeout: event occurred
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorPauseSupervisionTimeout">
+            <summary>
+            An unhandled NXPlayerDelegate::nexPlayerPauseSupervisionTimeout: event occurred.
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorNoValidFrameFound">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorOperationNotValidInCurrentState">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorDownloadFailure">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorUnsupportedEncryption">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorNotSupportedContentInAirPlay">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.UNSUPPORTED_SDK_FEATURE">
+            <summary>
+            NexPlayer detected an unsupported feature(i.e. recording or timeshift) or called a specific feature(i.e. call video capture in H/W mode).
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NXErrorInvalidSDKBase">
+            <summary>
+            iOS ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.PLAYER_ERROR_INVALID_SDK">
+            <summary>
+            Error while creating or initializing NexPlayer.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.PLAYER_ERROR_INIT">
+            <summary>
+            Error while creating or initializing NexPlayer.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.PLAYER_ERROR_NOT_ACTIVATED_APP_ID">
+            <summary>
+            Error while creating or initializing NexPlayer.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.PLAYER_ERROR_NOT_AES_ENCRYPTION">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.PLAYER_ERROR_TIME_LOCKED">
+            <summary>
+            The SDK has expired.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.PLAYER_ERROR_NO_LICENSE_FILE">
+            <summary>
+            Error while creating or initializing NexPlayer.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_NO_CONNECT">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_GENERAL">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_MEMORY">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_RAND_NUM_GEN">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_URL">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_REPLY">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_REPLY_MOVED">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_VERIFY_CERTIFICATE_CHAIN">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_CREATE_KEY_PAIR">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_NO_ENTITLED">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_CREATE_STORE">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_WRITE_STORE">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_READ_STORE">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+            
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_STORE_INTEGRRITY">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_STORE_FILE_NO_EXIST">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_CERT">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_INI">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_PRIVATE_KEY">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_CONVERT_PEMT_TO_X509">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_PUBLIC_ENCRYPT">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_ADD_X509_ENTRY">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_ADD_X509_SUBJECT">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_X509_SIGN">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_CANT_RETRIEVE_BOOT">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_CANT_PROVISION">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_ARGUMENTS">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_KEY_GENERATION">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_NO_PROVISIONED">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_COMMUNICATION_OBJECT_NOT_INITIALIZED">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_NO_OTT_SIGNATURE">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_OTT_SIGNATURE">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_KEY_FILE_NOT_ENTITLED">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_CERTIFICATE_EXPIRED">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_INTEGRITY_CHECK_FAILED">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_SECURITY_ERROR">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_FEATURE_UNAVAILABLE">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_NO_UNIQUE_IDENTIFIER">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_HANDSHAKE">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_FAILED_KEY_URL_PARSE">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_UNSUPPORTED_ASSET_TYPE">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_OFFLINE_NOT_ALLOWED">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_FAILED_NO_KEYS_AVAILABLE_OFFLINE">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_VR_OFFLINE_MODE">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_INVALID_CERTIFICATE_REQUEST">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_BAD_HASH">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_FAILED_STORE_MOVE">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_GLOBAL_POLICY_SECURITY">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_ASSET_POLICY_SECURITY">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.VMDRM_ERROR_DASH_INFO_UNAVAILABLE">
+            <summary>
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NEXPLAYER_INVALID_SUBTITLE">
+            <summary>
+            The subtitles for the video are either invalid or in an unsupported format. 
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NEXPLAYER_ERROR_SRC_NOT_FOUND">
+            <summary>
+            The URI is not supported or not found. Make sure the URI actually exists and check that necessary permissions are set.
+            E.g. Playing a video on Android requires setting the Player Setting "Internet Access" to "Required" (streaming videos) and the "Write Permission" to "External" (local videos).
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexErrorCode.NEXPLAYER_ERROR_URL">
+            <summary>
+            The URL was not found.
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerStatus">
+            <summary>
+            Possible status of NexPlayer
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerStatus.NEXPLAYER_STATUS_NONE">
+            <summary>
+            The player is opened but not playing
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerStatus.NEXPLAYER_STATUS_CLOSE">
+            <summary>
+            The player is closed, but not initialized
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerStatus.NEXPLAYER_STATUS_STOP">
+            <summary>    
+            The player is stoped
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerStatus.NEXPLAYER_STATUS_PLAY">
+            <summary>
+            The player is playing the video
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerStatus.NEXPLAYER_STATUS_PAUSE">
+            <summary>
+            The player is paused	
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerEvent">
+            <summary>
+            Possible events that NexPlayer sends to every Action subscribed to with <see cref="M:NexPlayerAPI.NexPlayerBase.AddEventListener(NexPlayerAPI.EventNotify)"/>
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_INIT_COMPLETE">
+            <summary>
+            This event occurs whenever the player has opened a video content.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_PLAYBACK_STARTED">
+            <summary>
+            This event occurs whenever the player has started the playback or has resumed.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_END_OF_CONTENT">
+            <summary>
+            This event occurs when the player reaches the end of the video content.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_ON_TIME">
+            <summary>
+            This event occurs once per second.
+            </summary>
+            <remarks>
+            If the application is displaying the current play position, it should update it to reflect this new value.
+            </remarks>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_BUFFERING_STARTED">
+            <summary>
+            This event occurs whenever the player has started buffering.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_BUFFERING_ENDED">
+            <summary>
+            This event occurs whenever the player has finished buffering.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TEXTURE_CHANGED">
+            <summary>
+            This event occurs whenever the reference to the internal texture has changed.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TRACK_CHANGED">
+            <summary>
+            This event occurs whenever the track of the playback has changed.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_PLAYBACK_PAUSED">
+            <summary>
+            This event occurs whenever the playback has paused.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_CLOSED">
+            <summary>
+            This event occurs whenever the player has closed
+            </summary>
+            
+            <remarks>
+            This means it ended all the work on the content currently open and closed content data.
+            </remarks>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_ERROR">
+            <summary>
+            This event occurs whenever an error occurs during playback.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_STOPPED">
+            <summary>
+            This event occurs whenever the playback has stopped.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_SEEKED">
+            <summary>
+            This event occurs whenever the playback has seeked.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_BUFFERING">
+            <summary>
+            This event occurs while the player is buffering.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_ON_TOTAL_TIME_CHANGED">
+            <summary>
+            This event occurs whenever the total time is changed during the playback.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_ON_HANDLE_EXTERNAL_PCM">
+            <summary>
+            This event occurs whenever there is new audio PCM data.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_AUDIO_TRACK_CHANGED">
+            <summary>
+            This event occurs whenever the audio track of the playback has changed.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_LOADING">
+            <summary>
+            This event occurs whenever the player is loading.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TEXT_BASE">
+            <summary>
+            This is is base of TEXT RENDER Event
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TEXT_INIT">
+            <summary>
+            This event occurs when the subtitle parsing is complete.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TEXT_RENDER">
+            <summary>
+            This event occurs whenever playback reaches a point in time where subtitles on any track need to be displayed or cleared.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TEXT_ERASE">
+            <summary>
+            This event occurs whenever a close caption (subtitle) needs to be erased
+            </summary>
+            
+            <remarks>
+            Deprecated: Use <see cref="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TEXT_RENDER"/> instead
+            </remarks>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TIMED_METADATA_BASE">
+            <summary>
+            This is is base of Timed Metadata RENDER Event.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TIMED_METADATA_INIT">
+            <summary>
+            Timed Metadata Init Event
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerEvent.NEXPLAYER_EVENT_TIMED_METADATA_RENDER">
+            <summary>
+            This event is called when new timed metadata is ready for display in HLS.
+            </summary>
+            
+            <remarks>
+            Timed metadata includes additional information about the playing content that may be displayed
+            to the user and this information may change at different times throughout the content.
+            Each time new metadata is available for display, this event occurs.
+            </remarks>
+        </member>
+        <member name="T:NexPlayerAPI.NexEncodingType">
+            <summary>
+            text encoding type code
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexContentStatisticsInfo">
+            <summary>
+            NexContentStatistics Info
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerAudioStream">
+            <summary>
+            Structure of an audio stream
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerAudioStream.id">
+            <summary>
+            id of the audio stream
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerAudioStream.name">
+            <summary>
+            Name of the audio stream if available
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerAudioStream.language">
+            <summary>
+            Language of the audio stream if available
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerCaptionStream">
+            <summary>
+            Structure of an caption stream
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerCaptionStream.id">
+            <summary>
+            id of the caption stream
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerCaptionStream.name">
+            <summary>
+            Name of the caption stream if available
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerCaptionStream.language">
+            <summary>
+            Language of the caption stream if available
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerTrack">
+            <summary>
+            Structure of a video track
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerTrack.id">
+            <summary>
+            id of the track
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerTrack.bitrate">
+            <summary>
+            Bit rate of the track in bits per second
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerTrack.width">
+            <summary>
+            Width of the track if available
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerTrack.height">
+            <summary>
+            Height of the track if available
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerTrack.framerate">
+            <summary>
+            Frame rate of the track in frames per second
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexSubtitleElement">
+            <summary>
+            Subtitle info
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexSubtitleElement.caption">
+            <summary>
+            subtitle data string
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexSubtitleElement.startTime">
+            <summary>
+            Subtitle start time in milliseconds
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexSubtitleElement.endTime">
+            <summary>
+            Subtitle end time in milliseconds
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexSubtitleElement.encodingType">
+            <summary>
+            caption encoding type(utf-8, utf-16,utf-16BE, euc-kr, etc..)
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexSubtitleElement.captionType">
+            <summary>
+            The caption type
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexTimedMetadata">
+            <summary>
+            TimedMetadata info
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.Title">
+            <summary>
+            Title in ID3 Tag
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.Album">
+            <summary>
+            Album in ID3 Tag
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.Artist">
+            <summary>
+            Artist in ID3 Tag
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.Genre">
+            <summary>
+            Genre in ID3 Tag
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.TrackNumber">
+            <summary>
+            Track Number in ID3 Tag
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.Year">
+            <summary>
+            Year in ID3 Tag
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.PrivateFrame">
+            <summary>
+            Private Frame in ID3 Tag(PRIV)
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.Comment">
+            <summary>
+            Comment In ID3 Tag(TXXX)
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.Text">
+            <summary>
+            Text in ID3 Tag(TXXX)
+            Currently, we are support only one TXXX Tag
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.EncapsulatedObject">
+            <summary>
+            Encapsulated Object in ID3 Tag(GEOB) 
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.EncapsulatedObjectBytes">
+            <summary>
+            Encapsulated Object in ID3 Tag(GEOB) with Byte Array Format 
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.AttachedImage">
+            <summary>
+            Attached Image in ID3 Tag(APIC)
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.ExtraTag">
+            <summary>
+            Extra Tag Dictionary in ID3 Tag
+            To this use, should call the API player.SetCustomTags()
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.ExtraTagCounts">
+            <summary>
+            Extra Tag Counts.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.MetadataProperties">
+            <summary>
+            Metadata Properties
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexTimedMetadata.Properties">
+            <summary>
+            Metadata Properties
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.Properties.FileName">
+            <summary>
+            Property that provides the name of the metadata file.
+            Supported for Encapsulated Object.
+            Only supported on MacOS.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.Properties.MimeType">
+            <summary>
+            Property that provides the type of the metadata file.
+            Supported for Encapsulated Object.
+            Only supported on MacOS.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexTimedMetadata.Properties.Description">
+            <summary>
+            Property that provides the description of the metadata file.
+            Supported for Encapsulated Object.
+            Only supported on MacOS.
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexRenderMode">
+            <summary>
+            Rendermode of a video
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexRenderMode.None">
+            <summary>
+            Render mode is not set
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexRenderMode.RawImage">
+            <summary>
+            RawImage Texture Mode 
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexRenderMode.RenderTexture">
+            <summary>
+            RenderTexture Mode 
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexRenderMode.MaterialOverride">
+            <summary>
+            Material Texture Mode 
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.VideoAspectRatio">
+            <summary>
+            Scalemode of a video
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.VideoAspectRatio.OriginSize">
+            <summary>
+            Preserve the pixel size without adjusting for target area
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.VideoAspectRatio.FitToScreen">
+            <summary>
+            Resizes proportionally so that the content fits the target area
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.VideoAspectRatio.StretchToFullScreen">
+            <summary>
+            Resizes the content's vertical and horizontal size to the target area
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.VideoAspectRatio.FitVertically">
+            <summary>
+            Resizes the content's vertical size to the target area's vertical size and resize the content's horizontal size proportionally
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.VideoAspectRatio.FitHorizontally">
+            <summary>
+            Resizes the content's horizontal size to the target area's horizontal size and resize the content's vertical size proportionally
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayer_LOG_LEVEL">
+            <summary>
+            The logging level for the NexPlayer protocol module
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_LOG_LEVEL.NEXPLAYER_LOG_LEVEL_NONE">
+            <summary>
+            Don't log anything
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_LOG_LEVEL.NEXPLAYER_LOG_LEVEL_DEBUG">
+            <summary>
+            Log start, stop and errors
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_LOG_LEVEL.NEXPLAYER_LOG_LEVEL_RTP">
+            <summary>
+            Generate log entries relating to RTP packets
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_LOG_LEVEL.NEXPLAYER_LOG_LEVEL_RTCP">
+            <summary>
+            Generate log entries relating to RTCP packets
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_LOG_LEVEL.NEXPLAYER_LOG_LEVEL_FRAME">
+            <summary>
+            Log information about the frame buffer
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_LOG_LEVEL.NEXPLAYER_LOG_LEVEL_ALL">
+            <summary>
+            Log everything
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerProperty">
+            <summary>
+            Possible properties that can be set on a NexPlayer
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.INITIAL_BUFFERING_DURATION">
+            <summary>
+            The number of milliseconds of media to buffer initially before beginning streaming playback
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.RE_BUFFERING_DURATION">
+            <summary>
+            The number of milliseconds of media to buffer if additional buffering is required during streaming playback
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.DRMLicenseTimeout">
+            <summary>
+            The DRM license timeout.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.TIMESTAMP_DIFFERENCE_VDISP_WAIT">
+            <summary>
+            The number of milliseconds (as a negative number) that video is allowed to run ahead of audio before the system waits for audio to catch up
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.TIMESTAMP_DIFFERENCE_VDISP_SKIP">
+            <summary>
+            The number of milliseconds that video is allowed to run behind audio before the system begins skipping frames to maintain synchronization
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.LIVE_VIEW_OPTION">
+            <summary>
+            Live HLS playback option
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.FIRST_DISPLAY_VIDEOFRAME">
+            <summary>
+            Controls what is displayed while the player is waiting for audio data
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.SUPPORT_ABR">
+            <summary>
+            If set to 1, enables HLS Adaptive Bit Rate (ABR) support
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.MAX_BW">
+            <summary>
+            When using HLS ABR, this is the maximum allowable bandwidth
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.AV_SYNC_OFFSET">
+            <summary>
+            Adjusts A/V synchronization by ofsetting video relative to audio
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.PREFER_BANDWIDTH">
+            <summary>
+            This property sets the preferred bandwidth when switching tracks during streaming play
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.ENABLE_TRACKDOWN">
+            <summary>
+            Allows NexPlayer to switch to a lower bandwidth track if the resolution or bitrate of the current track is too high for the device to play smoothly
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.TRACKDOWN_VIDEO_RATIO">
+            <summary>
+            This property controls the ratio of skipped frames that will be tolerated before a track change is forced, if ENABLE_TRACKDOWN is enabled
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.ENABLE_MEDIA_DRM">
+            <summary>
+            Enable the Media DRM
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.MIN_BW">
+            <summary>
+            When using HLS ABR, this is the minimum allowable bandwidth
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.PREFER_LANGUAGE_AUDIO">
+            <summary>
+            Sets the language to use for audio in multi-stream content, before content is played
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.START_NEARESTBW">
+            <summary>
+            Sets a target bandwidth (before playing HLS content) when selecting which track to play as playback starts
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.AUTO_LOW_LATENCY_ENABLE">
+            <summary>
+            Automatically sets the low latency value
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.MAX_CAPTION_LENGTH">
+            <summary>
+            MAX_CAPTION_LENGTH
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerProperty.Synchronization_Time">
+            <summary>
+            Presentation delay in milliseconds to synchronize end users, it sets a latency between the original stream and the player’s arrival.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:NexPlayerAPI.NexPlayerProperty.Synchronization_Enable" -->
+        <!-- Badly formed XML comment ignored for member "F:NexPlayerAPI.NexPlayerProperty.Synchronization_Speed_Up_Sync_Time" -->
+        <member name="F:NexPlayerAPI.NexPlayerProperty.Synchronization_Jump_Sync_Time">
+            <summary>
+            Maximum time in milliseconds that the playback is allowed to be out of synchronization before the player jumps to synchronized the video.
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerUnityEventType">
+            <summary>
+            Nexplayer event type.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerUnityEventType.Initialize">
+            <summary>
+            Initialize NexPlayer Instance
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerUnityEventType.Shutdown">
+            <summary>
+            Close player and destroy NexPlayer instances
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerUnityEventType.Update">
+            <summary>
+            Render Frame on Render Thread
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerUnityEventType.Max_EventType">
+            <summary>
+            Maximum value of event type
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerTimedMetadataInfo">
+            <summary>
+            ID3 Tag
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.MultiStreamProperties">
+            <summary>
+            Multi Streaming Properties
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.SynchronizedMultiStreamState">
+            <summary>
+            States for the Multi-Stream setup state machine
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.MediaType">
+            <summary>
+            Media Type
+            Audio Only : 1
+            Video Only : 2
+            Audio And Video : 3
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.MediaDuration">
+            <summary>
+            Media Total Play time
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.VideoCodec">
+            <summary>
+            Video Codec
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.VideoWidth">
+            <summary>
+            Video Width
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.VideoHeight">
+            <summary>
+            Height of Video
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.VideoFrameRate">
+            <summary>
+            framerates of Video
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.VideoBitrate">
+            <summary>
+            Bitrate of Video
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.AudioCodec">
+            <summary>
+            Audio Codec
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.AudioSampleRate">
+            <summary>
+            SamplingRate of Audio
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.AudioNumOfChannels">
+            <summary>
+            Number of Audio Channel
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.AudioBitrate">
+            <summary>
+            Bitrate of Audio
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.SeekableInfo">
+            <summary>
+            Seekable Info
+            0 : not seekable
+            1 : seekable in contents
+            2 : seekable in buffer
+            4 : only seekable to 0sec
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.IsPausable">
+            <summary>
+            1 : this content supports pause
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.VideoFourCC">
+            <summary>
+            Four CC of Video
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.VideoCodecClass">
+            <summary>
+            0 : SW Codec
+            1 : HW Codec
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.VideoProfile">
+            <summary>
+            Video Codec Profile, only H.264 profiles are suported.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.VideoLevel">
+            <summary>
+            Video Codec Level, only H.264 is suported
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentInfo.VideoCodecError">
+            <summary>
+            Error Information about video codec
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayer_ASYNC_EVENT_TYPE">
+            <summary>
+            When an asynchronous method of NexPlayer has completed successfully or failed, this event occurs
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_ASYNC_EVENT_TYPE.NEXPLAYER_EVENT_ASYNC_COMPLETE">
+            <summary>
+            Complete Async. NexPlayer API 
+            param1 : NexPlayerASYNC_EVENT_TYPE
+            param2 : result
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_ASYNC_EVENT_TYPE.NEXPLAYER_EVENT_END_OF_CONTENT">
+            <summary>
+            Reached the end of content
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_ASYNC_EVENT_TYPE.NEXPLAYER_EVENT_UPDATE_CONTENT_INFO">
+            <summary>
+            Content information is updated
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_ASYNC_EVENT_TYPE.NEXPLAYER_EVENT_TIME">
+            <summary>
+            Current playing time is updated 
+            param1 : current playing time (milisecond)
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_ASYNC_EVENT_TYPE.NEXPLAYER_EVENT_BUFFERING">
+            <summary>
+            Buffer state is chaged 
+            param1 : 1 (buffering begin), 2 (buffering progress), 3(buffering end)
+            param2 : buffering progress (percent)
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_ASYNC_EVENT_TYPE.NEXPLAYER_EVENT_ERROR">
+            <summary>
+            Error happen at NexPlayer 
+            param1 : error code
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_ASYNC_EVENT_TYPE.NEXPLAYER_EVENT_LOADSTART">
+            <summary>
+            Load Start at NexPlayer
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_ASYNC_EVENT_TYPE.NEXPLAYER_EVENT_EXTERNAL_PCM">
+            <summary>
+            Handle audio PCM data from NexPlayer
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_ASYNC_EVENT_TYPE.NEXPLAYER_EVENT_TEXT_INIT">
+            <summary>
+            This event occurs when the subtitle parsing is complete.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_ASYNC_EVENT_TYPE.NEXPLAYER_EVENT_TEXT_RENDER">
+            <summary>
+            Playback reaches a point in time where subtitles on any track need to be displayed or cleared.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_ASYNC_EVENT_TYPE.NEXPLAYER_EVENT_TIMED_METADATA_RENDER">
+            <summary>
+            Playback reaches a point in time where Timed Metadatas on any track need to be displayed or cleared
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerASYNC_EVENT_TYPE">
+            <summary>
+            Possible NexPlayer Async Event Type
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerASYNC_EVENT_TYPE.NEXPLAYER_ASYNC_CMD_OPEN_LOCAL">
+            <summary>
+            When NexPlayer local media start
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerASYNC_EVENT_TYPE.NEXPLAYER_ASYNC_CMD_OPEN_STREAMING">
+            <summary>
+            When NexPlayer streaming media open
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerASYNC_EVENT_TYPE.NEXPLAYER_ASYNC_CMD_START_LOCAL">
+            <summary>
+            When NexPlayer local media start
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerASYNC_EVENT_TYPE.NEXPLAYER_ASYNC_CMD_START_STREAMING">
+            <summary>
+            When NexPlayer Streaming media start
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerASYNC_EVENT_TYPE.NEXPLAYER_ASYNC_CMD_STOP">
+            <summary>
+            When NexPlayer stop
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerASYNC_EVENT_TYPE.NEXPLAYER_ASYNC_CMD_PAUSE">
+            <summary>
+            When NexPlayer pause
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerASYNC_EVENT_TYPE.NEXPLAYER_ASYNC_CMD_RESUME">
+            <summary>
+            When NexPlayer resume
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerASYNC_EVENT_TYPE.NEXPLAYER_ASYNC_CMD_SEEK">
+            <summary>
+            When NexPlayer seek
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_Caption_Type.NEX_TEXT_UNKNOWN">
+            <summary>
+            Unknown caption format
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_Caption_Type.NEX_TEXT_EXTERNAL_SMI">
+            <summary>
+            SMI subtitles
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_Caption_Type.NEX_TEXT_EXTERNAL_SRT">
+            <summary>
+            SRT subtitles
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_Caption_Type.NEX_TEXT_WEBVTT">
+            <summary>
+            WebVTT text tracks
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_Caption_Type.NEX_TEXT_3GPP_TIMEDTEXT">
+            <summary>
+            3GPP timed text
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_Caption_Type.NEX_TEXT_TTML">
+            <summary>
+            TTML timed text
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_Caption_Type.NEX_TEXT_CEA">
+            <summary>
+            Closed captions
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_Caption_Type.NEX_TEXT_CEA608">
+            <summary>
+            CEA608 caption
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayer_Caption_Type.NEX_TEXT_CEA708">
+            <summary>
+            CEA708 caption
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexContentType">
+            <summary>
+            Different content type sources
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentType.STREAMING">
+            <summary>
+            External URL
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentType.ASSET">
+            <summary>
+            From Streaming Assets folder
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexContentType.LOCAL">
+            <summary>
+            Any local folder
+            </summary>
+        </member>
+        <member name="T:NexPlayerAPI.NexPlayerError">
+            <summary>
+            Obsolete: use <see cref="T:NexPlayerAPI.NexErrorCode"/> instead
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerError.NEXPLAYER_ERROR_NONE">
+            <summary>
+            Obsolete: use <see cref="F:NexPlayerAPI.NexErrorCode.NONE"/> instead
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerError.NEXPLAYER_ERROR_GENERAL">
+            <summary>
+            Obsolete: use <see cref="F:NexPlayerAPI.NexErrorCode.HAS_NO_EFFECT"/> instead
+            The same command has been called already in the same state or the command is invalid.
+            E.g. If an open API is called while processing an open API, the engine does not regard it as an error.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerError.NEXPLAYER_ERROR_INVALID_SDK">
+            <summary>
+            Obsolete: use <see cref="F:NexPlayerAPI.NexErrorCode.PLAYER_ERROR_INVALID_SDK"/> instead
+            Error while creating or initializing NexPlayer.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerError.NEXPLAYER_ERROR_INIT">
+            <summary>
+            Obsolete: use <see cref="F:NexPlayerAPI.NexErrorCode.PLAYER_ERROR_INIT"/> instead
+            Error while creating or initializing NexPlayer.
+            ANDROID ONLY.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerError.NEXPLAYER_ERROR_NOT_ACTIVATED_APP_ID">
+            <summary>
+            Obsolete: use <see cref="F:NexPlayerAPI.NexErrorCode.PLAYER_ERROR_NOT_ACTIVATED_APP_ID"/> instead
+            Error while creating or initializing NexPlayer.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerError.NEXPLAYER_ERROR_TIME_LOCKED">
+            <summary>
+            Obsolete: use <see cref="F:NexPlayerAPI.NexErrorCode.PLAYER_ERROR_TIME_LOCKED"/> instead
+            The SDK has expired.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerError.NEXPLAYER_ERROR_NO_LICENSE_FILE">
+            <summary>
+            Obsolete: use <see cref="F:NexPlayerAPI.NexErrorCode.PLAYER_ERROR_NO_LICENSE_FILE"/> instead
+            Error while creating or initializing NexPlayer.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerError.NEXPLAYER_ERROR_DRM_INIT">
+            <summary>
+            Obsolete: use <see cref="F:NexPlayerAPI.NexErrorCode.DRM_INIT_FAILED"/> instead
+            The content DRM Initialization Failed.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerError.NEXPLAYER_UNKNOWN_ERROR_CHECK_LINKS">
+            <summary>
+            Obsolete: use <see cref="F:NexPlayerAPI.NexErrorCode.UNKNOWN"/> instead
+            This error is a kind of internal error such as "system failure".
+            E.g. NexPlayer returns this when memory allocation is failed for unknown reasons. It's mostly an error that the user can not handle.
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerError.NEXPLAYER_ERROR_NETWORK">
+            <summary>
+            Obsolete: use <see cref="F:NexPlayerAPI.NexErrorCode.ERROR_NETWORK_PROTOCOL"/> instead
+            Network related error such as socket errors.  
+            E.g. Socket open fail, connect fail, bind fail,...
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerError.NEXPLAYER_INVALID_SUBTITLE">
+            <summary>
+            Obsolete: use <see cref="F:NexPlayerAPI.NexErrorCode.NEXPLAYER_INVALID_SUBTITLE"/> instead
+            Input wrong subtitle
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerError.NEXPLAYER_ERROR_SRC_NOT_FOUND">
+            <summary>
+            Obsolete: use <see cref="F:NexPlayerAPI.NexErrorCode.NEXPLAYER_INVALID_SUBTITLE"/> instead
+            The URI is not supported or not found. Make sure the URI actually exists and check that necessary permissions are set.
+            E.g. Playing a video on Android requires setting the Player Setting "Internet Access" to "Required" (streaming videos) and the "Write Permission" to "External" (local videos).
+            </summary>
+        </member>
+        <member name="F:NexPlayerAPI.NexPlayerError.NEXPLAYER_ERROR_URL">
+            <summary>
+            Obsolete: use <see cref="F:NexPlayerAPI.NexErrorCode.NEXPLAYER_ERROR_URL"/> instead
+            The URL was not found.
+            </summary>
+        </member>
+        <member name="T:NexUtility.AsyncAction">
+            <summary>
+            Use this to maintain the event, token, and action
+            </summary>
+        </member>
+        <member name="M:NexUtility.AsyncEvent.#ctor(System.Action,NexPlayerAPI.NexPlayerEvent)">
+            <summary>
+            Perform the action and wait for the status
+            </summary>
+            <param name="action">The action to perform.</param>
+            <param name="requiredStatus">This event will be handled to confirm the action is complete.</param>
+        </member>
+        <member name="M:NexUtility.AsyncFunc.#ctor(System.Action,System.Func{System.Boolean})">
+            <summary>
+            Perform the action and wait for the status
+            </summary>
+            <param name="action">The action to perform.</param>
+            <param name="completeFunc">This func will return when the action is considered complete.</param>
+        </member>
+        <member name="T:NexUtility.AsyncQueue">
+            <summary>
+            Class that manages async operations with NexPlayer.
+            You can yield on the return values to ensure the operation
+            completes without error.
+            </summary>
+        </member>
+        <member name="F:NexUtility.AsyncQueue.queue">
+            <summary>
+            Queue up actions to handle
+            </summary>
+        </member>
+        <member name="F:NexUtility.AsyncQueue.timeout">
+            <summary>
+            The amount of time to wait for an async action to complete
+            </summary>
+        </member>
+        <member name="F:NexUtility.AsyncQueue.startTime">
+            <summary>
+            The start time of the most recent async action
+            </summary>
+        </member>
+        <member name="P:NexUtility.AsyncQueue.CurrentAsyncAction">
+            <summary>
+            The currently handled action
+            </summary>
+        </member>
+        <member name="M:NexUtility.AsyncQueue.AddToQueue(System.Action)">
+            <summary>
+            Add an action to the queue.
+            </summary>
+            <param name="action"></param>
+            <returns>AsyncToken that will be updated immediately after action is run.</returns>
+        </member>
+        <member name="M:NexUtility.AsyncQueue.AddToQueue(System.Action,NexPlayerAPI.NexPlayerEvent)">
+            <summary>
+            Add an action to the queue.
+            </summary>
+            <param name="action"></param>
+            <param name="completedEvent"></param>
+            <returns>AsyncToken that will be updated when the event is handled.</returns>
+        </member>
+        <member name="M:NexUtility.AsyncQueue.AddToQueue(System.Action,System.Func{System.Boolean})">
+            <summary>
+            Add an action to the queue.
+            </summary>
+            <param name="action"></param>
+            <param name="completeFunc"></param>
+            <returns>AsyncToken that will be updated when the func returns true.</returns>
+        </member>
+        <member name="M:NexUtility.AsyncQueue.HandleAction">
+            <summary>
+            Handle any actions if avaialable. Call in Update loop.
+            </summary>
+        </member>
+        <member name="T:NexUtility.AsyncToken">
+            <summary>
+            Use this token to determine if an action is completed.
+            Either Check isCompleted or use a yield.
+            </summary>
+        </member>
+        <member name="F:NexUtility.AsyncToken.result">
+            <summary>
+            Used to evaluate the result of the action
+            </summary>
+        </member>
+        <member name="M:NexUtility.NexUtil.GetPixelSizeOfMeshRenderer(UnityEngine.MeshRenderer,UnityEngine.Camera)">
+            <summary>
+            Get size in pixels of gameobject that have "MeshRenderer" component
+            </summary>
+            <param name="meshRenderer">Gameobject "MeshRenderer" component</param>
+            <param name="camera">Main camera of current scene</param>
+            <returns></returns>
+        </member>
+        <member name="M:NexUtility.NexUtil.GetPixelSizeOfRawImage(UnityEngine.UI.RawImage)">
+            <summary>
+            Get size in pixels of gameobject that have "RawImage" component
+            </summary>
+            <param name="rawImage">Gameobject "RawImage" component</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

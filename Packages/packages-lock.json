@@ -68,6 +68,28 @@
       "source": "local-tarball",
       "dependencies": {}
     },
+    "com.nexplayer.nxplayerfullfeatsample": {
+      "version": "file:com.nexplayer.nxplayerfullfeatsample",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.nexplayer.nxplayersdk": "2.3.0"
+      }
+    },
+    "com.nexplayer.nxplayersdk": {
+      "version": "file:com.nexplayer.nxplayersdk",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
+    "com.nexplayer.nxplayersimplesample": {
+      "version": "file:com.nexplayer.nxplayersimplesample",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.nexplayer.nxplayersdk": "2.3.0"
+      }
+    },
     "com.unity.ext.nunit": {
       "version": "1.0.6",
       "depth": 1,

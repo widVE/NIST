@@ -1,0 +1,22 @@
+{
+  "name": "com.nexplayer.nxplayersimplesample",
+  "version": "2.3.0",
+  "displayName": "NexPlayer Simple Sample",
+  "description": "Contain example scenes with the minimum functionality to work.",
+  "unity": "2019.1",
+  "documentationUrl": "https://github.com/NexPlayer/NexPlayer_Unity_Plugin",
+  "keywords": [
+    "nexplayer",
+    "videoplayer",
+    "streaming"
+  ],
+  "author": {
+    "name": "NexPlayer",
+    "email": "info@nexplayer.com",
+    "url": "https://nexplayersdk.com/"
+  },
+  "type": "sample",
+  "dependencies": {
+    "com.nexplayer.nxplayersdk": "2.3.0"
+  }
+}

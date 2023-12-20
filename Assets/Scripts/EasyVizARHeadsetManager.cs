@@ -38,7 +38,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     }
 
     [SerializeField]
-    string _local_headset_ID = "";
+    public string _local_headset_ID = "";
 
     public List<EasyVizARHeadset> _activeHeadsets = new List<EasyVizARHeadset>();
 
@@ -141,7 +141,6 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
     void RegisterCheckCallback(string resultData)
     {
-
         if (verbose_debug_log) Debug.Log("Registration Callback Check: " + resultData);
 
         //Returns error if no headset with ID on server
@@ -159,6 +158,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                 // but we should do so when starting a new session with an existing headset. Otherwise, the headset will be
                 // on the wrong map!
                 CreateCheckIn(h.id, _locationId);
+
+                CreateHeadsets();
 
                 //callback_headset_registered = true;
             }
@@ -199,18 +200,18 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             HeadsetRegistrationCheck(_local_headset_ID);
         }
 
-        if (EasyVizARServer.Instance.TryGetHeadsetID(out string new_registered_headset_ID))
-        {
-            _local_headset_ID = new_registered_headset_ID;
+        /*        if (EasyVizARServer.Instance.TryGetHeadsetID(out string new_registered_headset_ID))
+                {
+                    _local_headset_ID = new_registered_headset_ID;
 
-            if (!_headsetsCreated)
-            {
-                //CreateLocalHeadset();
-                CreateHeadsets();
+                    if (!_headsetsCreated)
+                    {
+                        //CreateLocalHeadset();
+                        CreateHeadsets();
 
-                _headsetsCreated = true;
-            }
-        }
+                        _headsetsCreated = true;
+                    }
+                }*/
     }
 
     public void CreateCheckIn(string headsetId, string locationId)
@@ -790,7 +791,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         }
     }
 */
-    void CreateHeadsets()
+    public void CreateHeadsets()
     {
         //list headsets from server for our location, create a prefab of each...
         EasyVizARServer.Instance.Get("headsets?envelope=headsets&location_id=" + _locationId, EasyVizARServer.JSON_TYPE, CreateHeadsetsCallback);

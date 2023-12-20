@@ -369,6 +369,8 @@ public class EasyVizARHeadset : MonoBehaviour
         h.location_id = _locationID;
 
         EasyVizARServer.Instance.Post("headsets", EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), CreateRegisterCallback);
+
+        //EasyVizARHeadsetManager.EasyVizARManager.gameObject.GetComponent<EasyVizARHeadsetManager>().CreateHeadsets();
     }
 
     void CreateRegisterCallback(string resultData)

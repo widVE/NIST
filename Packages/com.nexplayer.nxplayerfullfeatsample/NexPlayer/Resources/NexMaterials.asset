@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d38f98e142689d4c82cd145f1fd6aa9, type: 3}
+  m_Name: NexMaterials
+  m_EditorClassIdentifier: 
+  renderTextures:
+  - {fileID: 8400000, guid: 1357d88dc3a0ca04780ff3486e1237c1, type: 2}
+  - {fileID: 8400000, guid: 6b82510d922852640a7af831274cc7ef, type: 2}
+  - {fileID: 8400000, guid: a5bbeaf074974384ebdbd3f5c1ace1c0, type: 2}
+  - {fileID: 8400000, guid: 9e61fdfe7aca6a04eb30073cbc18cf32, type: 2}
+  Default: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  NexPlayerDefaultMaterial: {fileID: 2100000, guid: 5ad3f687318a0f44b859d3ecc577dca0,
+    type: 2}
+  NexPlayerDefaultMaterialRawImage: {fileID: 2100000, guid: f868772850a38d64fb78b648b2790cb8,
+    type: 2}
+  NexPlayer: {fileID: 2100000, guid: 9f13c2fd996cbbe4dbcd20dad41b8d02, type: 2}
+  RenderTexture0: {fileID: 2100000, guid: b089c19a130a3ce4596c4aa2c3766a2a, type: 2}
+  RenderTexture1: {fileID: 2100000, guid: 9caed495c369b0844b495753fe93e852, type: 2}
+  RenderTexture2: {fileID: 2100000, guid: a16eab7d0ff328e4faeaaf43066b0e2c, type: 2}
+  RenderTexture3: {fileID: 2100000, guid: 69e3bcdce4198bf4eb24e3c7119f3f7e, type: 2}
+  Transparent: {fileID: 2100000, guid: ed397ddc2639dd14eaad0318d4d1da1c, type: 2}
+  WorldSpaceTiling: {fileID: 2100000, guid: 64685bcd8d43543398dfa6d37f0881cc, type: 2}
+  Mono: {fileID: 2100000, guid: c7019a0529c335a4fbcef7b070faee16, type: 2}
+  Left: {fileID: 2100000, guid: 61740615aacde7747b420c28d803bb38, type: 2}
+  Right: {fileID: 2100000, guid: 5cc03cc8e1ecec54daa14ada65bda2b5, type: 2}
+  Over: {fileID: 2100000, guid: 65b9dc518ee3ad240b30a27afc9eca93, type: 2}
+  Under: {fileID: 2100000, guid: b503547dc75e8df4883fee6ea26fc425, type: 2}
+  screen: {fileID: 4300000, guid: 778fa22d4045e4c4ca3e4251c1771f1e, type: 3}
+  sphere360: {fileID: 4300000, guid: 04bd2a41286eecb40b0be5854138fcf5, type: 3}
+  quad: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+  cube: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
