@@ -42,6 +42,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
     public List<EasyVizARHeadset> _activeHeadsets = new List<EasyVizARHeadset>();
 
+    // TODO we should be able to clear and load the headset list any time a new QR code is scanned, not just the first time
     private bool _headsetsCreated = false;
 
     [SerializeField]
@@ -92,6 +93,10 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         if (_qrScanner)
         {
             var scanner = _qrScanner.GetComponent<QRScanner>();
+
+            // The QRScanner will call this function once whenever a new location QR code is detected.
+            // This would be a good place to initiate creating a new check-in and loading all of the
+            // the other headsets that are already in the location.
             scanner.LocationChanged += (o, ev) =>
             {
                 _locationId = ev.LocationID;
@@ -102,6 +107,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                     EasyVizARHeadset headset = _localHeadset.GetComponent<EasyVizARHeadset>();
                     headset.LocationID = this.LocationID;
                 }
+
+                LocalRegistrationSetup();
             };
         }
 
@@ -146,6 +153,12 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             if (h.id == _local_headset_ID)
             {
                 if (verbose_debug_log) Debug.Log("Registraiton ID is on server");
+
+                // Tell the server the headset is moving to a new location (create a check-in or aka device tracking session).
+                // We do not need to do this when we register a new headset because we pass the location ID during registration,
+                // but we should do so when starting a new session with an existing headset. Otherwise, the headset will be
+                // on the wrong map!
+                CreateCheckIn(h.id, _locationId);
 
                 //callback_headset_registered = true;
             }
@@ -198,6 +211,17 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                 _headsetsCreated = true;
             }
         }
+    }
+
+    public void CreateCheckIn(string headsetId, string locationId)
+    {
+        var checkIn = new EasyVizAR.NewCheckIn();
+        checkIn.location_id = locationId;
+
+        EasyVizARServer.Instance.Post($"/headsets/{headsetId}/check-ins", EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(checkIn), delegate (string result)
+        {
+            // Nothing needs to be done with the response.
+        });
     }
 
     void CreateNewRegistration()
@@ -600,7 +624,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
         //parse list of headsets for this location and create...
         //the key to parsing the array - the text we add here has to match the name of the variable in the array wrapper class (headsets).
-        EasyVizAR.HeadsetList headset_list = JsonUtility.FromJson<EasyVizAR.HeadsetList>("{\"headsets\":" + result_data + "}");
+        EasyVizAR.HeadsetList headset_list = JsonUtility.FromJson<EasyVizAR.HeadsetList>(result_data);
 
         // why are we pre-incrementing i???
         //Only one local headset and we know the ID. Find and spawn local, otherwise remote
@@ -769,7 +793,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     void CreateHeadsets()
     {
         //list headsets from server for our location, create a prefab of each...
-        EasyVizARServer.Instance.Get("headsets?location_id=" + _locationId, EasyVizARServer.JSON_TYPE, CreateHeadsetsCallback);
+        EasyVizARServer.Instance.Get("headsets?envelope=headsets&location_id=" + _locationId, EasyVizARServer.JSON_TYPE, CreateHeadsetsCallback);
     }
 
 

@@ -310,10 +310,14 @@ public class QRScanner : MonoBehaviour
 		//I removed the null check because it is better for it to thorw an error than to fail silently.
 		//TODO Either a throw catch error that is handeled and alerts the user, or find the manager it is looking for and assign it.
 		//if (_headsetManager is not null)
-        {
+        // Lance - I moved this logic back to the LocationChanged handler in the the headset manager.
+        // That way it only runs when the location changes.
+		/*
+		{
 			var manager = _headsetManager.GetComponent<EasyVizARHeadsetManager>();
 			manager.LocalRegistrationSetup();
 		}
+		*/
 	}
 
 	// Enable or disable certain features based on the configuration values from the server.
