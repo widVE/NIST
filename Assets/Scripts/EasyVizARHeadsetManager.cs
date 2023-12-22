@@ -109,6 +109,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                 }
 
                 LocalRegistrationSetup();
+                Invoke(nameof(HideLocalVisuals), 2f);
             };
         }
 
@@ -132,6 +133,19 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     void OnDisable()
     {
 
+    }
+
+    public void HideLocalVisuals()
+    {
+        foreach(Transform headset in transform)
+        {   
+            if(headset.name == _local_headset_ID)
+            {
+                Transform match_ID = headset.Find("Capsule");
+                GameObject capsule_visual = match_ID.gameObject;
+                capsule_visual.SetActive(false);
+            }
+        }
     }
 
     public void HeadsetRegistrationCheck(String headset_ID)

@@ -121,7 +121,7 @@ public class Navigation : MonoBehaviour
         for (int i = 0; i < path.points.Length; i++)
         {
             map_line.positionCount++;
-            map_line.SetPosition(i, new Vector3(path.points[i].x, path.points[i].y, path.points[i].z)); // this draws the line 
+            map_line.SetPosition(i, new Vector3(path.points[i].x, 0, path.points[i].z)); // this draws the line 
             //UnityEngine.Debug.Log("number of points in the path is: " + line.positionCount);
             //UnityEngine.Debug.Log("points: " + points.x + ", " + points.y + ", " + points.z);
             

@@ -7519,7 +7519,7 @@ MonoBehaviour:
   _researchModeManager: {fileID: 1194257831}
   followMovingQRCode: 1
   _scanningMode: 0
-  testQRCodeData: vizar://128.105.22.228:5000/locations/127b11b6-d2d4-4a96-9d5c-b8c50e1f2b89
+  testQRCodeData: 'vizar://128.105.22.228:5000/locations/69e92dff-7138-4091-89c4-ed073035bfe6 '
   triggerQRCodeDetected: 0
 --- !u!82 &291935033
 AudioSource:
