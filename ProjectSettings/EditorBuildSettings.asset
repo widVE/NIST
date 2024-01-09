@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/v3.1 Canvas Render Warning Remove.unity
-    guid: 6ac7110f885717a4784df732805a4e12
+    path: Assets/Scenes/v3.2 No Holohands and HMD Visuals Updates.unity
+    guid: dbbc9bf146ae67546bc032ae320e8f1d
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 24efe516db1dbf446a155a698a288aae, type: 2}
     Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: 8ff3c7c77ccd00441a88cebd82b4144c, type: 2}

@@ -7248,8 +7248,10 @@ MonoBehaviour:
   _headsetManager: {fileID: 1361342022}
   _meshCapture: {fileID: 1375559501}
   _photoCapture: {fileID: 404529389}
+  _researchModeManager: {fileID: 0}
   followMovingQRCode: 1
-  testQRCodeData: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/1cc48e8d-890d-413a-aa66-cabaaa6e5458
+  _scanningMode: 0
+  testQRCodeData: 'vizar://easyvizar.wings.cs.wisc.edu:5000/locations/69e92dff-7138-4091-89c4-ed073035bfe6 '
   triggerQRCodeDetected: 0
 --- !u!82 &291935033
 AudioSource:
@@ -19914,6 +19916,7 @@ MonoBehaviour:
   map_parent: {fileID: 335883421}
   _qrScanner: {fileID: 291935030}
   _updateInterval: 0.2
+  post_data: 0
   _echoMessages: 1
 --- !u!1 &920408654
 GameObject:
@@ -27133,6 +27136,7 @@ MonoBehaviour:
   m_Script: {fileID: 236468377}
   m_Name: 
   m_EditorClassIdentifier: 
+  verbose_debug: 0
 --- !u!4 &1368765919
 Transform:
   m_ObjectHideFlags: 0

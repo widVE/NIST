@@ -79,7 +79,6 @@ MonoBehaviour:
   capsule: {fileID: 8231832368714168251}
   is_feet: 1
   old_position: {x: 0, y: 0, z: 0}
-  new_position: {x: 0, y: 0, z: 0}
   headset_icon: {fileID: 4402188086708784334, guid: b234550f30f629c41ba6c5c3b64682a6, type: 3}
   map_parent: {fileID: 0}
   headset_parent: {fileID: 0}

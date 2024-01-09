@@ -129,6 +129,7 @@ namespace EasyVizAR
 	{
 		public string contentType;
 		public static float created;
+		public float cutting_height;
 		public int id;
 		public string imagePath;
 		public string imageUrl;
@@ -140,7 +141,13 @@ namespace EasyVizAR
 		public ViewBox viewBox;
 	}
 
-	[System.Serializable]
+    [System.Serializable]
+    public class MapLayerInfoList
+	{
+        public MapInfo[] layers;
+    }
+
+    [System.Serializable]
 	public class ViewBox
 	{
 		public float height;
@@ -324,8 +331,13 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	{
 		StartCoroutine(GetTexture(_baseURL+url, contentType, width, callBack));
 	}
-	
-	public void Put(string url, string contentType, string jsonData, System.Action<string> callBack)
+
+    public void TextureMapID(string url, string contentType, string width, int map_ID, System.Action<Texture,int> callBack)
+    {
+        StartCoroutine(GetTextureMapID(_baseURL + url, contentType, width, map_ID, callBack));
+    }
+
+    public void Put(string url, string contentType, string jsonData, System.Action<string> callBack)
 	{
 		StartCoroutine(DoRequest("PUT", _baseURL + url, contentType, jsonData, callBack));
 	}
@@ -560,7 +572,35 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	}
 
 
-	IEnumerator GetTexture(string url, string contentType, string width, System.Action<Texture> callBack)
+    IEnumerator GetTextureMapID(string url, string contentType, string width, int map_ID, Action<Texture,int> callBack)
+    {
+        UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
+
+        www.SetRequestHeader("Accept", contentType);
+        www.SetRequestHeader("Width", width);
+        if (_hasRegistration)
+        {
+            www.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+        }
+
+        //Debug.Log(www);
+        yield return www.SendWebRequest();
+
+        //Debug.Log(www.result);
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(www.error);
+        }
+        else
+        {
+            //Using the Texture download handler we get the content from the Unity Web Request object
+            Texture my_text = DownloadHandlerTexture.GetContent(www);
+            callBack(my_text, map_ID);
+        }
+    }
+
+    IEnumerator GetTexture(string url, string contentType, string width, System.Action<Texture> callBack)
 	{
 		UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
 

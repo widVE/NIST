@@ -127,7 +127,9 @@ public class QRScanner : MonoBehaviour
 	/// is an async call, so you could re-arrange this code to be non-blocking!
 	async void Start()
 	{
-		audioSource = GetComponent<AudioSource>();
+        _headsetManager = EasyVizARHeadsetManager.EasyVizARManager.gameObject;
+
+        audioSource = GetComponent<AudioSource>();
 
 		if (!QRCodeWatcher.IsSupported())
         {
@@ -238,8 +240,21 @@ public class QRScanner : MonoBehaviour
 		{
 			if (uri.Scheme == "vizar")
 			{
+                string base_url;
+
+                // Try to infer whether we should use HTTP or HTTPS for the
+                // connection.  It should work if we use this convention: if
+                // the URI explicitly specifies a port other than 443, such as
+                // 5000, then use HTTP; otherwise, default to HTTPS.
+                if (uri.Port == -1 || uri.Port == 443) {
+                    // Example: vizar://example.org/locations/xyz
+                    base_url = "https://" + uri.Authority + "/";
+                } else {
+                    // Example: vizar://1.2.3.4:5000/locations/xyz
+                    base_url = "http://" + uri.Authority + "/";
+                }
+
 				// Example: http://easyvizar.wings.cs.wisc.edu:5000/
-				string base_url = "http://" + uri.Authority + "/";
 				Debug.Log("Detected URL from QR code: " + base_url);
 				//Lance question here, does this matter if it fails and is never re-called? It seems to be the original place that _hasRegistration is set to true, but that only works if a registration exsists on the device. If a new one is required then I've set _hasRegistration to true in the Save Registration function, but that might not be the correct way to use it.
 				EasyVizARServer.Instance.SetBaseURL(base_url);
@@ -291,11 +306,18 @@ public class QRScanner : MonoBehaviour
 		}
 
 		//Calls into the manager when the QR code is detected. Checks the status of the system's registration and the called function then calls the headsets spawner for this location ID
-		if (_headsetManager is not null)
-        {
+		//!! This was failing silently! Even though assigned in the editor, the _headsetManager was null at runtime. I added an assignment in the start function to fix this. We should be throwing an error, but this wasn't implemented.
+		//I removed the null check because it is better for it to thorw an error than to fail silently.
+		//TODO Either a throw catch error that is handeled and alerts the user, or find the manager it is looking for and assign it.
+		//if (_headsetManager is not null)
+        // Lance - I moved this logic back to the LocationChanged handler in the the headset manager.
+        // That way it only runs when the location changes.
+		/*
+		{
 			var manager = _headsetManager.GetComponent<EasyVizARHeadsetManager>();
 			manager.LocalRegistrationSetup();
 		}
+		*/
 	}
 
 	// Enable or disable certain features based on the configuration values from the server.

@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 958d71136d590744693b237c45ed98f0, type: 3}
+  m_Name: NexUISprites
+  m_EditorClassIdentifier: 
+  UiSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  Background: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  UiMask: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
+  Knob: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  nexPlayerLogo: {fileID: 21300000, guid: a8fddcbafb58ec6499ae916b70065078, type: 3}
+  uiButtonDefault: {fileID: 21300000, guid: b803b16b7e84f0840a9496ada047dd49, type: 3}
+  arrow: {fileID: 21300000, guid: b8250313fb5705849903dc2896f195b2, type: 3}
+  languageCaptionSettings: {fileID: 21300000, guid: 255e7478d60d40d41b161b5d17c22e9a,
+    type: 3}
+  caption: {fileID: 21300000, guid: bf1c44d6a2cd9214d82de90ad47e0fd0, type: 3}
+  maximizeScreen: {fileID: 21300000, guid: f495039d5d87b1a438054c6202de1a2b, type: 3}
+  resizeScreen: {fileID: 21300000, guid: 6a8e4a5b3e0f2f74b912109664b5a4d4, type: 3}
+  originSize: {fileID: 21300000, guid: 696177634eb279143b2dd0d437c140e7, type: 3}
+  fullScreen: {fileID: 21300000, guid: 47d6dcc25d03fc644bf6ca3ce3eb83df, type: 3}
+  fitVertically: {fileID: 21300000, guid: 4983633aa901b6b47bf34b611e7070f9, type: 3}
+  fitHorizontal: {fileID: 21300000, guid: 089cc26a03f105848afc6400ea080808, type: 3}
+  previous: {fileID: 21300000, guid: 5b42f16bcb2b1b24a8e00b4e0d6869fd, type: 3}
+  play: {fileID: 21300000, guid: 41d4141d19d8d1045aa1f85c755b7192, type: 3}
+  pause: {fileID: 21300000, guid: f77a8907e9f7fd242ad64b073aac7ff5, type: 3}
+  stop: {fileID: 21300000, guid: f188dbf8bd948c847885edefca8b8b8f, type: 3}
+  next: {fileID: 21300000, guid: a635b88fea647f145a82a43c4364149c, type: 3}
+  download: {fileID: 21300000, guid: fc975cc495133944aa59c350a5726ae3, type: 3}
+  offlineList: {fileID: 21300000, guid: 3eefefa1f95d0bc4db7f2c54a39c2342, type: 3}
+  loop: {fileID: 21300000, guid: 440afa921311aa64aac3247aa610e39f, type: 3}
+  noLoop: {fileID: 21300000, guid: 6169338f7da808c47a661fdae08f036c, type: 3}
+  audioMute: {fileID: 21300000, guid: a25054ccc22a97c459c41d596198527e, type: 3}
+  audio: {fileID: 21300000, guid: 1d124fbb6c3e70b4c86354b3f2734c5c, type: 3}
+  whiteMat: {fileID: 0}
+  handGrab: {fileID: 0}
+  handHover: {fileID: 0}

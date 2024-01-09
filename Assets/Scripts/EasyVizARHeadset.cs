@@ -42,6 +42,7 @@ public class EasyVizARHeadset : MonoBehaviour
     //    set { _realTimeChanges = value; }
     //}
 
+	//This should be true if we want to use the PATCH method to update the server with position changes instead of the websockets. Generally assumed to be false unless testing is being done.
     [SerializeField]
 	bool _postPositionChanges = false;
 	public bool PostPositionChanges
@@ -117,7 +118,7 @@ public class EasyVizARHeadset : MonoBehaviour
         parent_headset_manager = EasyVizARHeadsetManager.EasyVizARManager.gameObject;
 
         //if (_is_local) StartCoroutine(PositionPostingUpdate(_updateFrequency));
-        StartCoroutine(PositionPostingUpdate(_updateFrequency));
+        if(_postPositionChanges && _is_local) StartCoroutine(PositionPostingUpdate(_updateFrequency));
     }
 
     public void Initialize(Headset headset_class_data)
@@ -163,13 +164,13 @@ public class EasyVizARHeadset : MonoBehaviour
         }
     */
 
-    public void CreateLocalHeadset(string headsetName, string location, bool postChanges)
+    public void CreateLocalHeadset(string headsetName, string location)
 	{
 		_is_local = true;
 		_headsetName = headsetName;
 		_locationID = location;
 		
-		if(_postPositionChanges)
+		//if(_postPositionChanges)
 		{
 			_realTimeChanges = true;
 
@@ -192,7 +193,7 @@ public class EasyVizARHeadset : MonoBehaviour
             }
 		}
 		
-		_postPositionChanges = postChanges;
+		//_postPositionChanges = postChanges;
 	}
 	
     // Update is called once per frame
@@ -368,6 +369,8 @@ public class EasyVizARHeadset : MonoBehaviour
         h.location_id = _locationID;
 
         EasyVizARServer.Instance.Post("headsets", EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), CreateRegisterCallback);
+
+        //EasyVizARHeadsetManager.EasyVizARManager.gameObject.GetComponent<EasyVizARHeadsetManager>().CreateHeadsets();
     }
 
     void CreateRegisterCallback(string resultData)
@@ -377,17 +380,7 @@ public class EasyVizARHeadset : MonoBehaviour
             _isRegisteredWithServer = true;
 
             EasyVizAR.RegisteredHeadset h = JsonUtility.FromJson<EasyVizAR.RegisteredHeadset>(resultData);
-/*            
- *            
- *         Vector3 newPos = Vector3.zero;
 
-            newPos.x = h.position.x;
-            newPos.y = h.position.y;
-            newPos.z = h.position.z;
-
-            transform.position = newPos;
-            transform.rotation = new Quaternion(h.orientation.x, h.orientation.y, h.orientation.z, h.orientation.w);
-*/
             _headsetID = h.id;
             _headsetName = h.name;
             _locationID = h.location_id;

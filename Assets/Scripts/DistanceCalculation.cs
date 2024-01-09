@@ -15,7 +15,6 @@ public class DistanceCalculation : MonoBehaviour
 	public bool is_feet = true;
 
 	public Vector3 old_position;
-	public Vector3 new_position;
 
 	//For displaying the headset icon on map 
 	public GameObject headset_icon;
@@ -216,11 +215,11 @@ public class DistanceCalculation : MonoBehaviour
         if (is_feet)
         {
             distance *= 3.281;
-            distance_text_TMP.text = headset_name + " : " + distance.ToString() + "ft";
+            distance_text_TMP.text = headset_name + " : " + distance.ToString("0.00") + "ft";
         }
         else
         {
-            distance_text_TMP.text = headset_name + " : " + distance.ToString() + "m";
+            distance_text_TMP.text = headset_name + " : " + distance.ToString("0.00") + "m";
         } 
     }
     
@@ -315,16 +314,16 @@ public class DistanceCalculation : MonoBehaviour
 	{
 		while (true)
 		{
-			new_position = main_camera.transform.position;
-			float change_x = (float)Math.Pow((new_position.x - old_position.x), 2);
-			float change_z = (float)Math.Pow((new_position.z - old_position.z), 2);
-			float change_dist = (float)Math.Sqrt(change_x + change_z);
+			Vector3 new_position = main_camera.transform.position;
 
-			if (change_dist > 0.0)
+            double change_distance = Vector3.Distance(new_position, old_position);
+
+            if (change_distance > 0.1)
 			{
                 CalculateHeadsetDistance();
 				old_position = new_position;
 			}
+
 			yield return new WaitForSeconds(1f);
 		}
 	}

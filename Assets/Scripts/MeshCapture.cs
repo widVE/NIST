@@ -86,7 +86,8 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
         {
 #if UNITY_EDITOR
             // This observer can be used in Unity Editor for testing.
-            if (provider.Name == "Spatial Object Mesh Observer") {
+            if (provider.Name == "Spatial Object Mesh Observer")
+            {
                 meshObserver = provider;
                 break;
             }
@@ -149,7 +150,7 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
     {
         while (true)
         {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(1f);
 
             MeshConversionResult result;
             while (resultQueue.TryDequeue(out result))
