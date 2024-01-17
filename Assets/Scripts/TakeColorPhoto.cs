@@ -180,12 +180,6 @@ public class TakeColorPhoto : MonoBehaviour
 		var headset = headsetManager.LocalHeadset;
 		if (headset != null)
         {
-			var hsObject = headset.GetComponent<EasyVizARHeadset>();
-			if (hsObject != null)
-            {
-				h.created_by = hsObject._headsetID;
-			}
-
 			h.camera_position = new EasyVizAR.Position();
 			h.camera_position.x = headset.transform.position.x;
 			h.camera_position.y = headset.transform.position.y;
@@ -202,6 +196,7 @@ public class TakeColorPhoto : MonoBehaviour
 
 		UnityWebRequest www = new UnityWebRequest(baseURL + "/photos", "POST");
 		www.SetRequestHeader("Content-Type", "application/json");
+		www.SetRequestHeader("Authorization", EasyVizARServer.Instance.GetAuthorizationHeader());
 
 		string ourJson = JsonUtility.ToJson(h);
 
@@ -233,6 +228,7 @@ public class TakeColorPhoto : MonoBehaviour
 
 		UnityWebRequest www2 = new UnityWebRequest(baseURL + h2.imageUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");
+		www2.SetRequestHeader("Authorization", EasyVizARServer.Instance.GetAuthorizationHeader());
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
 		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
