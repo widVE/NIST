@@ -171,76 +171,19 @@ public class TakeColorPhoto : MonoBehaviour
 
 	IEnumerator UploadImage(string path, int width, int height)
     {
-		EasyVizAR.Hololens2PhotoPost h = new EasyVizAR.Hololens2PhotoPost();
-		h.width = width;
-		h.height = height;
-		h.contentType = "image/png";
-		h.camera_location_id = headsetManager.LocationID;
-
-		var headset = headsetManager.LocalHeadset;
-		if (headset != null)
-        {
-			h.camera_position = new EasyVizAR.Position();
-			h.camera_position.x = headset.transform.position.x;
-			h.camera_position.y = headset.transform.position.y;
-			h.camera_position.z = headset.transform.position.z;
-
-			h.camera_orientation = new EasyVizAR.Orientation();
-			h.camera_orientation.x = headset.transform.rotation.x;
-			h.camera_orientation.y = headset.transform.rotation.y;
-			h.camera_orientation.z = headset.transform.rotation.z;
-			h.camera_orientation.w = headset.transform.rotation.w;
-		}
-
 		string baseURL = EasyVizARServer.Instance.GetBaseURL();
-
 		UnityWebRequest www = new UnityWebRequest(baseURL + "/photos", "POST");
-		www.SetRequestHeader("Content-Type", "application/json");
 		www.SetRequestHeader("Authorization", EasyVizARServer.Instance.GetAuthorizationHeader());
+		www.SetRequestHeader("Content-Type", "image/png");
 
-		string ourJson = JsonUtility.ToJson(h);
-
-		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(ourJson);
-		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
+		www.uploadHandler = new UploadHandlerFile(path);
 		www.downloadHandler = new DownloadHandlerBuffer();
 
 		yield return www.SendWebRequest();
-
 		if (www.result != UnityWebRequest.Result.Success)
 		{
-			Debug.Log(www.error);
-		}
-		else
-		{
-			Debug.Log("Form upload complete!");
-		}
-
-		string resultText = www.downloadHandler.text;
-
-		Debug.Log(resultText);
-
-		EasyVizAR.Hololens2PhotoPut h2 = JsonUtility.FromJson<EasyVizAR.Hololens2PhotoPut>(resultText);
-		//h2.imagePath = h2Location;
-
-		string photoJson = JsonUtility.ToJson(h2);
-		//Debug.Log(photoJson);
-		//Debug.Log(h2.imageUrl);
-
-		UnityWebRequest www2 = new UnityWebRequest(baseURL + h2.imageUrl, "PUT");
-		www2.SetRequestHeader("Content-Type", "image/png");
-		www2.SetRequestHeader("Authorization", EasyVizARServer.Instance.GetAuthorizationHeader());
-
-		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
-		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
-		www2.uploadHandler = new UploadHandlerFile(path);//new UploadHandlerRaw(image_as_bytes2);//
-		www2.downloadHandler = new DownloadHandlerBuffer();
-
-		yield return www2.SendWebRequest();
-
-		if (www2.result != UnityWebRequest.Result.Success)
-		{
 			//Debug.Log(www2.error);
-			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOutErr.txt"), www2.error);
+			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOutErr.txt"), www.error);
 		}
 		else
 		{
@@ -249,6 +192,5 @@ public class TakeColorPhoto : MonoBehaviour
 		}
 
 		www.Dispose();
-		www2.Dispose();
 	}
 }
