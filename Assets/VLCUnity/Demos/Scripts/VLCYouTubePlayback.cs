@@ -67,7 +67,7 @@ public class VLCYouTubePlayback : MonoBehaviour
             if(_mediaPlayer.Media == null)
             {
                 // playing youtube video
-                var youtubeLink = new Media(new Uri("https://www.youtube.com/playlist?list=PL_rR2s4GqBlaoriE6n0AvLGu_3e0_nHgr"));
+                var youtubeLink = new Media(new Uri("https://www.youtube.com/watch?v=aqz-KE-bpKQ"));
                 await youtubeLink.ParseAsync(_libVLC, MediaParseOptions.ParseNetwork);
                 _mediaPlayer.Media = youtubeLink.SubItems.First();
             }

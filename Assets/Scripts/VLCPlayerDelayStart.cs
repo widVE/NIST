@@ -14,7 +14,7 @@ using System.Collections.Generic;
 ///LibVLC parameters: https://wiki.videolan.org/VLC_command-line_help/
 ///Report a bug: https://code.videolan.org/videolan/vlc-unity/-/issues
 
-public class VLCPlayerExample : MonoBehaviour
+public class VLCPlayerDelayStart : MonoBehaviour
 {
 	public static LibVLC libVLC; //The LibVLC class is mainly used for making MediaPlayer and Media objects. You should only have one LibVLC instance.
 	public MediaPlayer mediaPlayer; //MediaPlayer is the main class we use to interact with VLC
@@ -28,9 +28,11 @@ public class VLCPlayerExample : MonoBehaviour
 
 
 	public string path = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"; //Can be a web path or a local path
+	
+	//https://easyvizar.wings.cs.wisc.edu/hls/0c1bb334-82a7-4b04-ad7c-b397b12897c1/index.m3u8
 
-	// when copying native Texture2D textures to Unity RenderTextures, the orientation mapping is incorrect on Android, so we flip it over.
-	public bool flipTextureX = true;
+    // when copying native Texture2D textures to Unity RenderTextures, the orientation mapping is incorrect on Android, so we flip it over.
+    public bool flipTextureX = true;
 	public bool flipTextureY = true;
 	public bool playOnAwake = true; //Open path and Play during Awake
 
@@ -38,7 +40,7 @@ public class VLCPlayerExample : MonoBehaviour
 
 	//Unity Awake, OnDestroy, and Update functions
 	#region unity
-	void Start()
+	void Awake()
 	{
 		//Setup LibVLC
 		if (libVLC == null)
@@ -55,7 +57,7 @@ public class VLCPlayerExample : MonoBehaviour
 
 		//Play On Start
 		if (playOnAwake)
-			Open();
+			Invoke("Open", 10f);
 	}
 
 	void OnDestroy()
