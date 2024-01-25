@@ -5,12 +5,24 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/v3.2 No Holohands and HMD Visuals Updates.unity
-    guid: dbbc9bf146ae67546bc032ae320e8f1d
   - enabled: 1
-    path: Assets/Scenes/v3.3 Video Stream Test.unity
-    guid: 4c4ddbe2e21db67488cbefa83df739db
+    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - EyeTracking/Scenes/EyeTrackingDemo-00-RootScene.unity
+    guid: 27c3fbe0128089f48994cdc6af8668fc
+  - enabled: 1
+    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - EyeTracking/Scenes/EyeTrackingDemo-01-BasicSetup.unity
+    guid: 3ac2cf3aa0e281340babd2053d8b7d46
+  - enabled: 1
+    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - EyeTracking/Scenes/EyeTrackingDemo-02-TargetSelection.unity
+    guid: 55643f7e4eceb734784192b162f565e0
+  - enabled: 1
+    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - EyeTracking/Scenes/EyeTrackingDemo-03-Navigation.unity
+    guid: 5df475f0bf57b1f488d59e0e16040d9a
+  - enabled: 1
+    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - EyeTracking/Scenes/EyeTrackingDemo-04-TargetPositioning.unity
+    guid: 91ded1f5ef2ae854ba4ac94eca7a2494
+  - enabled: 1
+    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - EyeTracking/Scenes/EyeTrackingDemo-05-Visualizer.unity
+    guid: 2d6c43a82f3a88c4dbdc3b5e99a68d8a
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 24efe516db1dbf446a155a698a288aae, type: 2}
     Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: 8ff3c7c77ccd00441a88cebd82b4144c, type: 2}
