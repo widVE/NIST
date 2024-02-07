@@ -11,8 +11,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using UnityEngine;
-using Unity.Sentis;
 using UnityEngine.Networking;
+using Unity.Sentis;
 using System.Runtime.InteropServices;
 
 
@@ -116,6 +116,12 @@ public class ObjectDetector : MonoBehaviour
 
 	// For experiments, send to an alternate server
 	public bool sendToExperimentServer = false;
+	public string experimentServerURL = "http://easyvizar.wings.cs.wisc.edu:5001";
+
+	// Divide photo into patches for ROI encoding
+	public int numPatchesX = 16;
+	public int numPatchesY = 16;
+	public bool sendAsPatches = false;
 
 	// Only start actively sending photos after a QR code has been scanned
 	private bool qrScanned = false;
@@ -350,9 +356,15 @@ public class ObjectDetector : MonoBehaviour
 			var format = texture.graphicsFormat;
 			uint width = (uint)texture.width;
 			uint height = (uint)texture.height;
-			var task = Task.Run<byte[]>(() => ImageConversion.EncodeArrayToJPG(rawData, format, (uint)width, (uint)height));
+			var task = Task.Run<byte[]>(() => ImageConversion.EncodeArrayToJPG(rawData, format, (uint)width, (uint)height, quality: 100));
 			yield return new WaitUntil(() => task.IsCompleted);
 			image = task.Result;
+
+			// EXPERIMENTAL
+			if (sendAsPatches)
+			{
+				yield return encodeAndSendPatches(texture);
+			}
 
 			report.encode_time_ms = GetTimestamp() - encode_start;
 
@@ -361,6 +373,34 @@ public class ObjectDetector : MonoBehaviour
 		}
 
 		yield return sendResults(image, report);
+	}
+
+	private IEnumerator encodeAndSendPatches(Texture2D texture)
+    {
+		int patchWidth = cameraWidth / 16;
+		int patchHeight = cameraHeight / 16;
+
+		List<IMultipartFormSection> patches = new List<IMultipartFormSection>();
+
+		for (int y = 0; y < numPatchesY; y++)
+        {
+			for (int x = 0; x < numPatchesX; x++)
+            {
+				// Just for testing, generate patches with checkerboard pattern of compression level.
+				int quality = ((x + y) % 2 == 0) ? (1 + 2 * x) : (100 - (2 * x));
+
+				var pixels = texture.GetPixels(x * patchWidth, (numPatchesY - y - 1) * patchHeight, patchWidth, patchHeight);
+				var data = ImageConversion.EncodeArrayToJPG(pixels, UnityEngine.Experimental.Rendering.GraphicsFormat.R32G32B32A32_SFloat, (uint)patchWidth, (uint)patchHeight, quality: quality);
+
+				var section = new MultipartFormFileSection("patches", data, $"{y:D2}_{x:D2}.jpg", "image/jpg");
+				patches.Add(section);
+            }
+
+			// I think encoding is a bit slow, so take a break after every row.
+			yield return null;
+		}
+
+		yield return sendPatches(patches);
 	}
 
 	private bool shouldSendFrame(DetectionResult dresult)
@@ -547,7 +587,7 @@ public class ObjectDetector : MonoBehaviour
 			report.cameras.Add(device.name);
         }
 
-		var url = "http://easyvizar.wings.cs.wisc.edu:5001/reports";
+		var url = experimentServerURL + "/reports";
 		UnityWebRequest www = new UnityWebRequest(url, "POST");
 
 		www.SetRequestHeader("Content-Type", "application/json");
@@ -566,7 +606,7 @@ public class ObjectDetector : MonoBehaviour
 
 	private IEnumerator sendReport(ImageProcessingResult result)
     {
-		var url = "http://easyvizar.wings.cs.wisc.edu:5001/reports";
+		var url = experimentServerURL + "/reports";
 		UnityWebRequest www = new UnityWebRequest(url, "POST");
 
 		www.SetRequestHeader("Content-Type", "application/json");
@@ -587,7 +627,7 @@ public class ObjectDetector : MonoBehaviour
 	{
 		string url;
 		if (sendToExperimentServer)
-			url = "http://easyvizar.wings.cs.wisc.edu:5001/photos";
+			url = experimentServerURL + "/photos";
 		else
 			url = EasyVizARServer.Instance.GetBaseURL() + "/photos";
 
@@ -597,6 +637,36 @@ public class ObjectDetector : MonoBehaviour
 		www.SetRequestHeader("Content-Type", contentType);
 
 		www.uploadHandler = new UploadHandlerRaw(data);
+		www.downloadHandler = new DownloadHandlerBuffer();
+
+		yield return www.SendWebRequest();
+
+		if (www.result == UnityWebRequest.Result.Success)
+		{
+			var created_photo = JsonUtility.FromJson<NewPhotoResult>(www.downloadHandler.text);
+			current_filename = created_photo.filename;
+		}
+		else
+		{
+			current_filename = "";
+		}
+
+		www.Dispose();
+	}
+
+	IEnumerator sendPatches(List<IMultipartFormSection> patches)
+	{
+		string url;
+		if (sendToExperimentServer)
+			url = experimentServerURL + "/photos";
+		else
+			url = EasyVizARServer.Instance.GetBaseURL() + "/photos";
+
+		UnityWebRequest www = UnityWebRequest.Post(url, patches);
+
+		www.SetRequestHeader("Authorization", EasyVizARServer.Instance.GetAuthorizationHeader());
+		//www.SetRequestHeader("Content-Type", contentType);
+
 		www.downloadHandler = new DownloadHandlerBuffer();
 
 		yield return www.SendWebRequest();
