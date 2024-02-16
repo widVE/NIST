@@ -395,6 +395,9 @@ public class ObjectDetector : MonoBehaviour
 
 		List<IMultipartFormSection> patches = new List<IMultipartFormSection>();
 
+		var stopwatch = new System.Diagnostics.Stopwatch();
+		stopwatch.Start();
+
 		for (int y = 0; y < numPatchesY; y++)
         {
 			for (int x = 0; x < numPatchesX; x++)
@@ -412,8 +415,12 @@ public class ObjectDetector : MonoBehaviour
 				patches.Add(section);
             }
 
-			// I think encoding is a bit slow, so take a break after every row.
-			yield return null;
+			// Image encoding is a bit slow, so take a break if our compute limit has been exceeded.
+			if (stopwatch.ElapsedMilliseconds > computeTimePerFrame)
+			{
+				yield return null;
+				stopwatch.Restart();
+			}
 		}
 
 		yield return sendPatches(patches);
