@@ -75,6 +75,7 @@ public enum DetectionMode
 	Off,			// Detection dispabled, only send in continuous transmission mode
 	MaxScore,		// Test for probable presence of object using max operator (relatively fast)
 	BoundingBox,	// Bounding box detection using nonmaximum suppression (slower)
+	CoarseSegment,	// Small grid of values indicating detection strength (fast)
 }
 
 public enum TransmitMode
@@ -119,8 +120,6 @@ public class ObjectDetector : MonoBehaviour
 	public string experimentServerURL = "http://easyvizar.wings.cs.wisc.edu:5001";
 
 	// Divide photo into patches for ROI encoding
-	public int numPatchesX = 16;
-	public int numPatchesY = 16;
 	public bool sendAsPatches = false;
 
 	// Only start actively sending photos after a QR code has been scanned
@@ -295,6 +294,7 @@ public class ObjectDetector : MonoBehaviour
         {
 			inputTensor = TextureConverter.ToTensor(webcamTexture, -1, -1, 3);
 		}
+
 		Graphics.Blit(webcamTexture, outputTexture);
 
 		execution_start_time = GetTimestamp();
@@ -323,6 +323,8 @@ public class ObjectDetector : MonoBehaviour
 			dresult = postprocessWithBBoxes(texture);
 		else if (detectionMode == DetectionMode.MaxScore)
 			dresult = postprocessWithoutBBoxes(texture);
+		else if (detectionMode == DetectionMode.CoarseSegment)
+			dresult = postprocessCoarseSegmentation(texture);
 		else
 			dresult = new DetectionResult();
 
@@ -350,20 +352,21 @@ public class ObjectDetector : MonoBehaviour
 			// JPEG encoder seems to be faster than PNG but still pretty slow (~30ms) on the HoloLens
 			//image = texture.EncodeToJPG();
 
-			// This might help by running the encoder in a background thread but not completely sure
-			// There would be some overhead associated with sending the data to a worker thread
-			var rawData = texture.GetRawTextureData();
-			var format = texture.graphicsFormat;
-			uint width = (uint)texture.width;
-			uint height = (uint)texture.height;
-			var task = Task.Run<byte[]>(() => ImageConversion.EncodeArrayToJPG(rawData, format, (uint)width, (uint)height, quality: 100));
-			yield return new WaitUntil(() => task.IsCompleted);
-			image = task.Result;
-
-			// EXPERIMENTAL
-			if (sendAsPatches)
+			if (detectionMode == DetectionMode.CoarseSegment)
 			{
 				yield return encodeAndSendPatches(texture);
+			}
+			else
+			{
+				// This might help by running the encoder in a background thread but not completely sure
+				// There would be some overhead associated with sending the data to a worker thread
+				var rawData = texture.GetRawTextureData();
+				var format = texture.graphicsFormat;
+				uint width = (uint)texture.width;
+				uint height = (uint)texture.height;
+				var task = Task.Run<byte[]>(() => ImageConversion.EncodeArrayToJPG(rawData, format, (uint)width, (uint)height, quality: 100));
+				yield return new WaitUntil(() => task.IsCompleted);
+				image = task.Result;
 			}
 
 			report.encode_time_ms = GetTimestamp() - encode_start;
@@ -377,8 +380,18 @@ public class ObjectDetector : MonoBehaviour
 
 	private IEnumerator encodeAndSendPatches(Texture2D texture)
     {
-		int patchWidth = cameraWidth / 16;
-		int patchHeight = cameraHeight / 16;
+		var output = engine.PeekOutput("output") as TensorFloat;
+		output.MakeReadable();
+
+		int numPatchesX = output.shape[3];
+		int numPatchesY = output.shape[2];
+
+		int patchWidth = cameraWidth / numPatchesX;
+		int patchHeight = cameraHeight / numPatchesY;
+
+#if UNITY_EDITOR
+		Debug.Log($"Scores shape {output.shape.ToString()}");
+#endif
 
 		List<IMultipartFormSection> patches = new List<IMultipartFormSection>();
 
@@ -386,8 +399,11 @@ public class ObjectDetector : MonoBehaviour
         {
 			for (int x = 0; x < numPatchesX; x++)
             {
-				// Just for testing, generate patches with checkerboard pattern of compression level.
-				int quality = ((x + y) % 2 == 0) ? (1 + 2 * x) : (100 - (2 * x));
+				int quality = 50;
+				if (output[0, 0, y, x] < 0.01)
+					quality = 1;
+				else if (output[0, 0, y, x] > 0.2)
+					quality = 100;
 
 				var pixels = texture.GetPixels(x * patchWidth, (numPatchesY - y - 1) * patchHeight, patchWidth, patchHeight);
 				var data = ImageConversion.EncodeArrayToJPG(pixels, UnityEngine.Experimental.Rendering.GraphicsFormat.R32G32B32A32_SFloat, (uint)patchWidth, (uint)patchHeight, quality: quality);
@@ -549,6 +565,47 @@ public class ObjectDetector : MonoBehaviour
 #if UNITY_EDITOR
 		Debug.Log($"Score for person {output[0, 0]}");
 #endif
+		return dresult;
+	}
+
+	private DetectionResult postprocessCoarseSegmentation(Texture2D texture)
+    {
+		DetectionResult dresult = new DetectionResult();
+
+		var output = engine.PeekOutput("output") as TensorFloat;
+		output.MakeReadable();
+
+		float min_score = 1000.0f;
+
+#if UNITY_EDITOR
+		Debug.Log($"Scores shape {output.shape.ToString()}");
+#endif
+
+		for (int i = 0; i < output.shape[2]; i++)
+        {
+			for (int j = 0; j < output.shape[3]; j++)
+            {
+				if (output[0, 0, i, j] > dresult.max_score)
+                {
+					dresult.max_score = output[0, 0, i, j];
+					dresult.max_label = "person";
+                }
+
+				if (output[0, 0, i, j] < min_score)
+					min_score = output[0, 0, i, j];
+
+				if (output[0, 0, i, j] > detectionThreshold)
+                {
+					dresult.num_detected = 1;
+					dresult.num_persons = 1;
+                }
+            }
+        }
+
+#if UNITY_EDITOR
+		Debug.Log($"Max score {dresult.max_score}, min score {min_score}");
+#endif
+
 		return dresult;
 	}
 
