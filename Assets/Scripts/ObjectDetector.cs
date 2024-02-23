@@ -14,7 +14,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Unity.Sentis;
 using System.Runtime.InteropServices;
-
+using UnityEngine.Rendering;
+using Unity.Collections;
 
 [System.Serializable]
 public class StartUpReport
@@ -61,6 +62,9 @@ public class ImageProcessingResult
 
 	public long execution_time_ms;
 	public long encode_time_ms;
+
+	public int binary_size;
+	public float average_quality;
 }
 
 [System.Serializable]
@@ -95,6 +99,9 @@ public class ObjectDetector : MonoBehaviour
 	// Minimum time between transmitted frames, not considered in continuous mode.
 	public int minSendInterval = 1000;
 
+	// Try to send a frame at least this often (applies to selective mode).
+	public int maxSendInterval = 5000;
+
 	public ModelAsset modelAsset;
 
 	IWorker engine;
@@ -102,9 +109,10 @@ public class ObjectDetector : MonoBehaviour
 	RenderTexture scaledTexture;
 	RenderTexture outputTexture;
 
-	// Size of input to ML model
-	public int modelInputWidth = 640;
-	public int modelInputHeight = 480;
+	// Size to request from camera
+	// This need not match the model input because we can scale the image
+	public int requestCameraWidth = 640;
+	public int requestCameraHeight = 480;
 
 	public int requestedFPS = 15;
 
@@ -119,8 +127,19 @@ public class ObjectDetector : MonoBehaviour
 	public bool sendToExperimentServer = false;
 	public string experimentServerURL = "http://easyvizar.wings.cs.wisc.edu:5001";
 
-	// Divide photo into patches for ROI encoding
-	public bool sendAsPatches = false;
+	// If performing ROI encoding, also send the original image (primarily for experiments).
+	public bool sendOriginalWithPatches = false;
+
+	// Image quality for ordinary JPEG encoding, range 1-100.
+	public int imageQuality = 100;
+
+	// Minimum quality to use for image patch encoding.
+	// The lowest valid setting is 1, but slightly higher may be preferred.
+	public int minimumPatchQuality = 10;
+
+	// Size of input to ML model
+	private int modelInputWidth = -1;
+	private int modelInputHeight = -1;
 
 	// Only start actively sending photos after a QR code has been scanned
 	private bool qrScanned = false;
@@ -128,12 +147,11 @@ public class ObjectDetector : MonoBehaviour
 
 	// We figure this out after initializing the camera.
 	// We might need to scale the image to match the ML model input size.
-	private int cameraWidth = 0;
-	private int cameraHeight = 0;
+	private int cameraWidth = -1;
+	private int cameraHeight = -1;
 	private bool needScaling = false;
 
 	bool captureStarted = false;
-	private long execution_start_time;
 
 	private long lastSendTime = 0;
 	private HashSet<int> lastSendDetectionSet = new HashSet<int>();
@@ -176,6 +194,16 @@ public class ObjectDetector : MonoBehaviour
 	private void initializeEngine()
     {
 		var model = ModelLoader.Load(modelAsset);
+
+		// Assuming only one input, the image
+		// Shape should by batch, channel, height, width (b, c, h, w)
+		var input = model.inputs[0];
+		if (input.shape.IsFullyKnown())
+        {
+			var shape = input.shape.ToTensorShape();
+			modelInputHeight = shape[2];
+			modelInputWidth = shape[3];
+		}
 
 		if (detectionMode == DetectionMode.BoundingBox)
 		{
@@ -237,14 +265,22 @@ public class ObjectDetector : MonoBehaviour
 	private void initializeCamera()
     {
 		WebCamDevice[] devices = WebCamTexture.devices;
-		webcamTexture = new WebCamTexture(modelInputWidth, modelInputHeight, requestedFPS);
+		webcamTexture = new WebCamTexture(requestCameraWidth, requestCameraHeight, requestedFPS);
 		webcamTexture.deviceName = devices[0].name;
 		webcamTexture.Play();
 
 		cameraWidth = webcamTexture.width;
 		cameraHeight = webcamTexture.height;
 
-		if (cameraWidth != modelInputWidth || cameraHeight != modelInputHeight)
+		// The model is initialized before the camera, so this means perhas the model has dynamic input size.
+		// This has not been tested!
+		if (modelInputWidth < 0 || modelInputHeight < 0)
+        {
+			modelInputWidth = cameraWidth;
+			modelInputHeight = cameraHeight;
+        }
+
+		else if (cameraWidth != modelInputWidth || cameraHeight != modelInputHeight)
 		{
 			needScaling = true;
 			scaledTexture = new RenderTexture(modelInputWidth, modelInputHeight, 0, RenderTextureFormat.ARGBFloat);
@@ -264,22 +300,39 @@ public class ObjectDetector : MonoBehaviour
 	private IEnumerator ProcessNextFrame()
     {
 		captureStarted = true;
-		long start = GetTimestamp();
 
 		startExecution();
+
+		long executionTime = 0;
+
+		var stopwatch = new System.Diagnostics.Stopwatch();
+		stopwatch.Start();
 
 		bool hasMoreWork = true;
 		while (hasMoreWork)
         {
 			hasMoreWork = executionSchedule.MoveNext();
-			if (GetTimestamp() - start >= computeTimePerFrame)
+
+			if (stopwatch.ElapsedMilliseconds > computeTimePerFrame)
 			{
+				executionTime += stopwatch.ElapsedMilliseconds;
 				yield return null;
-				start = GetTimestamp();
+				stopwatch.Restart();
 			}
 		}
 
-		yield return finishExecution();
+		executionTime += stopwatch.ElapsedMilliseconds;
+
+		var report = new ImageProcessingResult();
+		report.device = SystemInfo.deviceName;
+		report.model = modelAsset.name;
+		report.experiment_start = experiment_start_time;
+		report.number = counter;
+		report.execution_time_ms = executionTime;
+
+		counter++;
+
+		yield return finishExecution(report);
 		captureStarted = false;
     }
 
@@ -296,27 +349,28 @@ public class ObjectDetector : MonoBehaviour
 		}
 
 		Graphics.Blit(webcamTexture, outputTexture);
-
-		execution_start_time = GetTimestamp();
+		
 		executionSchedule = engine.StartManualSchedule(inputTensor);
 		//engine.Execute(inputTensor);
 	}
 
-	private IEnumerator finishExecution()
+	private IEnumerator finishExecution(ImageProcessingResult report)
     {
-		var report = new ImageProcessingResult();
-		report.device = SystemInfo.deviceName;
-		report.model = modelAsset.name;
-		report.experiment_start = experiment_start_time;
-		report.number = counter;
-
-		counter++;
-
-		report.execution_time_ms = GetTimestamp() - execution_start_time;
-
 		Texture2D texture = new Texture2D(outputTexture.width, outputTexture.height, TextureFormat.RGBA32, false);
 		RenderTexture.active = outputTexture;
-		texture.ReadPixels(new Rect(0, 0, outputTexture.width, outputTexture.height), 0, 0);
+
+		//texture.ReadPixels(new Rect(0, 0, outputTexture.width, outputTexture.height), 0, 0);
+
+		// ReadPixels is really slow. AsyncGPUReadback should be a bit better.
+		bool textureReady = false;
+		AsyncGPUReadback.Request(outputTexture, 0, TextureFormat.RGBA32, (request) =>
+			{
+				texture.LoadRawTextureData(request.GetData<uint>());
+				texture.Apply();
+				textureReady = true;
+			}
+		);
+		yield return new WaitUntil(() => textureReady);
 
 		DetectionResult dresult;
 		if (detectionMode == DetectionMode.BoundingBox)
@@ -344,41 +398,58 @@ public class ObjectDetector : MonoBehaviour
 
 		if (shouldSendFrame(dresult))
         {
-			long encode_start = GetTimestamp();
-
-			// Really slow (100-200ms) on the HoloLens
-			//image = texture.EncodeToPNG();
-
-			// JPEG encoder seems to be faster than PNG but still pretty slow (~30ms) on the HoloLens
-			//image = texture.EncodeToJPG();
-
 			if (detectionMode == DetectionMode.CoarseSegment)
 			{
-				yield return encodeAndSendPatches(texture);
+				yield return encodeAndSendPatches(texture, report);
+
+				report.filename = current_filename;
+
+				if (sendToExperimentServer)
+				{
+					yield return sendReport(report);
+				}
 			}
-			else
+
+			if (detectionMode != DetectionMode.CoarseSegment || sendOriginalWithPatches)
 			{
+				long encode_start = GetTimestamp();
+
 				// This might help by running the encoder in a background thread but not completely sure
 				// There would be some overhead associated with sending the data to a worker thread
 				var rawData = texture.GetRawTextureData();
 				var format = texture.graphicsFormat;
 				uint width = (uint)texture.width;
 				uint height = (uint)texture.height;
-				var task = Task.Run<byte[]>(() => ImageConversion.EncodeArrayToJPG(rawData, format, (uint)width, (uint)height, quality: 100));
+				var task = Task.Run<byte[]>(() => ImageConversion.EncodeArrayToJPG(rawData, format, (uint)width, (uint)height, quality: imageQuality));
 				yield return new WaitUntil(() => task.IsCompleted);
 				image = task.Result;
+
+				report.binary_size = image.Length;
+				report.encode_time_ms = GetTimestamp() - encode_start;
+				report.average_quality = (float)imageQuality;
+
+				yield return sendPhoto(image, "image/jpg");
+				report.filename = current_filename;
+
+				if (sendToExperimentServer)
+				{
+					yield return sendReport(report);
+				}
+
+				// Do we need to call task.Dispose()? Not sure.
+				// https://devblogs.microsoft.com/pfxteam/do-i-need-to-dispose-of-tasks/
+				task.Dispose();
 			}
 
-			report.encode_time_ms = GetTimestamp() - encode_start;
-
-			lastSendTime = encode_start;
+			lastSendTime = GetTimestamp();
 			lastSendDetectionSet = dresult.detected_classes;
 		}
 
-		yield return sendResults(image, report);
+		// We will cause a memory leak if we do not manually free Texture2D objects
+		Destroy(texture);
 	}
 
-	private IEnumerator encodeAndSendPatches(Texture2D texture)
+	private IEnumerator encodeAndSendPatches(Texture2D texture, ImageProcessingResult report)
     {
 		var output = engine.PeekOutput("output") as TensorFloat;
 		output.MakeReadable();
@@ -389,7 +460,13 @@ public class ObjectDetector : MonoBehaviour
 		int patchWidth = cameraWidth / numPatchesX;
 		int patchHeight = cameraHeight / numPatchesY;
 
+		int binarySize = 0;
+		long encodeTime = 0;
+		int summedQuality = 0;
+
 #if UNITY_EDITOR
+		Debug.Log($"Original camera image size {cameraWidth}x{cameraHeight}");
+		Debug.Log($"Patch size {patchWidth}x{patchHeight} grid {numPatchesX}x{numPatchesY}");
 		Debug.Log($"Scores shape {output.shape.ToString()}");
 #endif
 
@@ -402,14 +479,25 @@ public class ObjectDetector : MonoBehaviour
         {
 			for (int x = 0; x < numPatchesX; x++)
             {
-				int quality = 50;
-				if (output[0, 0, y, x] < 0.01)
-					quality = 1;
-				else if (output[0, 0, y, x] > 0.2)
+				int quality = 1;
+
+				if (output[0, 0, y, x] >= detectionThreshold)
+				{
 					quality = 100;
+				}
+				else
+                {
+					quality = (int)(100 * (output[0, 0, y, x] / detectionThreshold));
+				}
+
+				if (quality < minimumPatchQuality)
+					quality = minimumPatchQuality;
+
+				summedQuality += quality;
 
 				var pixels = texture.GetPixels(x * patchWidth, (numPatchesY - y - 1) * patchHeight, patchWidth, patchHeight);
 				var data = ImageConversion.EncodeArrayToJPG(pixels, UnityEngine.Experimental.Rendering.GraphicsFormat.R32G32B32A32_SFloat, (uint)patchWidth, (uint)patchHeight, quality: quality);
+				binarySize += data.Length;
 
 				var section = new MultipartFormFileSection("patches", data, $"{y:D2}_{x:D2}.jpg", "image/jpg");
 				patches.Add(section);
@@ -418,10 +506,17 @@ public class ObjectDetector : MonoBehaviour
 			// Image encoding is a bit slow, so take a break if our compute limit has been exceeded.
 			if (stopwatch.ElapsedMilliseconds > computeTimePerFrame)
 			{
+				encodeTime += stopwatch.ElapsedMilliseconds;
 				yield return null;
 				stopwatch.Restart();
 			}
 		}
+
+		encodeTime += stopwatch.ElapsedMilliseconds;
+
+		report.encode_time_ms = encodeTime;
+		report.binary_size = binarySize;
+		report.average_quality = (float)summedQuality / (numPatchesX * numPatchesY);
 
 		yield return sendPatches(patches);
 	}
@@ -439,10 +534,18 @@ public class ObjectDetector : MonoBehaviour
 		if (transmitMode == TransmitMode.Person && dresult.num_persons > 0)
 			return true;
 
-		// In Selective mode, check if the set of detected objects is different from the previously sent set.
-		// The idea is to avoid sending redundant photos if the scene stays the same.
-		if (transmitMode == TransmitMode.Selective && !dresult.detected_classes.SetEquals(lastSendDetectionSet))
-			return true;
+		// Selective mode tries to avoid sending redundant photos, which are either poor quality images
+		// or too similiar to the previously-sent image. We check a few things: whether at least one
+		// object class was detected, whether the set of detected objects differs from the previously sent
+		// image, and whether the time since the previous image is too long.
+		if (transmitMode == TransmitMode.Selective && dresult.detected_classes.Count > 0)
+		{
+			if (!dresult.detected_classes.SetEquals(lastSendDetectionSet))
+				return true;
+
+			if (interval > maxSendInterval)
+				return true;
+		}
 
 		return false;
     }
@@ -616,21 +719,11 @@ public class ObjectDetector : MonoBehaviour
 		return dresult;
 	}
 
-	private IEnumerator sendResults(byte[] image, ImageProcessingResult report)
-    {
-		if (image is not null)
-        {
-			yield return sendPhoto(image, "image/jpg");
-			report.filename = current_filename;
-        }
-
-		yield return sendReport(report);
-    }
-
 	private void OnDestroy()
 	{
-		engine.Dispose();
-		outputTexture.Release();
+		engine?.Dispose();
+		outputTexture?.Release();
+		scaledTexture?.Release();
 	}
 
 	private IEnumerator sendStartUpReport()
