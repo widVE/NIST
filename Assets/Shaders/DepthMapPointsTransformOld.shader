@@ -1,5 +1,5 @@
 
-Shader "Custom/DepthMapPointsTransform" {
+Shader "Custom/DepthMapPointsTransformOld" {
 	Properties {
 		_MinBounds ("Min Bounds", Vector) = (-20, -20, -20, 1)
 		_MaxBounds ("Max Bounds", Vector) = (20, 20, 20, 1)
@@ -87,10 +87,10 @@ Shader "Custom/DepthMapPointsTransform" {
 			//	v.vertex.x < _MaxBounds.x && v.vertex.y < _MaxBounds.y && v.vertex.z < _MaxBounds.z)
 			//{
 				uint resX = (uint)_ResolutionX;
-				int idW = (v.id * _SubSample) % resX;
-				int idH = (v.id * _SubSample) / resX;
+				float idW = (v.id * _SubSample) % resX;
+				float idH = (v.id * _SubSample) / resX;
 
-				float4 tc = float4((((float)idW+0.5)/_ResolutionX), (((float)idH+0.5)/_ResolutionY), 0, 1);
+				float4 tc = float4((((float)idW+0.5)/_ResolutionX), (((float)idH+0.5)/_ResolutionY), 0, 0);
 				float4 tc2 = tc;//float4(1.0-((float)idW+0.5)/_ResolutionX, 1.0-(((float)idH+0.5)/_ResolutionY), 0, 1);
 
 #if USE_CPU_DEPTH
@@ -102,21 +102,23 @@ Shader "Custom/DepthMapPointsTransform" {
 #endif
 
 
-				float4 d = tex2Dlod(_DepthImage, tc2);
+				float4 d = v.vertex;
+				//float4 d = tex2Dlod(_DepthImage, tc2);
 				//uint4 d = _DepthImage.Load(tc2);
 				//if(d.x > 0.0)
 				{
 					d.w = 1.0;
 					//d.xyz *= 65536;
 
-					float dx = d.x;//(d.x - 32768.0) / 1000.0;
-					float dy = d.y;//(d.y - 32768.0) / 1000.0;
-					float dz = d.z;//(d.z - 32768.0) / 1000.0;
+					float dx = d.x;
+					float dy = d.y;
+					float dz = d.z;
+					
+					//float dx = (d.x - 32768.0) / 1000.0;
+					//float dy = (d.y - 32768.0) / 1000.0;
+					//float dz = (d.z - 32768.0) / 1000.0;
 
 					float4 vert = float4(dx, dy, dz, 1.0);
-					//d.x = d.x * 65536.0;
-					//d.x = d.x / 5000.0;
-					//
 
 					vert = mul(_ModelTransform, vert);
 					
@@ -135,8 +137,9 @@ Shader "Custom/DepthMapPointsTransform" {
 					}
 					
 					o.normal = v.normal;
-					v.color = tex2Dlod(_ColorImage, tc);
+					//v.color = tex2Dlod(_ColorImage, tc);
 					o.color = v.color;
+
 
 					UNITY_TRANSFER_FOG(o,UnityObjectToClipPos(v.vertex));
 				}
@@ -145,7 +148,7 @@ Shader "Custom/DepthMapPointsTransform" {
 		
 		void surf (Input IN, inout SurfaceOutputStandard o)//SurfaceOutputStandardSpecular o) 
 		{
-			o.Normal = IN.normal;
+			o.Normal = float3(0,1,0);//IN.normal;
 			o.Albedo = IN.color;
 			//o.Specular = IN.color;
 			o.Smoothness = _Glossiness;

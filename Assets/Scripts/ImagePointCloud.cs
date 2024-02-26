@@ -96,8 +96,8 @@ public class ImagePointCloud : MonoBehaviour
 			}
 		}
 		
-		GetComponent<MeshFilter>().sharedMesh.vertices = verts;
-		GetComponent<MeshFilter>().sharedMesh.colors = colors;
+		//GetComponent<MeshFilter>().sharedMesh.vertices = verts;
+		//GetComponent<MeshFilter>().sharedMesh.colors = colors;
 		GetComponent<MeshFilter>().sharedMesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
 		GetComponent<MeshFilter>().sharedMesh.SetIndices(indices, MeshTopology.Points, 0, false);
 		//ip.GetComponent<MeshFilter>().sharedMesh.bounds = new Bounds((maxB + minB) * 0.5f, maxB-minB);

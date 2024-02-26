@@ -16,6 +16,16 @@ public class LiDARVis : MonoBehaviour
 	[SerializeField]
 	int depthHeight;
 
+	[SerializeField]
+	RenderTexture _colorTexture;
+
+	[SerializeField]
+	RenderTexture _pointCloudTexture;
+
+	Matrix4x4 _transform = Matrix4x4.identity;
+
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -29,6 +39,85 @@ public class LiDARVis : MonoBehaviour
         
     }
 
+	void ColorTextureCallback(Texture textureData)
+	{
+		Debug.Log("Hit color callback");
+		Texture2D texture2D = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+ 
+		//RenderTexture currentRT = RenderTexture.active;
+
+		//RenderTexture renderTexture = new RenderTexture(320, 288, 32);
+		Graphics.Blit(textureData, _colorTexture);
+
+		RenderTexture.active = _colorTexture;
+		texture2D.ReadPixels(new Rect(0, 0, _colorTexture.width, _colorTexture.height), 0, 0);
+		texture2D.Apply();
+	}
+
+	void GeomTextureCallback(Texture textureData)
+	{
+		Debug.Log("Hit geom callback");
+		Texture2D texture2D = new Texture2D(320, 288, TextureFormat.RGBA64, false);
+ 
+		//RenderTexture currentRT = RenderTexture.active;
+
+		//RenderTexture renderTexture = new RenderTexture(320, 288, 32);
+		Graphics.Blit(textureData, _pointCloudTexture);
+
+		RenderTexture.active = _pointCloudTexture;
+		texture2D.ReadPixels(new Rect(0, 0, _pointCloudTexture.width, _pointCloudTexture.height), 0, 0);
+		texture2D.Apply();
+	}
+
+    void GetImageCallback(string result_data)
+    {
+		/*using (StreamWriter outputFile = new StreamWriter(Path.Combine(Application.streamingAssetsPath, "out.txt")))
+		{
+			outputFile.WriteLine(result_data);
+		}*/
+		//Debug.Log(result_data);
+		bool once = false;
+		//public string s = "[{"annotations":[{"boundary":{"height":0.5230216979980469,"left":0.3690803796052933,"top":0.46514296531677246,"width":0.29712721705436707},"confidence":0.8203831315040588,"id":141,"identified_user_id":null,"label":"person","photo_record_id":154,"sublabel":""}],"camera_location_id":"69e92dff-7138-4091-89c4-ed073035bfe6","created":1670279509.861595,"created_by":null,"device_pose_id":null,"files":[],"id":154,"imageUrl":"/photos/154/image","priority":0,"queue_name":"done","ready":true,"retention":"auto","status":"done","updated":1707769869.494515}]"";
+		EasyVizAR.PhotoListReturn photo_list  = JsonUtility.FromJson<EasyVizAR.PhotoListReturn>("{\"photos\":"+result_data+"}");
+		for(int i = 0; i < photo_list.photos.Length; ++i)
+		{
+			//Debug.Log("ID: " + photo_list.photos[i].id);
+			//Debug.Log(photo_list.photos[i].imageUrl);
+			if(photo_list.photos[i].files != null)
+			{
+				//Debug.Log("Num photos: " + photo_list.photos[i].files.Length);
+				for(int j = 0; j < photo_list.photos[i].files.Length; ++j)
+				{
+					//Debug.Log(photo_list.photos[i].files[j].name);
+					if(photo_list.photos[i].files[j].name == "geometry.png")
+					{
+						if(!once)
+						{
+							//photo_list.photos[i].files[j].name
+							EasyVizARServer.Instance.Texture("https://easyvizar.wings.cs.wisc.edu/photos/"+photo_list.photos[i].id+"/photo.png", "image/png", "320", ColorTextureCallback);
+							EasyVizARServer.Instance.Texture("https://easyvizar.wings.cs.wisc.edu/photos/"+photo_list.photos[i].id+"/geometry.png", "image/png", "320", GeomTextureCallback);
+							once = true;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	[ContextMenu("GetFromServer")]
+	void ImageGetTest()
+	{
+		/*string s = "{\"photos\":[{\"annotations\":[{\"boundary\":{\"height\":0.5230216979980469,\"left\":0.3690803796052933,\"top\":0.46514296531677246,\"width\":0.29712721705436707},\"confidence\":0.8203831315040588,\"id\":141,\"identified_user_id\":null,\"label\":\"person\",\"photo_record_id\":154,\"sublabel\":\"\"}],\"camera_location_id\":\"69e92dff-7138-4091-89c4-ed073035bfe6\",\"created\":1670279509.861595,\"created_by\":null,\"device_pose_id\":null,\"files\":[],\"id\":154,\"imageUrl\":\"/photos/154/image\",\"priority\":0,\"queue_name\":\"done\",\"ready\":true,\"retention\":\"auto\",\"status\":\"done\",\"updated\":1707769869.494515}]}";
+		Debug.Log(s);
+		EasyVizAR.PhotoListReturn photo_list  = JsonUtility.FromJson<EasyVizAR.PhotoListReturn>(s);
+		for(int i = 0; i < photo_list.photos.Length; ++i)
+		{
+			Debug.Log(photo_list.photos[i].camera_location_id);
+		}*/
+		EasyVizARServer.Instance.Get("https://easyvizar.wings.cs.wisc.edu/photos?since=2024-02-07&camera_location_id=69e92dff-7138-4091-89c4-ed073035bfe6", EasyVizARServer.JSON_TYPE, GetImageCallback);
+	}
+
+	///photos/{photo_id}/{filename}
 	[ContextMenu("Debug Hololens 2 Scan New")]
 	void DebugHololens2Capture()
 	{
@@ -97,6 +186,55 @@ public class LiDARVis : MonoBehaviour
 			Texture2D depthTex = Resources.Load<Texture2D>(sPNGD);
 			Texture2D colorTex = Resources.Load<Texture2D>(sPNG);
 
+			//check for RGBA16 values here...
+			Unity.Collections.NativeArray<byte> geomBytes = depthTex.GetRawTextureData<byte>();
+			Unity.Collections.NativeArray<byte> colorBytes = colorTex.GetRawTextureData<byte>();
+
+			int numVerts = geomBytes.Length / 8;
+			int[] indices = new int[numVerts];
+		
+			Vector3 [] verts = new Vector3[numVerts];
+			Color[] colors = new Color[numVerts];
+			//Debug.Log(geomBytes.Length);
+			int colorByteCount = 0;
+			for(int j = 0; j < geomBytes.Length; j+=8)
+			{
+				byte r1 = geomBytes[j];
+				byte r2 = geomBytes[j+1];
+				byte g1 = geomBytes[j+2];
+				byte g2 = geomBytes[j+3];
+				byte b1 = geomBytes[j+4];
+				byte b2 = geomBytes[j+5];
+				byte a1 = geomBytes[j+6];
+				byte a2 = geomBytes[j+7];
+
+				int x = (int)(r1 | (r2 << 8));
+				int y = (int)(g1 | (g2 << 8));
+				int z = (int)(b1 | (b2 << 8));
+				ushort alpha = (ushort)(a1 | (a2 << 8));
+
+				x = x - 32768;
+				y = y - 32768;
+				z = z - 32768;
+				
+				float fX = (float)x / 1000.0f;
+				float fY = (float)y / 1000.0f;
+				float fZ = (float)z / 1000.0f;
+
+				verts[j/8] = new Vector3(fX, fY, fZ);
+				colors[j/8] = new Color((float)colorBytes[colorByteCount]/255.0f, (float)colorBytes[colorByteCount+1]/255.0f, (float)colorBytes[colorByteCount+2]/255.0f, 1.0f);
+				/*if(red != 0 || green != 0 || blue != 0)
+				{
+					Debug.Log(red);
+					Debug.Log(green);
+					Debug.Log(blue);
+					Debug.Log(alpha);
+				}*/
+				indices[j/8] = j/8;
+				colorByteCount+=4;
+			}
+
+			
 			GameObject ip = Instantiate(ipadDebugPrefab);
 
 			Matrix4x4 zScale = Matrix4x4.identity;
@@ -104,7 +242,7 @@ public class LiDARVis : MonoBehaviour
 			col2 = -col2;
 			zScale.SetColumn(2, col2);
 			
-			//scanTrans = zScale * scanTrans;
+			scanTrans = zScale * scanTrans;
 		
 			ip.transform.GetChild(0).transform.localPosition = scanTrans.GetColumn(3);
 		
@@ -129,9 +267,14 @@ public class LiDARVis : MonoBehaviour
 			
 			ipc.CreatePointMaterial();
 			ipc.CreatePointMesh((uint)depthWidth, (uint)depthHeight);
+			ipc.GetComponent<MeshFilter>().sharedMesh.vertices = verts;
+			ipc.GetComponent<MeshFilter>().sharedMesh.colors = colors;
+			ipc.GetComponent<MeshFilter>().sharedMesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+			ipc.GetComponent<MeshFilter>().sharedMesh.SetIndices(indices, MeshTopology.Points, 0, false);
+			ipc.GetComponent<MeshFilter>().sharedMesh.UploadMeshData(true);
 			ipc.CameraIntrinsics = camIntrinsics;
 			//ipc.ViewProj = viewProjMat;
-			ipc.ModelTransform = scanTrans;
+			//ipc.ModelTransform = scanTrans;
 			
 			ipc.PointMaterial.SetMatrix("_ViewProj", viewProjMat);
 			ipc.PointMaterial.SetMatrix("_ModelTransform", scanTrans);

@@ -244,6 +244,68 @@ namespace EasyVizAR
 		public string model_url;
 		public HeadsetConfiguration headset_configuration;
     }
+
+	[System.Serializable]
+	public class PhotoFileInfo
+	{
+		public string content_type;
+		public int height;
+		public string name;
+		public string purpose;
+		public int width;
+	}
+
+	[System.Serializable]
+	public class AnnotationBox
+	{
+		public float height;
+		public float left;
+		public float top;
+		public float width;
+	}
+
+	[System.Serializable]
+	public class PhotoFileAnnotation
+	{
+		public AnnotationBox boundary;
+		public float confidence;
+		public int id;
+		public string identified_user_id;
+		public string label;
+		public int photo_record_id;
+		public string sublabel;
+	}
+
+	[System.Serializable]
+	public class PhotoReturn
+	{
+		public PhotoFileAnnotation[] annotations;
+		public string camera_location_id;
+		public Orientation camera_orientation;
+		public Position camera_position;
+		
+		public string created;
+		public string created_by;
+		public int device_pose_id;
+
+		public PhotoFileInfo[] files;
+
+		public int id;
+		public string imageUrl;
+
+		public int priority;
+		public string queue_name;
+		public bool ready;
+		public string retention;
+		public string status;
+		public float updated;
+	}
+
+	[System.Serializable]
+	public class PhotoListReturn
+	{
+		public PhotoReturn[] photos;
+	}
 }
 
 public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
