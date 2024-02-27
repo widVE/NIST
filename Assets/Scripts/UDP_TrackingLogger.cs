@@ -1,3 +1,9 @@
+/*
+ * Hand tracking and gesture recognition
+ * Source: https://github.com/Duke-I3T-Lab/Hand-gesture-recognition
+ * Authors: Tianyi Hu and Maria Gorlatova
+ */
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -174,6 +180,10 @@ public class UDP_TrackingLogger : MonoBehaviour
         rowData.Add((data_counter).ToString());          // in csv column "Counter"
 
         bool? calibrationStatus = CoreServices.InputSystem?.EyeGazeProvider?.IsEyeCalibrationValid;
+
+        // I think the eye calibration check was failing,
+        // but maybe it is not required for hand tracking.
+        calibrationStatus = false;
 
         if (calibrationStatus != null)
         {
