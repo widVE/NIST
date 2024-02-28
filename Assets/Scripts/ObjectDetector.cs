@@ -255,6 +255,39 @@ public class ObjectDetector : MonoBehaviour
 
 			model.outputs = new List<string>() { "output0", "max_score" };
 		}
+		else if (detectionMode == DetectionMode.CoarseSegment)
+		{
+			model.AddConstant(new Unity.Sentis.Layers.Constant(
+				"norm_scale",
+				new TensorFloat(new TensorShape(3), new[] { 1.0f, 1.0f, 1.0f })
+			));
+
+			model.AddConstant(new Unity.Sentis.Layers.Constant(
+				"norm_bias",
+				new TensorFloat(new TensorShape(3), new[] { 0.0f, 0.0f, 0.0f })
+			));
+
+			int n = model.layers.Count;
+
+			// First add the new layer. This will append at the end of the layers list (index n).
+			// I think we need to call AddLayer rather than modify the layer list directly because
+			// it probably sets some internal metadata.
+			model.AddLayer(new Unity.Sentis.Layers.InstanceNormalization(
+				model.layers[0].inputs[0], // output name set to the input name of the next layer
+				"norm_input", // input name, will become the new model input
+				"norm_scale",
+				"norm_bias"
+			));
+
+			// Then move the normalization layer to to the top of the list.
+			var layer = model.layers[n];
+			model.layers.RemoveAt(n);
+			model.layers.Insert(0, layer);
+			
+			// Replace what is considered the model input with our normalization layer.
+			model.AddInput("norm_input", model.inputs[0].dataType, model.inputs[0].shape);
+			model.inputs.RemoveAt(0);
+		}
 
 		// haven't figured out how to parse this JSON string, hence I just use a constant array of class names
 		//var names = model.Metadata["names"];
