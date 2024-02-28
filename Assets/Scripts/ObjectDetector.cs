@@ -130,6 +130,10 @@ public class ObjectDetector : MonoBehaviour
 	// If performing ROI encoding, also send the original image (primarily for experiments).
 	public bool sendOriginalWithPatches = false;
 
+	// Whether to send as individually encoded JPEG patches. It seems the better alternative is
+	// to send as one JPEG image with independently scaled regions.
+	public bool sendAsPatches = false;
+
 	// Image quality for ordinary JPEG encoding, range 1-100.
 	public int imageQuality = 100;
 
@@ -433,13 +437,48 @@ public class ObjectDetector : MonoBehaviour
         {
 			if (detectionMode == DetectionMode.CoarseSegment)
 			{
-				yield return encodeAndSendPatches(texture, report);
-
-				report.filename = current_filename;
-
-				if (sendToExperimentServer)
+				if (sendAsPatches)
 				{
-					yield return sendReport(report);
+					yield return encodeAndSendPatches(texture, report);
+					report.filename = current_filename;
+
+					if (sendToExperimentServer)
+					{
+						yield return sendReport(report);
+					}
+				}
+                else
+                {
+					long encode_start = GetTimestamp();
+
+					var composite = encodeMultiScale(texture, report);
+
+					// This might help by running the encoder in a background thread but not completely sure
+					// There would be some overhead associated with sending the data to a worker thread
+					var rawData = composite.GetRawTextureData();
+					var format = composite.graphicsFormat;
+					uint width = (uint)composite.width;
+					uint height = (uint)composite.height;
+					var task = Task.Run<byte[]>(() => ImageConversion.EncodeArrayToJPG(rawData, format, (uint)width, (uint)height, quality: imageQuality));
+					yield return new WaitUntil(() => task.IsCompleted);
+					image = task.Result;
+
+					report.binary_size = image.Length;
+					report.encode_time_ms = GetTimestamp() - encode_start;
+
+					yield return sendPhoto(image, "image/jpg");
+					report.filename = current_filename;
+
+					if (sendToExperimentServer)
+					{
+						yield return sendReport(report);
+					}
+
+					// Do we need to call task.Dispose()? Not sure.
+					// https://devblogs.microsoft.com/pfxteam/do-i-need-to-dispose-of-tasks/
+					task.Dispose();
+
+					Destroy(composite);
 				}
 			}
 
@@ -480,6 +519,72 @@ public class ObjectDetector : MonoBehaviour
 
 		// We will cause a memory leak if we do not manually free Texture2D objects
 		Destroy(texture);
+	}
+
+	private Texture2D encodeMultiScale(Texture2D texture, ImageProcessingResult report)
+	{
+		var output = engine.PeekOutput("output") as TensorFloat;
+		output.MakeReadable();
+
+		int numPatchesX = output.shape[3];
+		int numPatchesY = output.shape[2];
+
+		int patchWidth = cameraWidth / numPatchesX;
+		int patchHeight = cameraHeight / numPatchesY;
+
+		int scale = 10;
+
+		var stopwatch = new System.Diagnostics.Stopwatch();
+		stopwatch.Start();
+
+		Texture2D compositeTexture = new Texture2D(texture.width, texture.height, TextureFormat.RGBA32, false);
+
+		var scaledRT = new RenderTexture(texture.width / scale, texture.height / scale, 0, RenderTextureFormat.ARGB32);
+		var rescaledRT = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32);
+		Graphics.Blit(texture, scaledRT);
+		Graphics.Blit(scaledRT, rescaledRT);
+
+		Texture2D patch = new Texture2D(patchWidth, patchHeight, TextureFormat.RGBA32, false);
+
+		float summedQuality = 0;
+
+		for (int i = 0; i < numPatchesY; i++)
+		{
+			for (int j = 0; j < numPatchesX; j++)
+			{
+				int y = i * patchHeight;
+				int x = j * patchWidth;
+
+				if (output[0, 0, i, j] < detectionThreshold)
+				{
+					int fy = (numPatchesY - i - 1) * patchHeight;
+
+					RenderTexture.active = rescaledRT;
+					patch.ReadPixels(new Rect(x, fy, patchWidth, patchHeight), 0, 0);
+					patch.Apply();
+
+					Graphics.CopyTexture(patch, 0, 0, 0, 0, patchWidth, patchHeight, compositeTexture, 0, 0, x, y);
+
+					summedQuality += 100.0f / scale;
+				}
+                else
+                {
+					Graphics.CopyTexture(texture, 0, 0, x, y, patchWidth, patchHeight, compositeTexture, 0, 0, x, y);
+
+					summedQuality += 100.0f;
+				}
+			}
+		}
+
+		report.average_quality = summedQuality / (numPatchesY * numPatchesX);
+
+		RenderTexture.active = null;
+
+		rescaledRT.Release();
+		scaledRT.Release();
+		Destroy(patch);
+
+		return compositeTexture;
 	}
 
 	private IEnumerator encodeAndSendPatches(Texture2D texture, ImageProcessingResult report)
