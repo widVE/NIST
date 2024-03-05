@@ -42,6 +42,7 @@ Shader "Custom/DepthMapPointsTransformHololens" {
 			float4 texcoord1 : TEXCOORD1;
 			float4 texcoord2 : TEXCOORD2;
 			uint id : SV_VertexID;
+			UNITY_VERTEX_INPUT_INSTANCE_ID
          };
 		
 		 struct Input {

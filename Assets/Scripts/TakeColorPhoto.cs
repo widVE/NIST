@@ -183,7 +183,7 @@ public class TakeColorPhoto : MonoBehaviour
 			var hsObject = headset.GetComponent<EasyVizARHeadset>();
 			if (hsObject != null)
             {
-				h.created_by = hsObject._headsetID;
+				//h.created_by = hsObject._headsetID;
 			}
 
 			h.camera_position = new EasyVizAR.Position();

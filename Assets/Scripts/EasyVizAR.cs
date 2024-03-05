@@ -725,7 +725,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			//var hsObject = headset.GetComponent<EasyVizARHeadset>();
 			//if (hsObject != null)
             {
-				h.created_by = headsetID;//hsObject._headsetID;
+				//h.created_by = headsetID;//hsObject._headsetID;
 			}
 
 			h.camera_position = new EasyVizAR.Position();
@@ -854,7 +854,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			//var hsObject = headset.GetComponent<EasyVizARHeadset>();
 			//if (hsObject != null)
 			{
-				h.created_by = headsetID;//hsObject._headsetID;
+				//h.created_by = headsetID;//hsObject._headsetID;
 			}
 
 			h.camera_position = new EasyVizAR.Position();
@@ -1010,7 +1010,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			//var hsObject = headset.GetComponent<EasyVizARHeadset>();
 			//if (hsObject != null)
             {
-				h.created_by = headsetID;//hsObject._headsetID;
+				//h.created_by = headsetID;//hsObject._headsetID;
 			}
 
 			h.camera_position = new EasyVizAR.Position();
@@ -1192,7 +1192,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			//var hsObject = headset.GetComponent<EasyVizARHeadset>();
 			//if (hsObject != null)
             {
-				h.created_by = headsetID;//hsObject._headsetID;
+				//h.created_by = headsetID;//hsObject._headsetID;
 			}
 
 			h.camera_position = new EasyVizAR.Position();
