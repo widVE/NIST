@@ -120,6 +120,7 @@ public class ObjectDetector : MonoBehaviour
 	public int computeTimePerFrame = 10;
 
 	public float detectionThreshold = 0.65f;
+	public float foregroundThreshold = 0.45f;
 
 	public bool drawBoundingBoxes = false;
 
@@ -136,6 +137,7 @@ public class ObjectDetector : MonoBehaviour
 
 	// Image quality for ordinary JPEG encoding, range 1-100.
 	public int imageQuality = 100;
+	public int backgroundScaleFactor = 20;
 
 	// Minimum quality to use for image patch encoding.
 	// The lowest valid setting is 1, but slightly higher may be preferred.
@@ -521,6 +523,16 @@ public class ObjectDetector : MonoBehaviour
 		Destroy(texture);
 	}
 
+	private RenderTexture rescaleTexture(Texture2D texture, int reduction)
+    {
+		var scaledRT = new RenderTexture(texture.width / reduction, texture.height / reduction, 0, RenderTextureFormat.ARGB32);
+		var rescaledRT = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32);
+		Graphics.Blit(texture, scaledRT);
+		Graphics.Blit(scaledRT, rescaledRT);
+		scaledRT.Release();
+		return rescaledRT;
+	}
+
 	private Texture2D encodeMultiScale(Texture2D texture, ImageProcessingResult report)
 	{
 		var output = engine.PeekOutput("output") as TensorFloat;
@@ -532,17 +544,13 @@ public class ObjectDetector : MonoBehaviour
 		int patchWidth = cameraWidth / numPatchesX;
 		int patchHeight = cameraHeight / numPatchesY;
 
-		int scale = 10;
-
 		var stopwatch = new System.Diagnostics.Stopwatch();
 		stopwatch.Start();
 
 		Texture2D compositeTexture = new Texture2D(texture.width, texture.height, TextureFormat.RGBA32, false);
+		Graphics.CopyTexture(texture, compositeTexture);
 
-		var scaledRT = new RenderTexture(texture.width / scale, texture.height / scale, 0, RenderTextureFormat.ARGB32);
-		var rescaledRT = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32);
-		Graphics.Blit(texture, scaledRT);
-		Graphics.Blit(scaledRT, rescaledRT);
+		var background = rescaleTexture(texture, backgroundScaleFactor);
 
 		Texture2D patch = new Texture2D(patchWidth, patchHeight, TextureFormat.RGBA32, false);
 
@@ -555,22 +563,21 @@ public class ObjectDetector : MonoBehaviour
 				int y = i * patchHeight;
 				int x = j * patchWidth;
 
-				if (output[0, 0, i, j] < detectionThreshold)
+				if (output[0, 0, i, j] < foregroundThreshold)
 				{
-					int fy = (numPatchesY - i - 1) * patchHeight;
+					RenderTexture.active = background;
 
-					RenderTexture.active = rescaledRT;
-					patch.ReadPixels(new Rect(x, fy, patchWidth, patchHeight), 0, 0);
+					int fy = (numPatchesY - i - 1) * patchHeight;
+					patch.ReadPixels(new Rect(x, y, patchWidth, patchHeight), 0, 0);
 					patch.Apply();
 
-					Graphics.CopyTexture(patch, 0, 0, 0, 0, patchWidth, patchHeight, compositeTexture, 0, 0, x, y);
+					Graphics.CopyTexture(patch, 0, 0, 0, 0, patchWidth, patchHeight, compositeTexture, 0, 0, x, fy);
 
-					summedQuality += 100.0f / scale;
+					summedQuality += 100.0f / backgroundScaleFactor;
 				}
                 else
                 {
-					Graphics.CopyTexture(texture, 0, 0, x, y, patchWidth, patchHeight, compositeTexture, 0, 0, x, y);
-
+					//Graphics.CopyTexture(texture, 0, 0, x, fy, patchWidth, patchHeight, compositeTexture, 0, 0, x, fy);
 					summedQuality += 100.0f;
 				}
 			}
@@ -580,8 +587,7 @@ public class ObjectDetector : MonoBehaviour
 
 		RenderTexture.active = null;
 
-		rescaledRT.Release();
-		scaledRT.Release();
+		background.Release();
 		Destroy(patch);
 
 		return compositeTexture;
