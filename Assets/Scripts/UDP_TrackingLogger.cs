@@ -63,7 +63,7 @@ public class UDP_TrackingLogger : MonoBehaviour
     #endregion
 
     // replace the ip address below with the Nvidia Jetson's IPv4
-    private string hostname = "192.168.1.31";        
+    public string hostname = "easyvizar.wings.cs.wisc.edu";
 
     private int csv_started, data_counter;
     private string loggerData = "";
@@ -71,11 +71,11 @@ public class UDP_TrackingLogger : MonoBehaviour
 
     // Create necessary UdpClient objects
     public bool isTxStarted = false;
-    int rxPort = 8000; // port to receive data from Python on
+    //int rxPort = 8000; // port to receive data from Python on
     int txPort = 8001; // port to send data to Python on
 
     UdpClient client;
-    IPEndPoint remoteEndPoint;
+    //IPEndPoint remoteEndPoint;
     Thread receiveThread; // Receiving Thread
 
     public TMP_Text logger_text;
@@ -90,10 +90,11 @@ public class UDP_TrackingLogger : MonoBehaviour
         data_counter = 0;
 
         // Create remote endpoint (to Nvidia Jetson) 
-        remoteEndPoint = new IPEndPoint(IPAddress.Parse(hostname), txPort);
+        //remoteEndPoint = new IPEndPoint(IPAddress.Parse(hostname), txPort);
 
         // Create local client
-        client = new UdpClient(rxPort);
+        client = new UdpClient();
+        client.Connect(hostname, txPort);
 
         // local endpoint define (where messages are received)
         // Create a new thread for reception of incoming messages
@@ -140,7 +141,7 @@ public class UDP_TrackingLogger : MonoBehaviour
         try
         {
             byte[] data = Encoding.UTF8.GetBytes(message);
-            client.Send(data, data.Length, remoteEndPoint);
+            client.Send(data, data.Length);
         }
         catch (Exception err)
         {
@@ -154,9 +155,8 @@ public class UDP_TrackingLogger : MonoBehaviour
         {
             try
             {
-                IPEndPoint anyIP = new IPEndPoint(IPAddress.Any, 0);
-                byte[] data = client.Receive(ref anyIP);                // receive from any server
-                //byte[] data = client.Receive(ref remoteEndPoint);     // can specify server as same remoteEndPoint
+                IPEndPoint remoteEndpoint = new IPEndPoint(IPAddress.Any, 0);
+                byte[] data = client.Receive(ref remoteEndpoint);                // receive from any server
                 string text = Encoding.UTF8.GetString(data);
                 
                 print("Received: " + text);
