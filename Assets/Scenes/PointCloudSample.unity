@@ -492,50 +492,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8087000642588291321, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
   m_PrefabInstance: {fileID: 1810665664}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &262040655
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 262040656}
-  - component: {fileID: 262040657}
-  m_Layer: 0
-  m_Name: PhotoGetter
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &262040656
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 262040655}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1539913615}
-  m_RootOrder: 13
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &262040657
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 262040655}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3dfbe7f10f9290a478da7dee6694a15b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &278560614
 GameObject:
   m_ObjectHideFlags: 0
@@ -2374,6 +2330,8 @@ MonoBehaviour:
   ipadDebugPrefab: {fileID: 3924963915668624178, guid: 347010cc5b91945b9b757fafa9a18b7a, type: 3}
   depthWidth: 320
   depthHeight: 288
+  _colorTexture: {fileID: 0}
+  _pointCloudTexture: {fileID: 0}
 --- !u!1 &1208393620
 GameObject:
   m_ObjectHideFlags: 0
