@@ -38,6 +38,10 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
     [SerializeField]
     GameObject _qrScanner;
 
+    // Attach HeadsetManager GameObject so we can listen for headset configuration change events.
+    [SerializeField]
+    GameObject _headsetManager;
+
     [SerializeField]
     [Tooltip("Enable debugging messages and initializing to test location.")]
     bool debug = false;
@@ -70,6 +74,15 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
             scanner.LocationChanged += (o, ev) =>
             {
                 _locationId = ev.LocationID;
+            };
+        }
+
+        if (_headsetManager)
+        {
+            var manager = _headsetManager.GetComponent<EasyVizARHeadsetManager>();
+            manager.HeadsetConfigurationChanged += (o, ev) =>
+            {
+                gameObject.SetActive(ev.enable_mesh_capture);
             };
         }
 

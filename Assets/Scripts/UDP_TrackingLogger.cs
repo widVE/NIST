@@ -83,15 +83,29 @@ public class UDP_TrackingLogger : MonoBehaviour
 
 
     // Start is called before the first frame update
-    async void Start()
+    void Start()
     {
-
         csv_started = 0;
         data_counter = 0;
 
         // Create remote endpoint (to Nvidia Jetson) 
         //remoteEndPoint = new IPEndPoint(IPAddress.Parse(hostname), txPort);
 
+        // Disable the game object until enabled by configuration loader below.
+        gameObject.SetActive(false);
+
+        GameObject headsetManager = GameObject.Find("EasyVizARHeadsetManager");
+        if (headsetManager)
+        {
+            var manager = headsetManager.GetComponent<EasyVizARHeadsetManager>();
+            manager.HeadsetConfigurationChanged += (sender, config) =>
+            {
+                gameObject.SetActive(config.enable_gesture_recognition);
+            };
+        }
+    }
+    private async void OnEnable()
+    {
         // Create local client
         client = new UdpClient();
         client.Connect(hostname, txPort);

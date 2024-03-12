@@ -102,8 +102,10 @@ public class ObjectDetector : MonoBehaviour
 	// Try to send a frame at least this often (applies to selective mode).
 	public int maxSendInterval = 5000;
 
-	public ModelAsset modelAsset;
+	public ModelAsset detectionModel;
+	public ModelAsset coarseSegmentationModel;
 
+	string modelName;
 	IWorker engine;
 	WebCamTexture webcamTexture;
 	RenderTexture scaledTexture;
@@ -148,8 +150,10 @@ public class ObjectDetector : MonoBehaviour
 	private int modelInputHeight = -1;
 
 	// Only start actively sending photos after a QR code has been scanned
+	private bool running = false;
 	private bool qrScanned = false;
 	private string locationID;
+	private bool sentStartupReport = false;
 
 	// We figure this out after initializing the camera.
 	// We might need to scale the image to match the ML model input size.
@@ -176,17 +180,11 @@ public class ObjectDetector : MonoBehaviour
 		return DateTimeOffset.Now.ToUnixTimeMilliseconds();
 	}
 
-	IEnumerator Start()
+	void Start()
 	{
 		Application.targetFrameRate = 60;
 
 		experiment_start_time = GetTimestamp();
-
-		initializeEngine();
-		initializeCamera();
-
-		if (sendToExperimentServer)
-			yield return sendStartUpReport();
 
 		GameObject qrscanner = GameObject.Find("QRScanner");
 		var scanner = qrscanner.GetComponent<QRScanner>();
@@ -195,21 +193,74 @@ public class ObjectDetector : MonoBehaviour
 			locationID = ev.LocationID;
 			qrScanned = true;
 		};
+
+		// Disable the game object until enabled by configuration loader below.
+		gameObject.SetActive(false);
+
+		GameObject headsetManager = GameObject.Find("EasyVizARHeadsetManager");
+		if (headsetManager)
+        {
+			var manager = headsetManager.GetComponent<EasyVizARHeadsetManager>();
+			manager.HeadsetConfigurationChanged += (sender, config) =>
+			{
+				switch(config.photo_capture_mode)
+                {
+					case "objects":
+						detectionMode = DetectionMode.MaxScore;
+						transmitMode = TransmitMode.Selective;
+						break;
+					case "people":
+						detectionMode = DetectionMode.CoarseSegment;
+						transmitMode = TransmitMode.Person;
+						break;
+					case "continuous":
+						detectionMode = DetectionMode.Off;
+						transmitMode = TransmitMode.Continuous;
+						break;
+					default:
+						detectionMode = DetectionMode.Off;
+						transmitMode = TransmitMode.Off;
+						break;
+				}
+
+				maxSendInterval = (int)(config.photo_target_interval * 1000.0f);
+				detectionThreshold = config.photo_detection_threshold;
+
+				running = config.photo_capture_mode != "off";
+				gameObject.SetActive(running);
+			};
+		}
+	}
+
+    private void OnEnable()
+    {
+		if (running)
+        {
+			initializeEngine();
+			initializeCamera();
+		}
+	}
+
+    private void OnDisable()
+    {
+		if (running)
+		{
+			webcamTexture.Stop();
+			running = false;
+		}
 	}
 
 	private void initializeEngine()
     {
-		var model = ModelLoader.Load(modelAsset);
+		ModelAsset asset = detectionModel;
+		if (detectionMode == DetectionMode.CoarseSegment)
+			asset = coarseSegmentationModel;
 
-		// Assuming only one input, the image
-		// Shape should by batch, channel, height, width (b, c, h, w)
-		var input = model.inputs[0];
-		if (input.shape.IsFullyKnown())
-        {
-			var shape = input.shape.ToTensorShape();
-			modelInputHeight = shape[2];
-			modelInputWidth = shape[3];
-		}
+		Model model = ModelLoader.Load(asset);
+		modelName = asset.name;
+#if UNITY_EDITOR
+		Debug.Log($"Loaded model {modelName}");
+#endif
 
 		if (detectionMode == DetectionMode.BoundingBox)
 		{
@@ -295,6 +346,16 @@ public class ObjectDetector : MonoBehaviour
 			model.inputs.RemoveAt(0);
 		}
 
+		// Assuming only one input, the image
+		// Shape should by batch, channel, height, width (b, c, h, w)
+		var input = model.inputs[0];
+		if (input.shape.IsFullyKnown())
+		{
+			var shape = input.shape.ToTensorShape();
+			modelInputHeight = shape[2];
+			modelInputWidth = shape[3];
+		}
+
 		// haven't figured out how to parse this JSON string, hence I just use a constant array of class names
 		//var names = model.Metadata["names"];
 
@@ -340,6 +401,12 @@ public class ObjectDetector : MonoBehaviour
     {
 		captureStarted = true;
 
+		if (!sentStartupReport && sendToExperimentServer)
+        {
+			yield return sendStartUpReport();
+			sentStartupReport = true;
+		}
+
 		startExecution();
 
 		long executionTime = 0;
@@ -364,7 +431,7 @@ public class ObjectDetector : MonoBehaviour
 
 		var report = new ImageProcessingResult();
 		report.device = SystemInfo.deviceName;
-		report.model = modelAsset.name;
+		report.model = modelName;
 		report.experiment_start = experiment_start_time;
 		report.number = counter;
 		report.execution_time_ms = executionTime;
@@ -873,7 +940,7 @@ public class ObjectDetector : MonoBehaviour
 	private IEnumerator sendStartUpReport()
 	{
 		var report = new StartUpReport();
-		report.model = modelAsset.name;
+		report.model = modelName;
 		report.experiment_start = experiment_start_time;
 		report.device = SystemInfo.deviceName;
 

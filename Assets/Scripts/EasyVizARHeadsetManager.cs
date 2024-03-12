@@ -70,6 +70,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     public GameObject feature_parent;
     public bool verbose_debug_log;
 
+    public event EventHandler<EasyVizAR.HeadsetConfiguration> HeadsetConfigurationChanged;
+
     private void Awake()
     {
         // If there is an instance, and it's not me, delete myself.
@@ -175,6 +177,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
                 CreateHeadsets();
 
+				LoadHeadsetConfiguration(h.id);
+
                 //callback_headset_registered = true;
             }
             else
@@ -190,6 +194,20 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             CreateNewRegistration();
         }
     }
+
+	void LoadHeadsetConfiguration(String headset_id)
+	{
+        EasyVizARServer.Instance.Get($"/headsets/{headset_id}/configuration", EasyVizARServer.JSON_TYPE, delegate (string result)
+		{
+			if (result != "error") {
+				EasyVizAR.HeadsetConfiguration config = JsonUtility.FromJson<EasyVizAR.HeadsetConfiguration>(result);
+                if (HeadsetConfigurationChanged is not null)
+                {
+                    HeadsetConfigurationChanged(this, config);
+                }
+			}
+		});
+	}
 
     [ContextMenu("CreateAllHeadsets")]
     public void LocalRegistrationSetup()

@@ -323,11 +323,6 @@ public class QRScanner : MonoBehaviour
 	// Enable or disable certain features based on the configuration values from the server.
 	void ApplyLocationConfiguration(EasyVizAR.Location location)
     {
-		if (_meshCapture)
-        {
-			_meshCapture.SetActive(location.headset_configuration.enable_mesh_capture);
-        }
-
 		if (_photoCapture)
         {
 			var script = _photoCapture.GetComponent<TakeColorPhoto>();
