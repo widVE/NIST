@@ -6,7 +6,14 @@ using Microsoft.MixedReality.Toolkit.UI;
 using TMPro;
 using System;
 
+public class HeadsetConfigurationChangedEvent
+{
+    public Uri ServerURI;
+    public string LocationID;
+    public string HeadsetID;
 
+    public EasyVizAR.HeadsetConfiguration Configuration;
+}
 
 public class EasyVizARHeadsetManager : MonoBehaviour
 {
@@ -70,7 +77,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     public GameObject feature_parent;
     public bool verbose_debug_log;
 
-    public event EventHandler<EasyVizAR.HeadsetConfiguration> HeadsetConfigurationChanged;
+    public event EventHandler<HeadsetConfigurationChangedEvent> HeadsetConfigurationChanged;
 
     private void Awake()
     {
@@ -200,10 +207,15 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         EasyVizARServer.Instance.Get($"/headsets/{headset_id}/configuration", EasyVizARServer.JSON_TYPE, delegate (string result)
 		{
 			if (result != "error") {
-				EasyVizAR.HeadsetConfiguration config = JsonUtility.FromJson<EasyVizAR.HeadsetConfiguration>(result);
                 if (HeadsetConfigurationChanged is not null)
                 {
-                    HeadsetConfigurationChanged(this, config);
+                    HeadsetConfigurationChangedEvent change = new HeadsetConfigurationChangedEvent();
+                    change.ServerURI = EasyVizARServer.Instance.GetServerURI();
+                    change.HeadsetID = headset_id;
+                    change.LocationID = _locationId;
+                    change.Configuration = JsonUtility.FromJson<EasyVizAR.HeadsetConfiguration>(result);
+
+                    HeadsetConfigurationChanged(this, change);
                 }
 			}
 		});

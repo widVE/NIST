@@ -82,7 +82,7 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
             var manager = _headsetManager.GetComponent<EasyVizARHeadsetManager>();
             manager.HeadsetConfigurationChanged += (o, ev) =>
             {
-                gameObject.SetActive(ev.enable_mesh_capture);
+                gameObject.SetActive(ev.Configuration.enable_mesh_capture);
             };
         }
 

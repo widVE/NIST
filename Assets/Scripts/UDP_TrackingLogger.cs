@@ -81,6 +81,8 @@ public class UDP_TrackingLogger : MonoBehaviour
     public TMP_Text logger_text;
     public static string gesture_outcome = "";
 
+    private bool running = false;
+
 
     // Start is called before the first frame update
     void Start()
@@ -98,29 +100,35 @@ public class UDP_TrackingLogger : MonoBehaviour
         if (headsetManager)
         {
             var manager = headsetManager.GetComponent<EasyVizARHeadsetManager>();
-            manager.HeadsetConfigurationChanged += (sender, config) =>
+            manager.HeadsetConfigurationChanged += (sender, change) =>
             {
-                gameObject.SetActive(config.enable_gesture_recognition);
+                hostname = change.ServerURI.Host;
+
+                running = change.Configuration.enable_gesture_recognition;
+                gameObject.SetActive(running);
             };
         }
     }
     private async void OnEnable()
     {
-        // Create local client
-        client = new UdpClient();
-        client.Connect(hostname, txPort);
+        if (running)
+        {
+            // Create local client
+            client = new UdpClient();
+            client.Connect(hostname, txPort);
 
-        // local endpoint define (where messages are received)
-        // Create a new thread for reception of incoming messages
-        receiveThread = new Thread(new ThreadStart(ReceiveData));
-        receiveThread.IsBackground = true;
-        receiveThread.Start();
+            // local endpoint define (where messages are received)
+            // Create a new thread for reception of incoming messages
+            receiveThread = new Thread(new ThreadStart(ReceiveData));
+            receiveThread.IsBackground = true;
+            receiveThread.Start();
 
-        // Initialize (seen in comments window)
-        print("UDP Comms Initialised");
+            // Initialize (seen in comments window)
+            print("UDP Comms Initialised");
 
-        StartCoroutine(SendDataCoroutine());
-        await MakeNewSession();
+            StartCoroutine(SendDataCoroutine());
+            await MakeNewSession();
+        }
     }
 
     // Update is called once per frame

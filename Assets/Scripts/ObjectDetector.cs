@@ -151,7 +151,6 @@ public class ObjectDetector : MonoBehaviour
 
 	// Only start actively sending photos after a QR code has been scanned
 	private bool running = false;
-	private bool qrScanned = false;
 	private string locationID;
 	private bool sentStartupReport = false;
 
@@ -186,14 +185,6 @@ public class ObjectDetector : MonoBehaviour
 
 		experiment_start_time = GetTimestamp();
 
-		GameObject qrscanner = GameObject.Find("QRScanner");
-		var scanner = qrscanner.GetComponent<QRScanner>();
-		scanner.LocationChanged += (o, ev) =>
-		{
-			locationID = ev.LocationID;
-			qrScanned = true;
-		};
-
 		// Disable the game object until enabled by configuration loader below.
 		gameObject.SetActive(false);
 
@@ -201,8 +192,11 @@ public class ObjectDetector : MonoBehaviour
 		if (headsetManager)
         {
 			var manager = headsetManager.GetComponent<EasyVizARHeadsetManager>();
-			manager.HeadsetConfigurationChanged += (sender, config) =>
+			manager.HeadsetConfigurationChanged += (sender, change) =>
 			{
+				locationID = change.LocationID;
+
+				var config = change.Configuration;
 				switch(config.photo_capture_mode)
                 {
 					case "objects":
@@ -391,7 +385,7 @@ public class ObjectDetector : MonoBehaviour
 
 	void Update()
 	{
-		if (qrScanned && !captureStarted)
+		if (running && !captureStarted)
         {
 			StartCoroutine(ProcessNextFrame());
 		}

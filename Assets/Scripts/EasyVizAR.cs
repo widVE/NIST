@@ -252,8 +252,9 @@ namespace EasyVizAR
 
 public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 {
-	private string _authority = null;
+	private string _authority;
 	private string _baseURL = null;
+	private Uri _serverURI = null;
 	private bool _hasRegistration = false;
 	private EasyVizAR.Registration _registration;
 
@@ -283,12 +284,17 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			return _baseURL;
     }
 
+	public Uri GetServerURI()
+    {
+		return _serverURI;
+    }
+
 	// Change the server base URL, which will affect all future API calls, e.g. "http://easyvizar.wing.cs.wisc.edu:5000/".
 	public void SetBaseURL(string url)
     {
-		if (Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
+		if (Uri.TryCreate(url, UriKind.Absolute, out _serverURI))
 		{
-			_authority = uri.Authority;
+			_authority = _serverURI.Authority;
 			_baseURL = url;
 
 			_hasRegistration = TryLoadRegistration(out _registration);
