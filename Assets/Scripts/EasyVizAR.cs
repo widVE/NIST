@@ -318,6 +318,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	public const string JSON_TYPE = "application/json";
 	public const string JPEG_TYPE = "image/jpeg";
 	public const string PNG_TYPE = "image/png";
+	public const string BMP_TYPE = "image/bmp";
 
     public bool verbose_debug = false;
 
@@ -1107,7 +1108,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl + ".png";
 
 		UnityWebRequest www2 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
-		www2.SetRequestHeader("Content-Type", "image/png");
+		www2.SetRequestHeader("Content-Type", "image/bmp");
 		if (_hasRegistration)
 		{
 			www2.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
