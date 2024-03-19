@@ -105,6 +105,8 @@ public class ObjectDetector : MonoBehaviour
 	public ModelAsset detectionModel;
 	public ModelAsset coarseSegmentationModel;
 
+	public GameObject outputTextMesh;
+
 	string modelName;
 	IWorker engine;
 	WebCamTexture webcamTexture;
@@ -174,6 +176,7 @@ public class ObjectDetector : MonoBehaviour
 	private string[] classNames = { "person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train", "truck", "boat", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", "sofa", "pottedplant", "bed", "diningtable", "toilet", "tvmonitor", "laptop", "mouse", "remote", "keyboard", "cell phone", "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors", "teddy bear", "hair drier", "toothbrush" };
 
 	private string current_filename = "";
+	private int current_photo_id = -1;
 	private int counter = 0;
 	private long experiment_start_time = 0;
 
@@ -548,6 +551,11 @@ public class ObjectDetector : MonoBehaviour
 					{
 						yield return sendReport(report);
 					}
+
+					if (outputTextMesh is not null)
+                    {
+						yield return waitAndDisplayResult();
+                    }
 
 					// Do we need to call task.Dispose()? Not sure.
 					// https://devblogs.microsoft.com/pfxteam/do-i-need-to-dispose-of-tasks/
@@ -1024,11 +1032,53 @@ public class ObjectDetector : MonoBehaviour
 		{
 			var created_photo = JsonUtility.FromJson<NewPhotoResult>(www.downloadHandler.text);
 			current_filename = created_photo.filename;
+			current_photo_id = created_photo.id;
 		}
 		else
 		{
 			current_filename = "";
+			current_photo_id = -1;
 		}
+
+		www.Dispose();
+	}
+
+	IEnumerator waitAndDisplayResult()
+	{
+		string url = EasyVizARServer.Instance.GetBaseURL() + $"/photos/{current_photo_id}?wait=5";
+
+		UnityWebRequest www = new UnityWebRequest(url, "GET");
+
+		www.SetRequestHeader("Authorization", EasyVizARServer.Instance.GetAuthorizationHeader());
+		www.downloadHandler = new DownloadHandlerBuffer();
+
+		yield return www.SendWebRequest();
+
+		string detectionResult = "";
+
+		if (www.result == UnityWebRequest.Result.Success)
+		{
+			Debug.Log(www.downloadHandler.text);
+			var photo = JsonUtility.FromJson<EasyVizAR.PhotoInfo>(www.downloadHandler.text);
+			if (photo is not null && photo.annotations is not null)
+			{
+				foreach (var annotation in photo.annotations)
+				{
+					if (annotation.label == "face" && outputTextMesh is not null)
+					{
+						detectionResult = annotation.sublabel;
+						break;
+					}
+				}
+			}
+		}
+
+		if (outputTextMesh is not null)
+        {
+			var tmp = outputTextMesh.GetComponent<TMPro.TMP_Text>();
+			if (tmp)
+				tmp.text = detectionResult;
+        }
 
 		www.Dispose();
 	}

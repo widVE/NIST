@@ -124,6 +124,31 @@ namespace EasyVizAR
 	}
 
 	[System.Serializable]
+	public class PhotoAnnotation
+    {
+		public string label;
+		public string sublabel;
+		public float confidence;
+    }
+
+	[System.Serializable]
+	public class PhotoInfo
+    {
+		public int id;
+		public string queue_name;
+		public int priority;
+		public string retention;
+		public string created_by;
+		public string camera_location_id;
+		public int device_pose_id;
+		public int tracking_session_id;
+		public float created;
+		public float updated;
+
+		public PhotoAnnotation[] annotations;
+    }
+
+	[System.Serializable]
 	public class MapInfo
 	{
 		public string contentType;
