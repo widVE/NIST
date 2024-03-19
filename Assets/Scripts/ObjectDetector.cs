@@ -145,6 +145,9 @@ public class ObjectDetector : MonoBehaviour
 	// The lowest valid setting is 1, but slightly higher may be preferred.
 	public int minimumPatchQuality = 10;
 
+	// Server image queue to use (detection|identification|done).
+	public string uploadQueueName = "detection";
+
 	// Size of input to ML model
 	private int modelInputWidth = -1;
 	private int modelInputHeight = -1;
@@ -174,12 +177,19 @@ public class ObjectDetector : MonoBehaviour
 	private int counter = 0;
 	private long experiment_start_time = 0;
 
+	private Material multiScaleMask;
+
 	public long GetTimestamp()
     {
 		return DateTimeOffset.Now.ToUnixTimeMilliseconds();
 	}
 
-	void Start()
+    private void Awake()
+    {
+        multiScaleMask = new Material(Shader.Find("Unlit/Transparent"));
+	}
+
+    void Start()
 	{
 		Application.targetFrameRate = 60;
 
@@ -202,10 +212,12 @@ public class ObjectDetector : MonoBehaviour
 					case "objects":
 						detectionMode = DetectionMode.MaxScore;
 						transmitMode = TransmitMode.Selective;
+						uploadQueueName = "detection";
 						break;
 					case "people":
 						detectionMode = DetectionMode.CoarseSegment;
 						transmitMode = TransmitMode.Person;
+						uploadQueueName = "identification";
 						break;
 					case "continuous":
 						detectionMode = DetectionMode.Off;
@@ -613,9 +625,13 @@ public class ObjectDetector : MonoBehaviour
 
 		var background = rescaleTexture(texture, backgroundScaleFactor);
 
-		Texture2D patch = new Texture2D(patchWidth, patchHeight, TextureFormat.RGBA32, false);
-
 		float summedQuality = 0;
+
+		Color[] clear = new Color[patchWidth * patchHeight];
+		for (int i = 0; i < clear.Length; i++)
+        {
+			clear[i] = Color.clear;
+        }
 
 		for (int i = 0; i < numPatchesY; i++)
 		{
@@ -626,30 +642,30 @@ public class ObjectDetector : MonoBehaviour
 
 				if (output[0, 0, i, j] < foregroundThreshold)
 				{
-					RenderTexture.active = background;
+					summedQuality += 100.0f / backgroundScaleFactor;
 
 					int fy = (numPatchesY - i - 1) * patchHeight;
-					patch.ReadPixels(new Rect(x, y, patchWidth, patchHeight), 0, 0);
-					patch.Apply();
-
-					Graphics.CopyTexture(patch, 0, 0, 0, 0, patchWidth, patchHeight, compositeTexture, 0, 0, x, fy);
-
-					summedQuality += 100.0f / backgroundScaleFactor;
+					compositeTexture.SetPixels(x, fy, patchWidth, patchHeight, clear);
 				}
                 else
                 {
-					//Graphics.CopyTexture(texture, 0, 0, x, fy, patchWidth, patchHeight, compositeTexture, 0, 0, x, fy);
 					summedQuality += 100.0f;
 				}
 			}
 		}
 
+		compositeTexture.Apply();
+		Graphics.Blit(compositeTexture, background, multiScaleMask);
+		
+		RenderTexture.active = background;
+		compositeTexture.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0);
+
 		report.average_quality = summedQuality / (numPatchesY * numPatchesX);
+		report.encode_time_ms = stopwatch.ElapsedMilliseconds;
 
 		RenderTexture.active = null;
 
 		background.Release();
-		Destroy(patch);
 
 		return compositeTexture;
 	}
@@ -997,6 +1013,7 @@ public class ObjectDetector : MonoBehaviour
 
 		www.SetRequestHeader("Authorization", EasyVizARServer.Instance.GetAuthorizationHeader());
 		www.SetRequestHeader("Content-Type", contentType);
+		www.SetRequestHeader("X-Queue-Name", uploadQueueName);
 
 		www.uploadHandler = new UploadHandlerRaw(data);
 		www.downloadHandler = new DownloadHandlerBuffer();
