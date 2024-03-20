@@ -19,7 +19,7 @@ public class DistanceCalculation : MonoBehaviour
 	//For displaying the headset icon on map 
 	public GameObject headset_icon;
 	public GameObject map_parent;
-	public GameObject headset_parent;
+	public GameObject EasyVizARHeadsetManager;
 	public EasyVizAR.HeadsetList headset_list;
 	public EasyVizAR.Headset current_headset;
 	public string headset_name; // this is set in the EasyVizARHeadsetManager.cs script \
@@ -50,7 +50,7 @@ public class DistanceCalculation : MonoBehaviour
         old_position = main_camera.transform.position;
 
         //mapParent = GameObject.Find("Map_Spawn_Target"); // NOTE: this is returning null when object is inactive
-        headset_parent = GameObject.Find("EasyVizARHeadsetManager");
+        EasyVizARHeadsetManager = GameObject.Find("EasyVizARHeadsetManager");
 		
         //Assign the Headset ID
         if (EasyVizARServer.Instance.TryGetHeadsetID(out string headset_ID))
@@ -64,6 +64,9 @@ public class DistanceCalculation : MonoBehaviour
             GameObject local = GameObject.Find("LocalHeadset");
             local.transform.GetChild(0).name = headset_ID;
         }
+
+        distance_text_TMP = current_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>();
+        // if gameobject position doesn't work, then i might have to do a get() to get the position of the given headset
 
         SpawnHeasetIcon();
 
@@ -206,10 +209,7 @@ public class DistanceCalculation : MonoBehaviour
 	}
 */
     public void CalculateHeadsetDistance()
-    {
-        distance_text_TMP = current_prefab.transform.Find("Headset_Dist").GetComponent<TextMeshPro>();
-        // if gameobject position doesn't work, then i might have to do a get() to get the position of the given headset
-
+    {        
         double distance = Vector3.Distance(main_camera.transform.position, capsule.gameObject.transform.position);
 
         if (is_feet)
@@ -271,10 +271,10 @@ public class DistanceCalculation : MonoBehaviour
                 headset_map_marker.transform.localPosition = new Vector3(camera_position.x, 0, camera_position.z);
 
                 // TODO: trying to get the rotation of the local headset --> since local headset's prefab is disabled
-                headset_parent.transform.Find(local_headset_id).position = camera_position;
-                headset_parent.transform.Find(local_headset_id).eulerAngles = main_camera.transform.eulerAngles;
+                //EasyVizARHeadsetManager.transform.Find(local_headset_id).position = camera_position;
+                //EasyVizARHeadsetManager.transform.Find(local_headset_id).eulerAngles = main_camera.transform.eulerAngles;
 
-                if (Debug_Verbose) UnityEngine.Debug.Log("this is the local headset's rotation: " + headset_parent.transform.Find(local_headset_id).eulerAngles);
+                if (Debug_Verbose) UnityEngine.Debug.Log("this is the local headset's rotation: " + EasyVizARHeadsetManager.transform.Find(local_headset_id).eulerAngles);
                 if (Debug_Verbose) UnityEngine.Debug.Log("this is the real rotation: " + main_camera.transform.eulerAngles);
             }
             else
@@ -284,7 +284,8 @@ public class DistanceCalculation : MonoBehaviour
 
             headset_map_marker.name = current_prefab.name;
             //This should be okay to remove because it caluclulates the distance from the local headset to the origin, which isn't that useful in this context
-            headset_map_marker.transform.Find("Feature_Text").GetComponent<TextMeshPro>().text = distance.ToString() + "ft";
+            //headset_map_marker.transform.Find("Feature_Text").GetComponent<TextMeshPro>().text = distance.ToString() + "ft";
+            
             //cur_prefab.GetComponent<EasyVizARHeadset>()
             //GetHeadsets();
             Color myColor = current_prefab.GetComponent<EasyVizARHeadset>()._color;
