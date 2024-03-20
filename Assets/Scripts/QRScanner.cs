@@ -186,11 +186,10 @@ public class QRScanner : MonoBehaviour
 			if (uri.Scheme == "vizar")
 			{
 				// Example: http://easyvizar.wings.cs.wisc.edu:5000/
-				string base_url = "http://" + uri.Authority + "/";
-				Debug.Log("Detected URL from QR code: " + base_url);
+				//string base_url = "http://" + uri.Authority + "/";
+				//Debug.Log("Detected URL from QR code: " + base_url);
 				//EasyVizARServer.Instance._baseURL = base_url;
 				//_updatedServerFromQR = true;
-
 				isVizarScheme = true;
 			}
 

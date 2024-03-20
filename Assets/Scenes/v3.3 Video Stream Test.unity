@@ -1371,6 +1371,7 @@ MonoBehaviour:
   backgroundScaleFactor: 20
   minimumPatchQuality: 10
   uploadQueueName: detection
+  multiScaleMask: {fileID: 2100000, guid: 7355b87662b03c0419f6402b2766d12c, type: 2}
 --- !u!64 &49547811
 MeshCollider:
   m_ObjectHideFlags: 0

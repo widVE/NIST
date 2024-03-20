@@ -150,13 +150,14 @@ public class ObjectDetector : MonoBehaviour
 	// Server image queue to use (detection|identification|done).
 	public string uploadQueueName = "detection";
 
+	public Material multiScaleMask;
+
 	// Size of input to ML model
 	private int modelInputWidth = -1;
 	private int modelInputHeight = -1;
 
 	// Only start actively sending photos after a QR code has been scanned
 	private bool running = false;
-	private string locationID;
 	private bool sentStartupReport = false;
 
 	// We figure this out after initializing the camera.
@@ -180,16 +181,9 @@ public class ObjectDetector : MonoBehaviour
 	private int counter = 0;
 	private long experiment_start_time = 0;
 
-	private Material multiScaleMask;
-
 	public long GetTimestamp()
     {
 		return DateTimeOffset.Now.ToUnixTimeMilliseconds();
-	}
-
-    private void Awake()
-    {
-        multiScaleMask = new Material(Shader.Find("Unlit/Transparent"));
 	}
 
     void Start()
@@ -207,8 +201,6 @@ public class ObjectDetector : MonoBehaviour
 			var manager = headsetManager.GetComponent<EasyVizARHeadsetManager>();
 			manager.HeadsetConfigurationChanged += (sender, change) =>
 			{
-				locationID = change.LocationID;
-
 				var config = change.Configuration;
 				switch(config.photo_capture_mode)
                 {
@@ -245,6 +237,7 @@ public class ObjectDetector : MonoBehaviour
     {
 		if (running)
         {
+			Debug.Log("Initializing ObjectDetector");
 			initializeEngine();
 			initializeCamera();
 		}
@@ -267,9 +260,7 @@ public class ObjectDetector : MonoBehaviour
 
 		Model model = ModelLoader.Load(asset);
 		modelName = asset.name;
-#if UNITY_EDITOR
 		Debug.Log($"Loaded model {modelName}");
-#endif
 
 		if (detectionMode == DetectionMode.BoundingBox)
 		{
@@ -551,8 +542,7 @@ public class ObjectDetector : MonoBehaviour
 					{
 						yield return sendReport(report);
 					}
-
-					if (outputTextMesh is not null)
+					else if (outputTextMesh is not null)
                     {
 						yield return waitAndDisplayResult();
                     }
