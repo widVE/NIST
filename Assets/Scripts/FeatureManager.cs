@@ -184,14 +184,11 @@ public class FeatureManager : MonoBehaviour
                
             };
         }
-
-        StartCoroutine(DisplayDist()); 
     }
 
     // Update is called once per frame
     void Update()
     {
-        //showMapIconDistance();
         /*
         // We should only need to call ListFeatures once on entering a new location.
         // After that, we can update the existing feature list from websocket events.
@@ -204,40 +201,6 @@ public class FeatureManager : MonoBehaviour
                 
     }
     
-    IEnumerator DisplayDist()
-    {
-        while (true)
-        {
-            showMapIconDistance();
-            yield return new WaitForSeconds(1f);
-        }
-    }
-    
-    // This will display the distance indicator on the map
-    public void showMapIconDistance()
-    {
-        if (PalmMap.activeSelf)
-        {
-            //palm_map_spawn_target.SetActive(true);
-        }
-        else
-        {
-            //palm_map_spawn_target.SetActive(false);
-        }
-
-        foreach (Transform child in palm_map_spawn_target.transform)
-        {
-            if (spawn_parent.transform.Find(child.name))
-            {
-                var feature = spawn_parent.transform.Find(child.name);
-                string input = feature.Find("Feature_Text").GetComponent<TextMeshPro>().text;
-                string dist = input.Substring(input.IndexOf(':') + 1);
-                child.Find("Feature_Text").GetComponent<TextMeshPro>().text = dist;
-            }
-            
-        }
-        
-    }
     // POST 
     public void CreateNewFeature(string feature_type, GameObject marker) //TODO: change the feature_type from int to string
     {
@@ -584,8 +547,17 @@ public class FeatureManager : MonoBehaviour
         world_marker.transform.Find("ID").GetChild(0).name = feature.id.ToString(); // this helps keeping track of feature id
         
         //I'm trying to add in the marker icon spawning to the floating map. I think this is where it happens!
-        GameObject palm_map_marker = Instantiate(map_icon_to_spawn, palm_map_spawn_target.transform, false);       
-        
+        GameObject palm_map_marker = Instantiate(map_icon_to_spawn, palm_map_spawn_target.transform, false);
+        MarkerObject palm_marker_object = palm_map_marker.GetComponent<MarkerObject>();
+        if (palm_marker_object is not null)
+        {
+            palm_marker_object.feature_ID = feature.id;
+            palm_marker_object.feature_type = feature.type;
+            palm_marker_object.feature_name = feature.name;
+            palm_marker_object.world_position = world_position;
+            palm_marker_object.manager_script = this;
+        }
+
         Vector3 map_coordinate_position = Vector3.zero;
         map_coordinate_position.x = world_position.x;
         map_coordinate_position.y = world_position.y;
@@ -610,7 +582,16 @@ public class FeatureManager : MonoBehaviour
         GameObject floating_map_marker = Instantiate(map_icon_to_spawn, floating_map_spawn_target.transform, false);
         floating_map_marker.transform.localPosition = new Vector3(world_position.x, y_offset, map_coordinate_position.z);
         floating_map_marker.name = string.Format("feature-{0}", feature.id);
-         
+        MarkerObject float_marker_object = floating_map_marker.GetComponent<MarkerObject>();
+        if (float_marker_object is not null)
+        {
+            float_marker_object.feature_ID = feature.id;
+            float_marker_object.feature_type = feature.type;
+            float_marker_object.feature_name = feature.name;
+            float_marker_object.world_position = world_position;
+            float_marker_object.manager_script = this;
+        }
+
         //GameObject mapMarker = Instantiate(world_feature_to_spawn, mapParent.transform, false);
 
         // Add the name of the feature to DistanceFeatureText.cs 
@@ -630,6 +611,9 @@ public class FeatureManager : MonoBehaviour
         if (new_marker_object is not null)
         {
             new_marker_object.feature_ID = feature.id;
+            new_marker_object.feature_type = feature.type;
+            new_marker_object.feature_name = feature.name;
+            new_marker_object.world_position = world_position;
             new_marker_object.manager_script = this;
         } 
         else

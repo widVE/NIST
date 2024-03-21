@@ -174,8 +174,6 @@ public class EasyVizARHeadset : MonoBehaviour
 		{
 			_realTimeChanges = true;
 
-			DistanceCalculation distance_calculator = this.GetComponent<DistanceCalculation>();
-
 			// Either reload our existing headset from the server or create a new one.
 			if (EasyVizARServer.Instance.TryGetHeadsetID(out string headsetId))
             {
@@ -183,7 +181,6 @@ public class EasyVizARHeadset : MonoBehaviour
                 UnityEngine.Debug.Log("This is the local headset: " + headsetId);
 				local_headset_id = headsetId;
                 Is_local = true;
-				distance_calculator.is_local = true;
                 LoadHeadset(headsetId);
             } 
 			else

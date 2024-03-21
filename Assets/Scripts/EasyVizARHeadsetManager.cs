@@ -72,10 +72,13 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
     //for displaying headset icon
     public GameObject map_parent;
+    public GameObject headset_icon;
     public GameObject headsetManager;
     public Color _color = Color.red;
     public GameObject feature_parent;
     public bool verbose_debug_log;
+
+    private GameObject local_headset_map_icon;
 
     public event EventHandler<HeadsetConfigurationChangedEvent> HeadsetConfigurationChanged;
 
@@ -129,7 +132,10 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     {
         // added for displaying distance
         //DisplayHeadsetsDistance();
-
+        if (local_headset_map_icon is not null)
+        {
+            MoveAndRotateIcon(local_headset_map_icon, Camera.main.transform);      
+        }
     }
 
     void OnEnable()
@@ -532,35 +538,63 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         }
     }
 
-/*    void OLD_CreateLocalHeadset()
-    {
-        if (!_visualizePreviousLocal)
+    /*    void OLD_CreateLocalHeadset()
         {
-            _localHeadset = Instantiate(_headsetPrefab, transform);
-
-            if (_localHeadset != null)
+            if (!_visualizePreviousLocal)
             {
-                EasyVizARHeadset local_headset = _localHeadset.GetComponent<EasyVizARHeadset>();
+                _localHeadset = Instantiate(_headsetPrefab, transform);
 
-                if (_localMaterial != null)
+                if (_localHeadset != null)
                 {
-                    _localHeadset.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
-                }
+                    EasyVizARHeadset local_headset = _localHeadset.GetComponent<EasyVizARHeadset>();
 
-                if (_makeUniqueLocalHeadset)
-                {
-                    string s = System.DateTime.Now.ToString();
+                    if (_localMaterial != null)
+                    {
+                        _localHeadset.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
+                    }
 
-                    local_headset.CreateLocalHeadset(_localHeadsetName + "_" + s, _locationId, !_visualizePreviousLocal);
+                    if (_makeUniqueLocalHeadset)
+                    {
+                        string s = System.DateTime.Now.ToString();
+
+                        local_headset.CreateLocalHeadset(_localHeadsetName + "_" + s, _locationId, !_visualizePreviousLocal);
+                    }
+                    else
+                    {
+                        local_headset.CreateLocalHeadset(_localHeadsetName, _locationId, !_visualizePreviousLocal);
+                    }
+                    Debug.Log("Create local headset says this is the local headset name: " + local_headset.name);
                 }
-                else
-                {
-                    local_headset.CreateLocalHeadset(_localHeadsetName, _locationId, !_visualizePreviousLocal);
-                }
-                Debug.Log("Create local headset says this is the local headset name: " + local_headset.name);
             }
+        }*/
+
+
+    public void MoveAndRotateIcon(GameObject target, Transform source)
+    {
+        target.transform.localPosition = new Vector3(source.position.x, 0, source.position.z);
+
+        Vector3 euler_rotation = new Vector3(0, source.eulerAngles.y, 0);
+        var icon_visual = target.transform.Find("Icon Visuals");
+        if (icon_visual is not null)
+        {
+            // Try to rotate only the icon.
+            var rotation = icon_visual.transform.localEulerAngles;
+            rotation.y = source.eulerAngles.y;
+            icon_visual.transform.localEulerAngles = rotation;
         }
-    }*/
+        else
+        {
+            // Otherwise, we end up rotating the text as well.
+            var rotation = new Vector3(0, source.eulerAngles.y, 0);
+            target.transform.localEulerAngles = rotation;
+        }
+
+        var marker_object = target.GetComponent<MarkerObject>();
+        if (marker_object is not null)
+        {
+            marker_object.world_position = source.position;
+        }
+    }
 
 
     // This is where we are instantiating the GameObject of Headset in Unity
@@ -570,11 +604,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         headset_game_object.name = remote_headset.id;
 
         EasyVizARHeadset headset_class_data = headset_game_object.GetComponent<EasyVizARHeadset>();
-        // Getting the reference for displaying the headset
-        DistanceCalculation distance_calculation_script = headset_game_object.GetComponent<DistanceCalculation>();
 
-        distance_calculation_script.map_parent = map_parent;
-        distance_calculation_script.headset_name = remote_headset.name;
         headset_class_data.map_parent = map_parent;
         headset_class_data.parent_headset_manager = headsetManager;
         headset_class_data.feature_parent = feature_parent;
@@ -603,9 +633,35 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
             _activeHeadsets.Add(headset_class_data);
 
-            DistanceCalculation distance_calculation_script = headset_game_object.GetComponent<DistanceCalculation>();
+            MarkerObject marker_object = headset_game_object.GetComponent<MarkerObject>();
+            if (marker_object is not null)
+            {
+                marker_object.feature_type = "headset";
+                marker_object.feature_name = remote_headset.name;
+                marker_object.world_position = headset_game_object.transform.position;
+            }
 
-            distance_calculation_script.Initialize(remote_headset.name, map_parent);
+            if (map_parent is not null)
+            {
+                var headset_map_marker = Instantiate(headset_icon, map_parent.transform, false);
+                headset_map_marker.name = remote_headset.id;
+
+                MoveAndRotateIcon(headset_map_marker, headset_game_object.transform);
+
+                var icon_renderer = headset_map_marker.transform.Find("Icon Visuals")?.GetComponent<Renderer>();
+                if (icon_renderer is not null)
+                {
+                    Color myColor = headset_class_data._color;
+                    icon_renderer.material.SetColor("_EmissionColor", myColor);
+                }
+
+                var map_marker_object = headset_map_marker.GetComponent<MarkerObject>();
+                if (map_marker_object is not null)
+                {
+                    map_marker_object.feature_type = "headset";
+                    map_marker_object.feature_name = remote_headset.name;
+                }
+            }
         }
     }
 
@@ -618,7 +674,30 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             CreateRemoteHeadset(remoteHeadset);
         }
         else if (matched_headset.Is_local) return;
-        else matched_headset.AssignValuesFromJson(remoteHeadset);
+        else
+        {
+            matched_headset.AssignValuesFromJson(remoteHeadset);
+
+            var marker_object = matched_headset.GetComponent<MarkerObject>();
+            if (marker_object is not null)
+            {
+                marker_object.feature_name = remoteHeadset.name;
+                marker_object.world_position = matched_headset.transform.position;
+            }
+
+            var map_icon = map_parent.transform.Find(previous_id);
+            if (map_icon is not null)
+            {
+                MoveAndRotateIcon(map_icon.gameObject, matched_headset.transform);
+
+                var map_marker_object = map_icon.GetComponent<MarkerObject>();
+                map_marker_object.feature_name = remoteHeadset.name;
+            }
+            else
+            {
+                UnityEngine.Debug.Log("Could not find map icon for " + previous_id);
+            }
+        }
     }
 
     public void DeleteRemoteHeadset(string id)
@@ -706,10 +785,6 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         {
             //This is needed right now because the map parent is used to spawn the icon in the map, but 
             //it really shouldn't be there. it should probably be in this class or a view manager
-            DistanceCalculation distance_calculation_script = headset_game_object.GetComponent<DistanceCalculation>();
-
-            distance_calculation_script.map_parent = map_parent;
-            distance_calculation_script.headset_name = local_headset.name;
 
             Debug.Log("Is it NULL?? " + headset_class_data);
 
@@ -748,13 +823,6 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
         if (headset_class_data != null)
         {
-            //This is needed right now because the map parent is used to spawn the icon in the map, but 
-            //it really shouldn't be there. it should probably be in this class or a view manager
-            DistanceCalculation distance_calculation_script = headset_game_object.GetComponent<DistanceCalculation>();
-
-            distance_calculation_script.map_parent = map_parent;
-            distance_calculation_script.headset_name = local_headset.name;
-
             Debug.Log("Is it NULL?? " + headset_class_data);
 
 
@@ -775,8 +843,29 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                 headset_game_object.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
             }
 
-
             _activeHeadsets.Add(headset_class_data);
+
+            if (map_parent is not null)
+            {
+                local_headset_map_icon = Instantiate(headset_icon, map_parent.transform, false);
+                local_headset_map_icon.name = local_headset.id;
+
+                MoveAndRotateIcon(local_headset_map_icon, Camera.main.transform);
+
+                var icon_renderer = local_headset_map_icon.transform.Find("Icon Visuals")?.GetComponent<Renderer>();
+                if (icon_renderer is not null)
+                {
+                    Color myColor = headset_class_data._color;
+                    icon_renderer.material.SetColor("_EmissionColor", myColor);
+                }
+
+                var map_marker_object = local_headset_map_icon.GetComponent<MarkerObject>();
+                if (map_marker_object is not null)
+                {
+                    map_marker_object.feature_type = "headset";
+                    map_marker_object.feature_name = local_headset.name;
+                }
+            }
         }
         else
         {

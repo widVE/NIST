@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 921069525072559226}
   - component: {fileID: 921069525072559175}
-  - component: {fileID: 5003610570359901067}
+  - component: {fileID: 6077780464579907565}
   m_Layer: 0
   m_Name: EasyVizarHeadset
   m_TagString: Untagged
@@ -62,7 +62,7 @@ MonoBehaviour:
   local_headset_id: 
   feature_parent: {fileID: 0}
   navigation_line: {fileID: 0}
---- !u!114 &5003610570359901067
+--- !u!114 &6077780464579907565
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -71,48 +71,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 921069525072559227}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f672d2c131a58984ea91d94d6b031977, type: 3}
+  m_Script: {fileID: 11500000, guid: 01df08ac3a635e14da5c4ae345fc8eae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  main_camera: {fileID: 0}
-  distance_text: {fileID: 0}
-  capsule: {fileID: 8231832368714168251}
-  is_feet: 1
-  old_position: {x: 0, y: 0, z: 0}
-  headset_icon: {fileID: 4402188086708784334, guid: b234550f30f629c41ba6c5c3b64682a6, type: 3}
-  map_parent: {fileID: 0}
-  headset_parent: {fileID: 0}
-  headset_list:
-    headsets: []
-  current_headset:
-    color: 
-    created: 0
-    id: 
-    location_id: 
-    mapId: 
-    name: 
-    navigation_target:
-      type: 
-      target_id: 
-      position:
-        x: 0
-        y: 0
-        z: 0
-    orientation:
-      w: 0
-      x: 0
-      y: 0
-      z: 0
-    position:
-      x: 0
-      y: 0
-      z: 0
-    updated: 0
-  headset_name: 
-  is_local: 0
-  local_headset_id: 
-  Debug_Verbose: 0
-  current_prefab: {fileID: 0}
+  feature_ID: -1
+  feature_type: headset
+  feature_name: 
+  world_position: {x: 0, y: 0, z: 0}
+  manager_script: {fileID: 0}
+  displayDistanceInFeet: 1
 --- !u!1 &6732124109696385241
 GameObject:
   m_ObjectHideFlags: 0
@@ -125,7 +92,7 @@ GameObject:
   - component: {fileID: 6904258856975439090}
   - component: {fileID: 4589887909658642003}
   m_Layer: 0
-  m_Name: Headset_Dist
+  m_Name: Feature_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -148,8 +115,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0621, y: 0.437}
-  m_SizeDelta: {x: 20, y: 5}
+  m_AnchoredPosition: {x: 0, y: 0.4}
+  m_SizeDelta: {x: 200, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &6904258856975439090
 MeshRenderer:
@@ -213,7 +180,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Sample text
+  m_text: Headset
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -247,7 +214,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
