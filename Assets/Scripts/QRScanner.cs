@@ -16,6 +16,7 @@ using Microsoft.Windows.Perception.Spatial.Preview;
 public class LocationChangedEventArgs
 {
 	public string Server;
+	public bool UseHTTPS;
 	public string LocationID;
 }
 
@@ -285,6 +286,7 @@ public class QRScanner : MonoBehaviour
 				{
 					LocationChangedEventArgs args = new LocationChangedEventArgs();
 					args.Server = uri.Authority; // Authority gives host:port
+					args.UseHTTPS = (uri.Port == -1 || uri.Port == 443);
 					args.LocationID = loc;
 
 					if (LocationChanged is not null)

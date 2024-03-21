@@ -86,7 +86,8 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
                     isConnected = false;
                 }
                 _locationId = ev.LocationID;
-                _webSocketURL = string.Format("ws://{0}/ws", ev.Server);
+                string scheme = ev.UseHTTPS ? "wss" : "ws";
+                _webSocketURL = string.Format("{0}://{1}/ws", scheme, ev.Server);
                 _ws = initializeWebSocket();
 
                 // Connect returns a Task that only completes after the connection closes.
