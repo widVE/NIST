@@ -240,6 +240,7 @@ public class ObjectDetector : MonoBehaviour
 			Debug.Log("Initializing ObjectDetector");
 			initializeEngine();
 			initializeCamera();
+			StartCoroutine(CaptureLoop());
 		}
 	}
 
@@ -389,13 +390,25 @@ public class ObjectDetector : MonoBehaviour
 		outputTexture = new RenderTexture(cameraWidth, cameraHeight, 0, RenderTextureFormat.ARGBFloat);
 	}
 
-	void Update()
-	{
-		if (running && !captureStarted)
+	private IEnumerator CaptureLoop()
+    {
+		var stopwatch = new System.Diagnostics.Stopwatch();
+		stopwatch.Start();
+
+		while (running)
         {
-			StartCoroutine(ProcessNextFrame());
-		}
-	}
+			yield return ProcessNextFrame();
+
+			// Slow down how often we process camera frames to match the configured minimum interval.
+			long remaining = minSendInterval - stopwatch.ElapsedMilliseconds;
+			if (remaining > 0)
+            {
+				yield return new WaitForSeconds(remaining / 1000.0f);
+            }
+
+			stopwatch.Restart();
+        }
+    }
 
 	private IEnumerator ProcessNextFrame()
     {
