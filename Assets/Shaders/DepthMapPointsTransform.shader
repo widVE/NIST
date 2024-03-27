@@ -24,7 +24,7 @@ Shader "Custom/DepthMapPointsTransform" {
 		
 		#include "UnityCG.cginc"
 		
-		//#define USE_CPU_DEPTH 1
+		#define USE_CPU_DEPTH 1
 
 		#pragma surface surf Standard fullforwardshadows vertex:vert
 		//#pragma multi_compile_fog
@@ -109,9 +109,9 @@ Shader "Custom/DepthMapPointsTransform" {
 					d.w = 1.0;
 					//d.xyz *= 65536;
 
-					float dx = d.x;//(d.x - 32768.0) / 1000.0;
-					float dy = d.y;//(d.y - 32768.0) / 1000.0;
-					float dz = d.z;//(d.z - 32768.0) / 1000.0;
+					float dx = (d.x - 32768.0) / 1000.0;
+					float dy = (d.y - 32768.0) / 1000.0;
+					float dz = (d.z - 32768.0) / 1000.0;
 
 					float4 vert = float4(dx, dy, dz, 1.0);
 					//d.x = d.x * 65536.0;
