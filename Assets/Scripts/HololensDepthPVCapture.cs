@@ -421,7 +421,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 						// Important - send the geometry image before the color image
 						// so that the image processing begins after both have been received.
 						// The server marks the photo as ready after the color image has been received.
-						if(EasyVizARServer.Instance.PutImageQuad("image/png", sPC, sColor, sDepth, sI, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, _lastPosition, _lastOrientation, headsetID, "geometry", "photo", "depth", "thermal"))
+						if(EasyVizARServer.Instance.PutImageQuad("image/png", sPC, sColor, sDepth, sI, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, headsetID, "geometry", "photo", "depth", "thermal"))
 						{
 							_lastDepthImageName = sDepth;
 							if(_captureRectifiedColorImages)

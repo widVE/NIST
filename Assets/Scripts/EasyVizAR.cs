@@ -389,9 +389,9 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		StartCoroutine(DoDELETE(_baseURL + url, contentType, jsonData, callBack));
 	}
 
-	public void Texture(string url, string contentType, string width, System.Action<Texture> callBack)
+	public void Texture(string url, string contentType, string width, System.Action<Texture2D> callBack, TextureFormat format = TextureFormat.RGBA32)
 	{
-		StartCoroutine(GetTexture(_baseURL+url, contentType, width, callBack));
+		StartCoroutine(GetTexture(_baseURL+url, contentType, width, callBack, format));
 	}
 
     public void TextureMapID(string url, string contentType, string width, int map_ID, System.Action<Texture,int> callBack)
@@ -662,12 +662,17 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
         }
     }
 
-    IEnumerator GetTexture(string url, string contentType, string width, System.Action<Texture> callBack)
+    IEnumerator GetTexture(string url, string contentType, string width, System.Action<Texture2D> callBack, TextureFormat format = TextureFormat.RGBA32)
 	{
-		UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
+		//UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
+		Debug.Log(url);
+		UnityWebRequest www = new UnityWebRequest(url);
+		www.downloadHandler = new DownloadHandlerBuffer();
 
-		www.SetRequestHeader("Accept", contentType);
-		www.SetRequestHeader("Width", width);
+		//www.SetRequestHeader("Accept", contentType);
+		//www.SetRequestHeader("Width", width);
+		//www.SetRequestHeader("Content-Type", "image/png");
+
 		if (_hasRegistration)
 		{
 			www.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
@@ -684,12 +689,37 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		}
 		else
 		{
-			
+			//Debug.Log(format);
 			//Using the Texture download handler we get the content from the Unity Web Request object
-			Texture my_text = DownloadHandlerTexture.GetContent(www);
-			callBack(my_text);
-			
-			//www.Dispose();
+			//Texture tex = DownloadHandlerTexture.GetContent(www);
+			if(www.downloadHandler.isDone)
+			{
+				//Debug.Log(((Texture2D)tex).format);
+				Texture2D newTex = new Texture2D(320, 288, format, false);
+				Debug.Log(newTex.format);
+				Debug.Log(www.downloadHandler.data.Length);
+				if(format == TextureFormat.RGBA32)
+				{
+					newTex.LoadImage(www.downloadHandler.data);
+				}
+				else
+				{
+					int texSize = 320 * 288 * 8;
+					byte[] texData = new byte[texSize];
+					const int HEADER_SIZE = 54;
+					byte[] downloadData = www.downloadHandler.data;
+					for(int i = 0; i < texSize; ++i)
+					{
+						texData[i] = downloadData[HEADER_SIZE+i];
+					}
+
+					newTex.LoadRawTextureData(texData);
+				}
+				
+				callBack(newTex);
+				
+				www.Dispose();
+			}
 			
 			//Map_lines is a list of different map display layers. The texture is assigned to the lines layer
 			//of the map_layout instances. Those objects can modify the display of color and other properties of the lines

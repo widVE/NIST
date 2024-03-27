@@ -66,8 +66,8 @@ Shader "Custom/DepthMapPointsTransformOld" {
 		float4x4 _ModelTransform;
 		float4x4 _ViewProj;
 
-		sampler2D _ColorImage;
-		sampler2D _DepthImage;
+		//sampler2D _ColorImage;
+		//sampler2D _DepthImage;
 
 		int useNormals = 1;
 		int _SubSample = 1;
