@@ -123,6 +123,9 @@ public class QRScanner : MonoBehaviour
 	bool isOriginChanging = false;
 	bool isCoordinateSystemChanging = false;
 
+	public GameObject headAttachedDisplay;
+	private HeadAttachedText headAttachedText;
+
 	/// Initialization is just a matter of asking for permission, and then
 	/// hooking up to the `QRCodeWatcher`'s events. `QRCodeWatcher.RequestAccessAsync`
 	/// is an async call, so you could re-arrange this code to be non-blocking!
@@ -131,6 +134,9 @@ public class QRScanner : MonoBehaviour
         _headsetManager = EasyVizARHeadsetManager.EasyVizARManager.gameObject;
 
         audioSource = GetComponent<AudioSource>();
+
+		if (headAttachedDisplay)
+			headAttachedText = headAttachedDisplay.GetComponent<HeadAttachedText>();
 
 		if (!QRCodeWatcher.IsSupported())
         {
@@ -300,6 +306,10 @@ public class QRScanner : MonoBehaviour
 					EasyVizARServer.Instance.Get("/locations/" + loc, EasyVizARServer.JSON_TYPE, delegate (string result)
 					{
 						var location = JsonUtility.FromJson<EasyVizAR.Location>(result);
+
+						if (headAttachedText)
+							headAttachedText.EnqueueMessage($"Joined location {location.name}", 3.0f);
+
 						ApplyLocationConfiguration(location);
 					});
 				}

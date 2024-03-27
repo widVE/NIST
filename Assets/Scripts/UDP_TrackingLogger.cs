@@ -32,8 +32,74 @@ using Windows.Storage;
 // This script establishes a UDP connection with Nvidia Jetson for real time 
 // hand gesture recognition.
 
+public enum Gesture
+{
+    Blossom,
+    Grab,
+    Swipe,
+    None,
+}
+
 public class UDP_TrackingLogger : MonoBehaviour
 {
+    private class GestureStatus
+    {
+        private int minimumDetections = 5;
+        private int minimumDetectionTime = 200;
+        private int minimumQuietTime = 5000;
+
+        public Gesture currentGesture = Gesture.None;
+        public int detectionCount = 0;
+        public System.Diagnostics.Stopwatch detectionTimer = new();
+        public System.Diagnostics.Stopwatch quietTimer = new();
+        public bool actionFired = false;
+
+        public void StartTimers()
+        {
+            detectionTimer.Start();
+            quietTimer.Start();
+        }
+
+        public void Update(Gesture gesture)
+        {
+            if (gesture == currentGesture)
+            {
+                detectionCount++;
+            }
+            else
+            {
+                currentGesture = gesture;
+                detectionCount = 0;
+                detectionTimer.Restart();
+                actionFired = false;
+            }
+        }
+
+        public bool TryFiring()
+        {
+            // Null gesture never fires.
+            if (currentGesture == Gesture.None)
+                return false;
+
+            // This gesture already fired, needs to be reset.
+            if (actionFired)
+                return false;
+
+            // Enforce minimum time between firing.
+            if (quietTimer.ElapsedMilliseconds < minimumQuietTime)
+                return false;
+
+            // Require minimum amount of time to perform the gesture.
+            if (detectionCount < minimumDetections || detectionTimer.ElapsedMilliseconds < minimumDetectionTime)
+                return false;
+
+            quietTimer.Restart();
+            actionFired = true;
+
+            return true;
+        }
+    }
+
     #region Constants to modify
     private const string DataSuffix = "UDPTracking";
     private const string CSVHeader = "Label," + "Time," + "Counter,"
@@ -78,10 +144,18 @@ public class UDP_TrackingLogger : MonoBehaviour
     //IPEndPoint remoteEndPoint;
     Thread receiveThread; // Receiving Thread
 
-    public TMP_Text logger_text;
+    public GameObject headAttachedDisplay;
     public static string gesture_outcome = "";
 
+    public int minimumDetections = 5;
+    public int minimumQuietTime = 5000;
+
     private bool running = false;
+
+    private GestureStatus leftHandStatus = new();
+    private GestureStatus rightHandStatus = new();
+
+    private FeatureManager featureManager;
 
 
     // Start is called before the first frame update
@@ -95,6 +169,12 @@ public class UDP_TrackingLogger : MonoBehaviour
 
         // Disable the game object until enabled by configuration loader below.
         gameObject.SetActive(false);
+
+        GameObject featureManager = GameObject.Find("FeatureManager");
+        if (featureManager)
+        {
+            this.featureManager = featureManager.GetComponent<FeatureManager>();
+        }
 
         GameObject headsetManager = GameObject.Find("EasyVizARHeadsetManager");
         if (headsetManager)
@@ -128,6 +208,10 @@ public class UDP_TrackingLogger : MonoBehaviour
 
             StartCoroutine(SendDataCoroutine());
             await MakeNewSession();
+
+            // Initialize timers
+            leftHandStatus.StartTimers();
+            rightHandStatus.StartTimers();
         }
     }
 
@@ -144,7 +228,8 @@ public class UDP_TrackingLogger : MonoBehaviour
         else if (csv_started == 1)
         {
             StartCoroutine("logging_tracking");
-            logger_text.text = string.Format(gesture_outcome);
+            //logger_text.text = string.Format(gesture_outcome);
+            FireGestureEvent();
         }
     }
 
@@ -171,6 +256,59 @@ public class UDP_TrackingLogger : MonoBehaviour
         }
     }
 
+    private void HandleGestureCode(string code)
+    {
+        Gesture gesture = Gesture.None;
+
+        switch (code.Substring(0, 3))
+        {
+            case "L/0":
+            case "R/0":
+                gesture = Gesture.Blossom;
+                break;
+            case "L/1":
+            case "R/1":
+                gesture = Gesture.Grab;
+                break;
+            case "L/2":
+            case "R/2":
+            case "L/3":
+            case "R/3":
+                gesture = Gesture.Swipe;
+                break;
+        }
+
+        if (code.StartsWith("L"))
+            leftHandStatus.Update(gesture);
+        else
+            rightHandStatus.Update(gesture);
+    }
+
+    private void FireGestureEvent()
+    {
+        var hands = new GestureStatus[] { leftHandStatus, rightHandStatus };
+        foreach (var hand in hands)
+        {
+            if (hand.TryFiring())
+            {
+                if (headAttachedDisplay)
+                {
+                    var manager = headAttachedDisplay.GetComponent<HeadAttachedText>();
+                    if (manager)
+                        manager.EnqueueMessage(hand.currentGesture.ToString() + " gesture detected", 2.0f);
+                }
+
+                if (hand.currentGesture == Gesture.Blossom)
+                {
+                    if (HandJointUtils.TryGetJointPose(TrackedHandJoint.Palm, Handedness.Any, out MixedRealityPose pose))
+                    {
+                        featureManager.spawnObjectAtIndex("person", pose.Position);
+                    }
+                }
+            }
+        }
+    }
+
     private void ReceiveData()
     {
         while (true)
@@ -180,9 +318,14 @@ public class UDP_TrackingLogger : MonoBehaviour
                 IPEndPoint remoteEndpoint = new IPEndPoint(IPAddress.Any, 0);
                 byte[] data = client.Receive(ref remoteEndpoint);                // receive from any server
                 string text = Encoding.UTF8.GetString(data);
+
+                //if (text.Length > 0)
+                //    UnityEngine.Debug.Log($"Received: {text} ({text.Length})");
                 
-                print("Received: " + text);
+                //print("Received: " + text);
                 gesture_outcome = text;
+
+                HandleGestureCode(text);
             }
             catch (Exception err)
             {
@@ -223,7 +366,7 @@ public class UDP_TrackingLogger : MonoBehaviour
                     loggerData += str.ToString() + ", ";
                 }
 
-                print("LoggerData: " + loggerData);
+                //print("LoggerData: " + loggerData);
             }
             
             if (csv_started == 1)
@@ -232,10 +375,6 @@ public class UDP_TrackingLogger : MonoBehaviour
                 FlushData();        // flush
             }
             data_counter++;
-        }
-        else
-        {
-            logger_text.text = string.Format("Need Eye Calibration");
         }
     }
 
@@ -252,7 +391,6 @@ public class UDP_TrackingLogger : MonoBehaviour
         m_csvData = new StringBuilder();
         m_csvData.AppendLine(",,,Right Hand,,,,,,,,,,,,,,,,,,,,,,,,,,Left Hand");           // top Header of CSV, categorizes left-right hands
         m_csvData.AppendLine(CSVHeader);                                                    // joint labels
-        logger_text.text = string.Format("CSV Started");
     }
 
     public async Task MakeNewSession()
@@ -323,7 +461,7 @@ public class UDP_TrackingLogger : MonoBehaviour
         string ring_disj, ring_knuckle, ring_mc, ring_middlej, ring_tip;
         string thumb_disj, thumb_mcj, thumb_proxj, thumb_tip;
         string palm, wrist;
-
+        
         if (HandJointUtils.TryGetJointPose(TrackedHandJoint.IndexDistalJoint, Handedness.Right, out pose))
         {
             index_disj = pose.Position.ToString("F3");

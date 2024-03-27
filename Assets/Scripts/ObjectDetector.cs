@@ -105,7 +105,8 @@ public class ObjectDetector : MonoBehaviour
 	public ModelAsset detectionModel;
 	public ModelAsset coarseSegmentationModel;
 
-	public GameObject outputTextMesh;
+	public GameObject headAttachedDisplay;
+	private HeadAttachedText headAttachedText;
 
 	string modelName;
 	IWorker engine;
@@ -194,6 +195,9 @@ public class ObjectDetector : MonoBehaviour
 
 		// Disable the game object until enabled by configuration loader below.
 		gameObject.SetActive(false);
+
+		if (headAttachedDisplay)
+			headAttachedText = headAttachedDisplay.GetComponent<HeadAttachedText>();
 
 		GameObject headsetManager = GameObject.Find("EasyVizARHeadsetManager");
 		if (headsetManager)
@@ -555,7 +559,7 @@ public class ObjectDetector : MonoBehaviour
 					{
 						yield return sendReport(report);
 					}
-					else if (outputTextMesh is not null)
+					else if (headAttachedDisplay is not null)
                     {
 						yield return waitAndDisplayResult();
                     }
@@ -1067,7 +1071,7 @@ public class ObjectDetector : MonoBehaviour
 			{
 				foreach (var annotation in photo.annotations)
 				{
-					if (annotation.label == "face" && outputTextMesh is not null)
+					if (annotation.label == "face" && headAttachedText is not null)
 					{
 						detectionResult = annotation.sublabel;
 						break;
@@ -1076,12 +1080,8 @@ public class ObjectDetector : MonoBehaviour
 			}
 		}
 
-		if (outputTextMesh is not null)
-        {
-			var tmp = outputTextMesh.GetComponent<TMPro.TMP_Text>();
-			if (tmp)
-				tmp.text = detectionResult;
-        }
+		if (headAttachedText)
+			headAttachedText.EnqueueMessage(detectionResult, 5.0f);
 
 		www.Dispose();
 	}
