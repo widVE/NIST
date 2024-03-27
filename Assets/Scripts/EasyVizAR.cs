@@ -1105,7 +1105,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		//instead let's add "photo.png" or "depth.png" to the end of the image URL...
 		string iUrl = h2.imageUrl;
 		iUrl = iUrl.Replace("image", imageType);
-		iUrl = iUrl + ".png";
+		iUrl = iUrl + ".bmp";
 
 		UnityWebRequest www2 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/bmp");
