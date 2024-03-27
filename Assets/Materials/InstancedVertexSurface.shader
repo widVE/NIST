@@ -39,7 +39,7 @@ Shader "Instanced/InstancedVertexShader" {
                 v2f o;
 				o.vertex = float4(0,0,0,0);
 				o.color = float4(0,0,0,0);
-				UNITY_SETUP_INSTANCE_ID(o);
+				//UNITY_SETUP_INSTANCE_ID(o);
 			    UNITY_INITIALIZE_OUTPUT(v2f, o);
 			    //UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
                 o.vertex = mul(UNITY_MATRIX_VP, float4(worldPosition, 1.0f));

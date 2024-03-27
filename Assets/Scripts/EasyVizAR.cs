@@ -106,7 +106,7 @@ namespace EasyVizAR
 		public int width;
 		public int height;
 
-		public string created_by;
+		//public string created_by;
 		public string camera_location_id;
 		public Position camera_position;
 		public Orientation camera_orientation;
@@ -318,6 +318,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	public const string JSON_TYPE = "application/json";
 	public const string JPEG_TYPE = "image/jpeg";
 	public const string PNG_TYPE = "image/png";
+	public const string BMP_TYPE = "image/bmp";
 
     public bool verbose_debug = false;
 
@@ -773,7 +774,12 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 
 		UnityWebRequest www = new UnityWebRequest(GetBaseURL() + "/photos", "POST");
 		www.SetRequestHeader("Content-Type", "application/json");
-
+		
+		if (_hasRegistration)
+		{
+			www.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+		
 		string ourJson = JsonUtility.ToJson(h);
 
 		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(ourJson);
@@ -815,6 +821,11 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		UnityWebRequest www2 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");
 
+		if (_hasRegistration)
+		{
+			www2.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+		
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
 		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
 		www2.uploadHandler = new UploadHandlerFile(path);//new UploadHandlerRaw(image_as_bytes2);//
@@ -840,6 +851,11 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		UnityWebRequest www3 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www3.SetRequestHeader("Content-Type", "image/png");
 
+		if (_hasRegistration)
+		{
+			www3.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+		
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
 		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
 		www3.uploadHandler = new UploadHandlerFile(path2);//new UploadHandlerRaw(image_as_bytes2);//
@@ -902,7 +918,12 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 
 		UnityWebRequest www = new UnityWebRequest(GetBaseURL() + "/photos", "POST");
 		www.SetRequestHeader("Content-Type", "application/json");
-
+		
+		if (_hasRegistration)
+		{
+			www.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+		
 		string ourJson = JsonUtility.ToJson(h);
 
 		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(ourJson);
@@ -948,7 +969,12 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
 		www2.uploadHandler = new UploadHandlerFile(path);//new UploadHandlerRaw(image_as_bytes2);//
 		www2.downloadHandler = new DownloadHandlerBuffer();
-
+		
+		if (_hasRegistration)
+		{
+			www2.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+		
 		yield return www2.SendWebRequest();
 
 		if (www2.result != UnityWebRequest.Result.Success)
@@ -969,6 +995,11 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		UnityWebRequest www3 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www3.SetRequestHeader("Content-Type", "image/png");
 
+		if (_hasRegistration)
+		{
+			www3.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+		
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
 		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
 		www3.uploadHandler = new UploadHandlerFile(path2);//new UploadHandlerRaw(image_as_bytes2);//
@@ -998,7 +1029,12 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
 		www4.uploadHandler = new UploadHandlerFile(path3);//new UploadHandlerRaw(image_as_bytes2);//
 		www4.downloadHandler = new DownloadHandlerBuffer();
-
+		
+		if (_hasRegistration)
+		{
+			www4.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+		
 		yield return www4.SendWebRequest();
 
 		if (www4.result != UnityWebRequest.Result.Success)
@@ -1064,7 +1100,11 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(ourJson);
 		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
 		www.downloadHandler = new DownloadHandlerBuffer();
-
+		if (_hasRegistration)
+		{
+			www.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+		
 		yield return www.SendWebRequest();
 
 		if (www.result != UnityWebRequest.Result.Success)
@@ -1098,8 +1138,12 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		iUrl = iUrl + ".png";
 
 		UnityWebRequest www2 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
-		www2.SetRequestHeader("Content-Type", "image/png");
-
+		www2.SetRequestHeader("Content-Type", "image/bmp");
+		if (_hasRegistration)
+		{
+			www2.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+		
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
 		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
 		www2.uploadHandler = new UploadHandlerFile(path);//new UploadHandlerRaw(image_as_bytes2);//
@@ -1129,7 +1173,11 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
 		www3.uploadHandler = new UploadHandlerFile(path2);//new UploadHandlerRaw(image_as_bytes2);//
 		www3.downloadHandler = new DownloadHandlerBuffer();
-
+		if (_hasRegistration)
+		{
+			www3.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+		
 		yield return www3.SendWebRequest();
 
 		if (www3.result != UnityWebRequest.Result.Success)
@@ -1154,7 +1202,11 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
 		www4.uploadHandler = new UploadHandlerFile(path3);//new UploadHandlerRaw(image_as_bytes2);//
 		www4.downloadHandler = new DownloadHandlerBuffer();
-
+		if (_hasRegistration)
+		{
+			www4.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+		
 		yield return www4.SendWebRequest();
 
 		if (www4.result != UnityWebRequest.Result.Success)
@@ -1179,7 +1231,11 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
 		www5.uploadHandler = new UploadHandlerFile(path4);//new UploadHandlerRaw(image_as_bytes2);//
 		www5.downloadHandler = new DownloadHandlerBuffer();
-
+		if (_hasRegistration)
+		{
+			www5.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+		
 		yield return www5.SendWebRequest();
 
 		if (www5.result != UnityWebRequest.Result.Success)
@@ -1240,7 +1296,11 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 
 		UnityWebRequest www = new UnityWebRequest(GetBaseURL() + "/photos", "POST");
 		www.SetRequestHeader("Content-Type", "application/json");
-
+		if (_hasRegistration)
+		{
+			www.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+		
 		string ourJson = JsonUtility.ToJson(h);
 
 		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(ourJson);
@@ -1281,7 +1341,11 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 
 		UnityWebRequest www2 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");
-
+		if (_hasRegistration)
+		{
+			www2.SetRequestHeader("Authorization", "Bearer " + _registration.auth_token);
+		}
+		
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
 		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
 		www2.uploadHandler = new UploadHandlerFile(path);//new UploadHandlerRaw(image_as_bytes2);//
