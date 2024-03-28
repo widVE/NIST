@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-using Microsoft.MixedReality.QR;
+//using Microsoft.MixedReality.QR;
 using Microsoft.MixedReality.OpenXR;
 using Microsoft.MixedReality.Toolkit.Utilities;
 
