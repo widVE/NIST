@@ -37,42 +37,42 @@ public class QRScanner : MonoBehaviour
 		public DateTimeOffset lastDetected;
 		public Guid spatialGraphNodeId;
 
-		public static QRData FromCode(QRCode qr)
-		{
-			QRData result = new QRData();
+		//public static QRData FromCode(QRCode qr)
+		//{
+		//	QRData result = new QRData();
 
-			SpatialGraphNode node = SpatialGraphNode.FromStaticNodeId(qr.SpatialGraphNodeId);
+		//	SpatialGraphNode node = SpatialGraphNode.FromStaticNodeId(qr.SpatialGraphNodeId);
 
-			if (node != null && node.TryLocate(FrameTime.OnUpdate, out result.pose))
-			{
-				/*if (CameraCache.Main.transform.parent != null)
-                {
-                    result.pose = result.pose.GetTransformedBy(CameraCache.Main.transform.parent);
-                }*/
+		//	if (node != null && node.TryLocate(FrameTime.OnUpdate, out result.pose))
+		//	{
+		//		/*if (CameraCache.Main.transform.parent != null)
+  //              {
+  //                  result.pose = result.pose.GetTransformedBy(CameraCache.Main.transform.parent);
+  //              }*/
 				
-				result.spatialGraphNodeId = qr.SpatialGraphNodeId;
+		//		result.spatialGraphNodeId = qr.SpatialGraphNodeId;
 				
-				result.pose.rotation *= Quaternion.Euler(90, 0, 0);
+		//		result.pose.rotation *= Quaternion.Euler(90, 0, 0);
 
-				// Move the anchor point to the *center* of the QR code
-				var deltaToCenter = qr.PhysicalSideLength * 0.5f;
-				result.pose.position += (result.pose.rotation * (deltaToCenter * Vector3.right) -
-								  result.pose.rotation * (deltaToCenter * Vector3.forward));
+		//		// Move the anchor point to the *center* of the QR code
+		//		var deltaToCenter = qr.PhysicalSideLength * 0.5f;
+		//		result.pose.position += (result.pose.rotation * (deltaToCenter * Vector3.right) -
+		//						  result.pose.rotation * (deltaToCenter * Vector3.forward));
 
-				//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "qrCodeFound.txt"), "Detected QRCode at " + result.pose.position.ToString("F4"));
-			}
+		//		//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "qrCodeFound.txt"), "Detected QRCode at " + result.pose.position.ToString("F4"));
+		//	}
 
-			result.lastDetected = qr.LastDetectedTime;
-			result.size = qr.PhysicalSideLength;
-			result.text = qr.Data == null ? "" : qr.Data;
-			Debug.Log("Loaded QR Data: " + result.text);
-			return result;
-		}
+		//	result.lastDetected = qr.LastDetectedTime;
+		//	result.size = qr.PhysicalSideLength;
+		//	result.text = qr.Data == null ? "" : qr.Data;
+		//	Debug.Log("Loaded QR Data: " + result.text);
+		//	return result;
+		//}
 	}
 
 	AudioSource audioSource;
 
-	QRCodeWatcher watcher = null;
+	//QRCodeWatcher watcher = null;
 	
 	[SerializeField]
 	GameObject _qrPrefab;
@@ -132,11 +132,11 @@ public class QRScanner : MonoBehaviour
 
         audioSource = GetComponent<AudioSource>();
 
-		if (!QRCodeWatcher.IsSupported())
-        {
-			Debug.Log("QR code tracking is not supported");
-			return;
-        }
+		//if (!QRCodeWatcher.IsSupported())
+  //      {
+		//	Debug.Log("QR code tracking is not supported");
+		//	return;
+  //      }
 
 		/*
 		 * The first time this runs, RequestAccessAsync will probably return Denied
@@ -147,92 +147,92 @@ public class QRScanner : MonoBehaviour
 		 * I think this is related to the discussion here:
 		 * https://github.com/microsoft/MixedReality-WorldLockingTools-Samples/issues/20
 		 */
-		var access = await QRCodeWatcher.RequestAccessAsync();
-		if (access != QRCodeWatcherAccessStatus.Allowed)
-		{
-			Debug.Log("QRCodeWatcher access was denied");
-			return;
-		}
+		//var access = await QRCodeWatcher.RequestAccessAsync();
+		//if (access != QRCodeWatcherAccessStatus.Allowed)
+		//{
+		//	Debug.Log("QRCodeWatcher access was denied");
+		//	return;
+		//}
 
 		// Set up the watcher, and listen for QR code events.
-		watcher = new QRCodeWatcher();
+		//watcher = new QRCodeWatcher();
 
-		watcher.Updated += (sender, e) =>
-		{
-			CodeAddedOrUpdated(e.Code);
-		};
+		//watcher.Updated += (sender, e) =>
+		//{
+		//	CodeAddedOrUpdated(e.Code);
+		//};
 		
-		if(!_scanningMode)
-		{
-			watcher.Added += (sender, e) =>
-			{
-				CodeAddedOrUpdated(e.Code);
-			};
-		}
+		//if(!_scanningMode)
+		//{
+		//	watcher.Added += (sender, e) =>
+		//	{
+		//		CodeAddedOrUpdated(e.Code);
+		//	};
+		//}
 		
-		//watcher.Removed += (sender, e) => { };
+		////watcher.Removed += (sender, e) => { };
 
-		watcher.Start();
+		//watcher.Start();
 	}
 
-	private void CodeAddedOrUpdated(QRCode qr)
-    {
-		//check timestamps here...
-		//qrCode.LastDetectedTime;
-		bool isVizarScheme = false;
-		bool isLocation = false;
+	//private void CodeAddedOrUpdated(QRCode qr)
+ //   {
+	//	//check timestamps here...
+	//	//qrCode.LastDetectedTime;
+	//	bool isVizarScheme = false;
+	//	bool isLocation = false;
 
-		if (Uri.TryCreate(qr.Data, UriKind.Absolute, out Uri uri))
-        {
-			if (uri.Scheme == "vizar")
-			{
-				// Example: http://easyvizar.wings.cs.wisc.edu:5000/
-				//string base_url = "http://" + uri.Authority + "/";
-				//Debug.Log("Detected URL from QR code: " + base_url);
-				//EasyVizARServer.Instance._baseURL = base_url;
-				//_updatedServerFromQR = true;
-				isVizarScheme = true;
-			}
+	//	if (Uri.TryCreate(qr.Data, UriKind.Absolute, out Uri uri))
+ //       {
+	//		if (uri.Scheme == "vizar")
+	//		{
+	//			// Example: http://easyvizar.wings.cs.wisc.edu:5000/
+	//			//string base_url = "http://" + uri.Authority + "/";
+	//			//Debug.Log("Detected URL from QR code: " + base_url);
+	//			//EasyVizARServer.Instance._baseURL = base_url;
+	//			//_updatedServerFromQR = true;
+	//			isVizarScheme = true;
+	//		}
 
-			// Expected path segments: "/", "locations/", and "<location-id>"
-			if (uri.Segments.Length == 3 && uri.Segments[1] == "locations/")
-			{
-				string loc = uri.Segments[2];
-				Debug.Log("Detected location ID from QR code: " + loc);
-				isLocation = true;
-			}
-		}
+	//		// Expected path segments: "/", "locations/", and "<location-id>"
+	//		if (uri.Segments.Length == 3 && uri.Segments[1] == "locations/")
+	//		{
+	//			string loc = uri.Segments[2];
+	//			Debug.Log("Detected location ID from QR code: " + loc);
+	//			isLocation = true;
+	//		}
+	//	}
 
-		// Example: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/69e92dff-7138-4091-89c4-ed073035bfe6
-		// This QR code marks a location origin. Add it to the appropriate dictionary, and we will
-		// take care of the rest on the next Update cycle.
-		if (isVizarScheme && isLocation)
-        {
-			var qrdata = QRData.FromCode(qr);
+	//	// Example: vizar://easyvizar.wings.cs.wisc.edu:5000/locations/69e92dff-7138-4091-89c4-ed073035bfe6
+	//	// This QR code marks a location origin. Add it to the appropriate dictionary, and we will
+	//	// take care of the rest on the next Update cycle.
+	//	if (isVizarScheme && isLocation)
+ //       {
+	//		var qrdata = QRData.FromCode(qr);
 
-			lock (originCodes)
-            {
-				originCodes[qr.Id] = qrdata;
+	//		lock (originCodes)
+ //           {
+	//			originCodes[qr.Id] = qrdata;
 
-				if (qr.Id != currentOriginId && qr.LastDetectedTime > lastDetectedTime)
-                {
-					currentOriginId = qr.Id;
-					lastDetectedTime = qr.LastDetectedTime;
-					isOriginChanging = true;
-					isCoordinateSystemChanging = true;
-                }
-				else if(followMovingQRCode && qr.Id == currentOriginId)
-                {
-					// We may have a better estimate of the QR code location, so trigger an update of the world coordinate system.
-					isCoordinateSystemChanging = true;
-					if(_scanningMode)
-					{
-						followMovingQRCode = false;
-					}
-				}
-            }
-        }
-    }
+	//			if (qr.Id != currentOriginId && qr.LastDetectedTime > lastDetectedTime)
+ //               {
+	//				currentOriginId = qr.Id;
+	//				lastDetectedTime = qr.LastDetectedTime;
+	//				isOriginChanging = true;
+	//				isCoordinateSystemChanging = true;
+ //               }
+	//			else if(followMovingQRCode && qr.Id == currentOriginId)
+ //               {
+	//				// We may have a better estimate of the QR code location, so trigger an update of the world coordinate system.
+	//				isCoordinateSystemChanging = true;
+	//				if(_scanningMode)
+	//				{
+	//					followMovingQRCode = false;
+	//				}
+	//			}
+ //           }
+ //       }
+ //   }
 
 	void ChangeOriginFromCode(QRData d)
     {
@@ -382,13 +382,13 @@ public class QRScanner : MonoBehaviour
 	// For shutdown, we just need to stop the watcher
 	void OnDestroy()
 	{
-		Debug.Log("Stopping QR Watcher");
+		//Debug.Log("Stopping QR Watcher");
 
-		if (watcher is not null)
-        {
-			watcher.Stop();
-			watcher = null;
-        }
+		//if (watcher is not null)
+  //      {
+		//	watcher.Stop();
+		//	watcher = null;
+  //      }
 	}
 
 	void Update()
@@ -411,15 +411,15 @@ public class QRScanner : MonoBehaviour
 	// the crashes have stopped, but it takes a surprisingly long time for this to stop, sometimes over a minute
 	void OnApplicationQuit()
 	{
-		Debug.Log("Stopping QR Watcher");
+		//Debug.Log("Stopping QR Watcher");
 
-		if (watcher is not null)
-        {
-			watcher.Stop();
-			watcher = null;
-        }
+		//if (watcher is not null)
+  //      {
+		//	watcher.Stop();
+		//	watcher = null;
+  //      }
 
-		Debug.Log("Application ending after " + Time.time + " seconds");
+		//Debug.Log("Application ending after " + Time.time + " seconds");
 	}
 
 	void OnValidate()
