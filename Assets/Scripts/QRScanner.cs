@@ -326,26 +326,26 @@ public class QRScanner : MonoBehaviour
     {
 		if (_photoCapture)
         {
-			var script = _photoCapture.GetComponent<TakeColorPhoto>();
+			//var script = _photoCapture.GetComponent<TakeColorPhoto>();
 			if (location.headset_configuration.enable_photo_capture)
             {
-				script.BeginContinuousCapture();
+				//script.BeginContinuousCapture();
             }
             else
             {
-				script.EndContinuousCapture();
+				//script.EndContinuousCapture();
             }
         }
 
         if (_researchModeManager) {
-            var script = _researchModeManager.GetComponent<HololensDepthPVCapture>();
+            //var script = _researchModeManager.GetComponent<HololensDepthPVCapture>();
             if (location.headset_configuration.enable_extended_capture)
             {
-                script.RunSensors();
+                //script.RunSensors();
             }
             else
             {
-                script.StopSensorsEvent();
+                //script.StopSensorsEvent();
             }
         }
     }
