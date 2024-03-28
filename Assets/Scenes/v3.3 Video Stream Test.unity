@@ -1371,6 +1371,8 @@ MonoBehaviour:
   backgroundScaleFactor: 20
   minimumPatchQuality: 10
   uploadQueueName: detection
+  speedLimit: 0.9
+  angularSpeedLimit: 90
   multiScaleMask: {fileID: 2100000, guid: 7355b87662b03c0419f6402b2766d12c, type: 2}
 --- !u!64 &49547811
 MeshCollider:

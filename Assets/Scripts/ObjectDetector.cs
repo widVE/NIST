@@ -151,6 +151,10 @@ public class ObjectDetector : MonoBehaviour
 	// Server image queue to use (detection|identification|done).
 	public string uploadQueueName = "detection";
 
+	// Speed limits to prevent capturing images when the camera is moving.
+	public float speedLimit = 0.9f;
+	public float angularSpeedLimit = 90.0f;
+
 	public Material multiScaleMask;
 
 	// Size of input to ML model
@@ -181,6 +185,10 @@ public class ObjectDetector : MonoBehaviour
 	private int current_photo_id = -1;
 	private int counter = 0;
 	private long experiment_start_time = 0;
+
+	private Quaternion lastOrientation;
+	private long lastOrientationTime;
+	private float estimatedAngularSpeed;
 
 	public long GetTimestamp()
     {
@@ -392,6 +400,9 @@ public class ObjectDetector : MonoBehaviour
 		}
 
 		outputTexture = new RenderTexture(cameraWidth, cameraHeight, 0, RenderTextureFormat.ARGBFloat);
+
+		lastOrientation = Camera.main.transform.rotation;
+		lastOrientationTime = GetTimestamp();
 	}
 
 	private IEnumerator CaptureLoop()
@@ -401,16 +412,23 @@ public class ObjectDetector : MonoBehaviour
 
 		while (running)
         {
-			yield return ProcessNextFrame();
-
-			// Slow down how often we process camera frames to match the configured minimum interval.
-			long remaining = minSendInterval - stopwatch.ElapsedMilliseconds;
-			if (remaining > 0)
+			if (shouldProcessFrame())
             {
-				yield return new WaitForSeconds(remaining / 1000.0f);
-            }
+				yield return ProcessNextFrame();
 
-			stopwatch.Restart();
+				// Slow down how often we process camera frames to match the configured minimum interval.
+				long remaining = minSendInterval - stopwatch.ElapsedMilliseconds;
+				if (remaining > 0)
+				{
+					yield return new WaitForSeconds(remaining / 1000.0f);
+				}
+
+				stopwatch.Restart();
+			}
+			else
+            {
+				yield return null;
+            }
         }
     }
 
@@ -757,6 +775,25 @@ public class ObjectDetector : MonoBehaviour
 		yield return sendPatches(patches);
 	}
 
+	private bool shouldProcessFrame()
+	{
+		if (estimatedAngularSpeed > angularSpeedLimit)
+			return false;
+
+		if (Camera.main.velocity.magnitude > speedLimit)
+			return false;
+
+		if (transmitMode == TransmitMode.Continuous)
+			return true;
+
+		// Other than Continuous mode, we want to limit how often we send frames to the server.
+		long interval = GetTimestamp() - lastSendTime;
+		if (interval < minSendInterval)
+			return false;
+
+		return true;
+	}
+
 	private bool shouldSendFrame(DetectionResult dresult)
     {
 		if (transmitMode == TransmitMode.Continuous)
@@ -962,7 +999,22 @@ public class ObjectDetector : MonoBehaviour
 		scaledTexture?.Release();
 	}
 
-	private IEnumerator sendStartUpReport()
+    private void Update()
+    {
+		long currentTime = GetTimestamp();
+		if (currentTime > lastOrientationTime)
+        {
+			// Roughly estimate the angular rotation speed of the camera.
+			// We will avoid processing frames when the camera is moving too much.
+			Quaternion currentOrientation = Camera.main.transform.rotation;
+			float diff = Quaternion.Angle(lastOrientation, currentOrientation);
+			estimatedAngularSpeed = 1000.0f * diff / (currentTime - lastOrientationTime);
+			lastOrientation = currentOrientation;
+			lastOrientationTime = currentTime;
+        }
+    }
+
+    private IEnumerator sendStartUpReport()
 	{
 		var report = new StartUpReport();
 		report.model = modelName;

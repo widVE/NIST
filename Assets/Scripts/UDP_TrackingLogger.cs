@@ -44,8 +44,8 @@ public class UDP_TrackingLogger : MonoBehaviour
 {
     private class GestureStatus
     {
-        private int minimumDetections = 5;
-        private int minimumDetectionTime = 200;
+        private int minimumDetections = 1;
+        private int minimumDetectionTime = 0;
         private int minimumQuietTime = 5000;
 
         public Gesture currentGesture = Gesture.None;
