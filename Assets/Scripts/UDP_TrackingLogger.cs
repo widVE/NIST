@@ -293,9 +293,9 @@ public class UDP_TrackingLogger : MonoBehaviour
             {
                 if (headAttachedDisplay)
                 {
-                    var manager = headAttachedDisplay.GetComponent<HeadAttachedText>();
-                    if (manager)
-                        manager.EnqueueMessage(hand.currentGesture.ToString() + " gesture detected", 2.0f);
+                    //var manager = headAttachedDisplay.GetComponent<HeadAttachedText>();
+                    //if (manager)
+                    //    manager.EnqueueMessage(hand.currentGesture.ToString() + " gesture detected", 2.0f);
                 }
 
                 if (hand.currentGesture == Gesture.Blossom)

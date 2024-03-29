@@ -124,7 +124,9 @@ public class QRScanner : MonoBehaviour
 	bool isCoordinateSystemChanging = false;
 
 	public GameObject headAttachedDisplay;
-	private HeadAttachedText headAttachedText;
+
+    //This used to be of type HeadAttachedText, but the class is missing, so I did this so it would compile
+    private String headAttachedText;
 
 	/// Initialization is just a matter of asking for permission, and then
 	/// hooking up to the `QRCodeWatcher`'s events. `QRCodeWatcher.RequestAccessAsync`
@@ -136,7 +138,7 @@ public class QRScanner : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
 
 		if (headAttachedDisplay)
-			headAttachedText = headAttachedDisplay.GetComponent<HeadAttachedText>();
+			headAttachedText = headAttachedDisplay.GetComponent<String>();
 
 		if (!QRCodeWatcher.IsSupported())
         {
@@ -307,8 +309,8 @@ public class QRScanner : MonoBehaviour
 					{
 						var location = JsonUtility.FromJson<EasyVizAR.Location>(result);
 
-						if (headAttachedText)
-							headAttachedText.EnqueueMessage($"Joined location {location.name}", 3.0f);
+						//if (headAttachedText)
+						//	headAttachedText.EnqueueMessage($"Joined location {location.name}", 3.0f);
 
 						ApplyLocationConfiguration(location);
 					});
