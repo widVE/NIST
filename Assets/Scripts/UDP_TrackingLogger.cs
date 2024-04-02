@@ -24,6 +24,7 @@ using UnityEngine.Networking;
 using System.Net;
 using System.Net.Sockets;
 using TMPro;
+using System.Collections.Concurrent;
 
 #if WINDOWS_UWP
 using Windows.Storage;
@@ -38,68 +39,11 @@ public enum Gesture
     Grab,
     Swipe,
     None,
+    Error,
 }
 
 public class UDP_TrackingLogger : MonoBehaviour
 {
-    private class GestureStatus
-    {
-        private int minimumDetections = 1;
-        private int minimumDetectionTime = 0;
-        private int minimumQuietTime = 5000;
-
-        public Gesture currentGesture = Gesture.None;
-        public int detectionCount = 0;
-        public System.Diagnostics.Stopwatch detectionTimer = new();
-        public System.Diagnostics.Stopwatch quietTimer = new();
-        public bool actionFired = false;
-
-        public void StartTimers()
-        {
-            detectionTimer.Start();
-            quietTimer.Start();
-        }
-
-        public void Update(Gesture gesture)
-        {
-            if (gesture == currentGesture)
-            {
-                detectionCount++;
-            }
-            else
-            {
-                currentGesture = gesture;
-                detectionCount = 0;
-                detectionTimer.Restart();
-                actionFired = false;
-            }
-        }
-
-        public bool TryFiring()
-        {
-            // Null gesture never fires.
-            if (currentGesture == Gesture.None)
-                return false;
-
-            // This gesture already fired, needs to be reset.
-            if (actionFired)
-                return false;
-
-            // Enforce minimum time between firing.
-            if (quietTimer.ElapsedMilliseconds < minimumQuietTime)
-                return false;
-
-            // Require minimum amount of time to perform the gesture.
-            if (detectionCount < minimumDetections || detectionTimer.ElapsedMilliseconds < minimumDetectionTime)
-                return false;
-
-            quietTimer.Restart();
-            actionFired = true;
-
-            return true;
-        }
-    }
-
     #region Constants to modify
     private const string DataSuffix = "UDPTracking";
     private const string CSVHeader = "Label," + "Time," + "Counter,"
@@ -137,26 +81,24 @@ public class UDP_TrackingLogger : MonoBehaviour
 
     // Create necessary UdpClient objects
     public bool isTxStarted = false;
-    //int rxPort = 8000; // port to receive data from Python on
+    int rxPort = 8000; // port to receive data from Python on
     int txPort = 8001; // port to send data to Python on
 
     UdpClient client;
     //IPEndPoint remoteEndPoint;
     Thread receiveThread; // Receiving Thread
 
-    public GameObject headAttachedDisplay;
-    public static string gesture_outcome = "";
-
-    public int minimumDetections = 5;
     public int minimumQuietTime = 5000;
 
+    public GameObject headAttachedDisplay;
+    private HeadAttachedText headAttachedText;
+
+    private string gesture_outcome = "";
+    private ConcurrentQueue<string> receivedMessages = new();
+    private System.Diagnostics.Stopwatch cooldownTimer = new();
     private bool running = false;
 
-    private GestureStatus leftHandStatus = new();
-    private GestureStatus rightHandStatus = new();
-
     private FeatureManager featureManager;
-
 
     // Start is called before the first frame update
     void Start()
@@ -169,6 +111,11 @@ public class UDP_TrackingLogger : MonoBehaviour
 
         // Disable the game object until enabled by configuration loader below.
         gameObject.SetActive(false);
+
+        if (headAttachedDisplay)
+        {
+            headAttachedText = headAttachedDisplay.GetComponent<HeadAttachedText>();
+        }
 
         GameObject featureManager = GameObject.Find("FeatureManager");
         if (featureManager)
@@ -195,6 +142,8 @@ public class UDP_TrackingLogger : MonoBehaviour
         {
             // Create local client
             client = new UdpClient();
+            //client = new UdpClient(rxPort);
+            //client = new UdpClient(hostname, txPort);
             client.Connect(hostname, txPort);
 
             // local endpoint define (where messages are received)
@@ -208,10 +157,6 @@ public class UDP_TrackingLogger : MonoBehaviour
 
             StartCoroutine(SendDataCoroutine());
             await MakeNewSession();
-
-            // Initialize timers
-            leftHandStatus.StartTimers();
-            rightHandStatus.StartTimers();
         }
     }
 
@@ -227,9 +172,15 @@ public class UDP_TrackingLogger : MonoBehaviour
         }
         else if (csv_started == 1)
         {
+            // Process messages in the receive queue.
+            // This needs to happen in the main thread because it interacts with Unity objects.
+            while (receivedMessages.TryDequeue(out string message))
+            {
+                HandleGestureCode(message);
+            }
+
             StartCoroutine("logging_tracking");
             //logger_text.text = string.Format(gesture_outcome);
-            FireGestureEvent();
         }
     }
 
@@ -256,10 +207,9 @@ public class UDP_TrackingLogger : MonoBehaviour
         }
     }
 
-    private void HandleGestureCode(string code)
+    private Gesture InterpretGestureCode(string code)
     {
-        Gesture gesture = Gesture.None;
-
+        Gesture gesture = Gesture.Error;
         switch (code.Substring(0, 3))
         {
             case "L/0":
@@ -276,36 +226,42 @@ public class UDP_TrackingLogger : MonoBehaviour
             case "R/3":
                 gesture = Gesture.Swipe;
                 break;
+            case "L/4":
+            case "R/4":
+                gesture = Gesture.None;
+                break;
         }
 
-        if (code.StartsWith("L"))
-            leftHandStatus.Update(gesture);
-        else
-            rightHandStatus.Update(gesture);
+        return gesture;
     }
 
-    private void FireGestureEvent()
+    private void HandleGestureCode(string code)
     {
-        var hands = new GestureStatus[] { leftHandStatus, rightHandStatus };
-        foreach (var hand in hands)
+        var gesture = InterpretGestureCode(code);
+        var hand = code.StartsWith("L") ? Handedness.Left : Handedness.Right;
+
+        if (hand == Handedness.Right && gesture == Gesture.Blossom)
         {
-            if (hand.TryFiring())
+            if (cooldownTimer.ElapsedMilliseconds >= minimumQuietTime)
             {
-                if (headAttachedDisplay)
+                if (headAttachedText)
                 {
-                    var manager = headAttachedDisplay.GetComponent<HeadAttachedText>();
-                    if (manager)
-                        manager.EnqueueMessage(hand.currentGesture.ToString() + " gesture detected", 2.0f);
+                    headAttachedText.EnqueueMessage(gesture.ToString() + " gesture detected", 2.0f);
                 }
 
-                if (hand.currentGesture == Gesture.Blossom)
+                if (HandJointUtils.TryGetJointPose(TrackedHandJoint.Palm, hand, out MixedRealityPose pose))
                 {
-                    if (HandJointUtils.TryGetJointPose(TrackedHandJoint.Palm, Handedness.Any, out MixedRealityPose pose))
-                    {
-                        featureManager.spawnObjectAtIndex("person", pose.Position);
-                    }
+                    featureManager.spawnObjectAtIndex("person", pose.Position);
                 }
+
+                cooldownTimer.Restart();
             }
+        }
+        else if (!cooldownTimer.IsRunning)
+        {
+            // Important! Make sure the cooldownTimer has started.
+            // We had it in OnEnable, but that was not reliably working on the HoloLens.
+            cooldownTimer.Start();
         }
     }
 
@@ -317,15 +273,14 @@ public class UDP_TrackingLogger : MonoBehaviour
             {
                 IPEndPoint remoteEndpoint = new IPEndPoint(IPAddress.Any, 0);
                 byte[] data = client.Receive(ref remoteEndpoint);                // receive from any server
-                string text = Encoding.UTF8.GetString(data);
+                string text = Encoding.UTF8.GetString(data).Trim();
 
                 //if (text.Length > 0)
                 //    UnityEngine.Debug.Log($"Received: {text} ({text.Length})");
-                
-                //print("Received: " + text);
-                gesture_outcome = text;
 
-                HandleGestureCode(text);
+                //print("Received: " + text);
+                receivedMessages.Enqueue(text);
+                gesture_outcome = text;
             }
             catch (Exception err)
             {

@@ -17924,8 +17924,6 @@ MonoBehaviour:
   hostname: athena.wings.cs.wisc.edu
   isTxStarted: 0
   headAttachedDisplay: {fileID: 1265293830}
-  minimumDetections: 5
-  minimumQuietTime: 5000
 --- !u!224 &778525365
 RectTransform:
   m_ObjectHideFlags: 0
