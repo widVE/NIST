@@ -1354,7 +1354,7 @@ MonoBehaviour:
   minSendInterval: 1000
   maxSendInterval: 5000
   detectionModel: {fileID: 5022602860645237092, guid: 7e5b42482e78d1847a368b56ef305c70, type: 3}
-  coarseSegmentationModel: {fileID: 5022602860645237092, guid: ec74198638cbbcd42946f0fadb63cb91, type: 3}
+  coarseSegmentationModel: {fileID: 5022602860645237092, guid: ee35cd1078d116e4182b49b248095a94, type: 3}
   headAttachedDisplay: {fileID: 1265293830}
   requestCameraWidth: 640
   requestCameraHeight: 480
@@ -17923,6 +17923,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hostname: athena.wings.cs.wisc.edu
   isTxStarted: 0
+  minimumQuietTime: 5000
   headAttachedDisplay: {fileID: 1265293830}
 --- !u!224 &778525365
 RectTransform:
@@ -25634,7 +25635,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1265293830}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -25643,7 +25644,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0.1}
+  m_AnchoredPosition: {x: 0, y: 0.05}
   m_SizeDelta: {x: 0.5, y: 0.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1265293832
@@ -25693,8 +25694,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
-  m_fontSizeBase: 0.2
+  m_fontSize: 0.1
+  m_fontSizeBase: 0.1
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
