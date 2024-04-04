@@ -155,6 +155,12 @@ public class ObjectDetector : MonoBehaviour
 	public float speedLimit = 0.9f;
 	public float angularSpeedLimit = 90.0f;
 
+	// Whether to swap foreground and background, e.g. detect and blur faces instead of the background.
+	public bool swapForeground = false;
+
+	// Whether to wait for result to be done on the server.
+	public bool shouldWaitForResult = false;
+
 	public Material multiScaleMask;
 
 	// Size of input to ML model
@@ -225,6 +231,15 @@ public class ObjectDetector : MonoBehaviour
 						detectionMode = DetectionMode.CoarseSegment;
 						transmitMode = TransmitMode.Person;
 						uploadQueueName = "identification";
+						swapForeground = false;
+						shouldWaitForResult = true;
+						break;
+					case "anonymize":
+						detectionMode = DetectionMode.CoarseSegment;
+						transmitMode = TransmitMode.Continuous;
+						uploadQueueName = "detection";
+						swapForeground = true;
+						shouldWaitForResult = false;
 						break;
 					case "continuous":
 						detectionMode = DetectionMode.Off;
@@ -577,7 +592,7 @@ public class ObjectDetector : MonoBehaviour
 					{
 						yield return sendReport(report);
 					}
-					else if (headAttachedDisplay is not null)
+					else if (shouldWaitForResult && headAttachedDisplay is not null)
                     {
 						yield return waitAndDisplayResult();
                     }
@@ -673,7 +688,7 @@ public class ObjectDetector : MonoBehaviour
 				int y = i * patchHeight;
 				int x = j * patchWidth;
 
-				if (output[0, 0, i, j] < foregroundThreshold)
+				if ((output[0, 0, i, j] < foregroundThreshold) ^ swapForeground)
 				{
 					summedQuality += 100.0f / backgroundScaleFactor;
 
