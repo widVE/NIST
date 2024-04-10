@@ -157,7 +157,7 @@ namespace winrt::HL2UnityPlugin::implementation
         UINT16* m_longDepthMap = nullptr;
         UINT8* m_longDepthMapTexture = nullptr;
         UINT16* m_longAbImage = nullptr;
-        UINT16* m_localPointCloud = nullptr;
+        UINT8* m_localPointCloud = nullptr;
 
 		UINT8* m_LFImage = nullptr;
 		UINT8* m_RFImage = nullptr;
