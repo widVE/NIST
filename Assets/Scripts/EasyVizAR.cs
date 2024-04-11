@@ -696,23 +696,74 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			if(www.downloadHandler.isDone)
 			{
 				//Debug.Log(((Texture2D)tex).format);
-				Texture2D newTex = new Texture2D(320, 288, format, false);
+				Texture2D newTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
 				Debug.Log(newTex.format);
 				Debug.Log(www.downloadHandler.data.Length);
-				if(format == TextureFormat.RGBA32)
+				if(contentType == "image/png")
 				{
 					newTex.LoadImage(www.downloadHandler.data);
 				}
 				else
 				{
-					int texSize = 320 * 288 * 8;
+					int texSize = 320 * 288 * 4;
 					byte[] texData = new byte[texSize];
 					const int HEADER_SIZE = 54;
+					int byteCount = 0;
+					ushort magicNumber = 0;
+					uint fileSize = 0;
+					uint bpp = 0;
+					uint reserved1 = 0;
+					uint reserved2 = 0;
+					uint offset = 0;
+					uint dibSize = 0;
+					uint compressionType = 0;
+					uint imageSize = 0;
+					uint imageWidth = 0;
+					uint imageHeight = 0;
+
+					byte[] headerData = new byte[HEADER_SIZE];
 					byte[] downloadData = www.downloadHandler.data;
+
+					for(int i = 0; i < HEADER_SIZE; ++i)
+					{
+						headerData[i] = downloadData[i];
+					}
+
 					for(int i = 0; i < texSize; ++i)
 					{
 						texData[i] = downloadData[HEADER_SIZE+i];
+						//Debug.Log(texData[i]);
 					}
+
+					fileSize = (uint)headerData[2] | (uint)(headerData[3] << 8) | (uint)(headerData[4] << 16) | (uint)(headerData[5] << 24);
+					reserved1 = (uint)headerData[6] | (uint)(headerData[7] << 8);
+					reserved2 = (uint)headerData[8] | (uint)(headerData[9] << 8);
+					offset = (uint)headerData[10] | (uint)(headerData[11] << 8) | (uint)(headerData[12] << 16) | (uint)(headerData[13] << 24);
+					dibSize = (uint)headerData[14] | (uint)(headerData[15] << 8) | (uint)(headerData[16] << 16) | (uint)(headerData[17] << 24);
+					imageWidth = (uint)headerData[18] | (uint)(headerData[19] << 8) | (uint)(headerData[20] << 16) | (uint)(headerData[21] << 24);
+					imageHeight = (uint)headerData[22] | (uint)(headerData[23] << 8) | (uint)(headerData[24] << 16) | (uint)(headerData[25] << 24);
+
+					bpp = (uint)headerData[28] | (uint)(headerData[29] << 8);
+					compressionType = (uint)headerData[30] | (uint)(headerData[31] << 8) | (uint)(headerData[32] << 16) | (uint)(headerData[33] << 24);
+					imageSize = (uint)headerData[34] | (uint)(headerData[35] << 8) | (uint)(headerData[36] << 16) | (uint)(headerData[37] << 24);
+
+					Debug.Log("FILE SIZE: " + fileSize);
+					Debug.Log("Image Width: " + imageWidth);
+					Debug.Log("Image Height: " + imageHeight);
+					
+					Debug.Log("BPP: " + bpp);
+					Debug.Log("Compression: " + compressionType);
+					Debug.Log("Image Size: " + imageSize);
+					Debug.Log("Offset: " + offset);
+					Debug.Log("DIB Size: " + dibSize);
+
+					/*uint rTest = (uint)texData[0] | (uint)(texData[1] << 8);
+					uint gTest = (uint)texData[2] | (uint)(texData[3] << 8);
+					uint bTest = (uint)texData[4] | (uint)(texData[5] << 8);
+					uint aTest = (uint)texData[6] | (uint)(texData[7] << 8);
+					Debug.Log(texData[6]);
+					Debug.Log(texData[7]);
+					Debug.Log("Color Test: " + rTest + " " + gTest + " " + bTest + " " + aTest);*/
 
 					newTex.LoadRawTextureData(texData);
 				}

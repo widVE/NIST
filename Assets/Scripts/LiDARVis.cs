@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System;
+
 
 public class LiDARVis : MonoBehaviour
 {
@@ -39,7 +41,7 @@ public class LiDARVis : MonoBehaviour
     void Start()
     {
 		_colorTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
- 		_geomTex = new Texture2D(320, 288, TextureFormat.RGBA64, false);
+ 		_geomTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
  
         //DebugHailScan();
 		//DebugSimpleCapture();
@@ -91,7 +93,7 @@ public class LiDARVis : MonoBehaviour
 		if(_geomTex == null)
 		{
 			Debug.Log("Making geom");
-			_geomTex = new Texture2D(320, 288, TextureFormat.RGBA64, false);
+			_geomTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
 		}
 
 		Graphics.CopyTexture(textureData, _geomTex);
@@ -158,14 +160,14 @@ public class LiDARVis : MonoBehaviour
 							_currentRotation.z = photo_list.photos[i].camera_orientation.z;
 							_currentRotation.w = photo_list.photos[i].camera_orientation.w;
 
-							/*Debug.Log("Index: " + i);
+							Debug.Log("Index: " + i);
 							Debug.Log(photo_list.photos[i].camera_orientation.x);
 							Debug.Log(photo_list.photos[i].camera_orientation.y);
 							Debug.Log(photo_list.photos[i].camera_orientation.z);
 							Debug.Log(photo_list.photos[i].camera_orientation.w);
-							Debug.Log();
 							Debug.Log(photo_list.photos[i].camera_position.y);
-							Debug.Log(photo_list.photos[i].camera_position.z);*/
+							Debug.Log(photo_list.photos[i].camera_position.y);
+							Debug.Log(photo_list.photos[i].camera_position.z);
 							
 							if(!once && _currentPosition.magnitude > 0)
 							{
@@ -174,7 +176,7 @@ public class LiDARVis : MonoBehaviour
 								_newColor = false;
 
 								EasyVizARServer.Instance.Texture("https://easyvizar.wings.cs.wisc.edu/photos/"+photo_list.photos[i].id+"/photo.png", "image/png", "320", ColorTextureCallback);
-								EasyVizARServer.Instance.Texture("https://easyvizar.wings.cs.wisc.edu/photos/"+photo_list.photos[i].id+"/geometry.bmp", "image/bmp", "320", GeomTextureCallback, TextureFormat.RGBA64);
+								EasyVizARServer.Instance.Texture("https://easyvizar.wings.cs.wisc.edu/photos/"+photo_list.photos[i].id+"/geometry.bmp", "image/bmp", "320", GeomTextureCallback);
 								once = true;
 								_nextReady = false;
 
@@ -209,7 +211,7 @@ public class LiDARVis : MonoBehaviour
 			Unity.Collections.NativeArray<byte> geomBytes = _geomTex.GetRawTextureData<byte>();
 			Unity.Collections.NativeArray<byte> colorBytes = _colorTex.GetRawTextureData<byte>();
 
-			int numVerts = geomBytes.Length / 8;
+			int numVerts = geomBytes.Length / 4;
 			int[] indices = new int[numVerts];
 		
 			Vector3 [] verts = new Vector3[numVerts];
@@ -219,41 +221,42 @@ public class LiDARVis : MonoBehaviour
 			//const int HEADER_SIZE = 54;
 
 			int colorByteCount = 0;
-			for(int j = 0; j < geomBytes.Length; j+=8)
+			for(int j = 0; j < geomBytes.Length; j+=4)
 			{
-				byte r1 = geomBytes[j];
-				byte r2 = geomBytes[j+1];
-				byte g1 = geomBytes[j+2];
-				byte g2 = geomBytes[j+3];
-				byte b1 = geomBytes[j+4];
-				byte b2 = geomBytes[j+5];
-				byte a1 = geomBytes[j+6];
-				byte a2 = geomBytes[j+7];
+				byte b1 = geomBytes[j];
+				byte g1 = geomBytes[j+1];
+				byte r1 = geomBytes[j+2];
+				byte a1 = geomBytes[j+3];
+				ushort a = (ushort)a1;
+				ushort x = (ushort)(((a & 0x03) << 8) | ((ushort)r1));
+				ushort y = (ushort)(((a & 0x0C) << 6) | ((ushort)g1));
+				ushort z = (ushort)(((a & 0xF0) << 4) | ((ushort)b1));
+				//ushort alpha = (ushort)((ushort)a1 | (ushort)((ushort)a2 << 8));
+				//int x = (int)(r1 | (r2 << 8));
+				//int y = (int)(g1 | (g2 << 8));
+				//int z = (int)(b1 | (b2 << 8));
 
-				int x = (int)(r1 | (r2 << 8));
-				int y = (int)(g1 | (g2 << 8));
-				int z = (int)(b1 | (b2 << 8));
-				ushort alpha = (ushort)(a1 | (a2 << 8));
-
-				x = x - 32768;
-				y = y - 32768;
-				z = z - 32768;
+				int x2 = (int)x;
+				x2 = x2 - 512;
+				int y2 = (int)y;
+				y2 = -y2;
+				int z2 = (int)z;
 				//alpha = alpha - 32768;
-				
-				//if(x != 0 && y != 0 && z != 0 && alpha != 0)
-				//{
-				//	//Debug.Log(x + " " + y + " " + z + " " + alpha);
-				//}
 
-				float fX = (float)x / 1000.0f;
-				float fY = (float)y / 1000.0f;
-				float fZ = (float)z / 1000.0f;
-				float fA = (float)alpha / 1000.0f;
 
-				//Debug.Log(fX + " " + fY + " " + fZ);
+				float fX = (float)x2 / 1000.0f;
+				float fY = (float)y2 / 1000.0f;
+				float fZ = (float)z2 / 1000.0f;
 
-				verts[j/8] = new Vector3(fX, fY, fZ);
-				colors[j/8] = new Color((float)colorBytes[colorByteCount+1]/255.0f, (float)colorBytes[colorByteCount+2]/255.0f, (float)colorBytes[colorByteCount+3]/255.0f, 1.0f);
+				if(x2 != 0 && y2 != 0 && z2 != 0)
+				{
+					//Debug.Log(r1 + " " + r2 + " " + g1 + " " + g2 + " " + b1 + " " + b2  + " " + a1 + " " + a2);
+					//Debug.Log(x + " " + y + " " + z + " " + alpha);
+					//Debug.Log(fX + " " + fY + " " + fZ);
+				}
+
+				verts[j/4] = new Vector3(fX, fY, fZ);
+				colors[j/4] = new Color((float)colorBytes[colorByteCount+1]/255.0f, (float)colorBytes[colorByteCount+2]/255.0f, (float)colorBytes[colorByteCount+3]/255.0f, 1.0f);
 				/*if(red != 0 || green != 0 || blue != 0)
 				{
 					Debug.Log(red);
@@ -261,7 +264,7 @@ public class LiDARVis : MonoBehaviour
 					Debug.Log(blue);
 					Debug.Log(alpha);
 				}*/
-				indices[j/8] = j/8;
+				indices[j/4] = j/4;
 				colorByteCount+=4;
 			}
 
@@ -313,11 +316,11 @@ public class LiDARVis : MonoBehaviour
 			ipc.PointMaterial.SetMatrix("_ViewProj", viewProjMat);
 			ipc.PointMaterial.SetMatrix("_ModelTransform", scanTrans);
 			ipc.PointMaterial.SetMatrix("_CameraIntrinsics", camIntrinsics);
-			//ipc.PointMaterial.SetTexture("_ColorImage", _colorTex);
+			ipc.PointMaterial.SetTexture("_ColorImage", _colorTex);
 			ipc.PointMaterial.SetFloat("_ResolutionX", depthWidth);
 			ipc.PointMaterial.SetFloat("_ResolutionY", depthHeight);
 			//Debug.Log(depthTex.format);
-			//ipc.PointMaterial.SetTexture("_DepthImage", depthTex);
+			ipc.PointMaterial.SetTexture("_DepthImage", _geomTex);
 			
 			//_nextReady = true;
 			_newGeom = false;
@@ -337,7 +340,7 @@ public class LiDARVis : MonoBehaviour
 		{
 			Debug.Log(photo_list.photos[i].camera_location_id);
 		}*/
-		EasyVizARServer.Instance.Get("https://easyvizar.wings.cs.wisc.edu/photos?since=2024-03-18&camera_location_id=1cc48e8d-890d-413a-aa66-cabaaa6e5458", EasyVizARServer.JSON_TYPE, GetImageCallback);
+		EasyVizARServer.Instance.Get("https://easyvizar.wings.cs.wisc.edu/photos?since=2024-04-11&camera_location_id=69e92dff-7138-4091-89c4-ed073035bfe6", EasyVizARServer.JSON_TYPE, GetImageCallback);
 	}
 
 	///photos/{photo_id}/{filename}
@@ -405,6 +408,11 @@ public class LiDARVis : MonoBehaviour
 			scanTrans[14] = float.Parse(mat4ValsD[2]);
 			scanTrans[15] = float.Parse(mat4ValsD[3]);
 			
+			Vector3 pos = scanTrans.GetPosition();
+			Vector3 vScale = scanTrans.lossyScale;
+			Debug.Log(vScale.ToString());
+			Quaternion rot = scanTrans.rotation;
+
 			//load depth texture...
 			Texture2D depthTex = Resources.Load<Texture2D>(sPNGD);
 			Texture2D colorTex = Resources.Load<Texture2D>(sPNG);
@@ -417,6 +425,8 @@ public class LiDARVis : MonoBehaviour
 			int[] indices = new int[numVerts];
 		
 			Vector3 [] verts = new Vector3[numVerts];
+			Vector3 [] normals = new Vector3[numVerts];
+
 			Color[] colors = new Color[numVerts];
 			//Debug.Log(geomBytes.Length);
 			int colorByteCount = 0;
@@ -444,8 +454,14 @@ public class LiDARVis : MonoBehaviour
 				float fY = (float)y / 1000.0f;
 				float fZ = (float)z / 1000.0f;
 
+				//if(i == 0)
+				//{
+					//Debug.Log(fX + " " + fY + " " + fZ);
+				//}
+
 				verts[j/8] = new Vector3(fX, fY, fZ);
 				colors[j/8] = new Color((float)colorBytes[colorByteCount]/255.0f, (float)colorBytes[colorByteCount+1]/255.0f, (float)colorBytes[colorByteCount+2]/255.0f, 1.0f);
+				normals[j/8] = new Vector3(0f, 1f, 0f);
 				/*if(red != 0 || green != 0 || blue != 0)
 				{
 					Debug.Log(red);
@@ -493,6 +509,7 @@ public class LiDARVis : MonoBehaviour
 #if MESH_BASED
 			ipc.GetComponent<MeshFilter>().sharedMesh.vertices = verts;
 			ipc.GetComponent<MeshFilter>().sharedMesh.colors = colors;
+			ipc.GetComponent<MeshFilter>().sharedMesh.normals = normals;
 			ipc.GetComponent<MeshFilter>().sharedMesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
 			ipc.GetComponent<MeshFilter>().sharedMesh.SetIndices(indices, MeshTopology.Points, 0, false);
 			ipc.GetComponent<MeshFilter>().sharedMesh.UploadMeshData(true);
