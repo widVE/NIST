@@ -782,7 +782,7 @@ namespace winrt::HL2UnityPlugin::implementation
                     UINT8 u8X = (u16X & 0x00FF);
                     UINT8 u8Y = (u16Y & 0x00FF);
                     UINT8 u8Z = (u16Z & 0x00FF);
-                    UINT8 u8A = (((u16X & 0xFF00) >> 8) & 0x03) | (((u16Y & 0xFF00) >> 6) & 0x0C) | (((u16Z & 0xFF00) >> 8) & 0xF0);
+                    UINT8 u8A = (((u16X & 0xFF00) >> 8) & 0x03) | (((u16Y & 0xFF00) >> 6) & 0x0C) | (((u16Z & 0xFF00) >> 4) & 0xF0);
 
                     if (pHL2ResearchMode->IsCapturingBinaryDepth())
                     {

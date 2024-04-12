@@ -124,7 +124,7 @@ public class HololensDepthPVCapture : MonoBehaviour
     {
 		DirectoryInfo dir = new DirectoryInfo(Application.persistentDataPath);
 		var files = Directory.GetFiles(Application.persistentDataPath, "*")
-			.Where(path => path.EndsWith(".txt") || path.EndsWith(".png"));
+			.Where(path => path.EndsWith(".txt") || path.EndsWith(".png") || path.EndsWith(".bmp"));
 		foreach (var f in files)
         {
 			File.Delete(f);
