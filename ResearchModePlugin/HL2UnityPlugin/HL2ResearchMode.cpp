@@ -767,13 +767,14 @@ namespace winrt::HL2UnityPlugin::implementation
                     pHL2ResearchMode->m_localDepth[idx*4 + 2] = tempPoint.z;
                     pHL2ResearchMode->m_localDepth[idx*4 + 3] = 0.0f;
 
-                    float fX = (tempPoint.x * 1000.0f) + 512.0f;    //maps 0->1024
+                    float fX = (tempPoint.x * 1000.0f) + 1024.0f;    //maps -1024->1024 to 0-2096
                     float fY = -(tempPoint.y * 1000.0f);    //0->1024
-                    float fZ = tempPoint.z * 1000.0f;   //0->4096
+                    float fZ = tempPoint.z * 1000.0f;   //0->2096
 
-                    //z - 12 bits plus only...
-                    //x - 10 bits plus/minus
+                    
+                    //x - 11 bits plus/minus
                     //y - 10 bits minus only?
+                    //z - 11 bits plus only...
                     //alpha channel - 4 bits z, 2 bits y, 2 bits x...
                     UINT16 u16X = (UINT16)fX;
                     UINT16 u16Y = (UINT16)fY;
@@ -782,7 +783,7 @@ namespace winrt::HL2UnityPlugin::implementation
                     UINT8 u8X = (u16X & 0x00FF);
                     UINT8 u8Y = (u16Y & 0x00FF);
                     UINT8 u8Z = (u16Z & 0x00FF);
-                    UINT8 u8A = (((u16X & 0xFF00) >> 8) & 0x03) | (((u16Y & 0xFF00) >> 6) & 0x0C) | (((u16Z & 0xFF00) >> 4) & 0xF0);
+                    UINT8 u8A = ((UINT8)((u16X & 0xFF00) >> 8) & 0x07) | ((UINT8)((u16Y & 0xFF00) >> 5) & 0x18) | ((UINT8)((u16Z & 0xFF00) >> 3) & 0xE0);
 
                     if (pHL2ResearchMode->IsCapturingBinaryDepth())
                     {
