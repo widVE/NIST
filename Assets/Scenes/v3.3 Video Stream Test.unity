@@ -1373,6 +1373,8 @@ MonoBehaviour:
   uploadQueueName: detection
   speedLimit: 0.9
   angularSpeedLimit: 90
+  swapForeground: 0
+  shouldWaitForResult: 0
   multiScaleMask: {fileID: 2100000, guid: 7355b87662b03c0419f6402b2766d12c, type: 2}
 --- !u!64 &49547811
 MeshCollider:
@@ -21957,7 +21959,7 @@ PrefabInstance:
       objectReference: {fileID: 1810665668}
     - target: {fileID: 7043154617577782632, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
       propertyPath: m_Name
-      value: Button Map
+      value: Button Map Head Locked
       objectReference: {fileID: 0}
     - target: {fileID: 7043154617577782646, guid: a9cc8946da38e3842938e1eba2c763c0, type: 3}
       propertyPath: m_RootOrder
