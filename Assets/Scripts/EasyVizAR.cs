@@ -281,8 +281,8 @@ namespace EasyVizAR
 	{
 		public PhotoFileAnnotation[] annotations;
 		public string camera_location_id;
-		public Orientation camera_orientation;
 		public Position camera_position;
+		public Orientation camera_orientation;
 		
 		public string created;
 		public string created_by;
@@ -666,7 +666,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
     IEnumerator GetTexture(string url, string contentType, string width, System.Action<Texture2D> callBack, TextureFormat format = TextureFormat.RGBA32)
 	{
 		//UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
-		Debug.Log(url);
+		//Debug.Log(url);
 		UnityWebRequest www = new UnityWebRequest(url);
 		www.downloadHandler = new DownloadHandlerBuffer();
 
@@ -697,8 +697,8 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 			{
 				//Debug.Log(((Texture2D)tex).format);
 				Texture2D newTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
-				Debug.Log(newTex.format);
-				Debug.Log(www.downloadHandler.data.Length);
+				//Debug.Log(newTex.format);
+				//Debug.Log(www.downloadHandler.data.Length);
 				if(contentType == "image/png")
 				{
 					newTex.LoadImage(www.downloadHandler.data);
@@ -735,7 +735,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 						//Debug.Log(texData[i]);
 					}
 
-					fileSize = (uint)headerData[2] | (uint)(headerData[3] << 8) | (uint)(headerData[4] << 16) | (uint)(headerData[5] << 24);
+					/*fileSize = (uint)headerData[2] | (uint)(headerData[3] << 8) | (uint)(headerData[4] << 16) | (uint)(headerData[5] << 24);
 					reserved1 = (uint)headerData[6] | (uint)(headerData[7] << 8);
 					reserved2 = (uint)headerData[8] | (uint)(headerData[9] << 8);
 					offset = (uint)headerData[10] | (uint)(headerData[11] << 8) | (uint)(headerData[12] << 16) | (uint)(headerData[13] << 24);
@@ -755,7 +755,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 					Debug.Log("Compression: " + compressionType);
 					Debug.Log("Image Size: " + imageSize);
 					Debug.Log("Offset: " + offset);
-					Debug.Log("DIB Size: " + dibSize);
+					Debug.Log("DIB Size: " + dibSize);*/
 
 					/*uint rTest = (uint)texData[0] | (uint)(texData[1] << 8);
 					uint gTest = (uint)texData[2] | (uint)(texData[3] << 8);
