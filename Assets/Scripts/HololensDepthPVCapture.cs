@@ -273,7 +273,114 @@ public class HololensDepthPVCapture : MonoBehaviour
 		Debug.Log("Texture uploaded to: " + imageURL);
 	}
 	
-    void LateUpdate()
+	IEnumerator LookForData(string prefix, string sPC)
+	{
+		string sColor = prefix+"_color.png";
+		string transFile = prefix+"_trans.txt";
+		string sDepth = prefix+"_depth.png";
+		string sI = prefix+"_intensity.png";
+		
+		
+		while(!File.Exists(sColor) && !File.Exists(transFile) && !File.Exists(sI) && !File.Exists(sDepth)) {
+			yield return new WaitForSeconds(0.1f);
+		}
+		
+		if(File.Exists(sColor) && File.Exists(transFile) && File.Exists(sI) && File.Exists(sDepth)) {
+			string[] transLines = File.ReadAllLines(transFile);
+			Vector3 pos = Vector3.zero;
+			Quaternion rot = Quaternion.identity;
+			Matrix4x4 depthTrans = Matrix4x4.identity;
+			
+			for(int i = 0; i < 4; ++i)
+			{
+				string[] vals = transLines[i].Split(" ");
+				for(int j = 0; j < 4; ++j)
+				{
+					depthTrans[i*4+j] = float.Parse(vals[j]);
+				}
+			}
+			
+			pos = depthTrans.GetPosition();
+			rot = depthTrans.rotation;
+
+			var headset = _manager.LocalHeadset;
+			string headsetID = "";
+			if (headset != null)
+			{
+				var hsObject = headset.GetComponent<EasyVizARHeadset>();
+				if (hsObject != null)
+				{
+					headsetID = hsObject._headsetID;
+				} 
+				else 
+				{
+					headsetID = _manager._local_headset_ID;
+				}
+			}
+			
+			//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "prefix.txt"), prefix);
+			
+			//if waiting on previous upload call... wait here as well...
+			
+			while(EasyVizARServer.Instance.IsUploadingImage()) {
+				yield return new WaitForSeconds(0.1f);
+			}
+			
+			
+			//EasyVizARServer.Instance.PutImagePair("image/png", sPC, sColor, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, headsetID, "geometry", "photo");
+			EasyVizARServer.Instance.PutImageQuad("image/png", sPC, sColor, sDepth, sI, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, headsetID, "geometry", "photo", "depth", "thermal");
+		}
+		
+	}
+	
+	void LateUpdate()
+	{
+
+#if ENABLE_WINMD_SUPPORT
+#if UNITY_EDITOR
+#else	
+		if(_uploadToServer)
+		{
+			if(_captureBinaryDepth && _captureRectifiedColorImages)
+			{
+				bool isNewPC = false;
+				
+				string sPC = researchMode.GetBinaryDepthName();
+				string prefix = "";
+				
+				bool isNewBinaryDepth = false;
+
+				if(sPC.Length > 0)
+				{
+					int lastIndex = sPC.LastIndexOf("_");
+					prefix = sPC.Substring(0, lastIndex);
+					
+					if(_lastDepthBinaryName.Length == 0)
+					{
+						_lastDepthBinaryName = sPC;
+						isNewBinaryDepth = true;
+					}
+					else
+					{
+						if(sPC != _lastDepthBinaryName)
+						{
+							isNewBinaryDepth = true;		
+						}
+					}
+				}
+				
+				if(isNewBinaryDepth) 
+				{
+					StartCoroutine(LookForData(prefix, sPC));
+					_lastDepthBinaryName = sPC;
+				}
+			}
+		}	
+#endif
+#endif
+	}
+	
+    void LateUpdate2()
     {
 
 #if ENABLE_WINMD_SUPPORT
@@ -347,6 +454,9 @@ public class HololensDepthPVCapture : MonoBehaviour
 				string sPC = researchMode.GetBinaryDepthName();
 				if(sPC.Length > 0)
 				{
+					//int lastIndex = sPC.LastIndexOf("_");
+					//string prefix = sPC.SubString(lastIndex);
+					
 					if(_lastDepthBinaryName.Length == 0)
 					{
 						_lastDepthBinaryName = sPC;
@@ -825,7 +935,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 										pos = depthTrans.GetPosition();
 										rot = depthTrans.rotation;
 										
-										if(EasyVizARServer.Instance.PutImage("image/png", sColor, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, _lastPosition, _lastOrientation, hsObject._headsetID))
+										if(EasyVizARServer.Instance.PutImage("image/png", sColor, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID))
 										{
 											_lastRectColorName = sColor;
 										}
@@ -887,7 +997,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 										pos = depthTrans.GetPosition();
 										rot = depthTrans.rotation;
 										
-										if(EasyVizARServer.Instance.PutImage("image/png", sIntensity, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, _lastPosition, _lastOrientation, hsObject._headsetID, "thermal"))
+										if(EasyVizARServer.Instance.PutImage("image/png", sIntensity, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, hsObject._headsetID, "thermal"))
 										{
 											_lastIntensityImageName = sIntensity;
 										}

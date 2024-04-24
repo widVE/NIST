@@ -324,6 +324,9 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 
     bool _isUploadingImage = false;
 	
+	
+	public bool IsUploadingImage() { return _isUploadingImage; }
+	
 	void Start()
     {
 		//BS Commented this out on 11-27 IDK why this is here before we know the location ID
@@ -867,10 +870,10 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		//instead let's add "photo.png" or "depth.png" to the end of the image URL...
 		string iUrl = h2.imageUrl;
 		iUrl = iUrl.Replace("image", imageType);
-		iUrl = iUrl + ".png";
+		iUrl = iUrl + ".bmp";
 
 		UnityWebRequest www2 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
-		www2.SetRequestHeader("Content-Type", "image/png");
+		www2.SetRequestHeader("Content-Type", "image/bmp");
 
 		if (_hasRegistration)
 		{
@@ -1011,7 +1014,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		//instead let's add "photo.png" or "depth.png" to the end of the image URL...
 		string iUrl = h2.imageUrl;
 		iUrl = iUrl.Replace("image", imageType);
-		iUrl = iUrl + ".png";
+		iUrl = iUrl + ".bmp";
 
 		UnityWebRequest www2 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www2.SetRequestHeader("Content-Type", "image/png");

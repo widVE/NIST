@@ -562,6 +562,11 @@ namespace winrt::HL2UnityPlugin::implementation
                 continue;
             }
 
+            if (pHL2ResearchMode->m_latestFrame == nullptr)
+            {
+                continue;
+            }
+
             if (pHL2ResearchMode->m_refFrame == nullptr)
             {
                 pHL2ResearchMode->m_refFrame = pHL2ResearchMode->m_locator.GetDefault().CreateStationaryFrameOfReferenceAtCurrentLocation().CoordinateSystem();
@@ -676,21 +681,6 @@ namespace winrt::HL2UnityPlugin::implementation
                     pHL2ResearchMode->m_currRotation[p * 4 + q] = rotMat.r[p].n128_f32[q];
                     pHL2ResearchMode->m_currPosition[p * 4 + q] = posMat.r[p].n128_f32[q];
                 }
-            }
-
-            if (pHL2ResearchMode->IsCapturingTransforms())
-            {
-                std::ofstream file;
-                std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_trans.txt";
-                file.open(pcName);
-                file << pHL2ResearchMode->m_depthToWorld[0] << " " << pHL2ResearchMode->m_depthToWorld[1] << " " << pHL2ResearchMode->m_depthToWorld[2] << " " << pHL2ResearchMode->m_depthToWorld[3] << std::endl;
-                file << pHL2ResearchMode->m_depthToWorld[4] << " " << pHL2ResearchMode->m_depthToWorld[5] << " " << pHL2ResearchMode->m_depthToWorld[6] << " " << pHL2ResearchMode->m_depthToWorld[7] << std::endl;
-                file << pHL2ResearchMode->m_depthToWorld[8] << " " << pHL2ResearchMode->m_depthToWorld[9] << " " << pHL2ResearchMode->m_depthToWorld[10] << " " << pHL2ResearchMode->m_depthToWorld[11] << std::endl;
-                file << pHL2ResearchMode->m_depthToWorld[12] << " " << pHL2ResearchMode->m_depthToWorld[13] << " " << pHL2ResearchMode->m_depthToWorld[14] << " " << pHL2ResearchMode->m_depthToWorld[15] << std::endl;
-
-                file.close();
-
-                pHL2ResearchMode->_lastTransformName = hstring(pcName);
             }
 
             /*FILE* fLocalDepth = 0;
@@ -873,11 +863,11 @@ namespace winrt::HL2UnityPlugin::implementation
             
             winrt::Windows::Foundation::Numerics::float4x4 worldToPV = winrt::Windows::Foundation::Numerics::float4x4::identity();
 
-            if (pHL2ResearchMode->m_latestFrame != nullptr)
-            {
+            //if (pHL2ResearchMode->m_latestFrame != nullptr)
+            //{
                 winrt::Windows::Media::Capture::Frames::MediaFrameReference frame = pHL2ResearchMode->m_latestFrame;
 
-                long long ts = pHL2ResearchMode->m_converter.RelativeTicksToAbsoluteTicks(HundredsOfNanoseconds(frame.SystemRelativeTime().Value().count())).count();
+                long long ts2 = pHL2ResearchMode->m_converter.RelativeTicksToAbsoluteTicks(HundredsOfNanoseconds(frame.SystemRelativeTime().Value().count())).count();
                 
                 winrt::Windows::Foundation::Numerics::float4x4 PVtoWorldtransform;
                 winrt::Windows::Foundation::Numerics::float4x4 worldToPVtransform;
@@ -1563,6 +1553,21 @@ namespace winrt::HL2UnityPlugin::implementation
                     CreateLocalFile(fName, localPCImage, true);
                     //pHL2ResearchMode->_frameCount++;
                 }
+            //}
+
+            if (pHL2ResearchMode->IsCapturingTransforms())
+            {
+                std::ofstream file;
+                std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_trans.txt";
+                file.open(pcName);
+                file << pHL2ResearchMode->m_depthToWorld[0] << " " << pHL2ResearchMode->m_depthToWorld[1] << " " << pHL2ResearchMode->m_depthToWorld[2] << " " << pHL2ResearchMode->m_depthToWorld[3] << std::endl;
+                file << pHL2ResearchMode->m_depthToWorld[4] << " " << pHL2ResearchMode->m_depthToWorld[5] << " " << pHL2ResearchMode->m_depthToWorld[6] << " " << pHL2ResearchMode->m_depthToWorld[7] << std::endl;
+                file << pHL2ResearchMode->m_depthToWorld[8] << " " << pHL2ResearchMode->m_depthToWorld[9] << " " << pHL2ResearchMode->m_depthToWorld[10] << " " << pHL2ResearchMode->m_depthToWorld[11] << std::endl;
+                file << pHL2ResearchMode->m_depthToWorld[12] << " " << pHL2ResearchMode->m_depthToWorld[13] << " " << pHL2ResearchMode->m_depthToWorld[14] << " " << pHL2ResearchMode->m_depthToWorld[15] << std::endl;
+
+                file.close();
+
+                pHL2ResearchMode->_lastTransformName = hstring(pcName);
             }
 
             // save point cloud
