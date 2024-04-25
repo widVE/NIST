@@ -389,7 +389,7 @@ public class LiDARVis : MonoBehaviour
 		{
 			Debug.Log(photo_list.photos[i].camera_location_id);
 		}*/
-		EasyVizARServer.Instance.Get("https://easyvizar.wings.cs.wisc.edu/photos?since=2024-04-18&camera_location_id=1cc48e8d-890d-413a-aa66-cabaaa6e5458", EasyVizARServer.JSON_TYPE, GetImageCallback);
+		EasyVizARServer.Instance.Get("https://easyvizar.wings.cs.wisc.edu/photos?since=2024-04-24&camera_location_id=1cc48e8d-890d-413a-aa66-cabaaa6e5458", EasyVizARServer.JSON_TYPE, GetImageCallback);
 	}
 
 	///photos/{photo_id}/{filename}
@@ -603,15 +603,15 @@ public class LiDARVis : MonoBehaviour
 	[ContextMenu("Debug Hololens 2 Scan New")]
 	void DebugHololens2CaptureNew()
 	{
-		string[] scansRGB = Directory.GetFiles("Assets/Resources/"+inputDirectory+"/rgb/", "*.png");
+		//string[] scansRGB = Directory.GetFiles("Assets/Resources/"+inputDirectory+"/rgb/", "*.png");
 		string[] scansDepth = Directory.GetFiles("Assets/Resources/"+inputDirectory+"/localPC/", "*.bmp");
-		string[] scansTrans = Directory.GetFiles("Assets/Resources/"+inputDirectory+"/trans/", "*.txt");
+		//string[] scansTrans = Directory.GetFiles("Assets/Resources/"+inputDirectory+"/trans/", "*.txt");
 
 		Vector3 maxB = new Vector3(-99999f, -99999f, -99999f);
 		Vector3 minB = new Vector3(99999f, 99999f, 99999f);
 		int zeroCount = 0;
 		
-		int numScans = scansRGB.Length;
+		int numScans = scansDepth.Length;
 
 		Matrix4x4 viewProjMat = Matrix4x4.identity;
 		Matrix4x4 camIntrinsics = Matrix4x4.identity;
@@ -620,19 +620,25 @@ public class LiDARVis : MonoBehaviour
 
 		for(int i = 0; i < numScans; ++i)
 		{
-			string sPNG = scansRGB[i];
-			sPNG = sPNG.Replace("Assets/Resources/", "");
-			sPNG = sPNG.Replace(".png", "");
-			
-			//Debug.Log(sPNG);
-
 			string sPNGD = scansDepth[i];
 			sPNGD = sPNGD.Replace("Assets/Resources/", "");
 			sPNGD = sPNGD.Replace(".bmp", "");
 
-			//Debug.Log(sPNGD);
+			string sPNG = sPNGD.Replace("_localPC", "_color");
+			sPNG = sPNG.Replace("/localPC/", "/rgb/");
 
-			string[] scanTransLines = File.ReadAllLines(scansTrans[i]);
+			string scanTransS = scansDepth[i];
+			scanTransS = scanTransS.Replace("/localPC/", "/trans/");
+			scanTransS = scanTransS.Replace("_localPC.bmp", "_trans.txt");
+			//scanTransS = scanTransS + ".txt";
+			//sPNG = sPNG.Replace("Assets/Resources/", "");
+			//sPNG = sPNG.Replace(".png", "");
+			
+			Debug.Log(sPNG);
+			Debug.Log(sPNGD);
+			Debug.Log(scanTransS);
+
+			string[] scanTransLines = File.ReadAllLines(scanTransS);
 			
 			Matrix4x4 scanTrans = Matrix4x4.identity;
 			
