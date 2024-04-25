@@ -37,6 +37,8 @@ public class LiDARVis : MonoBehaviour
 	Vector3 _currentPosition = Vector3.zero;
 	Quaternion _currentRotation = Quaternion.identity;
 
+	GameObject _currentParent = null;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -137,7 +139,7 @@ public class LiDARVis : MonoBehaviour
 
 				if(_nextReady)
 				{
-					Debug.Log("ID: " + photo_list.photos[i].id);
+					//Debug.Log("ID: " + photo_list.photos[i].id);
 					//Debug.Log(photo_list.photos[i].imageUrl);
 					if(photo_list.photos[i].files != null)
 					{
@@ -163,7 +165,7 @@ public class LiDARVis : MonoBehaviour
 								Debug.Log(photo_list.photos[i].camera_orientation.w);
 								Debug.Log(photo_list.photos[i].camera_position.x);
 								Debug.Log(photo_list.photos[i].camera_position.y);
-								Debug.Log(photo_list.photos[i].camera_position.z);*/
+								Debug.Log(photo_list.photos[i].camera_position.z);*/ 
 								
 								if(_currentPosition.magnitude > 0)
 								{
@@ -176,7 +178,7 @@ public class LiDARVis : MonoBehaviour
 
 									_nextReady = false;
 
-									StartCoroutine("WaitForTextures");
+									StartCoroutine(WaitForTextures(photo_list.photos[i].id.ToString()));
 									numLoaded++;
 								}
 							}
@@ -200,13 +202,20 @@ public class LiDARVis : MonoBehaviour
 		//Debug.Log(result_data);
 
 		_nextReady = true;
+
+		_currentParent = new GameObject("H2_3DScan");
+		_currentParent.transform.parent = gameObject.transform;
+		_currentParent.transform.position = Vector3.zero;
+		Quaternion q = Quaternion.identity;
+		q.eulerAngles = new Vector3(-90f, 0f, 0f);
+		_currentParent.transform.rotation = q;
 		//Debug.Log("Callback");
 		StartCoroutine(LoadPointClouds(result_data));
 
 		//public string s = "[{"annotations":[{"boundary":{"height":0.5230216979980469,"left":0.3690803796052933,"top":0.46514296531677246,"width":0.29712721705436707},"confidence":0.8203831315040588,"id":141,"identified_user_id":null,"label":"person","photo_record_id":154,"sublabel":""}],"camera_location_id":"69e92dff-7138-4091-89c4-ed073035bfe6","created":1670279509.861595,"created_by":null,"device_pose_id":null,"files":[],"id":154,"imageUrl":"/photos/154/image","priority":0,"queue_name":"done","ready":true,"retention":"auto","status":"done","updated":1707769869.494515}]"";
 	}
 
-	IEnumerator WaitForTextures()
+	IEnumerator WaitForTextures(string id)
 	{
 		while(!_newGeom || !_newColor)
 		{
@@ -301,7 +310,11 @@ public class LiDARVis : MonoBehaviour
 			//vP.w = 1f;
 			//scanTrans.SetColumn(3, vP);
 
+			ipadDebugPrefab.name = id;
+
 			GameObject ip = Instantiate(ipadDebugPrefab);
+
+			//ip.name = id;
 
 			Matrix4x4 zScale = Matrix4x4.identity;
 			Vector4 col2 = zScale.GetColumn(2);
@@ -335,8 +348,9 @@ public class LiDARVis : MonoBehaviour
 
 			ip.transform.GetChild(0).transform.localRotation = Quaternion.LookRotation(scaleZ, scaleY);
 			
-			ip.transform.GetChild(0).name = "hololens2_" + numberIndex;
+			ip.transform.GetChild(0).name = id + "_photo";
 			
+			ip.transform.SetParent(_currentParent.transform, false);
 			
 			Texture2D colorTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
 			Graphics.CopyTexture(_colorTex, colorTex);
