@@ -169,7 +169,7 @@ Shader "Custom/DepthMapPointsTransformOld" {
 					//vert.z = t;
 					
 					v.vertex = vert;
-					v.pointSize = 1.0;
+					v.pointSize = 5.0;
 
 					if(useNormals == 1)
 					{
@@ -180,7 +180,6 @@ Shader "Custom/DepthMapPointsTransformOld" {
 					o.normal = v.normal;//mul(inverse(_ModelTransform), v.normal);
 					//v.color = tex2Dlod(_ColorImage, tc);
 					o.color = v.color;
-
 
 					UNITY_TRANSFER_FOG(o,UnityObjectToClipPos(v.vertex));
 				}

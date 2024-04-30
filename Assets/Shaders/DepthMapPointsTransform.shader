@@ -8,6 +8,7 @@ Shader "Custom/DepthMapPointsTransform" {
 		_AmbientOcclusion ("Ambient Occlusion", Range(0,1)) = 0.0
 		_ColorImage("Color Image", 2D) = "white" {}
 		_DepthImage("Depth Image", 2D) = "black" {}
+		_LocalPCImage("Local PC", 2D) = "black" {}
 	}
     SubShader
     {
@@ -36,7 +37,7 @@ Shader "Custom/DepthMapPointsTransform" {
 		struct appdata {
             float4 vertex : POSITION;
 			float3 normal : NORMAL;
-			//float pointSize : PSIZE;
+			float pointSize : PSIZE;
 			float4 color : COLOR;
 			float4 tangent : TANGENT;
 			float4 texcoord0 : TEXCOORD0;
@@ -68,6 +69,7 @@ Shader "Custom/DepthMapPointsTransform" {
 
 		sampler2D _ColorImage;
 		sampler2D _DepthImage;
+		sampler2D _LocalPCImage;
 
 		int useNormals = 1;
 		int _SubSample = 1;
@@ -103,14 +105,14 @@ Shader "Custom/DepthMapPointsTransform" {
 
 
 				float4 d = tex2Dlod(_DepthImage, tc2);
-				//uint4 d = _DepthImage.Load(tc2);
+				float4 d2 = tex2Dlod(_LocalPCImage, tc2);
 				//if(d.x > 0.0)
 				{
 					d.w = 1.0;
 					//d.xyz *= 65536;
 
-					float dx = (d.x - 32768.0) / 1000.0;
-					float dy = (d.y - 32768.0) / 1000.0;
+					float dx = (d.x - 2048.0) / 1000.0;
+					float dy = (d.y - 2048.0) / 1000.0;
 					float dz = (d.z - 32768.0) / 1000.0;
 
 					float4 vert = float4(dx, dy, dz, 1.0);

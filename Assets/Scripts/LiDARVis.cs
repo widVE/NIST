@@ -18,21 +18,18 @@ public class LiDARVis : MonoBehaviour
 	[SerializeField]
 	int depthHeight;
 
-	[SerializeField]
-	RenderTexture _colorTexture;
-
 	Texture2D _colorTex;
 
-	[SerializeField]
-	RenderTexture _pointCloudTexture;
-
 	Texture2D _geomTex;
+
+	Texture2D _depthTex;
 
 	Matrix4x4 _transform = Matrix4x4.identity;
 
 	bool _nextReady = false;
 	bool _newGeom = false;
 	bool _newColor = false;
+	bool _newDepth = false;
 
 	Vector3 _currentPosition = Vector3.zero;
 	Quaternion _currentRotation = Quaternion.identity;
@@ -44,9 +41,12 @@ public class LiDARVis : MonoBehaviour
     {
 		_colorTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
  		_geomTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+ 		_depthTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
  
         //DebugHailScan();
 		//DebugSimpleCapture();
+
+		ImageGetTest();
     }
 
     // Update is called once per frame
@@ -55,73 +55,49 @@ public class LiDARVis : MonoBehaviour
         
     }
 
+	void DepthTextureCallback(Texture2D textureData)
+	{
+		if(_depthTex == null)
+		{
+			_depthTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+		}
+
+		if(textureData.width == depthWidth && textureData.height == depthHeight) {
+			Graphics.CopyTexture(textureData, _depthTex);
+		}
+
+		_depthTex.Apply(false);
+		_newDepth = true;
+	}
+
 	void ColorTextureCallback(Texture2D textureData)
 	{
-		//Debug.Log("Hit color callback");
-
-		//RenderTexture currentRT = RenderTexture.active;
 		if(_colorTex == null)
 		{
-			Debug.Log("Making color");
 			_colorTex = new Texture2D(320, 288, TextureFormat.ARGB32, false);
 		}
-		//RenderTexture renderTexture = new RenderTexture(320, 288, 32);
-		Graphics.CopyTexture(textureData, _colorTex);
-		_colorTex.Apply(false);
-		_newColor = true;
-		/*Graphics.Blit(textureData, _colorTexture);
-
-		RenderTexture prev = RenderTexture.active;
-
-		RenderTexture.active = _colorTexture;
-		if(_colorTex == null)
-		{
-			_colorTex = new Texture2D(320, 288, TextureFormat.RGBA32, -1, false);
-			_colorTex.Apply(false);
+	
+		if(textureData.width == depthWidth && textureData.height == depthHeight) {
+			Graphics.CopyTexture(textureData, _colorTex);
 		}
 
-		_colorTex.ReadPixels(new Rect(0, 0, _colorTexture.width, _colorTexture.height), 0, 0);
 		_colorTex.Apply(false);
-
 		_newColor = true;
-
-		RenderTexture.active = prev;*/
 	}
 
 	void GeomTextureCallback(Texture2D textureData)
 	{
-		//Debug.Log("Hit geom callback");
-
 		if(_geomTex == null)
 		{
-			//Debug.Log("Making geom");
 			_geomTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
 		}
 
-		Graphics.CopyTexture(textureData, _geomTex);
-		_geomTex.Apply(false);
-		_newGeom = true;
-		//Debug.Log(textureData.width + " " + textureData.height + " " + textureData.graphicsFormat);
-		//RenderTexture currentRT = RenderTexture.active;
-
-		//RenderTexture renderTexture = new RenderTexture(320, 288, 32);
-		/*Graphics.Blit(textureData, _pointCloudTexture);
-
-		RenderTexture prev = RenderTexture.active;
-
-		RenderTexture.active = _pointCloudTexture;
-		if(_geomTex == null)
-		{
-			_geomTex = new Texture2D(320, 288, TextureFormat.RGBA64, -1, false);
-			_geomTex.Apply(false);
+		if(textureData.width == depthWidth && textureData.height == depthHeight) {
+			Graphics.CopyTexture(textureData, _geomTex);
 		}
 
-		_geomTex.ReadPixels(new Rect(0, 0, _pointCloudTexture.width, _pointCloudTexture.height), 0, 0);
 		_geomTex.Apply(false);
-
 		_newGeom = true;
-
-		RenderTexture.active = prev;*/
 	}
 
 	IEnumerator LoadPointClouds(string result_data)
@@ -172,9 +148,11 @@ public class LiDARVis : MonoBehaviour
 									//photo_list.photos[i].files[j].name
 									_newGeom = false;
 									_newColor = false;
+									_newDepth = false;
 
 									EasyVizARServer.Instance.Texture("https://easyvizar.wings.cs.wisc.edu/photos/"+photo_list.photos[i].id+"/photo.png", "image/png", "320", ColorTextureCallback);
 									EasyVizARServer.Instance.Texture("https://easyvizar.wings.cs.wisc.edu/photos/"+photo_list.photos[i].id+"/geometry.bmp", "image/bmp", "320", GeomTextureCallback);
+									EasyVizARServer.Instance.Texture("https://easyvizar.wings.cs.wisc.edu/photos/"+photo_list.photos[i].id+"/depth.bmp", "image/bmp", "320", DepthTextureCallback);
 
 									_nextReady = false;
 
@@ -217,14 +195,17 @@ public class LiDARVis : MonoBehaviour
 
 	IEnumerator WaitForTextures(string id)
 	{
-		while(!_newGeom || !_newColor)
+		while(!_newGeom || !_newColor || !_newDepth)
 		{
 			yield return null;
 		}
 
 		int numberIndex = 0;
 
-		if(_newGeom && _newColor)
+		if(_newGeom && _newColor && _newDepth && 
+			_colorTex.width == depthWidth && _colorTex.height == depthHeight && 
+			_geomTex.width == depthWidth && _geomTex.height == depthHeight &&
+			_depthTex.width == depthWidth && _depthTex.height == depthHeight)
 		{
 			Vector3 maxB = new Vector3(-99999f, -99999f, -99999f);
 			Vector3 minB = new Vector3(99999f, 99999f, 99999f);
@@ -235,6 +216,7 @@ public class LiDARVis : MonoBehaviour
 			Matrix4x4 scanTrans = Matrix4x4.identity;
 	
 			Unity.Collections.NativeArray<byte> geomBytes = _geomTex.GetRawTextureData<byte>();
+			Unity.Collections.NativeArray<byte> depthBytes = _depthTex.GetRawTextureData<byte>();
 			Unity.Collections.NativeArray<byte> colorBytes = _colorTex.GetRawTextureData<byte>();
 
 			int numVerts = geomBytes.Length / 4;
@@ -253,14 +235,24 @@ public class LiDARVis : MonoBehaviour
 				byte g1 = geomBytes[j+1];
 				byte r1 = geomBytes[j+2];
 				byte a1 = geomBytes[j+3];
+
+				//sigma buffer is in a1
+
+				byte b2 = depthBytes[j];
+				byte g2 = depthBytes[j+1];
+				byte r2 = depthBytes[j+2];
+				byte a2 = depthBytes[j+3];
+				
+				//cube size is in a2 / b2
+
 				ushort a = (ushort)a1;
-				ushort x1 = (ushort)((a & 0x0007) << 8);
-				ushort y1 = (ushort)((a & 0x0018) << 5);
-				ushort z1 = (ushort)((a & 0x00E0) << 3);
+				ushort x1 = (ushort)((b1 & 0x000F) << 8);
+				ushort y1 = (ushort)((b1 & 0x00F0) << 4);
+				ushort z1 = (ushort)((g2 & 0x00FF) << 8);
 
 				ushort x = (ushort)(x1 | ((ushort)r1));
 				ushort y = (ushort)(y1 | ((ushort)g1));
-				ushort z = (ushort)(z1 | ((ushort)b1));
+				ushort z = (ushort)(z1 | ((ushort)r2));
 
 				//ushort alpha = (ushort)((ushort)a1 | (ushort)((ushort)a2 << 8));
 				//int x = (int)(r1 | (r2 << 8));
@@ -268,12 +260,11 @@ public class LiDARVis : MonoBehaviour
 				//int z = (int)(b1 | (b2 << 8));
 
 				int x2 = (int)x;
-				x2 = x2 - 1024;
+				x2 = x2 - 2048;
 				int y2 = (int)y;
-				y2 = -y2;
+				y2 = y2 - 2048;
 				int z2 = (int)z;
 				//alpha = alpha - 32768;
-
 
 				float fX = (float)x2 / 1000.0f;
 				float fY = (float)y2 / 1000.0f;
@@ -310,11 +301,11 @@ public class LiDARVis : MonoBehaviour
 			//vP.w = 1f;
 			//scanTrans.SetColumn(3, vP);
 
-			ipadDebugPrefab.name = id;
+			//ipadDebugPrefab.name = id;
 
 			GameObject ip = Instantiate(ipadDebugPrefab);
 
-			//ip.name = id;
+			ip.name = id;
 
 			Matrix4x4 zScale = Matrix4x4.identity;
 			Vector4 col2 = zScale.GetColumn(2);
@@ -364,7 +355,7 @@ public class LiDARVis : MonoBehaviour
 			ImagePointCloud ipc = ip.GetComponent<ImagePointCloud>();
 			
 			ipc.CreatePointMaterial();
-			ipc.CreatePointMesh((uint)depthWidth, (uint)depthHeight);
+			ipc.CreatePointMesh(id, (uint)depthWidth, (uint)depthHeight);
 #if MESH_BASED
 			ipc.GetComponent<MeshFilter>().sharedMesh.vertices = verts;
 			ipc.GetComponent<MeshFilter>().sharedMesh.colors = colors;
@@ -388,6 +379,15 @@ public class LiDARVis : MonoBehaviour
 			
 			_newGeom = false;
 			_newColor = false;
+			_newDepth = false;
+			_nextReady = true;
+			numberIndex++;
+		}
+		else
+		{
+			_newGeom = false;
+			_newColor = false;
+			_newDepth = false;
 			_nextReady = true;
 			numberIndex++;
 		}
@@ -403,7 +403,7 @@ public class LiDARVis : MonoBehaviour
 		{
 			Debug.Log(photo_list.photos[i].camera_location_id);
 		}*/
-		EasyVizARServer.Instance.Get("https://easyvizar.wings.cs.wisc.edu/photos?since=2024-04-24&camera_location_id=1cc48e8d-890d-413a-aa66-cabaaa6e5458", EasyVizARServer.JSON_TYPE, GetImageCallback);
+		EasyVizARServer.Instance.Get("https://easyvizar.wings.cs.wisc.edu/photos?since=2024-04-29&camera_location_id=1cc48e8d-890d-413a-aa66-cabaaa6e5458", EasyVizARServer.JSON_TYPE, GetImageCallback);
 	}
 
 	///photos/{photo_id}/{filename}
@@ -589,7 +589,7 @@ public class LiDARVis : MonoBehaviour
 			ImagePointCloud ipc = ip.GetComponent<ImagePointCloud>();
 			
 			ipc.CreatePointMaterial();
-			ipc.CreatePointMesh((uint)depthWidth, (uint)depthHeight);
+			ipc.CreatePointMesh("ipadImage", (uint)depthWidth, (uint)depthHeight);
 #if MESH_BASED
 			ipc.GetComponent<MeshFilter>().sharedMesh.vertices = verts;
 			ipc.GetComponent<MeshFilter>().sharedMesh.colors = colors;
@@ -807,7 +807,7 @@ public class LiDARVis : MonoBehaviour
 			ImagePointCloud ipc = ip.GetComponent<ImagePointCloud>();
 			
 			ipc.CreatePointMaterial();
-			ipc.CreatePointMesh((uint)depthWidth, (uint)depthHeight);
+			ipc.CreatePointMesh("ipadImage", (uint)depthWidth, (uint)depthHeight);
 #if MESH_BASED
 			ipc.GetComponent<MeshFilter>().sharedMesh.vertices = verts;
 			ipc.GetComponent<MeshFilter>().sharedMesh.colors = colors;

@@ -62,11 +62,11 @@ public class ImagePointCloud : MonoBehaviour
 		_pointMaterial = new Material(_pointShader);
 	}
 	
-	public void CreatePointMesh(uint width, uint height)
+	public void CreatePointMesh(string id, uint width, uint height)
 	{
-		name = "ipadImage";
+		//name = "ipadImage";
 		GetComponent<MeshFilter>().sharedMesh = new Mesh();
-		GetComponent<MeshFilter>().sharedMesh.name = "ipadImage";
+		GetComponent<MeshFilter>().sharedMesh.name = id;
 		
 		uint resolution = width * height;
 		uint subSampledResolution = width * height / SUBSAMPLE;
