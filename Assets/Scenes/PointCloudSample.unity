@@ -2445,7 +2445,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputDirectory: newNistExample
-  ipadDebugPrefab: {fileID: 3924963915668624178, guid: 030559ace04ce405791beebcba6b9914, type: 3}
+  ipadDebugPrefab: {fileID: 3924963915668624178, guid: 9cff4a6cad17f4144ab1361945ab0ad8, type: 3}
   depthWidth: 320
   depthHeight: 288
 --- !u!1 &1208393620

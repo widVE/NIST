@@ -156,7 +156,7 @@ public class LiDARVis : MonoBehaviour
 
 									_nextReady = false;
 
-									StartCoroutine(WaitForTexturesGPU(photo_list.photos[i].id.ToString()));
+									StartCoroutine(WaitForTexturesCube(photo_list.photos[i].id.ToString()));
 									numLoaded++;
 								}
 							}
@@ -463,7 +463,6 @@ public class LiDARVis : MonoBehaviour
 			ipc.PointMaterial.SetTexture("_ColorImage", colorTex);
 			ipc.PointMaterial.SetFloat("_ResolutionX", depthWidth);
 			ipc.PointMaterial.SetFloat("_ResolutionY", depthHeight);
-			//Debug.Log(depthTex.format);
 			ipc.PointMaterial.SetTexture("_DepthImage", _geomTex);
 			
 			
@@ -480,6 +479,99 @@ public class LiDARVis : MonoBehaviour
 			_newDepth = false;
 			_nextReady = true;
 			numberIndex++;
+		}
+	}
+
+	IEnumerator WaitForTexturesCube(string id)
+	{
+		while(!_newGeom || !_newColor || !_newDepth)
+		{
+			yield return null;
+		}
+
+		int numberIndex = 0;
+
+		if(_newGeom && _newColor && _newDepth && 
+			_colorTex.width == depthWidth && _colorTex.height == depthHeight && 
+			_geomTex.width == depthWidth && _geomTex.height == depthHeight &&
+			_depthTex.width == depthWidth && _depthTex.height == depthHeight)
+		{
+			Matrix4x4 scanTrans = Matrix4x4.TRS(_currentPosition, _currentRotation, Vector3.one);
+			
+			GameObject ip = Instantiate(ipadDebugPrefab);
+
+			ip.name = id;
+
+			Matrix4x4 zScale = Matrix4x4.identity;
+			Vector4 col2 = zScale.GetColumn(2);
+			col2 = -col2;
+			zScale.SetColumn(2, col2);
+			
+			scanTrans = zScale * scanTrans;
+			ip.transform.GetChild(0).transform.localPosition = scanTrans.GetColumn(3);
+		
+			Vector3 scaleX = scanTrans.GetColumn(0);
+			
+			Vector3 scaleY = scanTrans.GetColumn(1);
+			
+			Vector3 scaleZ = scanTrans.GetColumn(2);
+
+			ip.transform.GetChild(0).transform.localRotation = Quaternion.LookRotation(scaleZ, scaleY);
+			
+			ip.transform.GetChild(0).name = id + "_photo";
+			
+			ip.transform.SetParent(_currentParent.transform, false);
+			
+			Texture2D colorTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+			Graphics.CopyTexture(_colorTex, colorTex);
+
+			Texture2D geomTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+			Graphics.CopyTexture(_geomTex, geomTex);
+
+			Texture2D depthTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+			Graphics.CopyTexture(_depthTex, depthTex);
+
+			//Debug.Log("Setting texture for " + i);
+			ip.transform.GetChild(0).gameObject.GetComponent<Renderer>().sharedMaterial = new Material(Shader.Find("Unlit/TextureCullOff"));//"));
+			ip.transform.GetChild(0).gameObject.GetComponent<Renderer>().sharedMaterial.mainTexture = colorTex;
+			ip.transform.GetChild(0).gameObject.GetComponent<Renderer>().sharedMaterial.mainTextureScale = new Vector2(-1,-1);
+		
+
+			CubeTest c = ip.GetComponent<CubeTest>();
+			c.AssignData(colorTex, geomTex, depthTex, scanTrans);
+
+			/*ImagePointCloud ipc = ip.GetComponent<ImagePointCloud>();
+			
+			ipc.CreatePointMaterial();
+			ipc.CreatePointMesh(id, (uint)depthWidth, (uint)depthHeight);
+
+			//ipc.CameraIntrinsics = camIntrinsics;
+			//ipc.ViewProj = viewProjMat;
+			ipc.ModelTransform = scanTrans;
+			
+			//ipc.PointMaterial.SetMatrix("_ViewProj", viewProjMat);
+			ipc.PointMaterial.SetMatrix("_ModelTransform", scanTrans);
+			//ipc.PointMaterial.SetMatrix("_CameraIntrinsics", camIntrinsics);
+			ipc.PointMaterial.SetTexture("_ColorImage", colorTex);
+			ipc.PointMaterial.SetFloat("_ResolutionX", depthWidth);
+			ipc.PointMaterial.SetFloat("_ResolutionY", depthHeight);
+			ipc.PointMaterial.SetTexture("_DepthImage", geomTex);
+			ipc.PointMaterial.SetTexture("_LocalPCImage", depthTex);*/
+			
+			
+			_newGeom = false;
+			_newColor = false;
+			_newDepth = false;
+			_nextReady = true;
+			numberIndex++;
+		}
+		else
+		{
+			_newGeom = false;
+			_newColor = false;
+			_newDepth = false;
+			_nextReady = true;
+			numberIndex++;	
 		}
 	}
 
