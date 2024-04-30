@@ -52,7 +52,7 @@ SubShader {
 
             fixed4 frag (v2f i) : SV_Target
             {
-                fixed4 col = tex2D(_MainTex, i.texcoord);
+                fixed4 col = fixed4(tex2D(_MainTex, i.texcoord).yzw, 1.0);
                 UNITY_APPLY_FOG(i.fogCoord, col);
                 UNITY_OPAQUE_ALPHA(col.a);
                 return col;

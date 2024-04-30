@@ -74,7 +74,7 @@ public class LiDARVis : MonoBehaviour
 	{
 		if(_colorTex == null)
 		{
-			_colorTex = new Texture2D(320, 288, TextureFormat.ARGB32, false);
+			_colorTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
 		}
 	
 		if(textureData.width == depthWidth && textureData.height == depthHeight) {
@@ -156,7 +156,7 @@ public class LiDARVis : MonoBehaviour
 
 									_nextReady = false;
 
-									StartCoroutine(WaitForTextures(photo_list.photos[i].id.ToString()));
+									StartCoroutine(WaitForTexturesGPU(photo_list.photos[i].id.ToString()));
 									numLoaded++;
 								}
 							}
@@ -191,6 +191,96 @@ public class LiDARVis : MonoBehaviour
 		StartCoroutine(LoadPointClouds(result_data));
 
 		//public string s = "[{"annotations":[{"boundary":{"height":0.5230216979980469,"left":0.3690803796052933,"top":0.46514296531677246,"width":0.29712721705436707},"confidence":0.8203831315040588,"id":141,"identified_user_id":null,"label":"person","photo_record_id":154,"sublabel":""}],"camera_location_id":"69e92dff-7138-4091-89c4-ed073035bfe6","created":1670279509.861595,"created_by":null,"device_pose_id":null,"files":[],"id":154,"imageUrl":"/photos/154/image","priority":0,"queue_name":"done","ready":true,"retention":"auto","status":"done","updated":1707769869.494515}]"";
+	}
+
+	IEnumerator WaitForTexturesGPU(string id)
+	{
+		while(!_newGeom || !_newColor || !_newDepth)
+		{
+			yield return null;
+		}
+
+		int numberIndex = 0;
+
+		if(_newGeom && _newColor && _newDepth && 
+			_colorTex.width == depthWidth && _colorTex.height == depthHeight && 
+			_geomTex.width == depthWidth && _geomTex.height == depthHeight &&
+			_depthTex.width == depthWidth && _depthTex.height == depthHeight)
+		{
+			Matrix4x4 scanTrans = Matrix4x4.TRS(_currentPosition, _currentRotation, Vector3.one);
+			
+			GameObject ip = Instantiate(ipadDebugPrefab);
+
+			ip.name = id;
+
+			Matrix4x4 zScale = Matrix4x4.identity;
+			Vector4 col2 = zScale.GetColumn(2);
+			col2 = -col2;
+			zScale.SetColumn(2, col2);
+			
+			scanTrans = zScale * scanTrans;
+			ip.transform.GetChild(0).transform.localPosition = scanTrans.GetColumn(3);
+		
+			Vector3 scaleX = scanTrans.GetColumn(0);
+			
+			Vector3 scaleY = scanTrans.GetColumn(1);
+			
+			Vector3 scaleZ = scanTrans.GetColumn(2);
+
+			ip.transform.GetChild(0).transform.localRotation = Quaternion.LookRotation(scaleZ, scaleY);
+			
+			ip.transform.GetChild(0).name = id + "_photo";
+			
+			ip.transform.SetParent(_currentParent.transform, false);
+			
+			Texture2D colorTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+			Graphics.CopyTexture(_colorTex, colorTex);
+
+			Texture2D geomTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+			Graphics.CopyTexture(_geomTex, geomTex);
+
+			Texture2D depthTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+			Graphics.CopyTexture(_depthTex, depthTex);
+
+			//Debug.Log("Setting texture for " + i);
+			ip.transform.GetChild(0).gameObject.GetComponent<Renderer>().sharedMaterial = new Material(Shader.Find("Unlit/TextureCullOff"));//"));
+			ip.transform.GetChild(0).gameObject.GetComponent<Renderer>().sharedMaterial.mainTexture = colorTex;
+			ip.transform.GetChild(0).gameObject.GetComponent<Renderer>().sharedMaterial.mainTextureScale = new Vector2(-1,-1);
+		
+
+			ImagePointCloud ipc = ip.GetComponent<ImagePointCloud>();
+			
+			ipc.CreatePointMaterial();
+			ipc.CreatePointMesh(id, (uint)depthWidth, (uint)depthHeight);
+
+			//ipc.CameraIntrinsics = camIntrinsics;
+			//ipc.ViewProj = viewProjMat;
+			ipc.ModelTransform = scanTrans;
+			
+			//ipc.PointMaterial.SetMatrix("_ViewProj", viewProjMat);
+			ipc.PointMaterial.SetMatrix("_ModelTransform", scanTrans);
+			//ipc.PointMaterial.SetMatrix("_CameraIntrinsics", camIntrinsics);
+			ipc.PointMaterial.SetTexture("_ColorImage", colorTex);
+			ipc.PointMaterial.SetFloat("_ResolutionX", depthWidth);
+			ipc.PointMaterial.SetFloat("_ResolutionY", depthHeight);
+			ipc.PointMaterial.SetTexture("_DepthImage", geomTex);
+			ipc.PointMaterial.SetTexture("_LocalPCImage", depthTex);
+			
+			
+			_newGeom = false;
+			_newColor = false;
+			_newDepth = false;
+			_nextReady = true;
+			numberIndex++;
+		}
+		else
+		{
+			_newGeom = false;
+			_newColor = false;
+			_newDepth = false;
+			_nextReady = true;
+			numberIndex++;	
+		}
 	}
 
 	IEnumerator WaitForTextures(string id)
@@ -343,7 +433,7 @@ public class LiDARVis : MonoBehaviour
 			
 			ip.transform.SetParent(_currentParent.transform, false);
 			
-			Texture2D colorTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+			Texture2D colorTex = new Texture2D(320, 288, TextureFormat.ARGB32, false);
 			Graphics.CopyTexture(_colorTex, colorTex);
 
 			//Debug.Log("Setting texture for " + i);

@@ -7,9 +7,9 @@ public class ImagePointCloud : MonoBehaviour
     [SerializeField]
     Shader _pointShader;
 
-    Matrix4x4 _cameraIntrinsics;
-    Matrix4x4 _viewProj;
-    Matrix4x4 _modelTransform;
+    Matrix4x4 _cameraIntrinsics = Matrix4x4.identity;
+    Matrix4x4 _viewProj = Matrix4x4.identity;
+    Matrix4x4 _modelTransform = Matrix4x4.identity;
 
     Bounds _pointCloudBounds = new Bounds(Vector3.zero, new Vector3(64f, 64f, 64f));
 	
@@ -41,20 +41,20 @@ public class ImagePointCloud : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-		if(_pointMaterial == null)
-		{
-			_pointMaterial = new Material(_pointShader);
-		}
+		//if(_pointMaterial == null)
+		//{
+		//	_pointMaterial = new Material(_pointShader);
+		//}
 		 
         //CreatePointMesh(256, 192);
     }
 
     void Awake()
     {
-		if(_pointMaterial == null)
-		{
-			_pointMaterial = new Material(_pointShader);
-		}
+		//if(_pointMaterial == null)
+		//{
+		//	_pointMaterial = new Material(_pointShader);
+		//}
     }
 
 	public void CreatePointMaterial()
@@ -96,6 +96,7 @@ public class ImagePointCloud : MonoBehaviour
 			}
 		}
 		
+		GetComponent<MeshRenderer>().material = _pointMaterial;
 		//GetComponent<MeshFilter>().sharedMesh.isReadable = true;
 		GetComponent<MeshFilter>().sharedMesh.vertices = verts;
 		GetComponent<MeshFilter>().sharedMesh.colors = colors;
@@ -104,7 +105,7 @@ public class ImagePointCloud : MonoBehaviour
 		//ip.GetComponent<MeshFilter>().sharedMesh.bounds = new Bounds((maxB + minB) * 0.5f, maxB-minB);
 		GetComponent<MeshFilter>().sharedMesh.bounds = _pointCloudBounds;
 		GetComponent<MeshFilter>().sharedMesh.UploadMeshData(false);
-		GetComponent<MeshRenderer>().material = _pointMaterial;
+		
 	}
 	
     // Update is called once per frame
