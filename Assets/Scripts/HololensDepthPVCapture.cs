@@ -277,7 +277,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 	{
 		string sColor = prefix+"_color.png";
 		string transFile = prefix+"_trans.txt";
-		string sDepth = prefix+"_depth.png";
+		string sDepth = prefix+"_depth.bmp";
 		string sI = prefix+"_intensity.png";
 		
 		
