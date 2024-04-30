@@ -1247,10 +1247,10 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		
 		iUrl = h2.imageUrl;
 		iUrl = iUrl.Replace("image", imageType3);
-		iUrl = iUrl + ".png";
+		iUrl = iUrl + ".bmp";
 		
 		UnityWebRequest www4 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
-		www4.SetRequestHeader("Content-Type", "image/png");
+		www4.SetRequestHeader("Content-Type", "image/bmp");
 
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
 		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
