@@ -476,6 +476,9 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	
 	IEnumerator DoGET(string url, string contentType, System.Action<string> callBack)
 	{
+		Debug.Log(url);
+		Debug.Log(contentType);
+		
 		UnityWebRequest www = UnityWebRequest.Get(url);
 
 		www.SetRequestHeader("Content-Type", contentType);
@@ -491,8 +494,8 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		string result = "";
 		if (www.result != UnityWebRequest.Result.Success)
 		{
-			result = "error";
-			//Debug.Log(www.error);
+			result = www.error;
+            Debug.Log(www.error);
 		}
 		else
 		{
@@ -523,8 +526,8 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		string result = "";
         if (www.result != UnityWebRequest.Result.Success)
         {
-			result = "error";
-            //Debug.Log(www.error);
+			result = www.error;
+            Debug.Log(www.error);
         }
         else
         {

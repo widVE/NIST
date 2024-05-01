@@ -159,14 +159,14 @@ public class LiDARVis : MonoBehaviour
 									_newColor = false;
 									_newDepth = false;
 
-									EasyVizARServer.Instance.Texture("https://easyvizar.wings.cs.wisc.edu/photos/"+photo_list.photos[i].id+"/photo.png", "image/png", "320", ColorTextureCallback);
-									EasyVizARServer.Instance.Texture("https://easyvizar.wings.cs.wisc.edu/photos/"+photo_list.photos[i].id+"/geometry.bmp", "image/bmp", "320", GeomTextureCallback);
-									EasyVizARServer.Instance.Texture("https://easyvizar.wings.cs.wisc.edu/photos/"+photo_list.photos[i].id+"/depth.bmp", "image/bmp", "320", DepthTextureCallback);
+									EasyVizARServer.Instance.Texture("photos/"+photo_list.photos[i].id+"/photo.png", "image/png", "320", ColorTextureCallback);
+									EasyVizARServer.Instance.Texture("photos/"+photo_list.photos[i].id+"/geometry.bmp", "image/bmp", "320", GeomTextureCallback);
+									EasyVizARServer.Instance.Texture("photos/"+photo_list.photos[i].id+"/depth.bmp", "image/bmp", "320", DepthTextureCallback);
 
 									_nextReady = false;
 
-									//StartCoroutine(WaitForTexturesCube(photo_list.photos[i].id.ToString()));
-									StartCoroutine(WaitForTexturesGPU(photo_list.photos[i].id.ToString()));
+									StartCoroutine(WaitForTexturesCube(photo_list.photos[i].id.ToString()));
+									//StartCoroutine(WaitForTexturesGPU(photo_list.photos[i].id.ToString()));
 									numLoaded++;
 								}
 							}
@@ -600,7 +600,7 @@ public class LiDARVis : MonoBehaviour
 	
 	IEnumerator DelayGet(float duration) {
 		yield return new WaitForSeconds(duration);
-		EasyVizARServer.Instance.Get("https://easyvizar.wings.cs.wisc.edu/photos?since=2024-04-29&camera_location_id=1cc48e8d-890d-413a-aa66-cabaaa6e5458", EasyVizARServer.JSON_TYPE, GetImageCallback);
+		EasyVizARServer.Instance.Get("photos?since=2024-04-29&camera_location_id=1cc48e8d-890d-413a-aa66-cabaaa6e5458", EasyVizARServer.JSON_TYPE, GetImageCallback);
 	}
 
 	///photos/{photo_id}/{filename}

@@ -22,19 +22,33 @@ public class CubeTest : MonoBehaviour
 
     public Texture2D inputImage = null;
     public Texture2D inputDepth = null;
-
     public Texture2D inputLocalPC = null;
 
     public Matrix4x4 matrix;
     public Matrix4x4 localMatrix;
 
-    Material material;
+    public Material material;
 
     void Start()
     {
 
     }
-
+	
+	void OnDestroy()
+	{
+		if(positionBuffer != null)
+		{
+			positionBuffer.Release();
+			positionBuffer = null;
+		}
+		
+		if(argsBuffer != null)
+		{
+			argsBuffer.Release();
+			argsBuffer = null;
+		}
+	}
+	
     public void AssignData(Texture2D color, Texture2D depth, Texture2D localPC, Matrix4x4 transform)
     {
         if(material == null) {
