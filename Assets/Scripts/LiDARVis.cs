@@ -11,7 +11,10 @@ public class LiDARVis : MonoBehaviour
 	public string inputDirectory;
 
 	public GameObject ipadDebugPrefab;
-		
+	
+	[SerializeField]
+	QRScanner _qrScanner;
+	
 	[SerializeField]
 	int depthWidth;
 	
@@ -42,11 +45,15 @@ public class LiDARVis : MonoBehaviour
 		_colorTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
  		_geomTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
  		_depthTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
- 
-        //DebugHailScan();
-		//DebugSimpleCapture();
-
-		ImageGetTest();
+		
+		_qrScanner.LocationChanged += (o, ev) =>
+		{
+			Debug.Log("Calling ImageGetTest");
+			ImageGetTest();
+		};
+		
+		//ImageGetTest();
+			
     }
 
     // Update is called once per frame
@@ -104,6 +111,8 @@ public class LiDARVis : MonoBehaviour
 	{
 		if(result_data.Length > 0)
 		{
+			Debug.Log(result_data);
+			
 			EasyVizAR.PhotoListReturn photo_list  = JsonUtility.FromJson<EasyVizAR.PhotoListReturn>("{\"photos\":"+result_data+"}");
 			Debug.Log(photo_list.photos.Length);
 			int numLoaded = 0;
@@ -156,7 +165,8 @@ public class LiDARVis : MonoBehaviour
 
 									_nextReady = false;
 
-									StartCoroutine(WaitForTexturesCube(photo_list.photos[i].id.ToString()));
+									//StartCoroutine(WaitForTexturesCube(photo_list.photos[i].id.ToString()));
+									StartCoroutine(WaitForTexturesGPU(photo_list.photos[i].id.ToString()));
 									numLoaded++;
 								}
 							}
@@ -585,6 +595,11 @@ public class LiDARVis : MonoBehaviour
 		{
 			Debug.Log(photo_list.photos[i].camera_location_id);
 		}*/
+		StartCoroutine(DelayGet(3f));
+	}
+	
+	IEnumerator DelayGet(float duration) {
+		yield return new WaitForSeconds(duration);
 		EasyVizARServer.Instance.Get("https://easyvizar.wings.cs.wisc.edu/photos?since=2024-04-29&camera_location_id=1cc48e8d-890d-413a-aa66-cabaaa6e5458", EasyVizARServer.JSON_TYPE, GetImageCallback);
 	}
 

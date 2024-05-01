@@ -37,7 +37,7 @@ Shader "Custom/DepthMapPointsTransformOld" {
 		struct appdata {
             float4 vertex : POSITION;
 			float3 normal : NORMAL;
-			float pointSize : PSIZE;
+			//float pointSize : PSIZE;
 			float4 color : COLOR;
 			float4 tangent : TANGENT;
 			float4 texcoord0 : TEXCOORD0;
@@ -169,7 +169,7 @@ Shader "Custom/DepthMapPointsTransformOld" {
 					//vert.z = t;
 					
 					v.vertex = vert;
-					v.pointSize = 5.0;
+					//v.pointSize = 5.0;
 
 					if(useNormals == 1)
 					{
