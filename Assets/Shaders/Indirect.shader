@@ -10,6 +10,7 @@ Shader "Instanced/InstancedSurfaceShader" {
         Tags { "RenderType"="Opaque" }
         LOD 200
         Cull Front
+		//ZTest Always
 
         CGPROGRAM
         // Physically based Standard lighting model

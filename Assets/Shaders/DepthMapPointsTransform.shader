@@ -44,12 +44,14 @@ Shader "Custom/DepthMapPointsTransform" {
 			float4 texcoord1 : TEXCOORD1;
 			float4 texcoord2 : TEXCOORD2;
 			uint id : SV_VertexID;
+			UNITY_VERTEX_INPUT_INSTANCE_ID
          };
 		
 		 struct Input {
             float4 color;
 			float3 normal;
 			UNITY_FOG_COORDS(0)
+			UNITY_VERTEX_OUTPUT_STEREO
          };
 		
 		float4 _MinBounds;
@@ -82,9 +84,14 @@ Shader "Custom/DepthMapPointsTransform" {
 			//{
 			//	return;
 			//}
-
+			
+			UNITY_SETUP_INSTANCE_ID(v);
+			
 			UNITY_INITIALIZE_OUTPUT(Input,o);
-			UNITY_SETUP_INSTANCE_ID(o);
+			
+			UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+			
+			
 			//if(v.vertex.x > _MinBounds.x && v.vertex.y > _MinBounds.y && v.vertex.z > _MinBounds.z && 
 			//	v.vertex.x < _MaxBounds.x && v.vertex.y < _MaxBounds.y && v.vertex.z < _MaxBounds.z)
 			//{

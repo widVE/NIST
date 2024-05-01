@@ -165,8 +165,8 @@ public class LiDARVis : MonoBehaviour
 
 									_nextReady = false;
 
-									StartCoroutine(WaitForTexturesCube(photo_list.photos[i].id.ToString()));
-									//StartCoroutine(WaitForTexturesGPU(photo_list.photos[i].id.ToString()));
+									//StartCoroutine(WaitForTexturesCube(photo_list.photos[i].id.ToString()));
+									StartCoroutine(WaitForTexturesGPU(photo_list.photos[i].id.ToString()));
 									numLoaded++;
 								}
 							}

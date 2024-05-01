@@ -2372,7 +2372,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputDirectory: newNistExample
-  ipadDebugPrefab: {fileID: 3924963915668624178, guid: 9cff4a6cad17f4144ab1361945ab0ad8, type: 3}
+  ipadDebugPrefab: {fileID: 3924963915668624178, guid: 030559ace04ce405791beebcba6b9914, type: 3}
   _qrScanner: {fileID: 291935032}
   depthWidth: 320
   depthHeight: 288
@@ -3254,7 +3254,8 @@ PrefabInstance:
       propertyPath: onFirstHandDetected.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6710163434822126614, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
 --- !u!1 &1810665665 stripped
 GameObject:
@@ -9739,7 +9740,8 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7534510046481676359, guid: 8d9a1a91bd8236b49be2be0a78fcf5e6, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 8d9a1a91bd8236b49be2be0a78fcf5e6, type: 3}
 --- !u!4 &5167179012935016954 stripped
 Transform:
