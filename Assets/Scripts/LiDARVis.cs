@@ -13,6 +13,12 @@ public class LiDARVis : MonoBehaviour
 	public GameObject ipadDebugPrefab;
 	
 	[SerializeField]
+	string _scanDate = "";
+
+	[SerializeField]
+	string _locationID = "1cc48e8d-890d-413a-aa66-cabaaa6e5458";
+
+	[SerializeField]
 	QRScanner _qrScanner;
 	
 	[SerializeField]
@@ -107,6 +113,44 @@ public class LiDARVis : MonoBehaviour
 		_newGeom = true;
 	}
 
+	public bool LoadPhotoVis(EasyVizAR.PhotoReturn p)
+	{
+		for(int j = 0; j < p.files.Length; ++j)
+		{
+			if(p.files[j].name == "geometry.bmp")
+			{
+				_currentPosition.x = p.camera_position.x;
+				_currentPosition.y = p.camera_position.y;
+				_currentPosition.z = p.camera_position.z;
+				
+				_currentRotation.x = p.camera_orientation.x;
+				_currentRotation.y = p.camera_orientation.y;
+				_currentRotation.z = p.camera_orientation.z;
+				_currentRotation.w = p.camera_orientation.w;
+				
+				if(_currentPosition.magnitude > 0)
+				{
+					//photo_list.photos[i].files[j].name
+					_newGeom = false;
+					_newColor = false;
+					_newDepth = false;
+
+					EasyVizARServer.Instance.Texture("photos/"+p.id+"/photo.png", "image/png", "320", ColorTextureCallback);
+					EasyVizARServer.Instance.Texture("photos/"+p.id+"/geometry.bmp", "image/bmp", "320", GeomTextureCallback);
+					EasyVizARServer.Instance.Texture("photos/"+p.id+"/depth.bmp", "image/bmp", "320", DepthTextureCallback);
+
+					_nextReady = false;
+
+					StartCoroutine(WaitForTexturesCube(p.id.ToString()));
+					//StartCoroutine(WaitForTexturesGPU(p.id.ToString()));
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	IEnumerator LoadPointClouds(string result_data)
 	{
 		if(result_data.Length > 0)
@@ -114,7 +158,7 @@ public class LiDARVis : MonoBehaviour
 			Debug.Log(result_data);
 			
 			EasyVizAR.PhotoListReturn photo_list  = JsonUtility.FromJson<EasyVizAR.PhotoListReturn>("{\"photos\":"+result_data+"}");
-			Debug.Log(photo_list.photos.Length);
+			//Debug.Log(photo_list.photos.Length);
 			int numLoaded = 0;
 			int offset = 0;
 
@@ -129,49 +173,10 @@ public class LiDARVis : MonoBehaviour
 					if(photo_list.photos[i].files != null)
 					{
 						//Debug.Log("Num photos: " + photo_list.photos[i].files.Length);
-						for(int j = 0; j < photo_list.photos[i].files.Length; ++j)
-						{
-							//Debug.Log(photo_list.photos[i].files[j].name);
-							if(photo_list.photos[i].files[j].name == "geometry.bmp")
-							{
-								_currentPosition.x = photo_list.photos[i].camera_position.x;
-								_currentPosition.y = photo_list.photos[i].camera_position.y;
-								_currentPosition.z = photo_list.photos[i].camera_position.z;
-								
-								_currentRotation.x = photo_list.photos[i].camera_orientation.x;
-								_currentRotation.y = photo_list.photos[i].camera_orientation.y;
-								_currentRotation.z = photo_list.photos[i].camera_orientation.z;
-								_currentRotation.w = photo_list.photos[i].camera_orientation.w;
-
-								/*Debug.Log("Index: " + i);
-								Debug.Log(photo_list.photos[i].camera_orientation.x);
-								Debug.Log(photo_list.photos[i].camera_orientation.y);
-								Debug.Log(photo_list.photos[i].camera_orientation.z);
-								Debug.Log(photo_list.photos[i].camera_orientation.w);
-								Debug.Log(photo_list.photos[i].camera_position.x);
-								Debug.Log(photo_list.photos[i].camera_position.y);
-								Debug.Log(photo_list.photos[i].camera_position.z);*/ 
-								
-								if(_currentPosition.magnitude > 0)
-								{
-									//photo_list.photos[i].files[j].name
-									_newGeom = false;
-									_newColor = false;
-									_newDepth = false;
-
-									EasyVizARServer.Instance.Texture("photos/"+photo_list.photos[i].id+"/photo.png", "image/png", "320", ColorTextureCallback);
-									EasyVizARServer.Instance.Texture("photos/"+photo_list.photos[i].id+"/geometry.bmp", "image/bmp", "320", GeomTextureCallback);
-									EasyVizARServer.Instance.Texture("photos/"+photo_list.photos[i].id+"/depth.bmp", "image/bmp", "320", DepthTextureCallback);
-
-									_nextReady = false;
-
-									//StartCoroutine(WaitForTexturesCube(photo_list.photos[i].id.ToString()));
-									StartCoroutine(WaitForTexturesGPU(photo_list.photos[i].id.ToString()));
-									numLoaded++;
-								}
-							}
-						}
+						LoadPhotoVis(photo_list.photos[i]);
 					}
+
+					numLoaded++;
 				}
 				else
 				{
@@ -600,7 +605,8 @@ public class LiDARVis : MonoBehaviour
 	
 	IEnumerator DelayGet(float duration) {
 		yield return new WaitForSeconds(duration);
-		EasyVizARServer.Instance.Get("photos?since=2024-04-29&camera_location_id=1cc48e8d-890d-413a-aa66-cabaaa6e5458", EasyVizARServer.JSON_TYPE, GetImageCallback);
+		EasyVizARServer.Instance.Get("photos?since="+_scanDate+"&camera_location_id="+_locationID, EasyVizARServer.JSON_TYPE, GetImageCallback);
+		//created_by
 	}
 
 	///photos/{photo_id}/{filename}

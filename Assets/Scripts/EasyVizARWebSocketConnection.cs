@@ -20,6 +20,13 @@ public class HeadsetsEvent
     public EasyVizAR.Headset current;
 }
 
+[System.Serializable]
+public class PhotosEvent
+{
+    public EasyVizAR.PhotoReturn previous;
+    public EasyVizAR.PhotoReturn current;
+}
+
 public class EasyVizARWebSocketConnection : MonoBehaviour
 {
     [SerializeField]
@@ -41,6 +48,8 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     public GameObject featureManager = null;
     public GameObject headsetManager = null;
     public GameObject map_parent;
+
+    public GameObject lidarVis = null;
 
     // Attach QRScanner GameObject so we can listen for location change events.
     [SerializeField]
@@ -70,6 +79,11 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
         if (!headsetManager)
         {
             headsetManager = GameObject.Find("EasyVizARHeadsetManager");
+        }
+
+        if (!lidarVis)
+        {
+            lidarVis = GameObject.Find("CubeRendererTexture");
         }
 
         _mainCamera = Camera.main;
@@ -186,6 +200,12 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
             await _ws.SendText("subscribe features:deleted " + event_uri);
         }
 
+        if (lidarVis)
+        {
+            var photo_uri = $"/photos/*";
+            await _ws.SendText("subscribe photos:updated " + photo_uri);
+        }
+
         isConnected = true;
     }
 
@@ -244,6 +264,12 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
                 {
                     FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(event_body);
                     featureManager.GetComponent<FeatureManager>().DeleteFeatureFromServer(ev.previous.id);
+                    break;
+                }
+            case "photos:updated":
+                {
+                    PhotosEvent ev = JsonUtility.FromJson<PhotosEvent>(event_body);
+                    lidarVis.GetComponent<LiDARVis>().LoadPhotoVis(ev.current);
                     break;
                 }
             default:

@@ -476,8 +476,8 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	
 	IEnumerator DoGET(string url, string contentType, System.Action<string> callBack)
 	{
-		Debug.Log(url);
-		Debug.Log(contentType);
+		//Debug.Log(url);
+		//Debug.Log(contentType);
 		
 		UnityWebRequest www = UnityWebRequest.Get(url);
 
