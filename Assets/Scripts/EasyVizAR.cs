@@ -461,16 +461,17 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 	}
 	
 	public bool PutImageQuad(string contentType, string pathToFile, string pathToFile2, string pathToFile3, string pathToFile4, string locationID, int width, int height, System.Action<string> callBack, 
-				Vector3 position, Quaternion orientation, string headsetID = "", string imageType="photo", string imageType2="depth", string imageType3="geometry", string imageType4="thermal", int colorWidth=0, int colorHeight=0)
+				Vector3 position, Quaternion orientation, string headsetID = "", string imageType="photo", string imageType2="depth", string imageType3="geometry", string imageType4="thermal", string prefix="",
+				int colorWidth=0, int colorHeight=0)
 	{
-		if(!_isUploadingImage)
-		{
+		//if(!_isUploadingImage)
+		//{
 			_isUploadingImage = true;
-			StartCoroutine(UploadImageQuad(contentType, pathToFile, pathToFile2, pathToFile3, pathToFile4, locationID, width, height, callBack, position, orientation, headsetID, imageType, imageType2, imageType3, imageType4));
-			return true;
-		}
+			StartCoroutine(UploadImageQuad(contentType, pathToFile, pathToFile2, pathToFile3, pathToFile4, locationID, width, height, callBack, position, orientation, headsetID, imageType, imageType2, imageType3, imageType4, prefix, colorWidth, colorHeight));
+		//	return true;
+		//}
 		
-		return false;
+		return true;
 	}
 	
 	
@@ -937,8 +938,8 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		
 		_isUploadingImage = false;
 
-		File.Delete(path);
-		File.Delete(path2);
+		//File.Delete(path);
+		//File.Delete(path2);
 	}
 
 
@@ -1110,23 +1111,26 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		www3.Dispose();
 		www4.Dispose();
 
-		File.Delete(path);
-		File.Delete(path2);
-		File.Delete(path3);
+		//File.Delete(path);
+		//File.Delete(path2);
+		//File.Delete(path3);
 
 		_isUploadingImage = false;
 	}
 	
 	
 	IEnumerator UploadImageQuad(string contentType, string path, string path2, string path3, string path4, string locationID, int width, int height, System.Action<string> callBack, 
-				Vector3 position, Quaternion orientation, string headsetID = "", string imageType="photo", string imageType2="depth", string imageType3="geometry", string imageType4="thermal", int colorWidth=0, int colorHeight=0)
+				Vector3 position, Quaternion orientation, string headsetID = "", string imageType="photo", string imageType2="depth", string imageType3="geometry", string imageType4="thermal", 
+				string prefix="", int colorWidth=0, int colorHeight=0)
     {
 		EasyVizAR.Hololens2PhotoPost h = new EasyVizAR.Hololens2PhotoPost();
 		h.width = width;
 		h.height = height;
 		h.contentType = contentType;//"image/png";
 		h.camera_location_id = locationID;
-
+		
+		string return1 = prefix+"_1.txt";
+		
 		//var headset = headsetManager.LocalHeadset;
 		//if (headset != null)
         {
@@ -1167,12 +1171,12 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		if (www.result != UnityWebRequest.Result.Success)
 		{
 			//Debug.Log(www.error);
-			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOutErr1.txt"), www.error);
+			//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, return1), www.error);
 		}
 		else
 		{
 			//Debug.Log("Form upload complete!");
-			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOut1.txt"), "successfully posted photo");
+			//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, return1), "successfully posted photo");
 		}
 
 		string resultText = www.downloadHandler.text;
@@ -1207,16 +1211,18 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		www2.downloadHandler = new DownloadHandlerBuffer();
 
 		yield return www2.SendWebRequest();
-
+		
+		string return2 = prefix+"_2.txt";
+		
 		if (www2.result != UnityWebRequest.Result.Success)
 		{
 			//Debug.Log(www2.error);
-			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOutErr2.txt"), www2.error);
+			//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, return2), www2.error);
 		}
 		else
 		{
 			//Debug.Log("Photo upload complete!");
-			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOut2.txt"), iUrl);
+			//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, return2), iUrl);
 		}
 
 		iUrl = h2.imageUrl;
@@ -1236,16 +1242,17 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		}
 		
 		yield return www3.SendWebRequest();
-
+		
+		string return3 = prefix+"_3.txt";
 		if (www3.result != UnityWebRequest.Result.Success)
 		{
 			//Debug.Log(www2.error);
-			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOutErr3.txt"), www3.error);
+			//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, return3), www3.error);
 		}
 		else
 		{
 			//Debug.Log("Photo upload complete!");
-			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOut3.txt"), iUrl);
+			//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, return3), iUrl);
 		}
 		
 		iUrl = h2.imageUrl;
@@ -1266,15 +1273,16 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		
 		yield return www4.SendWebRequest();
 
+		string return4 = prefix+"_4.txt";
 		if (www4.result != UnityWebRequest.Result.Success)
 		{
 			//Debug.Log(www2.error);
-			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOutErr4.txt"), www4.error);
+			//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, return4), www4.error);
 		}
 		else
 		{
 			//Debug.Log("Photo upload complete!");
-			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOut3.txt"), iUrl);
+			//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, return4), iUrl);
 		}
 		
 		iUrl = h2.imageUrl;
@@ -1283,7 +1291,7 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		
 		UnityWebRequest www5 = new UnityWebRequest(GetBaseURL() + iUrl, "PUT");
 		www5.SetRequestHeader("Content-Type", "image/png");
-
+	
 		//byte[] image_as_bytes2 = imageData.GetRawTextureData();//new System.Text.UTF8Encoding().GetBytes(photoJson);
 		//for sending an image - above raw data technique didn't work, but sending via uploadhandlerfile below did...
 		www5.uploadHandler = new UploadHandlerFile(path4);//new UploadHandlerRaw(image_as_bytes2);//
@@ -1294,16 +1302,18 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		}
 		
 		yield return www5.SendWebRequest();
-
+		
+		string return5 = prefix+"_5.txt";
+		
 		if (www5.result != UnityWebRequest.Result.Success)
 		{
 			//Debug.Log(www2.error);
-			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOutErr4.txt"), www4.error);
+			//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, return5), www4.error);
 		}
 		else
 		{
 			//Debug.Log("Photo upload complete!");
-			System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "logOut3.txt"), iUrl);
+			//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, return5), iUrl);
 		}
 		
 		www.Dispose();
@@ -1312,10 +1322,10 @@ public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
 		www4.Dispose();
 		www5.Dispose();
 
-		File.Delete(path);
-		File.Delete(path2);
-		File.Delete(path3);
-		File.Delete(path4);
+		//File.Delete(path);
+		//File.Delete(path2);
+		//File.Delete(path3);
+		//File.Delete(path4);
 
 		_isUploadingImage = false;
 	}

@@ -11,6 +11,9 @@ public class LiDARVis : MonoBehaviour
 	public string inputDirectory;
 
 	public GameObject ipadDebugPrefab;
+		
+	[SerializeField]
+	bool _visualizeData;
 	
 	[SerializeField]
 	string _scanDate = "";
@@ -52,14 +55,16 @@ public class LiDARVis : MonoBehaviour
  		_geomTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
  		_depthTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
 		
-		_qrScanner.LocationChanged += (o, ev) =>
+		if(_visualizeData)
 		{
-			Debug.Log("Calling ImageGetTest");
-			ImageGetTest();
-		};
+			_qrScanner.LocationChanged += (o, ev) =>
+			{
+				Debug.Log("Calling ImageGetTest");
+				ImageGetTest();
+			};
+		}
 		
-		//ImageGetTest();
-			
+		//ImageGetTest();			
     }
 
     // Update is called once per frame

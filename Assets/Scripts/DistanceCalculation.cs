@@ -62,7 +62,13 @@ public class DistanceCalculation : MonoBehaviour
 
             local_headset_id = headset_ID;
             GameObject local = GameObject.Find("LocalHeadset");
-            local.transform.GetChild(0).name = headset_ID;
+            if(local != null) 
+            {
+                if(local.transform.childCount > 0)
+                {
+                    local.transform.GetChild(0).name = headset_ID;
+                }   
+            }
         }
 
         SpawnHeasetIcon();
@@ -305,7 +311,7 @@ public class DistanceCalculation : MonoBehaviour
         }
         else
         {
-            UnityEngine.Debug.Log("Missing headset Map Marker");
+        //    UnityEngine.Debug.Log("Missing headset Map Marker");
         }
 
     }
