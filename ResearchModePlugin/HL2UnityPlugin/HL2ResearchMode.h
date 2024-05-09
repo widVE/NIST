@@ -12,6 +12,7 @@
 #include <cmath>
 #include <DirectXMath.h>
 #include <vector>
+#include <queue>
 #include <winrt/Windows.Foundation.h>
 #include<winrt/Windows.Perception.Spatial.h>
 #include<winrt/Windows.Perception.Spatial.Preview.h>
@@ -35,7 +36,18 @@ namespace winrt::HL2UnityPlugin::implementation
 		hstring PrintRFExtrinsics();*/
 
         hstring GetTransformName() { return _lastTransformName;  }
-        hstring GetBinaryDepthName() { return _lastBinaryDepthName; }
+        hstring GetBinaryDepthName() 
+        {
+            if (_binaryDepthNames.size() > 0)
+            {
+                hstring s = _binaryDepthNames.front();
+                _binaryDepthNames.pop();
+                return s;
+            }
+
+            return hstring(L"");
+        }
+
         hstring GetRectColorName() { return _lastRectColorName; }
         hstring GetHiColorName() { return _lastHiColorName; }
         hstring GetDepthImageName() { return _lastDepthImageName; }
@@ -129,6 +141,8 @@ namespace winrt::HL2UnityPlugin::implementation
         com_array<float> GetCurrPosition();
         com_array<float> GetPVMatrix();
         com_array<float> GetLocalDepthBuffer();
+
+        std::queue<hstring> _binaryDepthNames;
 
         std::mutex mu;
         unsigned int _frameCount = 0;

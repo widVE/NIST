@@ -4,6 +4,7 @@
 #include <codecvt>
 #include <fstream>
 
+
 extern "C"
 HMODULE LoadLibraryA(
     LPCSTR lpLibFileName
@@ -289,7 +290,7 @@ namespace winrt::HL2UnityPlugin::implementation
 
             be.SetSoftwareBitmap(softwareBitmap);
 
-            co_await be.FlushAsync();
+            be.FlushAsync();
         }
         else
         {
@@ -297,7 +298,7 @@ namespace winrt::HL2UnityPlugin::implementation
 
             be.SetSoftwareBitmap(softwareBitmap);
 
-            co_await be.FlushAsync();
+            be.FlushAsync();
         }
     }
 
@@ -1578,10 +1579,12 @@ namespace winrt::HL2UnityPlugin::implementation
                     //depthImage = winrt::Windows::Graphics::Imaging::SoftwareBitmap::Convert(depthImage, winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Rgba16);
                     //std::wstring pcName = fullName + L"\\" + m_datetime + L"_" + m_ms + L"_color.png";
                     winrt::Windows::Storage::StorageFolder storageFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
-                    pHL2ResearchMode->_lastBinaryDepthName = storageFolder.Path();
-                    pHL2ResearchMode->_lastBinaryDepthName = pHL2ResearchMode->_lastBinaryDepthName + hstring(L"\\") + hstring(fName);
+                    
+                    pHL2ResearchMode->_lastBinaryDepthName = storageFolder.Path() + hstring(L"\\") + hstring(fName);
 
                     CreateLocalFile(fName, localPCImage, true);
+
+                    pHL2ResearchMode->_binaryDepthNames.push(pHL2ResearchMode->_lastBinaryDepthName);
                     //pHL2ResearchMode->_frameCount++;
                 }
             //}

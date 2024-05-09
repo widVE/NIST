@@ -269,6 +269,8 @@ public class HololensDepthPVCapture : MonoBehaviour
 		_isCapturing = false;
 		
 		StopSensorsEvent();
+		
+		
 	}
 	
 	public void TextureUploaded(string imageURL)
@@ -290,25 +292,25 @@ public class HololensDepthPVCapture : MonoBehaviour
 				string sColor = prefix+"_color.png";
 				string transFile = prefix+"_trans.txt";
 				string sDepth = prefix+"_depth.bmp";
-				string sI = prefix+"_intensity.png";
+				//string sI = prefix+"_intensity.png";
 				
-				FileInfo sColorInfo = null;
-				FileInfo sTransInfo = null;
-				FileInfo sIInfo = null;
-				FileInfo sDepthInfo = null;
+				//FileInfo sColorInfo = null;
+				//FileInfo sTransInfo = null;
+				//FileInfo sIInfo = null;
+				//FileInfo sDepthInfo = null;
 				
 				//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, prefix+"________.txt"), prefix);
 				
 				
-				while(!File.Exists(sColor) && !File.Exists(transFile) && !File.Exists(sI) && !File.Exists(sDepth)) 
+				while(!File.Exists(sColor) && !File.Exists(transFile) && !File.Exists(sDepth))// && !File.Exists(sI)) 
 				{
 					yield return new WaitForSeconds(0.1f);
 				}
 				
-				sColorInfo = new FileInfo(sColor);
-				sTransInfo = new FileInfo(transFile);
-				sIInfo = new FileInfo(sI);
-				sDepthInfo = new FileInfo(sDepth);
+				//sColorInfo = new FileInfo(sColor);
+				//sTransInfo = new FileInfo(transFile);
+				//sIInfo = new FileInfo(sI);
+				//sDepthInfo = new FileInfo(sDepth);
 				
 				//while(sColorInfo.Length == 0 || sTransInfo.Length == 0 || sIInfo.Length == 0 || sDepthInfo.Length == 0)
 				//{
@@ -356,7 +358,8 @@ public class HololensDepthPVCapture : MonoBehaviour
 				}
 				
 				//EasyVizARServer.Instance.PutImagePair("image/png", sPC, sColor, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, headsetID, "geometry", "photo");
-				EasyVizARServer.Instance.PutImageQuad("image/png", sPC, sColor, sDepth, sI, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, headsetID, "geometry", "photo", "depth", "thermal", prefix);
+				//EasyVizARServer.Instance.PutImageQuad("image/png", sPC, sColor, sDepth, sI, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, headsetID, "geometry", "photo", "depth", "thermal", prefix);
+				EasyVizARServer.Instance.PutImageTriple("image/png", sPC, sColor, sDepth, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, headsetID, "geometry", "photo", "depth", prefix);
 			}
 			else
 			{
