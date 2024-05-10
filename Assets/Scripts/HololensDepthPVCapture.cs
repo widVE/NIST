@@ -278,6 +278,63 @@ public class HololensDepthPVCapture : MonoBehaviour
 		Debug.Log("Texture uploaded to: " + imageURL);
 	}
 	
+	IEnumerator UploadImages(string sColor, string sPC, string sDepth, string transFile, string prefix)
+	{
+		while(!File.Exists(sColor) && !File.Exists(transFile) && !File.Exists(sDepth))// && !File.Exists(sI)) 
+		{
+			yield return new WaitForSeconds(0.1f);
+		}
+		
+		FileInfo sColorInfo = null;
+		FileInfo sTransInfo = null;
+		FileInfo sIInfo = null;
+		FileInfo sDepthInfo = null;
+		
+		sColorInfo = new FileInfo(sColor);
+		sTransInfo = new FileInfo(transFile);
+		//sIInfo = new FileInfo(sI);
+		sDepthInfo = new FileInfo(sDepth);
+		
+		while(sColorInfo.Length == 0 || sTransInfo.Length == 0 || sDepthInfo.Length == 0)
+		{
+			yield return new WaitForSeconds(0.1f);
+		}
+
+		string[] transLines = File.ReadAllLines(transFile);
+		Vector3 pos = Vector3.zero;
+		Quaternion rot = Quaternion.identity;
+		Matrix4x4 depthTrans = Matrix4x4.identity;
+		
+		for(int i = 0; i < 4; ++i)
+		{
+			string[] vals = transLines[i].Split(" ");
+			for(int j = 0; j < 4; ++j)
+			{
+				depthTrans[i*4+j] = float.Parse(vals[j]);
+			}
+		}
+		
+		pos = depthTrans.GetPosition();
+		rot = depthTrans.rotation;
+
+		var headset = _manager.LocalHeadset;
+		string headsetID = "";
+		if (headset != null)
+		{
+			var hsObject = headset.GetComponent<EasyVizARHeadset>();
+			if (hsObject != null)
+			{
+				headsetID = hsObject._headsetID;
+			} 
+			else 
+			{
+				headsetID = _manager._local_headset_ID;
+			}
+		}
+
+		EasyVizARServer.Instance.PutImageTriple("image/png", sPC, sColor, sDepth, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, headsetID, "geometry", "photo", "depth", prefix);
+	}
+
 	IEnumerator LookForData()
 	{
 		while(_isCapturing)
@@ -300,9 +357,9 @@ public class HololensDepthPVCapture : MonoBehaviour
 				//FileInfo sDepthInfo = null;
 				
 				//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, prefix+"________.txt"), prefix);
-				
-				
-				while(!File.Exists(sColor) && !File.Exists(transFile) && !File.Exists(sDepth))// && !File.Exists(sI)) 
+				StartCoroutine(UploadImages(sColor, sPC, sDepth, transFile, prefix));
+
+				/*while(!File.Exists(sColor) && !File.Exists(transFile) && !File.Exists(sDepth))// && !File.Exists(sI)) 
 				{
 					yield return new WaitForSeconds(0.1f);
 				}
@@ -349,8 +406,6 @@ public class HololensDepthPVCapture : MonoBehaviour
 					}
 				}
 				
-				//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, prefix+"________.txt"), prefix);
-				
 				//if waiting on previous upload call... wait here as well...
 				
 				while(EasyVizARServer.Instance.IsUploadingImage()) {
@@ -359,7 +414,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 				
 				//EasyVizARServer.Instance.PutImagePair("image/png", sPC, sColor, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, headsetID, "geometry", "photo");
 				//EasyVizARServer.Instance.PutImageQuad("image/png", sPC, sColor, sDepth, sI, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, headsetID, "geometry", "photo", "depth", "thermal", prefix);
-				EasyVizARServer.Instance.PutImageTriple("image/png", sPC, sColor, sDepth, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, headsetID, "geometry", "photo", "depth", prefix);
+				EasyVizARServer.Instance.PutImageTriple("image/png", sPC, sColor, sDepth, _locationId, DEPTH_WIDTH, DEPTH_HEIGHT, TextureUploaded, pos, rot, headsetID, "geometry", "photo", "depth", prefix);*/
 			}
 			else
 			{
@@ -414,7 +469,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 							sOut = " 0 ";
 						}
 						
-						System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, prefix+"___.txt"), prefix+sOut);
+						//System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, prefix+"___.txt"), prefix+sOut);
 						
 						_depthImageQueue.Enqueue(sPC);
 						//StartCoroutine(LookForData(prefix, sPC));
