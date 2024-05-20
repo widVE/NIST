@@ -117,6 +117,61 @@ public class LiDARVis : MonoBehaviour
 		_geomTex.Apply(false);
 		_newGeom = true;
 	}
+	
+	public bool LoadPhotoEvent(EasyVizAR.PhotoUpdated p)
+	{
+		bool bFoundGeom = false;
+		bool bFoundDepth = false;
+		
+		for(int j = 0; j < p.files.Length; ++j)
+		{
+			if(p.files[j].name == "geometry.bmp")
+			{
+				bFoundGeom = true;
+			}
+			else if(p.files[j].name == "depth.bmp")
+			{
+				bFoundDepth = true;
+			}
+		}
+		
+
+		if(bFoundGeom && bFoundDepth)
+		{
+			_currentPosition.x = p.camera_position.x;
+			_currentPosition.y = p.camera_position.y;
+			_currentPosition.z = p.camera_position.z;
+			
+			_currentRotation.x = p.camera_orientation.x;
+			_currentRotation.y = p.camera_orientation.y;
+			_currentRotation.z = p.camera_orientation.z;
+			_currentRotation.w = p.camera_orientation.w;
+			
+			Debug.Log(_currentPosition);
+			Debug.Log(_currentRotation);
+			
+			if(_currentPosition.magnitude > 0)
+			{
+				//photo_list.photos[i].files[j].name
+				_newGeom = false;
+				_newColor = false;
+				_newDepth = false;
+
+				EasyVizARServer.Instance.Texture("photos/"+p.id+"/photo.png", "image/png", "320", ColorTextureCallback);
+				EasyVizARServer.Instance.Texture("photos/"+p.id+"/geometry.bmp", "image/bmp", "320", GeomTextureCallback);
+				EasyVizARServer.Instance.Texture("photos/"+p.id+"/depth.bmp", "image/bmp", "320", DepthTextureCallback);
+
+				_nextReady = false;
+
+				//StartCoroutine(WaitForTexturesCube(p.id.ToString()));
+				StartCoroutine(WaitForTexturesGPU(p.id.ToString()));
+				return true;
+			}
+		}
+	
+
+		return false;	
+	}
 
 	public bool LoadPhotoVis(EasyVizAR.PhotoReturn p)
 	{

@@ -275,6 +275,35 @@ namespace EasyVizAR
 		public int photo_record_id;
 		public string sublabel;
 	}
+	
+	[System.Serializable]
+	public class PhotoUpdated
+	{
+		public string queue_name;
+		public int id;
+		public string retention;
+		public int priority;
+		public string created_by;
+		public int device_pose_id;
+		public string camera_location_id;
+		public float created;
+		public PhotoFileAnnotation[] annotations;
+		public int tracking_session_id;
+		public PhotoFileInfo[] files;
+		public float updated;
+		public string imageUrl;
+		public bool ready;
+		public string status;
+		public Position camera_position;
+		public Orientation camera_orientation;
+	}
+	
+	[System.Serializable]
+	public class PhotoUpdatedEvent
+	{
+		public PhotoUpdated current;
+		public PhotoUpdated previous;
+	}
 
 	[System.Serializable]
 	public class PhotoReturn

@@ -1517,7 +1517,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 1556404472470392495}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 758851942}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e225851d0172f184ea4336a911d50719, type: 3}
   m_Name: 
@@ -2314,8 +2314,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputDirectory: newNistExample
-  ipadDebugPrefab: {fileID: 3924963915668624178, guid: 9cff4a6cad17f4144ab1361945ab0ad8, type: 3}
-  _visualizeData: 0
+  ipadDebugPrefab: {fileID: 3924963915668624178, guid: 030559ace04ce405791beebcba6b9914, type: 3}
+  _visualizeData: 1
   _scanDate: 2024-05-02
   _locationID: 1cc48e8d-890d-413a-aa66-cabaaa6e5458
   _qrScanner: {fileID: 291935032}
@@ -4773,7 +4773,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: _qrScanner

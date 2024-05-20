@@ -23,8 +23,8 @@ public class HeadsetsEvent
 [System.Serializable]
 public class PhotosEvent
 {
-    public EasyVizAR.PhotoReturn previous;
-    public EasyVizAR.PhotoReturn current;
+	public EasyVizAR.PhotoUpdated current;
+    public EasyVizAR.PhotoUpdated previous;
 }
 
 public class EasyVizARWebSocketConnection : MonoBehaviour
@@ -202,6 +202,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
         if (lidarVis)
         {
+			UnityEngine.Debug.Log("Register Photos updated");
             var photo_uri = $"/photos/*";
             await _ws.SendText("subscribe photos:updated " + photo_uri);
         }
@@ -268,8 +269,9 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
                 }
             case "photos:updated":
                 {
+					UnityEngine.Debug.Log(event_body);
                     PhotosEvent ev = JsonUtility.FromJson<PhotosEvent>(event_body);
-                    lidarVis.GetComponent<LiDARVis>().LoadPhotoVis(ev.current);
+                    lidarVis.GetComponent<LiDARVis>().LoadPhotoEvent(ev.current);
                     break;
                 }
             default:
