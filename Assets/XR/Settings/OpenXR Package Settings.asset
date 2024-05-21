@@ -210,6 +210,7 @@ MonoBehaviour:
   m_Name: Standalone
   m_EditorClassIdentifier: 
   features:
+  - {fileID: 216420937979731222}
   - {fileID: -4977413496949118957}
   - {fileID: -1758634648558424078}
   - {fileID: -8987255150459089001}
@@ -222,10 +223,9 @@ MonoBehaviour:
   - {fileID: -7227082149858661626}
   - {fileID: -4634555826935526833}
   - {fileID: -4359398897823207556}
+  - {fileID: 1046682741125997521}
   - {fileID: 5794461020405038905}
   - {fileID: -773491367236895362}
-  - {fileID: 1046682741125997521}
-  - {fileID: 216420937979731222}
   m_renderMode: 1
   m_depthSubmissionMode: 0
 --- !u!114 &-5729417024541042283
@@ -554,6 +554,21 @@ MonoBehaviour:
   company: Unity
   priority: 0
   required: 0
+--- !u!114 &-180538649336409316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5a1f07dc5afe854f9f12a4194aca3fb, type: 3}
+  m_Name: WebGL
+  m_EditorClassIdentifier: 
+  features: []
+  m_renderMode: 1
+  m_depthSubmissionMode: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -566,11 +581,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f0ebc320a151d3408ea1e9fce54d40e, type: 3}
   m_Name: OpenXR Package Settings
   m_EditorClassIdentifier: 
-  Keys: 01000000070000000e000000
+  Keys: 01000000070000000e0000000d000000
   Values:
   - {fileID: -5926657866655775842}
   - {fileID: -2493593676847025116}
   - {fileID: -7989831385245197106}
+  - {fileID: -180538649336409316}
 --- !u!114 &216420937979731222
 MonoBehaviour:
   m_ObjectHideFlags: 0

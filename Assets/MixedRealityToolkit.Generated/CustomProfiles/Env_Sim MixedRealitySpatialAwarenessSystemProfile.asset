@@ -22,16 +22,16 @@ MonoBehaviour:
     runtimePlatform: 8
     observerProfile: {fileID: 11400000, guid: 8be0bcd2117dd214da41ed98f0def2e3, type: 2}
   - componentType:
-      reference: Microsoft.MixedReality.Toolkit.SpatialObjectMeshObserver.SpatialObjectMeshObserver,
-        Microsoft.MixedReality.Toolkit.Providers.ObjectMeshObserver
-    componentName: Spatial Object Mesh Observer
-    priority: 0
-    runtimePlatform: 216
-    observerProfile: {fileID: 11400000, guid: 80d7153585ff1ca45a698307274690c5, type: 2}
-  - componentType:
       reference: Microsoft.MixedReality.Toolkit.WindowsSceneUnderstanding.Experimental.WindowsSceneUnderstandingObserver,
         Microsoft.MixedReality.Toolkit.Providers.WindowsSceneUnderstanding
     componentName: Windows Scene Understanding Observer
     priority: 0
     runtimePlatform: 8
     observerProfile: {fileID: 11400000, guid: 18fd28f8731a1074b8671e21090600d9, type: 2}
+  - componentType:
+      reference: Microsoft.MixedReality.Toolkit.SpatialObjectMeshObserver.SpatialObjectMeshObserver,
+        Microsoft.MixedReality.Toolkit.Providers.ObjectMeshObserver
+    componentName: Spatial Object Mesh Observer
+    priority: 0
+    runtimePlatform: 208
+    observerProfile: {fileID: 11400000, guid: 80d7153585ff1ca45a698307274690c5, type: 2}
