@@ -135,6 +135,15 @@ public class LiDARVis : MonoBehaviour
 			}
 		}
 		
+		if(_currentParent == null)
+		{
+			_currentParent = new GameObject("H2_3DScan");
+			_currentParent.transform.parent = gameObject.transform;
+			_currentParent.transform.position = Vector3.zero;
+			Quaternion q = Quaternion.identity;
+			q.eulerAngles = new Vector3(-90f, 0f, 0f);
+			_currentParent.transform.rotation = q;
+		}
 
 		if(bFoundGeom && bFoundDepth)
 		{
