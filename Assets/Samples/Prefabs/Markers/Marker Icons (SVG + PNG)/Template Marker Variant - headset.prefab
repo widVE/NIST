@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &4870229907198442120
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 759943075284539836, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 6dc538b9bb630404d80c5c5a02c4c925, type: 2}
+    - target: {fileID: 3961399598258537733, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_Name
+      value: Headset
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316280435711188199, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5318789042369293505, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: m_Name
+      value: Template Marker Variant - headset
+      objectReference: {fileID: 0}
+    - target: {fileID: 5953477909177969358, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: constraintsManager
+      value: 
+      objectReference: {fileID: 6263519901181511079}
+    - target: {fileID: 7132239816822482889, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+      propertyPath: feature_map
+      value: 
+      objectReference: {fileID: 4402188086708784334, guid: d8bfdd92541e05d438e4d0d1945df5aa, type: 3}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+--- !u!114 &6263519901181511079 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1547820340582317871, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
+  m_PrefabInstance: {fileID: 4870229907198442120}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a98de877dee5fc341b4eb59dfdab266c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

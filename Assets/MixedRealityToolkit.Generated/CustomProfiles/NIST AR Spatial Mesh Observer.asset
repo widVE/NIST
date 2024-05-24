@@ -22,8 +22,8 @@ MonoBehaviour:
   levelOfDetail: 0
   trianglesPerCubicMeter: 0
   recalculateNormals: 1
-  displayOption: 2
-  visibleMaterial: {fileID: 2100000, guid: a809c7ea182b699409443d46d5b42435, type: 2}
-  occlusionMaterial: {fileID: 2100000, guid: a809c7ea182b699409443d46d5b42435, type: 2}
+  displayOption: 0
+  visibleMaterial: {fileID: 0}
+  occlusionMaterial: {fileID: 0}
   physicsMaterial: {fileID: 0}
   runtimeSpatialMeshPrefab: {fileID: 0}

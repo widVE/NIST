@@ -196,10 +196,6 @@ public class ObjectDetector : MonoBehaviour
 	private long lastOrientationTime;
 	private float estimatedAngularSpeed;
 
-	private string currentLocationId = "";
-	private Vector3 positionAtCapture = new();
-	private Quaternion rotationAtCapture = new();
-
 	public long GetTimestamp()
     {
 		return DateTimeOffset.Now.ToUnixTimeMilliseconds();
@@ -222,9 +218,7 @@ public class ObjectDetector : MonoBehaviour
         {
 			var manager = headsetManager.GetComponent<EasyVizARHeadsetManager>();
 			manager.HeadsetConfigurationChanged += (sender, change) =>
-            {
-				currentLocationId = change.LocationID;
-
+			{
 				var config = change.Configuration;
 				switch(config.photo_capture_mode)
                 {
@@ -463,9 +457,6 @@ public class ObjectDetector : MonoBehaviour
 			sentStartupReport = true;
 		}
 
-		positionAtCapture = Camera.main.transform.position;
-		rotationAtCapture = Camera.main.transform.rotation;
-
 		startExecution();
 
 		long executionTime = 0;
@@ -594,20 +585,14 @@ public class ObjectDetector : MonoBehaviour
 					report.binary_size = image.Length;
 					report.encode_time_ms = GetTimestamp() - encode_start;
 
+					yield return sendPhoto(image, "image/jpg");
+					report.filename = current_filename;
+
 					if (sendToExperimentServer)
 					{
-						yield return sendPhoto(image, "image/jpg");
-						report.filename = current_filename;
-
 						yield return sendReport(report);
 					}
-                    else
-                    {
-						yield return sendPhotoWithPose(image, "image/jpg");
-						report.filename = current_filename;
-					}
-
-					if (shouldWaitForResult && headAttachedDisplay is not null)
+					else if (shouldWaitForResult && headAttachedDisplay is not null)
                     {
 						yield return waitAndDisplayResult();
                     }
@@ -638,16 +623,12 @@ public class ObjectDetector : MonoBehaviour
 				report.encode_time_ms = GetTimestamp() - encode_start;
 				report.average_quality = (float)imageQuality;
 
+				yield return sendPhoto(image, "image/jpg");
+				report.filename = current_filename;
+
 				if (sendToExperimentServer)
 				{
-					yield return sendPhoto(image, "image/jpg");
-					report.filename = current_filename;
-
 					yield return sendReport(report);
-				}
-				else
-                {
-					yield return sendPhotoWithPose(image, "image/jpg");
 				}
 
 				// Do we need to call task.Dispose()? Not sure.
@@ -1098,74 +1079,6 @@ public class ObjectDetector : MonoBehaviour
 		www.downloadHandler = new DownloadHandlerBuffer();
 
 		yield return www.SendWebRequest();
-
-		www.Dispose();
-	}
-
-	IEnumerator sendPhotoWithPose(byte[] data, string contentType)
-    {
-		string url = EasyVizARServer.Instance.GetBaseURL() + "/photos";
-
-		UnityWebRequest www = new UnityWebRequest(url, "POST");
-
-		www.SetRequestHeader("Authorization", EasyVizARServer.Instance.GetAuthorizationHeader());
-		www.SetRequestHeader("Content-Type", "application/json");
-
-		var description = new EasyVizAR.Hololens2PhotoPost();
-		description.contentType = contentType;
-		description.width = cameraWidth;
-		description.height = cameraHeight;
-		description.camera_location_id = currentLocationId;
-
-		description.camera_position = new EasyVizAR.Position();
-		description.camera_position.x = positionAtCapture.x;
-		description.camera_position.y = positionAtCapture.y;
-		description.camera_position.z = positionAtCapture.z;
-
-		description.camera_orientation = new EasyVizAR.Orientation();
-		description.camera_orientation.x = rotationAtCapture.x;
-		description.camera_orientation.y = rotationAtCapture.y;
-		description.camera_orientation.z = rotationAtCapture.z;
-		description.camera_orientation.w = rotationAtCapture.w;
-
-		var json_data = JsonUtility.ToJson(description);
-		byte[] json_as_bytes = new System.Text.UTF8Encoding().GetBytes(json_data);
-
-		www.uploadHandler = new UploadHandlerRaw(json_as_bytes);
-		www.downloadHandler = new DownloadHandlerBuffer();
-
-		yield return www.SendWebRequest();
-
-		if (www.result == UnityWebRequest.Result.Success)
-		{
-			var photo = JsonUtility.FromJson<EasyVizAR.PhotoInfo>(www.downloadHandler.text);
-			string put_url = url + $"/{photo.id}/image";
-
-			UnityWebRequest www2 = new UnityWebRequest(put_url, "PUT");
-
-			www2.SetRequestHeader("Authorization", EasyVizARServer.Instance.GetAuthorizationHeader());
-			www2.SetRequestHeader("Content-Type", contentType);
-			www2.SetRequestHeader("X-Queue-Name", uploadQueueName);
-
-			www2.uploadHandler = new UploadHandlerRaw(data);
-			www2.downloadHandler = new DownloadHandlerBuffer();
-
-			yield return www2.SendWebRequest();
-
-			if (www2.result == UnityWebRequest.Result.Success)
-			{
-				var created_photo = JsonUtility.FromJson<NewPhotoResult>(www2.downloadHandler.text);
-				current_filename = created_photo.filename;
-				current_photo_id = created_photo.id;
-			}
-			else
-			{
-				current_filename = "";
-				current_photo_id = -1;
-			}
-
-			www2.Dispose();
-		}
 
 		www.Dispose();
 	}
