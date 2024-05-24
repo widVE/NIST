@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastScriptReload.Runtime", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexPlayer", "NexPlayer.csproj", "{D800A998-5C67-7CC2-EAF5-7E7B24D9F61C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.MixedReality.Toolkit.Demos.UX.Interactables", "Microsoft.MixedReality.Toolkit.Demos.UX.Interactables.csproj", "{0DE5A41B-5C24-23AB-24F5-A19B7303D827}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.MixedReality.Toolkit.Demos.InspectorFields", "Microsoft.MixedReality.Toolkit.Demos.InspectorFields.csproj", "{1737A543-15BD-8FD2-78EA-41B743A0F12F}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.SpatialAudio.Spatializer", "Microsoft.SpatialAudio.Spatializer.csproj", "{AF0C9C37-8B5D-109C-9931-E606CC949DD8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "endel.nativewebsocket", "endel.nativewebsocket.csproj", "{B75E9945-21E2-83C5-22E9-A04B78E5B87F}"
@@ -30,6 +34,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexPlayer.SimpleSample.Editor", "NexPlayer.SimpleSample.Editor.csproj", "{FE7222F9-610E-9725-0E0E-D7E359C42FD8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.SpatialAudio.Spatializer.Editor", "Microsoft.SpatialAudio.Spatializer.Editor.csproj", "{86E782CF-7E7A-0A47-2D1B-54779294481B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.MixedReality.Toolkit.Demos.InspectorFields.Inspectors", "Microsoft.MixedReality.Toolkit.Demos.InspectorFields.Inspectors.csproj", "{B5FC2EDD-DF06-C27D-90B1-40A7FEE51C13}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.MixedReality.QR.Editor", "Microsoft.MixedReality.QR.Editor.csproj", "{CBB5A096-AEFA-0F94-446E-88076D4F27E6}"
 EndProject
@@ -59,6 +65,14 @@ Global
 		{D800A998-5C67-7CC2-EAF5-7E7B24D9F61C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D800A998-5C67-7CC2-EAF5-7E7B24D9F61C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D800A998-5C67-7CC2-EAF5-7E7B24D9F61C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DE5A41B-5C24-23AB-24F5-A19B7303D827}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DE5A41B-5C24-23AB-24F5-A19B7303D827}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DE5A41B-5C24-23AB-24F5-A19B7303D827}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DE5A41B-5C24-23AB-24F5-A19B7303D827}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1737A543-15BD-8FD2-78EA-41B743A0F12F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1737A543-15BD-8FD2-78EA-41B743A0F12F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1737A543-15BD-8FD2-78EA-41B743A0F12F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1737A543-15BD-8FD2-78EA-41B743A0F12F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AF0C9C37-8B5D-109C-9931-E606CC949DD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AF0C9C37-8B5D-109C-9931-E606CC949DD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF0C9C37-8B5D-109C-9931-E606CC949DD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -99,6 +113,10 @@ Global
 		{86E782CF-7E7A-0A47-2D1B-54779294481B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86E782CF-7E7A-0A47-2D1B-54779294481B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86E782CF-7E7A-0A47-2D1B-54779294481B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5FC2EDD-DF06-C27D-90B1-40A7FEE51C13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5FC2EDD-DF06-C27D-90B1-40A7FEE51C13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5FC2EDD-DF06-C27D-90B1-40A7FEE51C13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5FC2EDD-DF06-C27D-90B1-40A7FEE51C13}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CBB5A096-AEFA-0F94-446E-88076D4F27E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CBB5A096-AEFA-0F94-446E-88076D4F27E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBB5A096-AEFA-0F94-446E-88076D4F27E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
