@@ -309,9 +309,10 @@ namespace EasyVizAR
 	public class PhotoReturn
 	{
 		public PhotoFileAnnotation[] annotations;
+		public string camera;
 		public string camera_location_id;
-		public Position camera_position;
 		public Orientation camera_orientation;
+		public Position camera_position;
 		
 		public string created;
 		public string created_by;
@@ -327,6 +328,7 @@ namespace EasyVizAR
 		public bool ready;
 		public string retention;
 		public string status;
+		public string tracking_session_id;
 		public float updated;
 	}
 

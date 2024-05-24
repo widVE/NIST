@@ -210,8 +210,8 @@ public class LiDARVis : MonoBehaviour
 
 					_nextReady = false;
 
-					StartCoroutine(WaitForTexturesCube(p.id.ToString()));
-					//StartCoroutine(WaitForTexturesGPU(p.id.ToString()));
+					//StartCoroutine(WaitForTexturesCube(p.id.ToString()));
+					StartCoroutine(WaitForTexturesGPU(p.id.ToString()));
 					return true;
 				}
 			}
@@ -261,7 +261,8 @@ public class LiDARVis : MonoBehaviour
 		{
 			outputFile.WriteLine(result_data);
 		}*/
-		//Debug.Log(result_data);
+		
+		Debug.Log(result_data);
 
 		_nextReady = true;
 
