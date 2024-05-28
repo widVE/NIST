@@ -73,7 +73,7 @@ Shader "Instanced/InstancedSurfaceShader" {
             pXYZ.x = uint(d.z) | ((uint(d.x) & 0x0000000F) << 8);
             pXYZ.y = uint(d.y) | ((uint(d.x) & 0x000000F0) << 4);
 
-            pXYZ.z = uint(d2.z) | ((uint(d2.y) & 0x0000000F) << 8);
+            pXYZ.z = (uint(d2.z) & 0x000000FF) | ((uint(d2.y) & 0x000000FF) << 8);
             pXYZ.w = uint(d2.x) | ((uint(d2.w) & 0x0000000F) << 8);
 
             float dx = (pXYZ.x - 2048.0) / 1000.0;
