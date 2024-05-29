@@ -9537,7 +9537,7 @@ PrefabInstance:
     - target: {fileID: 8405082116546204954, guid: 3f1f46cbecbe08e46a303ccfdb5b498a, type: 3}
       propertyPath: iconQuadTexture
       value: 
-      objectReference: {fileID: 2800000, guid: 8d0274d8bc6a17844a08b493920d9491, type: 3}
+      objectReference: {fileID: 2800000, guid: 114589bc5b891c3488cbb8607b6b9171, type: 3}
     - target: {fileID: 8450114940090461486, guid: 3f1f46cbecbe08e46a303ccfdb5b498a, type: 3}
       propertyPath: m_LocalScale.z
       value: 2
@@ -49194,7 +49194,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1662177744579670093, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1662177745099241132, guid: 67957c16514f80e4c95c394447944a28, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.15
       objectReference: {fileID: 0}
     - target: {fileID: 1704944278096700531, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: m_Name

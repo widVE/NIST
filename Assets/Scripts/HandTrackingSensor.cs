@@ -1,3 +1,6 @@
+using Microsoft.MixedReality.Toolkit.Input;
+using Microsoft.MixedReality.Toolkit.Utilities;
+using Microsoft.MixedReality.Toolkit;
 using System.Collections;
 using UnityEngine;
 
@@ -19,9 +22,11 @@ public class HandTrackingSensor : MonoBehaviour
 
     public void Trigger()
     {
-        
-        StartCoroutine(TrackHand());
+        ServiceHandJointData();
+        //StartCoroutine(TrackHand());
+        StartCoroutine(TrackHandService());
     }
+
 
     IEnumerator TrackHand()
     {
@@ -37,6 +42,36 @@ public class HandTrackingSensor : MonoBehaviour
         else
         {
             Debug.Log("Right hand or left hand not found!");
+        }
+    }
+
+    IEnumerator TrackHandService()
+    {
+        yield return new WaitForSeconds(1f); // Wait for 5 seconds before tracking hand
+
+        ServiceHandJointData(); // Get hand joint data
+
+        if (wristTransform != null && fingertipTransform != null)
+        {
+            Invoke("RecordOffset",5f); // Update finger position every 0.1 seconds
+        }
+        else
+        {
+            Debug.Log("Wrist or fingertip transform not found!");
+        }
+    }
+
+    public void ServiceHandJointData()
+    {
+        var hand_joint_service = CoreServices.GetInputSystemDataProvider<IMixedRealityHandJointService>();
+        
+        if (hand_joint_service != null)
+        {
+            Transform index_tip_transform = hand_joint_service.RequestJointTransform(TrackedHandJoint.IndexTip, Handedness.Left);
+            fingertipTransform = index_tip_transform.gameObject;
+
+            Transform wrist_transform = hand_joint_service.RequestJointTransform(TrackedHandJoint.Wrist, Handedness.Right);
+            wristTransform = wrist_transform.gameObject;
         }
     }
 
