@@ -748,19 +748,31 @@ namespace winrt::HL2UnityPlugin::implementation
                         z = 0.0f;
                     }
 
-                    float d = (float)depth/1000.0f;
+                    float d = (float)depth / 1000.0f;
+
                     XMFLOAT3 tempPoint = XMFLOAT3(xy[0] * d, xy[1] * d, z*d);
                     pHL2ResearchMode->m_localDepth[idx*4] = tempPoint.x;
                     pHL2ResearchMode->m_localDepth[idx*4 + 1] = tempPoint.y;
                     pHL2ResearchMode->m_localDepth[idx*4 + 2] = tempPoint.z;
                     pHL2ResearchMode->m_localDepth[idx*4 + 3] = 0.0f;
                     
-                    float fX = (tempPoint.x * 1000.0f) + 2048.0f;       //-2048->2048 to 0->4096 - 12 bits
-                    float fY = (tempPoint.y * 1000.0f) + 2048.0f;       //same as above
+                    float fX = (tempPoint.x * 1000.0f) + 2047.0f;       //-2047->2047 to 0->4095 - 12 bits
+                    float fY = (tempPoint.y * 1000.0f) + 2047.0f;       //same as above
+                    
+                    if(fX > 4095.0f)
+                    {
+                        fX = 4095.0f;
+                    }
+
+                    if(fY > 4095.0f)
+                    {
+                        fY = 4095.0f;
+                    }
+
                     float fZ = tempPoint.z * 1000.0f;
                     
-                    if (fZ > 4096.0f) {
-                        fZ = 4096.0f;
+                    if (fZ > 4095.0f) {
+                        fZ = 4095.0f;
                     }
 
                     //float fX = (tempPoint.x * 1000.0f) + 1024.0f;    //maps -1024->1024 to 0-2048

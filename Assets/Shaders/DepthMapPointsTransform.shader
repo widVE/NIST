@@ -122,11 +122,11 @@ Shader "Custom/DepthMapPointsTransform" {
 
 				uint dA = uint(d.w);
 
-				if((dA & 0x00000080) == 0)
+				//if((dA & 0x00000080) == 0)
 				//if(d.x > 0.0)
 				{
-					float dx = (pXYZ.x - 2048.0) / 1000.0;
-					float dy = (pXYZ.y - 2048.0) / 1000.0;
+					float dx = (pXYZ.x - 2047.0) / 1000.0;
+					float dy = (pXYZ.y - 2047.0) / 1000.0;
 					float dz = (pXYZ.z) / 1000.0;
 
 					float4 vert = float4(dx, dy, dz, 1.0);
@@ -154,10 +154,10 @@ Shader "Custom/DepthMapPointsTransform" {
 					v.color = float4(tex2Dlod(_ColorImage, tc2).yzw, 1.0);
 					o.color = v.color;
 
-					//if((dA & 0x00000080) != 0)
-					//{
-					//	o.color = float4(0,255,0,255);
-					//}
+					if((dA & 0x00000080) != 0)
+					{
+						o.color = float4(0,255,0,255);
+					}
 
 					UNITY_TRANSFER_FOG(o,UnityObjectToClipPos(v.vertex));
 				}
