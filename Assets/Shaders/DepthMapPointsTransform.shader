@@ -116,17 +116,20 @@ Shader "Custom/DepthMapPointsTransform" {
 				float4 d2 = tex2Dlod(_LocalPCImage, tc2);
 				d2 *= 255.0;
 				uint3 pXYZ = uint3(0,0,0);
-				pXYZ.x = uint(d.z) | ((uint(d.x) & 0x0000000F) << 8);
-				pXYZ.y = uint(d.y) | ((uint(d.x) & 0x000000F0) << 4);
+				
+				uint dA = uint(d.w);
+				
+				pXYZ.x = uint(d.z) | ((uint(d.x) & 0x0000000F) << 8) | ((dA & 0x0000000F) << 12);
+				pXYZ.y = uint(d.y) | ((uint(d.x) & 0x000000F0) << 4) | ((dA & 0x000000F0) << 8);
 				pXYZ.z = (uint(d2.z) & 0x000000FF) | ((uint(d2.y) & 0x000000FF) << 8);
 
-				uint dA = uint(d.w);
+				
 
 				//if((dA & 0x00000080) == 0)
 				//if(d.x > 0.0)
 				{
-					float dx = (pXYZ.x - 2047.0) / 1000.0;
-					float dy = (pXYZ.y - 2047.0) / 1000.0;
+					float dx = (pXYZ.x - 4095.0) / 1000.0;
+					float dy = (pXYZ.y - 4095.0) / 1000.0;
 					float dz = (pXYZ.z) / 1000.0;
 
 					float4 vert = float4(dx, dy, dz, 1.0);
@@ -154,10 +157,10 @@ Shader "Custom/DepthMapPointsTransform" {
 					v.color = float4(tex2Dlod(_ColorImage, tc2).yzw, 1.0);
 					o.color = v.color;
 
-					if((dA & 0x00000080) != 0)
-					{
-						o.color = float4(0,255,0,255);
-					}
+					//if((dA & 0x00000080) != 0)
+					//{
+					//	o.color = float4(0,255,0,255);
+					//}
 
 					UNITY_TRANSFER_FOG(o,UnityObjectToClipPos(v.vertex));
 				}

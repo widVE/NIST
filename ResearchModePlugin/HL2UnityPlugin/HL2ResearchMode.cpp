@@ -756,24 +756,24 @@ namespace winrt::HL2UnityPlugin::implementation
                     pHL2ResearchMode->m_localDepth[idx*4 + 2] = tempPoint.z;
                     pHL2ResearchMode->m_localDepth[idx*4 + 3] = 0.0f;
                     
-                    float fX = (tempPoint.x * 1000.0f) + 2047.0f;       //-2047->2047 to 0->4095 - 12 bits
-                    float fY = (tempPoint.y * 1000.0f) + 2047.0f;       //same as above
+                    float fX = (tempPoint.x * 1000.0f) + 4095.0f;       //-2047->2047 to 0->4095 - 12 bits
+                    float fY = (tempPoint.y * 1000.0f) + 4095.0f;       //same as above
                     
-                    if(fX > 4095.0f)
+                    if(fX > 8191.0f)
                     {
-                        fX = 4095.0f;
+                        fX = 8191.0f;
                     }
 
-                    if(fY > 4095.0f)
+                    if(fY > 8191.0f)
                     {
-                        fY = 4095.0f;
+                        fY = 8191.0f;
                     }
 
                     float fZ = tempPoint.z * 1000.0f;
                     
-                    if (fZ > 4095.0f) {
+                    /*if (fZ > 4095.0f) {
                         fZ = 4095.0f;
-                    }
+                    }*/
 
                     //float fX = (tempPoint.x * 1000.0f) + 1024.0f;    //maps -1024->1024 to 0-2048
                     //float fY = -(tempPoint.y * 1000.0f);    //0->1024
@@ -790,7 +790,7 @@ namespace winrt::HL2UnityPlugin::implementation
                     UINT8 u8X = (u16X & 0x00FF);
                     UINT8 u8Y = (u16Y & 0x00FF);
                     UINT8 u8Z = ((u16X & 0x0F00) >> 8) | (u16Y & 0x0F00) >> 4;
-                    UINT8 u8A = pSigma[idx];//((UINT8)((u16X & 0xFF00) >> 8) & 0x07) | ((UINT8)((u16Y & 0xFF00) >> 5) & 0x18) | ((UINT8)((u16Z & 0xFF00) >> 3) & 0xE0);
+                    UINT8 u8A = ((u16X & 0xF000) >> 12) | (u16Y & 0xF000) >> 8;//pSigma[idx];//((UINT8)((u16X & 0xFF00) >> 8) & 0x07) | ((UINT8)((u16Y & 0xFF00) >> 5) & 0x18) | ((UINT8)((u16Z & 0xFF00) >> 3) & 0xE0);
 
                     //instead use two images... RGBA 32 bit bitmap - 12 bits x, 12 bits y. 8 bits sigma buffer.
                     //second image, RGBA 32 bit bitmap - 16 bits z, 16 bits cube size
