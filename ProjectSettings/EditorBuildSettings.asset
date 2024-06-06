@@ -6,50 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Experimental - ExamplesHub/Scenes/MRTKExamplesHubMainMenu.unity
-    guid: 63a00118e809c754f9c7911bb85d635f
-  - enabled: 1
-    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - StandardShader/Scenes/ClippingExamples.unity
-    guid: e532091edada3e04aa706112e8d5f310
-  - enabled: 1
-    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - UX/Tooltips/Scenes/TooltipExamples.unity
-    guid: de90a43947eced441b4c426e11f35f28
-  - enabled: 1
-    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - StandardShader/Scenes/MaterialGallery.unity
-    guid: c6b1477d31864dff836e9738518eae60
-  - enabled: 1
-    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - UX/BoundingBox/Scenes/BoundingBoxExamples.unity
-    guid: 9da574c0affd04d42a6b1e5db09e82b4
-  - enabled: 1
-    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - UX/PressableButton/Scenes/PressableButtonExample.unity
-    guid: b2d06bb8d7f107d4783a56c796c5c120
-  - enabled: 1
-    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - UX/Slate/SlateExample.unity
-    guid: 86e8b0c6246dbb74aa04ecd40a57d89c
-  - enabled: 1
-    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - UX/Slider/Scenes/SliderExample.unity
-    guid: 086aad2912678d04e968264b2398004b
-  - enabled: 1
-    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - EyeTracking/Scenes/EyeTrackingDemo-02-TargetSelection.unity
-    guid: 55643f7e4eceb734784192b162f565e0
-  - enabled: 1
-    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - EyeTracking/Scenes/EyeTrackingDemo-03-Navigation.unity
-    guid: 5df475f0bf57b1f488d59e0e16040d9a
-  - enabled: 1
-    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - EyeTracking/Scenes/EyeTrackingDemo-04-TargetPositioning.unity
-    guid: 91ded1f5ef2ae854ba4ac94eca7a2494
-  - enabled: 1
-    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - EyeTracking/Scenes/EyeTrackingDemo-05-Visualizer.unity
-    guid: 2d6c43a82f3a88c4dbdc3b5e99a68d8a
-  - enabled: 1
-    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - ScrollingObjectCollection/Scenes/ScrollingObjectCollection.unity
-    guid: 79a0bb4c0426b7a4099c35eeced52ee4
-  - enabled: 1
-    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Experimental - SceneUnderstanding/Scenes/SceneUnderstandingExample.unity
-    guid: d42a352dc9a8c4d4990a924687759199
-  - enabled: 1
-    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - Solvers/Scenes/SurfaceMagnetismSpatialAwarenessExample.unity
-    guid: 8feae87497f549c4e8dc08a6e4b7b15c
+    path: Assets/Scenes/v3.3 Video Stream Test.unity
+    guid: 4c4ddbe2e21db67488cbefa83df739db
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 24efe516db1dbf446a155a698a288aae, type: 2}
     Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: 8ff3c7c77ccd00441a88cebd82b4144c, type: 2}
