@@ -48,12 +48,23 @@ public class LiDARVis : MonoBehaviour
 
 	GameObject _currentParent = null;
 
+	Camera _mainCamera = null;
+
+	[SerializeField]
+	EasyVizARHeadsetManager _manager = null;
+
+	[SerializeField]
+	GameObject bounds3D = null;
+
+	const int TEX_WIDTH = 320;
+	const int TEX_HEIGHT = 288;
+
     // Start is called before the first frame update
     void Start()
     {
-		_colorTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
- 		_geomTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
- 		_depthTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+		_colorTex = new Texture2D(TEX_WIDTH, TEX_HEIGHT, TextureFormat.RGBA32, false);
+ 		_geomTex = new Texture2D(TEX_WIDTH, TEX_HEIGHT, TextureFormat.RGBA32, false);
+ 		_depthTex = new Texture2D(TEX_WIDTH, TEX_HEIGHT, TextureFormat.RGBA32, false);
 		
 		if(_visualizeData)
 		{
@@ -63,6 +74,8 @@ public class LiDARVis : MonoBehaviour
 				ImageGetTest();
 			};
 		}
+
+		_mainCamera = Camera.main;
 		
 		//ImageGetTest();			
     }
@@ -77,7 +90,7 @@ public class LiDARVis : MonoBehaviour
 	{
 		if(_depthTex == null)
 		{
-			_depthTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+			_depthTex = new Texture2D(TEX_WIDTH, TEX_HEIGHT, TextureFormat.RGBA32, false);
 		}
 
 		if(textureData.width == depthWidth && textureData.height == depthHeight) {
@@ -92,7 +105,7 @@ public class LiDARVis : MonoBehaviour
 	{
 		if(_colorTex == null)
 		{
-			_colorTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+			_colorTex = new Texture2D(TEX_WIDTH, TEX_HEIGHT, TextureFormat.RGBA32, false);
 		}
 	
 		if(textureData.width == depthWidth && textureData.height == depthHeight) {
@@ -107,7 +120,7 @@ public class LiDARVis : MonoBehaviour
 	{
 		if(_geomTex == null)
 		{
-			_geomTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+			_geomTex = new Texture2D(TEX_WIDTH, TEX_HEIGHT, TextureFormat.RGBA32, false);
 		}
 
 		if(textureData.width == depthWidth && textureData.height == depthHeight) {
@@ -140,8 +153,10 @@ public class LiDARVis : MonoBehaviour
 			_currentParent = new GameObject("H2_3DScan");
 			_currentParent.transform.parent = gameObject.transform;
 			_currentParent.transform.position = Vector3.zero;
+
 			Quaternion q = Quaternion.identity;
 			q.eulerAngles = new Vector3(-90f, 0f, 0f);
+			
 			_currentParent.transform.rotation = q;
 		}
 
@@ -172,8 +187,8 @@ public class LiDARVis : MonoBehaviour
 
 				_nextReady = false;
 
-				//StartCoroutine(WaitForTexturesCube(p.id.ToString()));
-				StartCoroutine(WaitForTexturesGPU(p.id.ToString()));
+				StartCoroutine(WaitForTexturesCube(p.id.ToString(), p.annotations));
+				//StartCoroutine(WaitForTexturesGPU(p.id.ToString()));
 				return true;
 			}
 		}
@@ -210,8 +225,8 @@ public class LiDARVis : MonoBehaviour
 
 					_nextReady = false;
 
-					//StartCoroutine(WaitForTexturesCube(p.id.ToString()));
-					StartCoroutine(WaitForTexturesGPU(p.id.ToString()));
+					StartCoroutine(WaitForTexturesCube(p.id.ToString(), p.annotations));
+					//StartCoroutine(WaitForTexturesGPU(p.id.ToString()));
 					return true;
 				}
 			}
@@ -318,13 +333,13 @@ public class LiDARVis : MonoBehaviour
 			
 			ip.transform.SetParent(_currentParent.transform, false);
 			
-			Texture2D colorTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+			Texture2D colorTex = new Texture2D(TEX_WIDTH, TEX_HEIGHT, TextureFormat.RGBA32, false);
 			Graphics.CopyTexture(_colorTex, colorTex);
 
-			Texture2D geomTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+			Texture2D geomTex = new Texture2D(TEX_WIDTH, TEX_HEIGHT, TextureFormat.RGBA32, false);
 			Graphics.CopyTexture(_geomTex, geomTex);
 
-			Texture2D depthTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+			Texture2D depthTex = new Texture2D(TEX_WIDTH, TEX_HEIGHT, TextureFormat.RGBA32, false);
 			Graphics.CopyTexture(_depthTex, depthTex);
 
 			//Debug.Log("Setting texture for " + i);
@@ -518,7 +533,7 @@ public class LiDARVis : MonoBehaviour
 			
 			ip.transform.SetParent(_currentParent.transform, false);
 			
-			Texture2D colorTex = new Texture2D(320, 288, TextureFormat.ARGB32, false);
+			Texture2D colorTex = new Texture2D(TEX_WIDTH, TEX_HEIGHT, TextureFormat.ARGB32, false);
 			Graphics.CopyTexture(_colorTex, colorTex);
 
 			//Debug.Log("Setting texture for " + i);
@@ -567,7 +582,29 @@ public class LiDARVis : MonoBehaviour
 		}
 	}
 
-	IEnumerator WaitForTexturesCube(string id)
+	Vector4 ConvertToLocal(Color c, Color c2)
+	{
+		Vector4 ulC = c;
+		Vector4 ulC2 = c2;
+
+		ulC *= 255.0f;
+		ulC2 *= 255.0f;
+
+		float fX = ((uint)(ulC.z) | (((uint)(ulC.x) & 0x0000000F) << 8) | (((uint)(ulC.w) & 0x0000000F) << 12));
+		float fY = ((uint)(ulC.y) | (((uint)(ulC.x) & 0x000000F0) << 4) | (((uint)(ulC.w) & 0x000000F0) << 8));
+
+		float fZ = ((uint)(ulC2.z) & 0x000000FF) | (((uint)(ulC2.y) & 0x000000FF) << 8);
+		//float fW = uint(ulC2.x) | ((uint(ulC2.w) & 0x0000000F) << 8);
+
+		float dx = (fX - 4095.0f) / 1000.0f;
+		float dy = (fY - 4095.0f) / 1000.0f;
+		float dz = fZ / 1000.0f;
+		//float cubeSize = pXYZ.w / 1000.0;
+		
+		return new Vector4(dx, dy, dz, 1.0f);
+	}
+
+	IEnumerator WaitForTexturesCube(string id, EasyVizAR.PhotoFileAnnotation[] annotations)
 	{
 		while(!_newGeom || !_newColor || !_newDepth)
 		{
@@ -607,13 +644,13 @@ public class LiDARVis : MonoBehaviour
 			
 			ip.transform.SetParent(_currentParent.transform, false);
 			
-			Texture2D colorTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+			Texture2D colorTex = new Texture2D(TEX_WIDTH, TEX_HEIGHT, TextureFormat.RGBA32, false);
 			Graphics.CopyTexture(_colorTex, colorTex);
 
-			Texture2D geomTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+			Texture2D geomTex = new Texture2D(TEX_WIDTH, TEX_HEIGHT, TextureFormat.RGBA32, false);
 			Graphics.CopyTexture(_geomTex, geomTex);
 
-			Texture2D depthTex = new Texture2D(320, 288, TextureFormat.RGBA32, false);
+			Texture2D depthTex = new Texture2D(TEX_WIDTH, TEX_HEIGHT, TextureFormat.RGBA32, false);
 			Graphics.CopyTexture(_depthTex, depthTex);
 
 			//Debug.Log("Setting texture for " + i);
@@ -621,28 +658,76 @@ public class LiDARVis : MonoBehaviour
 			ip.transform.GetChild(0).gameObject.GetComponent<Renderer>().sharedMaterial.mainTexture = colorTex;
 			ip.transform.GetChild(0).gameObject.GetComponent<Renderer>().sharedMaterial.mainTextureScale = new Vector2(-1,-1);
 		
-
 			CubeTest c = ip.GetComponent<CubeTest>();
 			c.AssignData(colorTex, geomTex, depthTex, scanTrans);
 
-			/*ImagePointCloud ipc = ip.GetComponent<ImagePointCloud>();
-			
-			ipc.CreatePointMaterial();
-			ipc.CreatePointMesh(id, (uint)depthWidth, (uint)depthHeight);
+			if(annotations.Length > 0)
+			{
+				for(int i = 0; i < annotations.Length; ++i) 
+				{
+					//Debug.Log(p.annotations[i].label);
 
-			//ipc.CameraIntrinsics = camIntrinsics;
-			//ipc.ViewProj = viewProjMat;
-			ipc.ModelTransform = scanTrans;
-			
-			//ipc.PointMaterial.SetMatrix("_ViewProj", viewProjMat);
-			ipc.PointMaterial.SetMatrix("_ModelTransform", scanTrans);
-			//ipc.PointMaterial.SetMatrix("_CameraIntrinsics", camIntrinsics);
-			ipc.PointMaterial.SetTexture("_ColorImage", colorTex);
-			ipc.PointMaterial.SetFloat("_ResolutionX", depthWidth);
-			ipc.PointMaterial.SetFloat("_ResolutionY", depthHeight);
-			ipc.PointMaterial.SetTexture("_DepthImage", geomTex);
-			ipc.PointMaterial.SetTexture("_LocalPCImage", depthTex);*/
-			
+					//need to go from 2D to 3D here...
+					
+					int l = (int)(annotations[i].boundary.left * (float)TEX_WIDTH);
+					int t = (int)(annotations[i].boundary.top * (float)TEX_HEIGHT);
+					int w = (int)(annotations[i].boundary.width * (float)TEX_WIDTH);
+					int h = (int)(annotations[i].boundary.height * (float)TEX_HEIGHT);
+
+					Color ulC = geomTex.GetPixel(l, TEX_HEIGHT - t);
+					Color blC = geomTex.GetPixel(l, TEX_HEIGHT - (t+h));
+					Color urC = geomTex.GetPixel(l+w, TEX_HEIGHT - t);
+					Color brC = geomTex.GetPixel(l+w, TEX_HEIGHT - (t+h));
+					
+					Color ulC2 = depthTex.GetPixel(l, TEX_HEIGHT - t);
+					Color blC2 = depthTex.GetPixel(l, TEX_HEIGHT - (t+h));
+					Color urC2 = depthTex.GetPixel(l+w, TEX_HEIGHT - t);
+					Color brC2 = depthTex.GetPixel(l+w, TEX_HEIGHT - (t+h));
+					
+					Color centerColor = geomTex.GetPixel((l + (l + w)) / 2, TEX_HEIGHT - (t + (t + h)) / 2);
+					Color centerColor2 = depthTex.GetPixel((l + (l + w)) / 2, TEX_HEIGHT - (t + (t + h)) / 2);
+					//need to look these up in the local point cloud to use scanTrans to calc world positions
+					//of the boundaries / center...
+
+					Vector4 vertUL = ConvertToLocal(ulC, ulC2);
+
+					vertUL = scanTrans * vertUL;
+
+					Vector4 vertBL = ConvertToLocal(blC, blC2);
+
+					vertBL = scanTrans * vertBL;
+
+					Vector4 vertUR = ConvertToLocal(urC, urC2);
+
+					vertUR = scanTrans * vertUR;
+
+					Vector4 vertBR = ConvertToLocal(brC, brC2);
+
+					vertBR = scanTrans * vertBR;
+
+					//now find min and max points in each main direction...
+					Vector4 scanCenter = ConvertToLocal(centerColor, centerColor2);
+					
+					scanCenter = scanTrans * scanCenter;
+
+					if(bounds3D != null)
+					{
+						GameObject b = Instantiate(bounds3D);
+
+						Vector3 sc = Vector3.zero;
+						sc.x = scanCenter.x;
+						sc.y = scanCenter.y;
+						sc.z = scanCenter.z;
+
+						b.transform.position = sc;
+						//b.transform.rotation = Quaternion.identity;
+						b.name = annotations[i].label;
+
+						b.transform.SetParent(_currentParent.transform, false);
+
+					}
+				}
+			}
 			
 			_newGeom = false;
 			_newColor = false;
@@ -673,9 +758,16 @@ public class LiDARVis : MonoBehaviour
 		StartCoroutine(DelayGet(3f));
 	}
 	
-	IEnumerator DelayGet(float duration) {
+	IEnumerator DelayGet(float duration) {//}, string headsetID) {
 		yield return new WaitForSeconds(duration);
-		EasyVizARServer.Instance.Get("photos?since="+_scanDate+"&camera_location_id="+_locationID, EasyVizARServer.JSON_TYPE, GetImageCallback);
+		if(_manager != null)
+		{
+			EasyVizARServer.Instance.Get("photos?since="+_scanDate+"&camera_location_id="+_locationID+"&created_by!="+_manager._local_headset_ID, EasyVizARServer.JSON_TYPE, GetImageCallback);
+		}
+		else
+		{
+			EasyVizARServer.Instance.Get("photos?since="+_scanDate+"&camera_location_id="+_locationID, EasyVizARServer.JSON_TYPE, GetImageCallback);
+		}
 		//created_by
 	}
 

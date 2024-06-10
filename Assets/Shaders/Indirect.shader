@@ -25,7 +25,7 @@ Shader "Instanced/InstancedSurfaceShader" {
 
         struct Input {
             float2 uv_MainTex;
-            float4 color;
+            nointerpolation float4 color;
         };
 
 #ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
@@ -70,14 +70,14 @@ Shader "Instanced/InstancedSurfaceShader" {
 
             uint4 pXYZ = uint4(0,0,0,0);
             
-            pXYZ.x = uint(d.z) | ((uint(d.x) & 0x0000000F) << 8);
-            pXYZ.y = uint(d.y) | ((uint(d.x) & 0x000000F0) << 4);
+            pXYZ.x = uint(d.z) | ((uint(d.x) & 0x0000000F) << 8) | ((uint(d.w) & 0x0000000F) << 12);
+            pXYZ.y = uint(d.y) | ((uint(d.x) & 0x000000F0) << 4) | ((uint(d.w) & 0x000000F0) << 8);
 
             pXYZ.z = (uint(d2.z) & 0x000000FF) | ((uint(d2.y) & 0x000000FF) << 8);
             pXYZ.w = uint(d2.x) | ((uint(d2.w) & 0x0000000F) << 8);
 
-            float dx = (pXYZ.x - 2048.0) / 1000.0;
-            float dy = (pXYZ.y - 2048.0) / 1000.0;
+            float dx = (pXYZ.x - 4095.0) / 1000.0;
+            float dy = (pXYZ.y - 4095.0) / 1000.0;
             float dz = (pXYZ.z) / 1000.0;
             float cubeSize = pXYZ.w / 1000.0;
 
@@ -88,7 +88,7 @@ Shader "Instanced/InstancedSurfaceShader" {
             data.xyz = vert.xzy;
             data.z = -data.z;
             data.w = cubeSize;
-            data.w*=1.2;
+            //data.w*=1.2;
             
             float s = data.w;
             float4x4 scale = float4x4(s,0,0,0,
