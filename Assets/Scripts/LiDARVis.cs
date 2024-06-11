@@ -720,11 +720,28 @@ public class LiDARVis : MonoBehaviour
 						sc.z = scanCenter.z;
 
 						b.transform.position = sc;
+
 						//b.transform.rotation = Quaternion.identity;
 						b.name = annotations[i].label;
 
 						b.transform.SetParent(_currentParent.transform, false);
+						b.transform.GetChild(0).GetComponent<TMPro.TextMeshPro>().text = b.name;
 
+						/*Transform cameraTransform = _mainCamera.transform;
+						
+						Vector3 v = (cameraTransform.position - sc).normalized;
+						Vector3 lookPosition = sc - v;
+						b.transform.GetChild(0).transform.LookAt(lookPosition);
+
+						//lock some axes
+						Vector3 rotationAngles = b.transform.GetChild(0).transform.rotation.eulerAngles;
+						
+						rotationAngles[0] = 0;
+						rotationAngles[2] = 0;
+							
+						//apply final rotation
+						b.transform.GetChild(0).transform.rotation = Quaternion.Euler(rotationAngles);*/
+						
 					}
 				}
 			}
