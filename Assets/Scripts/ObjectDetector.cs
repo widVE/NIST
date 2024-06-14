@@ -162,6 +162,7 @@ public class ObjectDetector : MonoBehaviour
 	public bool shouldWaitForResult = false;
 
 	public Material multiScaleMask;
+	public Material lineRendererMaterial;
 
 	// Size of input to ML model
 	private int modelInputWidth = -1;
@@ -199,6 +200,8 @@ public class ObjectDetector : MonoBehaviour
 	private string currentLocationId = "";
 	private Vector3 positionAtCapture = new();
 	private Quaternion rotationAtCapture = new();
+
+	private List<GameObject> existingContours = new();
 
 	public long GetTimestamp()
     {
@@ -245,7 +248,7 @@ public class ObjectDetector : MonoBehaviour
 						transmitMode = TransmitMode.Continuous;
 						uploadQueueName = "detection";
 						swapForeground = true;
-						shouldWaitForResult = false;
+						shouldWaitForResult = true;
 						break;
 					case "continuous":
 						detectionMode = DetectionMode.Off;
@@ -1206,7 +1209,7 @@ public class ObjectDetector : MonoBehaviour
 
 	IEnumerator waitAndDisplayResult()
 	{
-		string url = EasyVizARServer.Instance.GetBaseURL() + $"/photos/{current_photo_id}?wait=5";
+		string url = EasyVizARServer.Instance.GetBaseURL() + $"/photos/{current_photo_id}?inflate_vectors=TRUE&wait=5";
 
 		UnityWebRequest www = new UnityWebRequest(url, "GET");
 
@@ -1216,13 +1219,15 @@ public class ObjectDetector : MonoBehaviour
 		yield return www.SendWebRequest();
 
 		string detectionResult = "";
-
+		
 		if (www.result == UnityWebRequest.Result.Success)
 		{
 			Debug.Log(www.downloadHandler.text);
 			var photo = JsonUtility.FromJson<EasyVizAR.PhotoInfo>(www.downloadHandler.text);
 			if (photo is not null && photo.annotations is not null)
 			{
+				List<GameObject> newContours = new();
+
 				foreach (var annotation in photo.annotations)
 				{
 					if (annotation.label == "face" && headAttachedText is not null)
@@ -1230,7 +1235,37 @@ public class ObjectDetector : MonoBehaviour
 						detectionResult = annotation.sublabel;
 						break;
 					}
+					else if (annotation.projected_contour.Count > 0)
+                    {
+						Debug.Log($"Adding contour of length {annotation.projected_contour.Count}");
+
+						GameObject obj = new GameObject($"contour-{annotation.id}-{annotation.label}");
+						obj.transform.parent = transform;
+						var line = obj.AddComponent(typeof(LineRenderer)) as LineRenderer;
+						line.material = lineRendererMaterial;
+						line.startColor = Color.blue;
+						line.endColor = Color.blue;
+						line.startWidth = 0.1f;
+						line.endWidth = 0.1f;
+
+						line.positionCount = annotation.projected_contour.Count;
+						line.SetPositions(annotation.projected_contour.ToArray());
+
+						newContours.Add(obj);
+					}
 				}
+
+				// Keep the existing contours up until we have some new ones.
+				// This allows the most recent object contours to persist in the view
+				// even if more recent images had no detected objects.
+				if (newContours.Count > 0)
+                {
+					foreach (var obj in existingContours)
+                    {
+						Destroy(obj);
+                    }
+					existingContours = newContours;
+                }
 			}
 		}
 

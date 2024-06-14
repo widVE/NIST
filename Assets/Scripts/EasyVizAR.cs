@@ -126,9 +126,14 @@ namespace EasyVizAR
 	[System.Serializable]
 	public class PhotoAnnotation
     {
+		public int id;
+
 		public string label;
 		public string sublabel;
 		public float confidence;
+
+		public List<Vector2> contour;
+		public List<Vector3> projected_contour;
     }
 
 	[System.Serializable]
