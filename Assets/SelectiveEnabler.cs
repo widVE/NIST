@@ -2,6 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * This script is used to enable and disable objects in the scene. Different functions are used to enable and disable different components of the object.
+ * 
+ * By Bryce Sprecher 06-14-24
+ * 
+ * */
+ 
 public class SelectiveEnabler : MonoBehaviour
 {
     //list of  activeable objects
