@@ -6161,7 +6161,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7824111022908722930}
   m_Layer: 2
-  m_Name: Sign Navigation
+  m_Name: Sign Navigation 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
