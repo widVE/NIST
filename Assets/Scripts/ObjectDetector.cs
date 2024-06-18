@@ -164,6 +164,8 @@ public class ObjectDetector : MonoBehaviour
 	public Material multiScaleMask;
 	public Material lineRendererMaterial;
 
+	public float contourWidth = 0.02f;
+
 	// Size of input to ML model
 	private int modelInputWidth = -1;
 	private int modelInputHeight = -1;
@@ -1245,8 +1247,8 @@ public class ObjectDetector : MonoBehaviour
 						line.material = lineRendererMaterial;
 						line.startColor = Color.blue;
 						line.endColor = Color.blue;
-						line.startWidth = 0.1f;
-						line.endWidth = 0.1f;
+						line.startWidth = contourWidth;
+						line.endWidth = contourWidth;
 
 						line.positionCount = annotation.projected_contour.Count;
 						line.SetPositions(annotation.projected_contour.ToArray());
