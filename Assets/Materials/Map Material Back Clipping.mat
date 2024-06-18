@@ -10,6 +10,7 @@ Material:
   m_Name: Map Material Back Clipping
   m_Shader: {fileID: 4800000, guid: 5bdea20278144b11916d77503ba1467a, type: 3}
   m_ValidKeywords:
+  - _CLIPPING_SPHERE
   - _DIRECTIONAL_LIGHT
   - _DISABLE_ALBEDO_MAP
   - _REFLECTIONS
@@ -165,7 +166,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _ClippingBorderColor: {r: 1, g: 0.2, b: 0, a: 1}
-    - _Color: {r: 0.5433405, g: 1, b: 0.18396229, a: 1}
+    - _Color: {r: 0.46381897, g: 0, b: 0.8301887, a: 1}
     - _EmissionColor: {r: 0, g: 0.8962264, b: 0.039503325, a: 1}
     - _EmissiveColor: {r: 0, g: 0.8962264, b: 0.039503325, a: 1}
     - _EnvironmentColorX: {r: 1, g: 0, b: 0, a: 1}
