@@ -76,6 +76,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     public GameObject headsetManager;
     public Color _color = Color.red;
     public GameObject feature_parent;
+    public GameObject volumetricMapParent;
     public bool verbose_debug_log;
 
     private GameObject local_headset_map_icon;
@@ -514,6 +515,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     void CreateLocalHeadset()
     {
         _localHeadset = Instantiate(_headsetPrefab, transform);
+        
 
         if (_localHeadset != null)
         {
@@ -622,6 +624,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     public void CreateRemoteHeadset(EasyVizAR.Headset remote_headset)
     {
         GameObject headset_game_object = Instantiate(_headsetPrefab, transform);
+   
         headset_game_object.name = remote_headset.id;
 
         EasyVizARHeadset headset_class_data = headset_game_object.GetComponent<EasyVizARHeadset>();
@@ -663,6 +666,59 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                 }
             }
         }
+
+        if(volumetricMapParent != null)
+        {
+            CreateVolumetricMapHeadset(remote_headset);
+        }
+    }
+
+    public void CreateVolumetricMapHeadset(EasyVizAR.Headset remote_headset)
+    {
+        GameObject headset_game_object = Instantiate(_headsetPrefab, volumetricMapParent.transform, false);
+        headset_game_object.name = remote_headset.id;
+
+        EasyVizARHeadset headset_class_data = headset_game_object.GetComponent<EasyVizARHeadset>();
+
+        if (headset_class_data != null)
+        {
+            //This has to be initialized before the JSON values are assigned 
+            headset_class_data.Initialize(remote_headset, volumetricMapParent, headsetManager, feature_parent);
+
+            _activeHeadsets.Add(headset_class_data);
+
+            MarkerObject marker_object = headset_game_object.GetComponent<MarkerObject>();
+            if (marker_object is not null)
+            {
+                marker_object.feature_type = "headset";
+                marker_object.feature_name = remote_headset.name;
+                marker_object.world_position = headset_game_object.transform.position;
+            }
+
+/*            if (volumetricMapParent is not null)
+            {
+                var headset_map_marker = Instantiate(headset_icon, volumetricMapParent.transform, false);
+                headset_map_marker.name = remote_headset.id;
+
+                MoveAndRotateIcon(headset_map_marker, headset_game_object.transform);
+
+                var icon_renderer = headset_map_marker.transform.Find("Icon Visuals")?.GetComponent<Renderer>();
+                if (icon_renderer is not null)
+                {
+                    Color myColor = headset_class_data._color;
+                    icon_renderer.material.SetColor("_EmissionColor", myColor);
+                }
+
+                var map_marker_object = headset_map_marker.GetComponent<MarkerObject>();
+                if (map_marker_object is not null)
+                {
+                    map_marker_object.feature_type = "headset";
+                    map_marker_object.feature_name = remote_headset.name;
+                }
+            }*/
+        }
+
+
     }
 
     public void UpdateRemoteHeadset(string previous_id, EasyVizAR.Headset remoteHeadset)

@@ -1,3 +1,4 @@
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,7 +19,7 @@ public class FeatureManager : MonoBehaviour
     // Each GameObject now contains a field call obj_feature (in the script MarkerObject.cs) so that feature is now one of the fields of the GameObject 
     //public Dictionary<int, GameObject> feature_gameobj_dictionary = new Dictionary<int, GameObject>(); // a seperate dictionary for keeping track of Gameobject in the scene
     public bool mirror_map_axis = false;
-    
+
     public EasyVizAR.FeatureList feature_list = new EasyVizAR.FeatureList();
     public EasyVizAR.Feature featureHolder = null;
     public GameObject markerHolder = null;
@@ -30,6 +31,7 @@ public class FeatureManager : MonoBehaviour
     // For displaying map 
     public GameObject palm_map_spawn_target;
     public GameObject floating_map_spawn_target;
+    public GameObject volumetric_map_spawn_target; //added a target to spawn the volumetric map markers
     public GameObject PalmMap;
     public Dictionary<string, GameObject> map_icon_dictionary = new Dictionary<string, GameObject>(); // contains all possible marker objects
     //map icon
@@ -164,7 +166,7 @@ public class FeatureManager : MonoBehaviour
         headsetPos = curr_headset.GetComponent<Transform>().position;
         oldPos = headsetPos;
         distance_updated = true;
-        
+
 
 
 #if UNITY_EDITOR
@@ -181,7 +183,7 @@ public class FeatureManager : MonoBehaviour
             {
                 ListFeaturesFromLocation(ev.LocationID);
                 location_id = ev.LocationID;
-               
+
             };
         }
     }
@@ -198,14 +200,14 @@ public class FeatureManager : MonoBehaviour
             ListFeatures();
         }
         */
-                
+
     }
-    
+
     // POST 
     public void CreateNewFeature(string feature_type, GameObject marker) //TODO: change the feature_type from int to string
     {
         EasyVizAR.Feature feature_to_post = new EasyVizAR.Feature();
-      
+
         feature_to_post.createdBy = manager.LocationID;
         feature_to_post.createdBy = manager.LocationID;
 
@@ -221,7 +223,7 @@ public class FeatureManager : MonoBehaviour
         EasyVizAR.FeatureDisplayStyle style = new EasyVizAR.FeatureDisplayStyle();
         style.placement = "point";
         feature_to_post.style = style;
-        
+
         //Serialize the feature into JSON
         var data = JsonUtility.ToJson(feature_to_post);
 
@@ -230,9 +232,9 @@ public class FeatureManager : MonoBehaviour
             // Pass the relevant marker GameObject to the callback so that it can be updated.
             PostFeature(result, marker);
         });
-   
+
         featureHolder = feature_to_post;
-        markerHolder = marker;     
+        markerHolder = marker;
     }
 
     // a callback function
@@ -253,7 +255,7 @@ public class FeatureManager : MonoBehaviour
         {
             Debug.Log("ERROR: " + result);
         }
-        
+
 
     }
 
@@ -267,7 +269,7 @@ public class FeatureManager : MonoBehaviour
 
 
     }
-    
+
     void GetFeatureCallBack(string result)
     {
         var resultJSON = JsonUtility.FromJson<List<EasyVizAR.Feature>>(result);
@@ -282,7 +284,7 @@ public class FeatureManager : MonoBehaviour
                 {
                     //if (child.name )
                 }
-                
+
             }
 
 
@@ -292,11 +294,11 @@ public class FeatureManager : MonoBehaviour
             Debug.Log("ERROR: " + result);
         }
     }
-    
+
 
     //NOTE: this function is now also displaying all the features listed on the server.
     [ContextMenu("ListFeatures")]
-    public void ListFeatures() 
+    public void ListFeatures()
     {
         EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
         //Debug.Log("ListFeatures Called");
@@ -306,22 +308,22 @@ public class FeatureManager : MonoBehaviour
     {
         EasyVizARServer.Instance.Get("locations/" + locationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
     }
-    
-    void ListFeatureCallBack(string result) 
+
+    void ListFeatureCallBack(string result)
     {
         if (result != "error")
         {
-            
+
             foreach (EasyVizAR.Feature feature in feature_list.features)
             {
                 DeleteFeatureFromServer(feature.id);
             }
-            
 
-            this.feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList> ("{\"features\":" + result + "}");
-            
+
+            this.feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList>("{\"features\":" + result + "}");
+
             //Debug.Log("feature_list length: " + feature_list.features.Length);
-            
+
             foreach (EasyVizAR.Feature feature in feature_list.features)
             {
                 // This will add the feature if it is new or update an existing one.
@@ -331,7 +333,7 @@ public class FeatureManager : MonoBehaviour
 
             //disabling the Update()
             isChanged = false;
-           
+
         }
         else
         {
@@ -355,8 +357,8 @@ public class FeatureManager : MonoBehaviour
 
         //var id = featureID; // parameter 
         var new_feature = markerHolder; // parameter
-        // the following feature will be specified by user
-        
+                                        // the following feature will be specified by user
+
         if (this.feature_dictionary.ContainsKey(id))
         {
             //Debug.Log("in the if statement");
@@ -433,9 +435,9 @@ public class FeatureManager : MonoBehaviour
     //[ContextMenu("DeleteFeature")]
     public void DeleteFeature(int id)
     {
-       //var id = featureID; //parameter 
+        //var id = featureID; //parameter 
 
-        
+
         if (feature_dictionary.ContainsKey(id))
         {
             EasyVizAR.Feature delete_feature = feature_dictionary[id];
@@ -556,7 +558,7 @@ public class FeatureManager : MonoBehaviour
         GameObject world_marker = Instantiate(world_feature_to_spawn, world_position, spawn_root.transform.rotation, spawn_parent.transform);
         world_marker.name = string.Format("feature-{0}", feature.id);
         world_marker.transform.Find("ID").GetChild(0).name = feature.id.ToString(); // this helps keeping track of feature id
-        
+
         //I'm trying to add in the marker icon spawning to the floating map. I think this is where it happens!
         GameObject palm_map_marker = Instantiate(map_icon_to_spawn, palm_map_spawn_target.transform, false);
         MarkerObject palm_marker_object = palm_map_marker.GetComponent<MarkerObject>();
@@ -584,11 +586,11 @@ public class FeatureManager : MonoBehaviour
         palm_map_marker.name = string.Format("feature-{0}", feature.id);
 
         //Adding the rotation to the map marker, we want it specifically for the headsets, but the other icons might look weird
-/*        Vector3 map_rotation = Vector3.zero;
-        map_rotation.x = feature.position.x;
-        map_rotation.y = feature.position.y;
-        map_rotation.z = feature.position.z;
-*/
+        /*        Vector3 map_rotation = Vector3.zero;
+                map_rotation.x = feature.position.x;
+                map_rotation.y = feature.position.y;
+                map_rotation.z = feature.position.z;
+        */
 
         GameObject floating_map_marker = Instantiate(map_icon_to_spawn, floating_map_spawn_target.transform, false);
         floating_map_marker.transform.localPosition = new Vector3(world_position.x, y_offset, map_coordinate_position.z);
@@ -609,6 +611,12 @@ public class FeatureManager : MonoBehaviour
         world_marker.transform.Find("type").GetChild(0).name = feature.name;
         //UnityEngine.Debug.Log("the feature name is in feature manager: " + spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("type").GetChild(0).name);
 
+        if(volumetric_map_spawn_target != null)
+        {
+            SpawnVolumeMapMarker(world_feature_to_spawn, feature);
+
+        }
+
         Color myColor;
         if (ColorUtility.TryParseHtmlString(feature.color, out myColor))
         {
@@ -626,12 +634,46 @@ public class FeatureManager : MonoBehaviour
             new_marker_object.feature_name = feature.name;
             new_marker_object.world_position = world_position;
             new_marker_object.manager_script = this;
-        } 
+        }
         else
         {
             Debug.Log("Warning: MarkerObject component is missing");
         }
     }
+
+    //added this to spawn markers on the volumetric map
+    public void SpawnVolumeMapMarker(GameObject feature_to_spawn, EasyVizAR.Feature feature)
+    {
+        Vector3 world_position = Vector3.zero;
+        world_position.x = feature.position.x;
+        world_position.y = feature.position.y;
+        world_position.z = feature.position.z;
+        float y_offset = (feature.id / 1000f);
+
+        GameObject volumetric_map_marker = Instantiate(feature_to_spawn, volumetric_map_spawn_target.transform, false);
+        volumetric_map_marker.name = string.Format("feature-{0}", feature.id);
+        volumetric_map_marker.transform.localPosition = new Vector3(world_position.x, y_offset, world_position.z);
+
+        MarkerObject volumetric_marker_object = volumetric_map_marker.GetComponent<MarkerObject>();
+
+
+
+        if (volumetric_marker_object is not null)
+        {
+            volumetric_marker_object.feature_ID = feature.id;
+            volumetric_marker_object.feature_type = feature.type;
+            volumetric_marker_object.feature_name = feature.name;
+            volumetric_marker_object.world_position = world_position;
+            volumetric_marker_object.manager_script = this;
+        }
+        Color myColor;
+            if (ColorUtility.TryParseHtmlString(feature.color, out myColor))
+            {
+                volumetric_map_marker.transform.Find("Icon Visuals").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+            }
+
+    }
+    
 
     public void UpdateFeatureFromServer(EasyVizAR.Feature feature)
     {
@@ -659,6 +701,7 @@ public class FeatureManager : MonoBehaviour
 
         Transform feature_object = spawn_parent.transform.Find(string.Format("feature-{0}", id));
         Transform map_icon = palm_map_spawn_target.transform.Find(string.Format("feature-{0}", id));
+        Transform volumetric_icon = volumetric_map_spawn_target.transform.Find(string.Format("feature-{0}", id));
         if (feature_object)
         {
             Debug.Log("deleted feature: " + id);
@@ -667,9 +710,14 @@ public class FeatureManager : MonoBehaviour
         }
         if (map_icon)
         {
-            Debug.Log("deleted icon: "+ id);
+            Debug.Log("deleted icon: " + id);
             Destroy(map_icon.gameObject);
 
+        }
+        if(volumetric_icon)
+        {
+            Debug.Log("deleted icon: " + id);
+            Destroy(map_icon.gameObject);
         }
     }
 
@@ -684,5 +732,5 @@ public class FeatureManager : MonoBehaviour
     {
 
     }
-    
+
 }

@@ -7,6 +7,10 @@ using System.Linq;
 
 public class DockGrabCloner : MonoBehaviour
 {
+    public FeatureManager volume_map_reference;
+
+    public EasyVizARHeadsetManager headset_reference;
+
     //location to spawn the cloned object
     public GameObject spawn_parent_location;
 
@@ -29,6 +33,8 @@ public class DockGrabCloner : MonoBehaviour
     //spawned at the location the user lets go of the docked object at, has no parent   
     public void SpawnVolumetricMap(GameObject prefab)
     {
+        
+
         //find the child of volumetric_map_prefab GameObject that has the name "VolumeMap"
         //this is using LINQ, which is a way to query objects in a collection. I'm not really sure how it works, but I thought it was cool
         GameObject culling_region = volumetric_map_prefab.GetComponentsInChildren<Transform>().FirstOrDefault(c => c.gameObject.name == culling_box_name)?.gameObject;
@@ -40,6 +46,16 @@ public class DockGrabCloner : MonoBehaviour
         spawn_position.y += culling_region.GetComponent<BoxCollider>().bounds.extents.y;
         
         GameObject volume_map = Instantiate(prefab, spawn_position, quaternion.identity);
+
+
+        volume_map_reference.volumetric_map_spawn_target = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject;
+
+        headset_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject;
+
+
+        //call spawn volumetric function in featuremanager
+        //volume_map_reference.SpawnVolumeMapMarker();
+
     }
 
     // Destroy this object
