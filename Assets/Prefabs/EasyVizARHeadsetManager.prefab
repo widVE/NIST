@@ -46,6 +46,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _locationId: none
   _headsetPrefab: {fileID: 921069525072559227, guid: 53b7274ec7bf90643b352bf1c7589e26, type: 3}
+  _qrScanner: {fileID: 0}
   _localHeadsetName: 
+  _local_headset_ID: 
+  _activeHeadsets: []
   _localMaterial: {fileID: 0}
-  _visualizePreviousLocal: 0
+  _makeUniqueLocalHeadset: 0
+  _mapObjects: []
+  horizontal_offset_slider: {fileID: 0}
+  vertical_offset_slider: {fileID: 0}
+  map_parent: {fileID: 0}
+  headset_icon: {fileID: 0}
+  headsetManager: {fileID: 0}
+  _color: {r: 1, g: 0, b: 0, a: 1}
+  feature_parent: {fileID: 0}
+  verbose_debug_log: 0
