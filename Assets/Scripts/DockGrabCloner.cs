@@ -11,6 +11,8 @@ public class DockGrabCloner : MonoBehaviour
 
     public EasyVizARHeadsetManager headset_reference;
 
+    public NavigationManager navimesh_reference;
+
     //location to spawn the cloned object
     public GameObject spawn_parent_location;
 
@@ -48,9 +50,13 @@ public class DockGrabCloner : MonoBehaviour
         GameObject volume_map = Instantiate(prefab, spawn_position, quaternion.identity);
 
 
-        volume_map_reference.volumetric_map_spawn_target = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject;
+        volume_map_reference.volumetric_map_spawn_target = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/features").gameObject;
 
-        headset_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject;
+        headset_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/headsets").gameObject;
+
+        navimesh_reference.meshGameObject = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/WavefrontObject").gameObject;
+
+        navimesh_reference.UpdateNavMesh(volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/WavefrontObject").gameObject);
 
 
         //call spawn volumetric function in featuremanager

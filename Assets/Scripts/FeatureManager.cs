@@ -652,7 +652,7 @@ public class FeatureManager : MonoBehaviour
 
         GameObject volumetric_map_marker = Instantiate(feature_to_spawn, volumetric_map_spawn_target.transform, false);
         volumetric_map_marker.name = string.Format("feature-{0}", feature.id);
-        volumetric_map_marker.transform.localPosition = new Vector3(world_position.x, y_offset, world_position.z);
+        volumetric_map_marker.transform.localPosition = new Vector3(world_position.x, world_position.y, world_position.z);
 
         MarkerObject volumetric_marker_object = volumetric_map_marker.GetComponent<MarkerObject>();
 
@@ -701,7 +701,16 @@ public class FeatureManager : MonoBehaviour
 
         Transform feature_object = spawn_parent.transform.Find(string.Format("feature-{0}", id));
         Transform map_icon = palm_map_spawn_target.transform.Find(string.Format("feature-{0}", id));
-        Transform volumetric_icon = volumetric_map_spawn_target.transform.Find(string.Format("feature-{0}", id));
+        if (volumetric_map_spawn_target != null)
+        {
+            Transform volumetric_icon = volumetric_map_spawn_target.transform.Find(string.Format("feature-{0}", id));
+            if (volumetric_icon)
+            {
+                Debug.Log("deleted icon: " + id);
+                Destroy(map_icon.gameObject);
+            }
+        }
+        
         if (feature_object)
         {
             Debug.Log("deleted feature: " + id);
@@ -714,11 +723,7 @@ public class FeatureManager : MonoBehaviour
             Destroy(map_icon.gameObject);
 
         }
-        if(volumetric_icon)
-        {
-            Debug.Log("deleted icon: " + id);
-            Destroy(map_icon.gameObject);
-        }
+
     }
 
 

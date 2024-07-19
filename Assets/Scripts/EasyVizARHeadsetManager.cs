@@ -676,6 +676,9 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     public void CreateVolumetricMapHeadset(EasyVizAR.Headset remote_headset)
     {
         GameObject headset_game_object = Instantiate(_headsetPrefab, volumetricMapParent.transform, false);
+
+        headset_game_object.transform.localPosition = headset_game_object.transform.position;
+
         headset_game_object.name = remote_headset.id;
 
         EasyVizARHeadset headset_class_data = headset_game_object.GetComponent<EasyVizARHeadset>();
@@ -692,7 +695,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             {
                 marker_object.feature_type = "headset";
                 marker_object.feature_name = remote_headset.name;
-                marker_object.world_position = headset_game_object.transform.position;
+                //marker_object.world_position = headset_game_object.transform.position;
             }
 
 /*            if (volumetricMapParent is not null)

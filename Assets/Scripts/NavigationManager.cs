@@ -37,7 +37,7 @@ public class NavigationManager : MonoBehaviour
 
     // Update the global NavMesh from a Mesh object.
     // This could be called with an externally-sourced mesh to load a saved map for navigation.
-    AsyncOperation UpdateNavMesh(Mesh mesh)
+    public AsyncOperation UpdateNavMesh(Mesh mesh)
     {
         this.mesh = mesh;
 
@@ -54,7 +54,7 @@ public class NavigationManager : MonoBehaviour
 
     // Update the global NavMesh from a GameObject containing one or more meshes.
     // This could be called with an externally-sourced mesh to load a saved map for navigation.
-    AsyncOperation UpdateNavMesh(GameObject meshGameObject)
+    public AsyncOperation UpdateNavMesh(GameObject meshGameObject)
     {
         this.meshGameObject = meshGameObject;
 

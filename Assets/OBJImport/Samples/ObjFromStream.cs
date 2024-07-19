@@ -22,6 +22,7 @@ public class ObjFromStream : MonoBehaviour {
         if (loadedObj != null && spawn_parent != null)
         {
             loadedObj.transform.SetParent(spawn_parent.transform);
+            spawn_parent.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
             loadedObj.transform.localPosition = Vector3.zero;
         }
 
