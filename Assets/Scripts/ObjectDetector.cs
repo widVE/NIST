@@ -80,6 +80,7 @@ public enum DetectionMode
 	MaxScore,		// Test for probable presence of object using max operator (relatively fast)
 	BoundingBox,	// Bounding box detection using nonmaximum suppression (slower)
 	CoarseSegment,	// Small grid of values indicating detection strength (fast)
+	Blur,			// Only detect blur level of image
 }
 
 public enum TransmitMode
@@ -165,6 +166,8 @@ public class ObjectDetector : MonoBehaviour
 	public Material lineRendererMaterial;
 
 	public float contourWidth = 0.02f;
+
+	public int blurAcceptanceThreshold = 100;
 
 	// Size of input to ML model
 	private int modelInputWidth = -1;
@@ -253,7 +256,7 @@ public class ObjectDetector : MonoBehaviour
 						shouldWaitForResult = true;
 						break;
 					case "continuous":
-						detectionMode = DetectionMode.Off;
+						detectionMode = DetectionMode.Blur;
 						transmitMode = TransmitMode.Continuous;
 						break;
 					default:
@@ -383,6 +386,57 @@ public class ObjectDetector : MonoBehaviour
 			// Replace what is considered the model input with our normalization layer.
 			model.AddInput("norm_input", model.inputs[0].dataType, model.inputs[0].shape);
 			model.inputs.RemoveAt(0);
+		}
+		else
+        {
+			Model blur = new Model();
+			blur.AddInput("input", model.inputs[0].dataType, model.inputs[0].shape);
+			blur.AddConstant(new Unity.Sentis.Layers.Constant(
+				"kernel",
+				new TensorFloat(new TensorShape(1, 1, 3, 3), new[] { 0.0f, 1.0f, 0.0f, 1.0f, -4.0f, 1.0f, 0.0f, 1.0f, 0.0f })
+			));
+			blur.AddConstant(new Unity.Sentis.Layers.Constant(
+				"reduce_axes",
+				new TensorInt(new TensorShape(1), new[] { 1 })
+			));
+			blur.AddLayer(new Unity.Sentis.Layers.ReduceMean(
+				"single_channel",
+				new[] { "input", "reduce_axes" }
+			));
+			blur.AddLayer(new Unity.Sentis.Layers.Conv(
+				"laplacian",
+				"single_channel",
+				"kernel",
+				1,
+				new int[] { 1, 1 },         // strides
+				new int[] { 0, 0, 0, 0 },       // padding
+				new int[] { 1, 1 }          // dilation
+			));
+			blur.AddLayer(new Unity.Sentis.Layers.GlobalAveragePool(
+				"mean",
+				"laplacian"
+			));
+			blur.AddLayer(new Unity.Sentis.Layers.Sub(
+				"differences",
+				"laplacian",
+				"mean"
+			));
+			blur.AddLayer(new Unity.Sentis.Layers.Square(
+				"squared_differences",
+				"differences"
+			));
+			blur.AddLayer(new Unity.Sentis.Layers.GlobalAveragePool(
+				"variance",
+				"squared_differences"
+			));
+			blur.AddLayer(new Unity.Sentis.Layers.Div(
+				"relative_variance",
+				"variance",
+				"mean"
+			));
+			blur.outputs = new List<string>() { "relative_variance" };
+
+			model = blur;
 		}
 
 		// Assuming only one input, the image
@@ -519,7 +573,7 @@ public class ObjectDetector : MonoBehaviour
 		}
 
 		Graphics.Blit(webcamTexture, outputTexture);
-		
+
 		executionSchedule = engine.StartManualSchedule(inputTensor);
 		//engine.Execute(inputTensor);
 	}
@@ -835,6 +889,13 @@ public class ObjectDetector : MonoBehaviour
 
 	private bool shouldSendFrame(DetectionResult dresult)
     {
+		if (detectionMode == DetectionMode.Blur)
+		{
+			var outputTensor = engine.PeekOutput() as TensorFloat;
+			outputTensor.MakeReadable();
+			return (Math.Abs(outputTensor[0, 0, 0, 0]) >= blurAcceptanceThreshold);
+		}
+
 		if (transmitMode == TransmitMode.Continuous)
 			return true;
 
