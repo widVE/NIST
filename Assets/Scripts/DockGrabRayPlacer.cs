@@ -30,6 +30,9 @@ public class DockGrabRayPlacer : MonoBehaviour
     public void SpawnPrefab(GameObject prefab)
     {    
         wall_map = Instantiate(prefab);
+        //set wall_Map's parent to null
+        wall_map.transform.SetParent(null);
+        this.transform.SetParent(null);
     }
 
     public void StopWallfindingInChildren()
