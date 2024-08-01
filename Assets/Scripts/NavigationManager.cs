@@ -6,6 +6,8 @@ using UnityEngine.AI;
 
 public class NavigationManager : MonoBehaviour
 {
+    public GameObject qrScanner;
+
     // One of these can be set in the editor to load a mesh at startup.
     // They can also be altered during runtime by calling UpdateNavMesh.
     public Mesh mesh;
@@ -17,6 +19,11 @@ public class NavigationManager : MonoBehaviour
     public bool targetIsSet = false;
     public Vector3 targetPosition;
 
+    public Material pathMaterial;
+
+    public Color navigationStartColor = Color.cyan;
+    public Color navigationEndColor = Color.magenta;
+
     private NavMeshData navMeshData;
 
     private NavMeshSurface myNavMeshSurface;
@@ -24,6 +31,11 @@ public class NavigationManager : MonoBehaviour
 
     private bool foundPath = false;
     private NavMeshPath path;
+
+    // Location of this device, which will be set after scanning a QR code.
+    private string locationId = "";
+
+    private Dictionary<int, GameObject> mapPathLineRenderers = new();
 
     private NavMeshBuildSource BuildSourceFromMesh(Mesh mesh)
     {
@@ -100,6 +112,17 @@ public class NavigationManager : MonoBehaviour
             yield return UpdateNavMesh(mesh);
         else if (meshGameObject)
             yield return UpdateNavMesh(meshGameObject);
+
+        // Wait for a QR code to be scanned to fetch features from the correct location.
+        if (qrScanner)
+        {
+            var scanner = qrScanner.GetComponent<QRScanner>();
+            scanner.LocationChanged += (o, ev) =>
+            {
+                LoadMapPaths(ev.LocationID);
+                locationId = ev.LocationID;
+            };
+        }
     }
 
     // Update is called once per frame
@@ -115,5 +138,127 @@ public class NavigationManager : MonoBehaviour
             myLineRender.positionCount = path.corners.Length;
             myLineRender.SetPositions(path.corners);
         }
+    }
+
+    /*
+     * Give visual navigation directions to another user.
+     * 
+     * This function uses the local navigation mesh to calculate a path between startPosition and endPosition.
+     * If a path can be found, we send the path to the EasyVizAR server to be forwarded to the appropriate
+     * headset. It is important that the local NavMesh has been constructed before calling this, eg. UpdateNavMesh
+     * has been called at least once.
+     * 
+     * locationId: Location for which the path was calculated.
+     * deviceId: Headset or other device that should receive the path.
+     * color: Path display color, which might be shown on command dashboards.
+     *        It is recommended to use the target headset color, so multiple paths look visually distinct on the dashboard.
+     *        Since the target user headset only has one path to display, it may ignore this color and display a hot-cold gradient instead.
+     * label: Label text for the path. It is recommended to generate meaningful text like "Directions for <headset name>"
+     *        or "Directions to <waypoint name>". This text will appear on the dashboard and may be displayed in the headset.
+     */
+    public bool GiveDirectionsToUser(Vector3 startPosition, Vector3 endPosition, string locationId, string deviceId, string color, string label)
+    {
+        foundPath = NavMesh.CalculatePath(startPosition, endPosition, NavMesh.AllAreas, path);
+        if (!foundPath)
+            return false;
+
+        EasyVizAR.NewMapPath mapPath = new();
+        mapPath.location_id = locationId;
+        mapPath.mobile_device_id = deviceId;
+        mapPath.type = "navigation";
+        mapPath.color = color;
+        mapPath.label = label;
+        mapPath.points = path.corners;
+
+        //Serialize the feature into JSON
+        var data = JsonUtility.ToJson(mapPath);
+
+        string url = $"locations/{locationId}/map-paths?mobile_device_id={deviceId}&type=navigation";
+        EasyVizARServer.Instance.Put(url, EasyVizARServer.JSON_TYPE, data, delegate (string result)
+        {
+            // callback for server request
+        });
+
+        return true;
+    }
+
+    public void UpdateMapPath(EasyVizAR.MapPath path)
+    {
+        GameObject lineObject;
+        LineRenderer lr;
+
+        if (mapPathLineRenderers.ContainsKey(path.id))
+        {
+            // Reuse existing LineRenderer
+            lineObject = mapPathLineRenderers[path.id];
+            lr = lineObject.GetComponent<LineRenderer>();
+        }
+        else
+        {
+            // Create new LineRenderer
+            lineObject = new GameObject();
+            lineObject.name = $"map-path-{path.id}";
+            lineObject.transform.parent = transform;
+
+            lr = lineObject.AddComponent<LineRenderer>();
+            lr.material = pathMaterial;
+            lr.startWidth = 0.1f;
+            lr.endWidth = 0.1f;
+
+            // These settings may improve rendering performance.
+            lr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            lr.receiveShadows = false;
+
+            mapPathLineRenderers[path.id] = lineObject;
+        }
+
+        if (path.type == "navigation" && path.mobile_device_id != "")
+        {
+            lr.startColor = navigationStartColor;
+            lr.endColor = navigationEndColor;
+        }
+        else if (ColorUtility.TryParseHtmlString(path.color, out Color color))
+        {
+            lr.startColor = color;
+            lr.endColor = color;
+        }
+        else
+        {
+            lr.startColor = Color.magenta;
+            lr.endColor = Color.magenta;
+        }
+
+        lr.positionCount = path.points.Length;
+        lr.SetPositions(path.points);
+    }
+
+    private void LoadMapPaths(string newLocationId)
+    {
+        // Remove any existing map paths assuming we are changing location
+        foreach (var path in mapPathLineRenderers.Values)
+        {
+            Destroy(path);
+        }
+        mapPathLineRenderers.Clear();
+
+        EasyVizARServer.Instance.TryGetHeadsetID(out string deviceId);
+
+        // This retrieves paths for the given deviceId and paths with null deviceId (intended for everyone).
+        string url = $"locations/{newLocationId}/map-paths?envelope=map_paths&inflate_vectors=T&mobile_device_id={deviceId}";
+        EasyVizARServer.Instance.Get(url, EasyVizARServer.JSON_TYPE, delegate (string result)
+        {
+            if (result != "error")
+            {
+                var mapPathList = JsonUtility.FromJson<EasyVizAR.MapPathList>(result);
+                foreach (var path in mapPathList.map_paths)
+                {
+                    UpdateMapPath(path);
+                }
+            }
+            else
+            {
+                Debug.Log(result);
+            }
+        });
     }
 }
