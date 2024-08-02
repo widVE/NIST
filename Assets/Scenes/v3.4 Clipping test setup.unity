@@ -1479,6 +1479,7 @@ MonoBehaviour:
   transmitMode: 2
   minSendInterval: 1000
   maxSendInterval: 5000
+  blurModel: {fileID: 5022602860645237092, guid: fa9745136f63b2342a96dfa0f9aec946, type: 3}
   detectionModel: {fileID: 5022602860645237092, guid: 7e5b42482e78d1847a368b56ef305c70, type: 3}
   coarseSegmentationModel: {fileID: 5022602860645237092, guid: ee35cd1078d116e4182b49b248095a94, type: 3}
   headAttachedDisplay: {fileID: 1265293830}
@@ -1504,7 +1505,7 @@ MonoBehaviour:
   multiScaleMask: {fileID: 2100000, guid: 7355b87662b03c0419f6402b2766d12c, type: 2}
   lineRendererMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   contourWidth: 0.02
-  blurAcceptanceThreshold: 100
+  blurAcceptanceThreshold: 0.0005
 --- !u!64 &49547811
 MeshCollider:
   m_ObjectHideFlags: 0
