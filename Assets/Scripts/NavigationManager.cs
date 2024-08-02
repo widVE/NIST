@@ -212,24 +212,46 @@ public class NavigationManager : MonoBehaviour
             mapPathLineRenderers[path.id] = lineObject;
         }
 
-        if (path.type == "navigation" && path.mobile_device_id != "")
+        EasyVizARServer.Instance.TryGetHeadsetID(out string myDeviceId);
+
+        if (path.type == "navigation" && path.mobile_device_id == myDeviceId)
         {
+            // If this is a navigation path intended for me, then show the nice color gradient.
             lr.startColor = navigationStartColor;
             lr.endColor = navigationEndColor;
+
+            // Maybe allow other holograms (eg. markers) to render over the line, but
+            // this navigation line should be higher priority than any of the other lines.
+            lr.sortingOrder = -10;
         }
         else if (ColorUtility.TryParseHtmlString(path.color, out Color color))
         {
+            // Otherwise, try to show the suggested line color, e.g. for other users' navigation paths.
             lr.startColor = color;
             lr.endColor = color;
+
+            lr.sortingOrder = -100;
         }
         else
         {
+            // Magenta in the case that nothing else works.
             lr.startColor = Color.magenta;
             lr.endColor = Color.magenta;
+
+            lr.sortingOrder = -1000;
         }
 
         lr.positionCount = path.points.Length;
         lr.SetPositions(path.points);
+    }
+
+    public void DeleteMapPath(int mapPathId)
+    {
+        if (mapPathLineRenderers.ContainsKey(mapPathId))
+        {
+            Destroy(mapPathLineRenderers[mapPathId]);
+            mapPathLineRenderers.Remove(mapPathId);
+        }
     }
 
     private void LoadMapPaths(string newLocationId)
@@ -241,10 +263,8 @@ public class NavigationManager : MonoBehaviour
         }
         mapPathLineRenderers.Clear();
 
-        EasyVizARServer.Instance.TryGetHeadsetID(out string deviceId);
-
         // This retrieves paths for the given deviceId and paths with null deviceId (intended for everyone).
-        string url = $"locations/{newLocationId}/map-paths?envelope=map_paths&inflate_vectors=T&mobile_device_id={deviceId}";
+        string url = $"locations/{newLocationId}/map-paths?envelope=map_paths";
         EasyVizARServer.Instance.Get(url, EasyVizARServer.JSON_TYPE, delegate (string result)
         {
             if (result != "error")

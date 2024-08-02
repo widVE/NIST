@@ -21855,6 +21855,8 @@ MonoBehaviour:
   targetIsSet: 0
   targetPosition: {x: 1, y: 1, z: 1}
   pathMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  navigationStartColor: {r: 0, g: 1, b: 1, a: 1}
+  navigationEndColor: {r: 1, g: 0, b: 1, a: 1}
 --- !u!1 &886984433
 GameObject:
   m_ObjectHideFlags: 0
@@ -22716,6 +22718,7 @@ MonoBehaviour:
   _locationId: 69e92dff-7138-4091-89c4-ed073035bfe6
   featureManager: {fileID: 1885103011}
   headsetManager: {fileID: 1361342022}
+  navigationManager: {fileID: 885636686}
   map_parent: {fileID: 335883421}
   _qrScanner: {fileID: 291935030}
   _updateInterval: 0.3
