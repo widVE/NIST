@@ -90,7 +90,7 @@ public class NavigationManager : MonoBehaviour
 
     // Set a navigation target.
     // This will result in a visible navigation cue if a path can be found.
-    void SetTarget(Vector3 position)
+    public void SetTarget(Vector3 position)
     {
         targetPosition = position;
         targetIsSet = true;

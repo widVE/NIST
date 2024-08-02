@@ -8138,7 +8138,7 @@ MonoBehaviour:
   _researchModeManager: {fileID: 1194257831}
   followMovingQRCode: 1
   _scanningMode: 0
-  testQRCodeData: vizar://easyvizar.wings.cs.wisc.edu/locations/69e92dff-7138-4091-89c4-ed073035bfe6
+  testQRCodeData: vizar://easyvizar.wings.cs.wisc.edu/locations/bec66948-ab50-421a-9d12-281a77f228e3
   triggerQRCodeDetected: 0
   headAttachedDisplay: {fileID: 1265293830}
 --- !u!82 &291935033
@@ -50952,6 +50952,10 @@ PrefabInstance:
       propertyPath: verbose_debug_log
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
+      propertyPath: _volumeHeadsetPrefab
+      value: 
+      objectReference: {fileID: 2161221711680702053, guid: 5c4955614de38d9499b3f70ed2fa71fa, type: 3}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: _shouldCreateHeadsets
       value: 0

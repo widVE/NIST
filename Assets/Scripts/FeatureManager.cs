@@ -707,7 +707,7 @@ public class FeatureManager : MonoBehaviour
             if (volumetric_icon)
             {
                 Debug.Log("deleted icon: " + id);
-                Destroy(map_icon.gameObject);
+                Destroy(volumetric_icon.gameObject);
             }
         }
         

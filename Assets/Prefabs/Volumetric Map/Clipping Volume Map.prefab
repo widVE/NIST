@@ -1752,6 +1752,7 @@ GameObject:
   - component: {fileID: 2258202188667151517}
   - component: {fileID: 2258202188667151516}
   - component: {fileID: 1386190225703608513}
+  - component: {fileID: 4088849271823474795}
   m_Layer: 0
   m_Name: Manual Culling Box Adjustment
   m_TagString: Untagged
@@ -2138,6 +2139,20 @@ MonoBehaviour:
   scaleMinimum: 0.3
   scaleMaximum: 5
   relativeToInitialState: 1
+--- !u!114 &4088849271823474795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2258202190051486333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85c4831d41668454c88bb3e1a8480008, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  culler: {fileID: 4077556883244807159}
+  moveable_map: {fileID: 4806826019019045591}
 --- !u!1 &2817685599304298710
 GameObject:
   m_ObjectHideFlags: 0
@@ -2403,6 +2418,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2743851383100947593}
   - component: {fileID: 2970157599306225870}
+  - component: {fileID: 4568117896081384196}
   m_Layer: 0
   m_Name: Culler
   m_TagString: Untagged
@@ -2453,6 +2469,19 @@ MonoBehaviour:
   useOnPreRender: 0
   applyToSharedMaterial: 1
   cacheSharedMaterialsFromRenderer: 0
+--- !u!65 &4568117896081384196
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4077556883244807159}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4806826019019045591
 GameObject:
   m_ObjectHideFlags: 0
