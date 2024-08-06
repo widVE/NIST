@@ -67,6 +67,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.XR.OpenXR.Features.Oc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.Sentis.MacBLAS", "Unity.Sentis.MacBLAS.csproj", "{86769129-59F9-C8F1-F75B-1549C4915978}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kybernetik.InspectorGadgets", "Kybernetik.InspectorGadgets.csproj", "{9886CEC7-0FD4-4AC3-9D49-A26F2957A6E2}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.XR.OpenXR.Editor", "Unity.XR.OpenXR.Editor.csproj", "{9543ECA8-82EB-FCEC-4424-A586250CB371}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.VisualStudio.Editor", "Unity.VisualStudio.Editor.csproj", "{3B5725E2-75CC-0C03-EEFA-244D81EEE182}"
@@ -134,6 +136,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.InternalAPIEditorBridge.005", "Unity.InternalAPIEditorBridge.005.csproj", "{48B2BE58-E2E6-C36A-FD81-58990C1877E8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.MixedReality.QR.Editor", "Microsoft.MixedReality.QR.Editor.csproj", "{CBB5A096-AEFA-0F94-446E-88076D4F27E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kybernetik.InspectorGadgets.Editor", "Kybernetik.InspectorGadgets.Editor.csproj", "{570F0B24-E48C-56C5-FD1D-8BDBE3F7A28B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -273,6 +277,10 @@ Global
 		{86769129-59F9-C8F1-F75B-1549C4915978}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86769129-59F9-C8F1-F75B-1549C4915978}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86769129-59F9-C8F1-F75B-1549C4915978}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9886CEC7-0FD4-4AC3-9D49-A26F2957A6E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9886CEC7-0FD4-4AC3-9D49-A26F2957A6E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9886CEC7-0FD4-4AC3-9D49-A26F2957A6E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9886CEC7-0FD4-4AC3-9D49-A26F2957A6E2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9543ECA8-82EB-FCEC-4424-A586250CB371}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9543ECA8-82EB-FCEC-4424-A586250CB371}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9543ECA8-82EB-FCEC-4424-A586250CB371}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -409,6 +417,10 @@ Global
 		{CBB5A096-AEFA-0F94-446E-88076D4F27E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBB5A096-AEFA-0F94-446E-88076D4F27E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBB5A096-AEFA-0F94-446E-88076D4F27E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{570F0B24-E48C-56C5-FD1D-8BDBE3F7A28B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{570F0B24-E48C-56C5-FD1D-8BDBE3F7A28B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{570F0B24-E48C-56C5-FD1D-8BDBE3F7A28B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{570F0B24-E48C-56C5-FD1D-8BDBE3F7A28B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
