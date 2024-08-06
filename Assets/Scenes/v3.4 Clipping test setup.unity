@@ -21853,6 +21853,7 @@ MonoBehaviour:
   qrScanner: {fileID: 291935030}
   mesh: {fileID: 0}
   meshGameObject: {fileID: 919132149155446097, guid: fdfc356c86b82044aad87aa5df9daf01, type: 3}
+  mapPathGameObject: {fileID: 1810665669}
   targetIsSet: 0
   targetPosition: {x: 1, y: 1, z: 1}
   pathMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
@@ -40807,6 +40808,34 @@ PrefabInstance:
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.size
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 6963556928545528350, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: m_Parameters.colorGradient.ctime1
+      value: 65535
+      objectReference: {fileID: 0}
+    - target: {fileID: 6963556928545528350, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: m_Parameters.colorGradient.key0.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6963556928545528350, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: m_Parameters.colorGradient.key0.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6963556928545528350, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: m_Parameters.colorGradient.key0.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6963556928545528350, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: m_Parameters.colorGradient.key1.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6963556928545528350, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: m_Parameters.colorGradient.key1.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6963556928545528350, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: m_Parameters.colorGradient.m_NumColorKeys
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 7419221152134798865, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: map_spawn_target
       value: 
@@ -40992,6 +41021,11 @@ GameObject:
 --- !u!1 &1810665668 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 9155385415246039275, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+  m_PrefabInstance: {fileID: 1810665664}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1810665669 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 622476188437637769, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
   m_PrefabInstance: {fileID: 1810665664}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1813667874

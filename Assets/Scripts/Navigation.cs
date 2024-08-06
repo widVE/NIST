@@ -41,6 +41,8 @@ public class Navigation : MonoBehaviour
     // This holds the position data of the user's target
     EasyVizAR.Position user_target_position = new EasyVizAR.Position();
 
+    private UnityEngine.AI.NavMeshPath nmPath;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -50,7 +52,7 @@ public class Navigation : MonoBehaviour
         map_parent = this.transform.parent.gameObject;
         last_target = map_parent.GetComponent<MapIconSpawn>().last_clicked_target;
 
-        local_headset_id = "BRAWNDO!";
+        EasyVizARServer.Instance.TryGetHeadsetID(out local_headset_id);
 
         //markerSpawnParent = GameObject.Find("Marker Spawn Parent");
 
@@ -79,6 +81,7 @@ public class Navigation : MonoBehaviour
             //FindPath();
         }
 
+        nmPath = new();
     }
 
     // Querying the server with path between two points
@@ -97,12 +100,20 @@ public class Navigation : MonoBehaviour
             user_target_position.y = destination_position.y;
             user_target_position.z = destination_position.z;
 
+            var foundPath = UnityEngine.AI.NavMesh.CalculatePath(start, destination_position, UnityEngine.AI.NavMesh.AllAreas, nmPath);
+            if (foundPath)
+            {
+                NavigationManager.GiveDirectionsToUser(nmPath.corners, location_id, local_headset_id, "#0000ff", "Directions");
+            }
+            else
+            {
+                EasyVizARServer.Instance.Get("locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + destination_position.x + "," + destination_position.y + "," + destination_position.z, EasyVizARServer.JSON_TYPE, GetPathCallback);
+            }
 
             //UnityEngine.Debug.Log("start: " + start.x + ", " + start.y + ", " + start.z);
             //UnityEngine.Debug.Log("target: " + target.x + ", " + target.y + ", " + target.z);
 
             //UnityEngine.Debug.Log("http://easyvizar.wings.cs.wisc.edu:5000/locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + target.x + "," + target.y + "," + target.z);
-            EasyVizARServer.Instance.Get("locations/" + location_id + "/route?from=" + start.x + "," + start.y + "," + start.z + "&to=" + destination_position.x + "," + destination_position.y + "," + destination_position.z, EasyVizARServer.JSON_TYPE, GetPathCallback);
         }        
     }
 

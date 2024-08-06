@@ -12,6 +12,7 @@ public class NavigationManager : MonoBehaviour
     // They can also be altered during runtime by calling UpdateNavMesh.
     public Mesh mesh;
     public GameObject meshGameObject;
+    public GameObject mapPathGameObject;
 
     // A target can be set in the editor or by calling SetTarget.
     // After a target has been set, if a path can be found, it will be displayed
@@ -28,6 +29,7 @@ public class NavigationManager : MonoBehaviour
 
     private NavMeshSurface myNavMeshSurface;
     private LineRenderer myLineRender;
+    private LineRenderer mapLineRenderer;
 
     private bool foundPath = false;
     private NavMeshPath path;
@@ -102,6 +104,9 @@ public class NavigationManager : MonoBehaviour
         myNavMeshSurface = GetComponent<NavMeshSurface>();
         myLineRender = GetComponent<LineRenderer>();
 
+        if (mapPathGameObject)
+            mapLineRenderer = mapPathGameObject.GetComponent<LineRenderer>();
+
         path = new();
         navMeshData = new();
 
@@ -162,13 +167,32 @@ public class NavigationManager : MonoBehaviour
         if (!foundPath)
             return false;
 
+        return GiveDirectionsToUser(path.corners, locationId, deviceId, color, label);
+    }
+
+    /*
+     * Give visual navigation directions to another user.
+     * 
+     * This function takes a given list of Vector3 points and sends them to the EasyVizAR server
+     * to then be forwarded to the appropriate headset.
+     * 
+     * locationId: Location for which the path was calculated.
+     * deviceId: Headset or other device that should receive the path.
+     * color: Path display color, which might be shown on command dashboards.
+     *        It is recommended to use the target headset color, so multiple paths look visually distinct on the dashboard.
+     *        Since the target user headset only has one path to display, it may ignore this color and display a hot-cold gradient instead.
+     * label: Label text for the path. It is recommended to generate meaningful text like "Directions for <headset name>"
+     *        or "Directions to <waypoint name>". This text will appear on the dashboard and may be displayed in the headset.
+     */
+    public static bool GiveDirectionsToUser(Vector3[] points, string locationId, string deviceId, string color, string label)
+    {
         EasyVizAR.NewMapPath mapPath = new();
         mapPath.location_id = locationId;
         mapPath.mobile_device_id = deviceId;
         mapPath.type = "navigation";
         mapPath.color = color;
         mapPath.label = label;
-        mapPath.points = path.corners;
+        mapPath.points = points;
 
         //Serialize the feature into JSON
         var data = JsonUtility.ToJson(mapPath);
@@ -223,6 +247,13 @@ public class NavigationManager : MonoBehaviour
             // Maybe allow other holograms (eg. markers) to render over the line, but
             // this navigation line should be higher priority than any of the other lines.
             lr.sortingOrder = -10;
+
+            // Also display our navigation path on the hand-attached map.
+            if (mapLineRenderer)
+            {
+                mapLineRenderer.positionCount = path.points.Length;
+                mapLineRenderer.SetPositions(path.points);
+            }
         }
         else if (ColorUtility.TryParseHtmlString(path.color, out Color color))
         {
