@@ -43,7 +43,7 @@ public class VolumeHeadsetManager : MonoBehaviour
         if (local_nav_reference != null)
         {
             Debug.Log(this.transform.parent.GetComponent<Transform>().localPosition);
-            local_nav_reference.GiveDirectionsToUser(this.transform.parent.GetComponent<Transform>().localPosition, old_position, headset_reference._color.ToString(), headsetManager_reference._local_headset_ID, headset_reference._headsetID, headset_reference.Name);
+            local_nav_reference.GiveDirectionsToUser(this.transform.parent.GetComponent<Transform>().localPosition, old_position, headsetManager_reference.LocationID, headset_reference._headsetID, ColorUtility.ToHtmlStringRGB(headset_reference._color), headset_reference.Name);
         }
         else
         {
@@ -62,3 +62,4 @@ public class VolumeHeadsetManager : MonoBehaviour
         old_position = this.transform.parent.GetComponent<Transform>().localPosition;
     }
 }
+

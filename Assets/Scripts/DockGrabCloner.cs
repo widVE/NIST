@@ -13,6 +13,11 @@ public class DockGrabCloner : MonoBehaviour
 
     public NavigationManager navimesh_reference;
 
+    //GameObject VolumeHeadsetLoader;
+
+    //public VolumeHeadsetLoader headsetloader_reference;
+
+
     //public BoundsCheck boundscheck_reference;
 
 
@@ -29,6 +34,7 @@ public class DockGrabCloner : MonoBehaviour
     public string culling_box_name = "Manual Culling Box Adjustment";
 
     //funtion, when this object is picked up it will spawn a prefab at the spawn_parent_location
+
     public void SpawnObject(GameObject prefab)
     {
         GameObject docked_object = Instantiate(prefab, spawn_parent_location.transform.position, spawn_parent_location.transform.rotation);
@@ -57,6 +63,8 @@ public class DockGrabCloner : MonoBehaviour
         volume_map_reference.volumetric_map_spawn_target = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/features").gameObject;
 
         headset_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/headsets").gameObject;
+
+        //headsetloader_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject;
 
         navimesh_reference.meshGameObject = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/WavefrontObject").gameObject;
 

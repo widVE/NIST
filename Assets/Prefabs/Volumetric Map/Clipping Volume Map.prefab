@@ -1336,6 +1336,8 @@ GameObject:
   - component: {fileID: 1477525487928821630}
   - component: {fileID: 2317057510497868884}
   - component: {fileID: 8260540303665855295}
+  - component: {fileID: 1640645750212004366}
+  - component: {fileID: 1557076056160291013}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -1407,6 +1409,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawn_parent: {fileID: 4806826019019045591}
+--- !u!114 &1640645750212004366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1477525487928821629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e54110d5ee287043aea8951a712f581, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _volumeHeadsetPrefab: {fileID: 2161221711680702053, guid: 5c4955614de38d9499b3f70ed2fa71fa, type: 3}
+  volumetricMapParent: {fileID: 2023970205899778087}
+  headsetManager_reference: {fileID: 0}
+--- !u!114 &1557076056160291013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1477525487928821629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75a883552f4a4d5409a4dd920e6c7b19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  feature_list:
+    features: []
+  featureManager_reference: {fileID: 0}
 --- !u!1 &1477525488214877148
 GameObject:
   m_ObjectHideFlags: 0

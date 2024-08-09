@@ -672,7 +672,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
         if(volumetricMapParent != null)
         {
-            CreateVolumetricMapHeadset(remote_headset);
+            //CreateVolumetricMapHeadset(remote_headset);
         }
     }
 
@@ -698,9 +698,9 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             {
                 marker_object.feature_type = "headset";
                 marker_object.feature_name = remote_headset.name;
-                marker_object.world_position = headset_game_object.transform.position;
+                marker_object.transform.localPosition = headset_game_object.transform.position;
                 
-                MoveAndRotateIcon(headset_game_object, headset_game_object.transform); //this is the line that actually sets the right position for the headsets on the map
+                //MoveAndRotateIcon(headset_game_object, headset_game_object.transform); //this is the line that actually sets the right position for the headsets on the map
 
                 var icon_renderer = headset_game_object.transform.Find("Capsule")?.GetComponent<Renderer>();
                 if (icon_renderer is not null)
