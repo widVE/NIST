@@ -80,7 +80,6 @@ public enum DetectionMode
 	MaxScore,		// Test for probable presence of object using max operator (relatively fast)
 	BoundingBox,	// Bounding box detection using nonmaximum suppression (slower)
 	CoarseSegment,	// Small grid of values indicating detection strength (fast)
-	Blur,			// Only detect blur level of image
 }
 
 public enum TransmitMode
@@ -103,7 +102,6 @@ public class ObjectDetector : MonoBehaviour
 	// Try to send a frame at least this often (applies to selective mode).
 	public int maxSendInterval = 5000;
 
-	public ModelAsset blurModel;
 	public ModelAsset detectionModel;
 	public ModelAsset coarseSegmentationModel;
 
@@ -167,8 +165,6 @@ public class ObjectDetector : MonoBehaviour
 	public Material lineRendererMaterial;
 
 	public float contourWidth = 0.02f;
-
-	public float blurAcceptanceThreshold = 0.0005f;
 
 	// Size of input to ML model
 	private int modelInputWidth = -1;
@@ -257,7 +253,7 @@ public class ObjectDetector : MonoBehaviour
 						shouldWaitForResult = true;
 						break;
 					case "continuous":
-						detectionMode = DetectionMode.Blur;
+						detectionMode = DetectionMode.Off;
 						transmitMode = TransmitMode.Continuous;
 						break;
 					default:
@@ -300,8 +296,6 @@ public class ObjectDetector : MonoBehaviour
 		ModelAsset asset = detectionModel;
 		if (detectionMode == DetectionMode.CoarseSegment)
 			asset = coarseSegmentationModel;
-		else if (detectionMode == DetectionMode.Blur)
-			asset = blurModel;
 
 		Model model = ModelLoader.Load(asset);
 		modelName = asset.name;
@@ -525,7 +519,7 @@ public class ObjectDetector : MonoBehaviour
 		}
 
 		Graphics.Blit(webcamTexture, outputTexture);
-
+		
 		executionSchedule = engine.StartManualSchedule(inputTensor);
 		//engine.Execute(inputTensor);
 	}
@@ -841,13 +835,6 @@ public class ObjectDetector : MonoBehaviour
 
 	private bool shouldSendFrame(DetectionResult dresult)
     {
-		if (detectionMode == DetectionMode.Blur)
-		{
-			var variance = engine.PeekOutput("variance") as TensorFloat;
-			variance.MakeReadable();
-			return (variance[0] >= blurAcceptanceThreshold);
-		}
-
 		if (transmitMode == TransmitMode.Continuous)
 			return true;
 

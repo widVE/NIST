@@ -20,13 +20,6 @@ public class HeadsetsEvent
     public EasyVizAR.Headset current;
 }
 
-[System.Serializable]
-public class MapPathsEvent
-{
-    public EasyVizAR.MapPath previous;
-    public EasyVizAR.MapPath current;
-}
-
 public class EasyVizARWebSocketConnection : MonoBehaviour
 {
     [SerializeField]
@@ -47,7 +40,6 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
     public GameObject featureManager = null;
     public GameObject headsetManager = null;
-    public GameObject navigationManager = null;
     public GameObject map_parent;
 
     // Attach QRScanner GameObject so we can listen for location change events.
@@ -195,13 +187,6 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
             await _ws.SendText("subscribe features:deleted " + event_uri);
         }
 
-        if (navigationManager)
-        {
-            await _ws.SendText("subscribe map-paths:created " + event_uri);
-            await _ws.SendText("subscribe map-paths:updated " + event_uri);
-            await _ws.SendText("subscribe map-paths:deleted " + event_uri);
-        }
-
         isConnected = true;
     }
 
@@ -260,24 +245,6 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
                 {
                     FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(event_body);
                     featureManager.GetComponent<FeatureManager>().DeleteFeatureFromServer(ev.previous.id);
-                    break;
-                }
-            case "map-paths:created":
-                {
-                    MapPathsEvent ev = JsonUtility.FromJson<MapPathsEvent>(event_body);
-                    navigationManager.GetComponent<NavigationManager>().UpdateMapPath(ev.current);
-                    break;
-                }
-            case "map-paths:updated":
-                {
-                    MapPathsEvent ev = JsonUtility.FromJson<MapPathsEvent>(event_body);
-                    navigationManager.GetComponent<NavigationManager>().UpdateMapPath(ev.current);
-                    break;
-                }
-            case "map-paths:deleted":
-                {
-                    MapPathsEvent ev = JsonUtility.FromJson<MapPathsEvent>(event_body);
-                    navigationManager.GetComponent<NavigationManager>().DeleteMapPath(ev.previous.id);
                     break;
                 }
             default:

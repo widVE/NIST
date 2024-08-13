@@ -16,7 +16,7 @@ namespace EasyVizAR
 		public Vector3 position;
 		public Vector3 orientation;
 	}*/
-
+	
 	[System.Serializable]
 	public class Orientation
 	{
@@ -25,7 +25,7 @@ namespace EasyVizAR
 		public float y;
 		public float z;
 	}
-
+	
 	[System.Serializable]
 	public class Position
 	{
@@ -37,7 +37,7 @@ namespace EasyVizAR
 	[System.Serializable]
 	public class NavigationTarget
 	{
-		public string type;         // One of (none|point|feature|headset)
+		public string type;			// One of (none|point|feature|headset)
 		public string target_id;    // May be set to headset_id or feature_id depending on type
 		public Position position;
 	}
@@ -45,7 +45,7 @@ namespace EasyVizAR
 	[System.Serializable]
 	public class Headset
 	{
-		public string color;
+		public string color; 
 		public int created;
 		public string id;
 		public string location_id;
@@ -57,17 +57,17 @@ namespace EasyVizAR
 		public int updated;
 	};
 
-	[System.Serializable]
-	public class HeadsetList
-	{
-		public Headset[] headsets;
-	}
+    [System.Serializable]
+    public class HeadsetList
+    {
+        public Headset[] headsets;
+    }
 
-	/*
+    /*
 	 * RegisteredHeadset is only received when creating a new headset.
 	 * It contains the authentication token that we need to save for future API calls.
 	 */
-	[System.Serializable]
+    [System.Serializable]
 	public class RegisteredHeadset
 	{
 		public string color;
@@ -83,14 +83,14 @@ namespace EasyVizAR
 		public string token;
 	};
 
-	/*
+    /*
 	 * HeadsetPositionUpdate contains a subset of the Headset class attributes
 	 * that we send with position updates. Sending this instead of the full
 	 * Headset object can avoid clobbering other fields such as color.
 	 */
-	[System.Serializable]
+    [System.Serializable]
 	public class HeadsetPositionUpdate
-	{
+    {
 		public string location_id;
 		public Orientation orientation;
 		public Position position;
@@ -102,7 +102,7 @@ namespace EasyVizAR
 		public string contentType;
 		public string imagePath;
 		public string id;
-
+		
 		public int width;
 		public int height;
 
@@ -125,7 +125,7 @@ namespace EasyVizAR
 
 	[System.Serializable]
 	public class PhotoAnnotation
-	{
+    {
 		public int id;
 
 		public string label;
@@ -134,11 +134,11 @@ namespace EasyVizAR
 
 		public List<Vector2> contour;
 		public List<Vector3> projected_contour;
-	}
+    }
 
 	[System.Serializable]
 	public class PhotoInfo
-	{
+    {
 		public int id;
 		public string queue_name;
 		public int priority;
@@ -151,7 +151,7 @@ namespace EasyVizAR
 		public float updated;
 
 		public PhotoAnnotation[] annotations;
-	}
+    }
 
 	[System.Serializable]
 	public class MapInfo
@@ -162,7 +162,7 @@ namespace EasyVizAR
 		public int id;
 		public string imagePath;
 		public string imageUrl;
-		public string name;
+		public string name; 
 		public bool ready;
 		public string type;
 		public static float updated;
@@ -170,13 +170,13 @@ namespace EasyVizAR
 		public ViewBox viewBox;
 	}
 
-	[System.Serializable]
-	public class MapLayerInfoList
+    [System.Serializable]
+    public class MapLayerInfoList
 	{
-		public MapInfo[] layers;
-	}
+        public MapInfo[] layers;
+    }
 
-	[System.Serializable]
+    [System.Serializable]
 	public class ViewBox
 	{
 		public float height;
@@ -184,7 +184,7 @@ namespace EasyVizAR
 		public float top;
 		public float width;
 	}
-
+	
 	[System.Serializable]
 	public class PoseChange
 	{
@@ -192,7 +192,7 @@ namespace EasyVizAR
 		public Position position;
 		public float time;
 	}
-
+	
 	[System.Serializable]
 	public class PoseChanges
 	{
@@ -233,38 +233,14 @@ namespace EasyVizAR
 		public float updated;
 	}
 
-	[System.Serializable]
+    [System.Serializable]
 	public class FeatureDisplayStyle
 	{
 		public float leftOffset;
 		public string placement;
 		public float radius;
 		public float topOffset;
-	}
-
-	[System.Serializable]
-	public class NewMapPath
-	{
-		public string location_id;
-		public string mobile_device_id;
-		public int target_marker_id;
-		public string type;
-		public string color;
-		public string label;
-		public Vector3[] points;
-	}
-
-	[System.Serializable]
-	public class MapPath : NewMapPath 
-	{
-		public int id;
-	}
-
-	[System.Serializable]
-	public class MapPathList
-	{
-		public MapPath[] map_paths;
-	}
+    }
 
 	[System.Serializable]
 	public class Registration
