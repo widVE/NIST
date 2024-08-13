@@ -12,6 +12,7 @@ Material:
   m_ValidKeywords:
   - _ALPHATEST_ON
   - _BORDER_LIGHT_USES_HOVER_COLOR
+  - _CLIPPING_SPHERE
   - _EMISSION
   - _SPECULAR_HIGHLIGHTS
   m_InvalidKeywords:

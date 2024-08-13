@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 //using System.Diagnostics;
 //using Color = UnityEngine.Color;
 
+
 public class FeatureManager : MonoBehaviour
 {
 
@@ -105,34 +106,10 @@ public class FeatureManager : MonoBehaviour
     [SerializeField]
     GameObject _qrScanner;
 
-    [SerializeField]
-    Sprite[] typeIcons;
-    Dictionary<string, Sprite> typeIconDic = new();
-
-    public EasyVizAR.Location location;
-
-    private void Awake()
-    {
-        InitTypeIcons();
-    }
-
-    private void InitTypeIcons()
-    {
-        for(int i = 0; i < typeIcons.Length; i++)
-        {
-            var typeIcon = typeIcons[i];
-            if(typeIcon != null)
-            {
-                typeIconDic[typeIcon.name] = typeIcon;
-            }
-        }
-    }
-
     // Start is called before the first frame update
 
     void Start()
     {
-
         headset_parent = EasyVizARHeadsetManager.EasyVizARManager.gameObject;
 
         DeleteAll();
@@ -205,7 +182,6 @@ public class FeatureManager : MonoBehaviour
             scanner.LocationChanged += (o, ev) =>
             {
                 ListFeaturesFromLocation(ev.LocationID);
-                RequestLocationName(ev.LocationID);
                 location_id = ev.LocationID;
 
             };
@@ -676,7 +652,7 @@ public class FeatureManager : MonoBehaviour
 
         GameObject volumetric_map_marker = Instantiate(feature_to_spawn, volumetric_map_spawn_target.transform, false);
         volumetric_map_marker.name = string.Format("feature-{0}", feature.id);
-        volumetric_map_marker.transform.localPosition = new Vector3(world_position.x, y_offset, world_position.z);
+        volumetric_map_marker.transform.localPosition = new Vector3(world_position.x, world_position.y, world_position.z);
 
         MarkerObject volumetric_marker_object = volumetric_map_marker.GetComponent<MarkerObject>();
 
@@ -725,7 +701,16 @@ public class FeatureManager : MonoBehaviour
 
         Transform feature_object = spawn_parent.transform.Find(string.Format("feature-{0}", id));
         Transform map_icon = palm_map_spawn_target.transform.Find(string.Format("feature-{0}", id));
-        Transform volumetric_icon = volumetric_map_spawn_target.transform.Find(string.Format("feature-{0}", id));
+        if (volumetric_map_spawn_target != null)
+        {
+            Transform volumetric_icon = volumetric_map_spawn_target.transform.Find(string.Format("feature-{0}", id));
+            if (volumetric_icon)
+            {
+                Debug.Log("deleted icon: " + id);
+                Destroy(volumetric_icon.gameObject);
+            }
+        }
+        
         if (feature_object)
         {
             Debug.Log("deleted feature: " + id);
@@ -738,11 +723,7 @@ public class FeatureManager : MonoBehaviour
             Destroy(map_icon.gameObject);
 
         }
-        if(volumetric_icon)
-        {
-            Debug.Log("deleted icon: " + id);
-            Destroy(map_icon.gameObject);
-        }
+
     }
 
 
@@ -757,30 +738,4 @@ public class FeatureManager : MonoBehaviour
 
     }
 
-    public Sprite GetTypeIcon(string type)
-    {
-        if(typeIconDic.TryGetValue(type, out Sprite ret))
-        {
-            return ret;
-        }
-        return null;
-    }
-
-
-    private void RequestLocationName(string locationID)
-    {
-        EasyVizARServer.Instance.Get("locations/" + locationID, EasyVizARServer.JSON_TYPE, RequestLocationNameCallback);
-    }
-
-    private void RequestLocationNameCallback(string result)
-    {
-        if (result != "error")
-        {
-            location = JsonUtility.FromJson<EasyVizAR.Location>(result);
-        }
-        else
-        {
-            Debug.Log("ERROR: " + result);
-        }
-    }
 }

@@ -30,6 +30,9 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     [SerializeField]
     GameObject _headsetPrefab;  //prefab for loading other headsets...
 
+    [SerializeField]
+    GameObject _volumeHeadsetPrefab;
+
     // Attach QRScanner GameObject so we can listen for location change events.
     [SerializeField]
     GameObject _qrScanner;
@@ -669,13 +672,16 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
         if(volumetricMapParent != null)
         {
-            CreateVolumetricMapHeadset(remote_headset);
+            //CreateVolumetricMapHeadset(remote_headset);
         }
     }
 
     public void CreateVolumetricMapHeadset(EasyVizAR.Headset remote_headset)
     {
-        GameObject headset_game_object = Instantiate(_headsetPrefab, volumetricMapParent.transform, false);
+        GameObject headset_game_object = Instantiate(_volumeHeadsetPrefab, volumetricMapParent.transform, false);
+
+        //headset_game_object.transform.localPosition = headset_game_object.transform.position;
+
         headset_game_object.name = remote_headset.id;
 
         EasyVizARHeadset headset_class_data = headset_game_object.GetComponent<EasyVizARHeadset>();
@@ -692,7 +698,16 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             {
                 marker_object.feature_type = "headset";
                 marker_object.feature_name = remote_headset.name;
-                marker_object.world_position = headset_game_object.transform.position;
+                marker_object.transform.localPosition = headset_game_object.transform.position;
+                
+                //MoveAndRotateIcon(headset_game_object, headset_game_object.transform); //this is the line that actually sets the right position for the headsets on the map
+
+                var icon_renderer = headset_game_object.transform.Find("Capsule")?.GetComponent<Renderer>();
+                if (icon_renderer is not null)
+                {
+                    Color myColor = headset_class_data._color;
+                    icon_renderer.material.SetColor("_EmissionColor", myColor);
+                }
             }
 
 /*            if (volumetricMapParent is not null)

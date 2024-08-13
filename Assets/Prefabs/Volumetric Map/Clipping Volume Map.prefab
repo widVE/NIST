@@ -673,7 +673,7 @@ Transform:
   m_GameObject: {fileID: 1477525487252507097}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1477525486663859442}
@@ -1336,6 +1336,8 @@ GameObject:
   - component: {fileID: 1477525487928821630}
   - component: {fileID: 2317057510497868884}
   - component: {fileID: 8260540303665855295}
+  - component: {fileID: 1640645750212004366}
+  - component: {fileID: 1557076056160291013}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -1407,6 +1409,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawn_parent: {fileID: 4806826019019045591}
+--- !u!114 &1640645750212004366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1477525487928821629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e54110d5ee287043aea8951a712f581, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _volumeHeadsetPrefab: {fileID: 2161221711680702053, guid: 5c4955614de38d9499b3f70ed2fa71fa, type: 3}
+  volumetricMapParent: {fileID: 2023970205899778087}
+  headsetManager_reference: {fileID: 0}
+--- !u!114 &1557076056160291013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1477525487928821629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75a883552f4a4d5409a4dd920e6c7b19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  feature_list:
+    features: []
+  featureManager_reference: {fileID: 0}
 --- !u!1 &1477525488214877148
 GameObject:
   m_ObjectHideFlags: 0
@@ -1704,6 +1736,37 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &2023970205899778087
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8303062334230359967}
+  m_Layer: 0
+  m_Name: headsets
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8303062334230359967
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2023970205899778087}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4702042332979524344}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2258202190051486333
 GameObject:
   m_ObjectHideFlags: 0
@@ -1721,6 +1784,7 @@ GameObject:
   - component: {fileID: 2258202188667151517}
   - component: {fileID: 2258202188667151516}
   - component: {fileID: 1386190225703608513}
+  - component: {fileID: 4088849271823474795}
   m_Layer: 0
   m_Name: Manual Culling Box Adjustment
   m_TagString: Untagged
@@ -2107,6 +2171,20 @@ MonoBehaviour:
   scaleMinimum: 0.3
   scaleMaximum: 5
   relativeToInitialState: 1
+--- !u!114 &4088849271823474795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2258202190051486333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85c4831d41668454c88bb3e1a8480008, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  culler: {fileID: 4077556883244807159}
+  moveable_map: {fileID: 4806826019019045591}
 --- !u!1 &2817685599304298710
 GameObject:
   m_ObjectHideFlags: 0
@@ -2372,6 +2450,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2743851383100947593}
   - component: {fileID: 2970157599306225870}
+  - component: {fileID: 4568117896081384196}
   m_Layer: 0
   m_Name: Culler
   m_TagString: Untagged
@@ -2422,6 +2501,19 @@ MonoBehaviour:
   useOnPreRender: 0
   applyToSharedMaterial: 1
   cacheSharedMaterialsFromRenderer: 0
+--- !u!65 &4568117896081384196
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4077556883244807159}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4806826019019045591
 GameObject:
   m_ObjectHideFlags: 0
@@ -2460,6 +2552,8 @@ Transform:
   - {fileID: 3138965506310708579}
   - {fileID: 5887399551381885855}
   - {fileID: 7514148162885578174}
+  - {fileID: 312074109640620552}
+  - {fileID: 8303062334230359967}
   m_Father: {fileID: 3358215563306109486}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2873,6 +2967,37 @@ Transform:
   - {fileID: 4702042332979524344}
   m_Father: {fileID: 2180752674561791703}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8640142239930784295
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 312074109640620552}
+  m_Layer: 0
+  m_Name: features
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &312074109640620552
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8640142239930784295}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4702042332979524344}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &9063056906042724431
 GameObject:

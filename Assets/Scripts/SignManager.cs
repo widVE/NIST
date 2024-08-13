@@ -1,11 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using EasyVizAR;
 using Sign;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public enum Dir
 {
@@ -29,116 +27,102 @@ public class SignDataJSON
     public List<SignItemData> data = new List<SignItemData>();
 }
 
-public class FeatureWithIcon
-{
-    public Feature feature;
-    public Sprite icon;
-
-    public FeatureWithIcon(Feature feature, Sprite icon)
-    {
-        this.feature = feature;
-        this.icon = icon;
-    }
-}
 
 public class SignManager : MonoBehaviour
 {
-    public VerticalLayoutGroup layout;
+    private SignDataJSON jsondata;
 
-    public TextMeshProUGUI locationLabel;
-    public TextMeshProUGUI levelLabel;
 
-    public SignNavigationBoard_DirectionItem directionItemTempalte;
-    public Transform diretionItemRoot;
+    public TextMeshPro LevelInedexTextMeshPro;
+    public TextMeshPro LocationTextMeshPro;
 
-    private List<SignNavigationBoard_DirectionItem> directionItemList = new();
+    public GameObject go;
 
-    private Dictionary<Dir, List<FeatureWithIcon>> signData = new();
-
-    private string location;
-    private int levelIndex; // TODO
-
+    public Sprite[] imgs;
+    
     private void Start()
     {
+        TestInitA();
         RefreshView();
     }
 
-    public void RefreshView()
+    private void RefreshView()
     {
-        layout.enabled = false;
+        LevelInedexTextMeshPro.text = jsondata.levelIndex;
+        LocationTextMeshPro.text = jsondata.location;
 
-        CleanItemList();
+        var parentChildCount = go.transform.parent.childCount;
 
-        locationLabel.text = location;
-        levelLabel.text = levelIndex.ToString();
-
-        //TryAddFeatureByDirection(Dir.top);
-        TryAddFeatureByDirection(Dir.left);
-        TryAddFeatureByDirection(Dir.right);
-        TryAddFeatureByDirection(Dir.bottom);
-
-        layout.enabled = true;
-    }
-
-    private void TryAddFeatureByDirection(Dir direction)
-    {
-        if (signData.TryGetValue(direction, out List<FeatureWithIcon> features))
+        for (int i = 1; i < parentChildCount; i++)
         {
-            CreateDirectionItem(direction, features);
-            //Debug_DisplayDebugNode(features);
+            Destroy(go.transform.parent.GetChild(i).gameObject);
+        }
+
+        foreach (var signItemData in jsondata.data)
+        {
+            var instantiate = Instantiate(go, go.transform.parent);
+            instantiate.transform.localPosition = Vector3.zero;
+
+            instantiate.transform.localRotation = Quaternion.identity;
+
+            instantiate.transform.localScale = Vector3.one;
+            instantiate.gameObject.SetActive(true);
+            instantiate.GetComponent<SignItemView>().SetData((signItemData));
         }
     }
 
-
-    private void CreateDirectionItem(Dir direction, List<FeatureWithIcon> features)
+    private void TestInitA()
     {
-        var newDirectionItem =
-            Instantiate(directionItemTempalte.gameObject, diretionItemRoot)
-            .GetComponent<SignNavigationBoard_DirectionItem>();
-        directionItemList.Add(newDirectionItem);
-        newDirectionItem.gameObject.SetActive(true);
-        newDirectionItem.UpdateFeatureData(direction, features);
+        jsondata = new SignDataJSON();
+        jsondata.levelIndex = "1";
+        jsondata.location = "building1";
+        jsondata.data.Add(new SignItemData() { dir = Dir.right, locationName = "laboratory" ,img = imgs[0]});
+        jsondata.data.Add(new SignItemData() { dir = Dir.left, locationName = "WC",img = imgs[3] });
+        jsondata.data.Add(new SignItemData() { dir = Dir.top, locationName = "fireExtinguisher" ,img = imgs[1]});
+        jsondata.data.Add(new SignItemData() { dir = Dir.bottom, locationName = "elevator" ,img = imgs[2]});
     }
 
-    private void CleanItemList()
+    private void TestInitB()
     {
-        for (int i = 0; i < directionItemList.Count; i++)
+        jsondata = new SignDataJSON();
+        jsondata.levelIndex = "2";
+        jsondata.location = "building2";
+        jsondata.data.Add(new SignItemData() { dir = Dir.top, locationName = "laboratory2" });
+        jsondata.data.Add(new SignItemData() { dir = Dir.bottom, locationName = "WC2" });
+        jsondata.data.Add(new SignItemData() { dir = Dir.left, locationName = "elevator2" });
+        jsondata.data.Add(new SignItemData() { dir = Dir.right, locationName = "fireExtinguisher2" });
+
+    }
+
+    private void TestInitC()
+    {
+        jsondata = new SignDataJSON();
+        jsondata.levelIndex = "3";
+        jsondata.location = "building3";
+        jsondata.data.Add(new SignItemData() { dir = Dir.top, locationName = "laboratory3" });
+        jsondata.data.Add(new SignItemData() { dir = Dir.bottom, locationName = "WC3" });
+        jsondata.data.Add(new SignItemData() { dir = Dir.left, locationName = "elevator3" });
+        jsondata.data.Add(new SignItemData() { dir = Dir.right, locationName = "fireExtinguisher3" });
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F1))
         {
-            Destroy(directionItemList[i].gameObject);
+            TestInitA();
+            RefreshView();
         }
-        directionItemList.Clear();
-    }
 
-    internal void UpdatePositionAndRotation(Vector3 spawnPosition, Quaternion spawnRotation)
-    {
-        spawnPosition.y = 0.69f;
-        transform.position = spawnPosition;
-        var euler = spawnRotation.eulerAngles;
-        euler.x = 0f;
-        transform.eulerAngles = euler;
-    }
-
-    public void CleanList()
-    {
-        signData.Clear();
-    }
-
-    public void AddFeature(Dir direction, Feature feature, Sprite sprite)
-    {
-        if (signData.TryGetValue(direction, out List<FeatureWithIcon> featureList))
+        if (Input.GetKeyDown(KeyCode.F2))
         {
-            featureList.Add(new FeatureWithIcon(feature, sprite));
+            TestInitB();
+            RefreshView();
         }
-        else
-        {
-            var newFeatureList = new List<FeatureWithIcon>();
-            newFeatureList.Add(new FeatureWithIcon(feature, sprite));
-            signData.Add(direction, newFeatureList);
-        }
-    }
 
-    public void SetLocation(string slocation)
-    {
-        location = slocation;
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            TestInitC();
+            RefreshView();
+        }
     }
 }

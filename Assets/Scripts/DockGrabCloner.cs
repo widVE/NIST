@@ -11,6 +11,16 @@ public class DockGrabCloner : MonoBehaviour
 
     public EasyVizARHeadsetManager headset_reference;
 
+    public NavigationManager navimesh_reference;
+
+    //GameObject VolumeHeadsetLoader;
+
+    //public VolumeHeadsetLoader headsetloader_reference;
+
+
+    //public BoundsCheck boundscheck_reference;
+
+
     //location to spawn the cloned object
     public GameObject spawn_parent_location;
 
@@ -24,6 +34,7 @@ public class DockGrabCloner : MonoBehaviour
     public string culling_box_name = "Manual Culling Box Adjustment";
 
     //funtion, when this object is picked up it will spawn a prefab at the spawn_parent_location
+
     public void SpawnObject(GameObject prefab)
     {
         GameObject docked_object = Instantiate(prefab, spawn_parent_location.transform.position, spawn_parent_location.transform.rotation);
@@ -47,10 +58,19 @@ public class DockGrabCloner : MonoBehaviour
         
         GameObject volume_map = Instantiate(prefab, spawn_position, quaternion.identity);
 
+        volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
 
-        volume_map_reference.volumetric_map_spawn_target = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject;
+        volume_map_reference.volumetric_map_spawn_target = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/features").gameObject;
 
-        headset_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject;
+        headset_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/headsets").gameObject;
+
+        //headsetloader_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject;
+
+        navimesh_reference.meshGameObject = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/WavefrontObject").gameObject;
+
+        navimesh_reference.UpdateNavMesh(volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/WavefrontObject").gameObject);
+
+        //boundscheck_reference.map = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/WavefrontObject").gameObject;
 
 
         //call spawn volumetric function in featuremanager
