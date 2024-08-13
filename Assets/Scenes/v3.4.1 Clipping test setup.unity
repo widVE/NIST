@@ -1479,6 +1479,7 @@ MonoBehaviour:
   transmitMode: 2
   minSendInterval: 1000
   maxSendInterval: 5000
+  blurModel: {fileID: 0}
   detectionModel: {fileID: 5022602860645237092, guid: 7e5b42482e78d1847a368b56ef305c70, type: 3}
   coarseSegmentationModel: {fileID: 5022602860645237092, guid: ee35cd1078d116e4182b49b248095a94, type: 3}
   headAttachedDisplay: {fileID: 1265293830}
@@ -1504,6 +1505,7 @@ MonoBehaviour:
   multiScaleMask: {fileID: 2100000, guid: 7355b87662b03c0419f6402b2766d12c, type: 2}
   lineRendererMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   contourWidth: 0.02
+  blurAcceptanceThreshold: 0.0005
 --- !u!64 &49547811
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -8756,10 +8758,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d9485676ecf0cb43990e23920e91df8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  qrScanner: {fileID: 0}
   mesh: {fileID: 0}
   meshGameObject: {fileID: 0}
+  mapPathGameObject: {fileID: 0}
   targetIsSet: 0
   targetPosition: {x: 1, y: 1, z: 1}
+  pathMaterial: {fileID: 0}
+  navigationStartColor: {r: 0, g: 1, b: 1, a: 1}
+  navigationEndColor: {r: 1, g: 0, b: 1, a: 1}
 --- !u!1 &316250992
 GameObject:
   m_ObjectHideFlags: 0
@@ -22716,6 +22723,7 @@ MonoBehaviour:
   _locationId: 69e92dff-7138-4091-89c4-ed073035bfe6
   featureManager: {fileID: 1885103011}
   headsetManager: {fileID: 1361342022}
+  navigationManager: {fileID: 0}
   map_parent: {fileID: 335883421}
   _qrScanner: {fileID: 291935030}
   _updateInterval: 0.3

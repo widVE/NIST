@@ -1,11 +1,11 @@
 fileFormatVersion: 2
-guid: f19fa002269f39149a8365758ce30526
+guid: b39a1120d44cc1e4e88d6ebcc7e0b031
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable:
   - first:
       74: -203655887218126122
-    second: Silly Walking
+    second: Fall Flat Impact
   externalObjects: {}
   materials:
     materialImportMode: 2
@@ -36,11 +36,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Silly Walking
+      name: Fall Flat Impact
       takeName: mixamo.com
       internalID: 0
       firstFrame: 0
-      lastFrame: 94
+      lastFrame: 93
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

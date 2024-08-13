@@ -1,11 +1,11 @@
 fileFormatVersion: 2
-guid: f19fa002269f39149a8365758ce30526
+guid: 00be98c9e03f26b458a22f9b99c4bebe
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable:
   - first:
       74: -203655887218126122
-    second: Silly Walking
+    second: Ninja Idle
   externalObjects: {}
   materials:
     materialImportMode: 2
@@ -36,11 +36,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Silly Walking
+      name: Ninja Idle
       takeName: mixamo.com
       internalID: 0
       firstFrame: 0
-      lastFrame: 94
+      lastFrame: 550
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
