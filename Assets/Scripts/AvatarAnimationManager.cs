@@ -6,23 +6,23 @@ public class AvatarAnimationManager : MonoBehaviour
 {
     public Animator animator;
     
-    private bool held = false;
+    private bool holding = false;
     private bool dropped = false;
 
-    void HoldAvatar()
+    public void HoldAvatar()
     {
        if (animator)
         {
-            animator.SetBool("Held", true);
+            animator.SetBool("Holding", true);
             animator.SetBool("Dropped", false);
         }
     }
 
-    void DropAvatar()
+    public void DropAvatar()
     {
         if (animator)
         {
-            animator.SetBool("Held", false);
+            animator.SetBool("Holding", false);
             animator.SetBool("Dropped", true);
         }
     }
