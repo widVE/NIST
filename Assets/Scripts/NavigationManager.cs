@@ -39,6 +39,13 @@ public class NavigationManager : MonoBehaviour
 
     private Dictionary<int, GameObject> mapPathLineRenderers = new();
 
+    [SerializeField]
+    private SignManager mSignNavigation;
+
+    public FeatureManager featureManager;
+
+    List<List<Vector3>> _pointCache = new();
+
     private NavMeshBuildSource BuildSourceFromMesh(Mesh mesh)
     {
         var src = new NavMeshBuildSource();
@@ -101,6 +108,8 @@ public class NavigationManager : MonoBehaviour
     // Start is called before the first frame update
     IEnumerator Start()
     {
+        featureManager.OnFeatureListReceived = OnFeatureListReceived;
+
         myNavMeshSurface = GetComponent<NavMeshSurface>();
         myLineRender = GetComponent<LineRenderer>();
 
@@ -128,6 +137,10 @@ public class NavigationManager : MonoBehaviour
                 locationId = ev.LocationID;
             };
         }
+
+        mSignNavigation.OnManipulateSign = OnManipulateSign;
+
+        UpdateNavigationSigns();
     }
 
     // Update is called once per frame
@@ -311,5 +324,100 @@ public class NavigationManager : MonoBehaviour
                 Debug.Log(result);
             }
         });
+    }
+
+    private void UpdateNavigationSigns()
+    {
+        if (featureManager == null)
+        {
+            Debug.LogError("SignNavigationManager:FeatureManager is null");
+            return;
+        }
+        // user current position
+        mSignNavigation.CleanList();
+        _pointCache.Clear();
+
+
+        var sourcePosition = Camera.main.transform.position;
+        var features = featureManager.feature_list.features;
+        for (int i = 0; i < features.Length; i++)
+        {
+            var feature = features[i];
+            var targetPosition =
+                new Vector3(feature.position.x, feature.position.y, feature.position.z);
+
+            if (GetDirection(sourcePosition, targetPosition, out Dir direction))
+            {
+                mSignNavigation.AddFeature(direction, feature, featureManager.GetTypeIcon(feature.type));
+                print(direction + ":" + feature.name);
+            }
+        }
+        mSignNavigation.RefreshView();
+    }
+
+    private bool GetDirection(Vector3 sourcePosition, Vector3 targetPosition, out Dir direction)
+    {
+        direction = Dir.bottom;
+
+        NavMeshPath path = new();
+        if (NavMesh.CalculatePath(sourcePosition, targetPosition, NavMesh.AllAreas, path))
+        {
+            if (path != null && path.corners.Length > 0)
+            {
+                var firstCorner = path.corners[1];
+                Vector3 directionToTarget = firstCorner - sourcePosition;
+                Vector3 normalizedDirection = directionToTarget.normalized;
+                direction = GetDirection(normalizedDirection);
+
+                //Debug_DisplayPath(path.corners);
+
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Dir GetDirection(Vector3 direction)
+    {
+        if (Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
+        {
+            if (direction.z > 0)
+            {
+                if (direction.x > 0)
+                {
+                    return Dir.right;
+                }
+                else
+                {
+                    return Dir.left;
+                }
+            }
+            else
+            {
+                return Dir.bottom;
+            }
+        }
+        else
+        {
+            if (direction.x > 0)
+            {
+                return Dir.right;
+            }
+            else
+            {
+                return Dir.left;
+            }
+        }
+    }
+
+    private void OnManipulateSign()
+    {
+        UpdateNavigationSigns();
+    }
+
+
+    private void OnFeatureListReceived()
+    {
+        UpdateNavigationSigns();
     }
 }
