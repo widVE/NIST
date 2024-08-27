@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 //using System.Diagnostics;
 //using Color = UnityEngine.Color;
 
+
 public class FeatureManager : MonoBehaviour
 {
 
@@ -105,36 +106,13 @@ public class FeatureManager : MonoBehaviour
     [SerializeField]
     GameObject _qrScanner;
 
-    [SerializeField]
-    Sprite[] typeIcons;
-    Dictionary<string, Sprite> typeIconDic = new();
-
-    public EasyVizAR.Location location;
-
-    public UnityEngine.Events.UnityAction OnFeatureListReceived;
-
-    private void Awake()
-    {
-        InitTypeIcons();
-    }
-
-    private void InitTypeIcons()
-    {
-        for(int i = 0; i < typeIcons.Length; i++)
-        {
-            var typeIcon = typeIcons[i];
-            if(typeIcon != null)
-            {
-                typeIconDic[typeIcon.name] = typeIcon;
-            }
-        }
-    }
+    private EasyVizAR.Location location;
+    public string LocationName => location.name;
 
     // Start is called before the first frame update
 
     void Start()
     {
-
         headset_parent = EasyVizARHeadsetManager.EasyVizARManager.gameObject;
 
         DeleteAll();
@@ -359,11 +337,6 @@ public class FeatureManager : MonoBehaviour
 
             //disabling the Update()
             isChanged = false;
-
-            if(OnFeatureListReceived != null)
-            {
-                OnFeatureListReceived();
-            }
 
         }
         else
@@ -767,15 +740,6 @@ public class FeatureManager : MonoBehaviour
     void ReplaceFeatureCallback()
     {
 
-    }
-
-    public Sprite GetTypeIcon(string type)
-    {
-        if(typeIconDic.TryGetValue(type, out Sprite ret))
-        {
-            return ret;
-        }
-        return null;
     }
 
 

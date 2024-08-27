@@ -39,13 +39,6 @@ public class NavigationManager : MonoBehaviour
 
     private Dictionary<int, GameObject> mapPathLineRenderers = new();
 
-    [SerializeField]
-    private SignManager mSignNavigation;
-
-    public FeatureManager featureManager;
-
-    List<List<Vector3>> _pointCache = new();
-
     private NavMeshBuildSource BuildSourceFromMesh(Mesh mesh)
     {
         var src = new NavMeshBuildSource();
@@ -108,8 +101,6 @@ public class NavigationManager : MonoBehaviour
     // Start is called before the first frame update
     IEnumerator Start()
     {
-        featureManager.OnFeatureListReceived = OnFeatureListReceived;
-
         myNavMeshSurface = GetComponent<NavMeshSurface>();
         myLineRender = GetComponent<LineRenderer>();
 
@@ -137,10 +128,6 @@ public class NavigationManager : MonoBehaviour
                 locationId = ev.LocationID;
             };
         }
-
-        mSignNavigation.OnManipulateSign = OnManipulateSign;
-
-        UpdateNavigationSigns();
     }
 
     // Update is called once per frame
@@ -326,36 +313,7 @@ public class NavigationManager : MonoBehaviour
         });
     }
 
-    private void UpdateNavigationSigns()
-    {
-        if (featureManager == null)
-        {
-            Debug.LogError("SignNavigationManager:FeatureManager is null");
-            return;
-        }
-        // user current position
-        mSignNavigation.CleanList();
-        _pointCache.Clear();
-
-
-        var sourcePosition = Camera.main.transform.position;
-        var features = featureManager.feature_list.features;
-        for (int i = 0; i < features.Length; i++)
-        {
-            var feature = features[i];
-            var targetPosition =
-                new Vector3(feature.position.x, feature.position.y, feature.position.z);
-
-            if (GetDirection(sourcePosition, targetPosition, out Dir direction))
-            {
-                mSignNavigation.AddFeature(direction, feature, featureManager.GetTypeIcon(feature.type));
-                print(direction + ":" + feature.name);
-            }
-        }
-        mSignNavigation.RefreshView();
-    }
-
-    private bool GetDirection(Vector3 sourcePosition, Vector3 targetPosition, out Dir direction)
+    internal bool GetDirection(Vector3 sourcePosition, Vector3 targetPosition, out Dir direction)
     {
         direction = Dir.bottom;
 
@@ -410,14 +368,4 @@ public class NavigationManager : MonoBehaviour
         }
     }
 
-    private void OnManipulateSign()
-    {
-        UpdateNavigationSigns();
-    }
-
-
-    private void OnFeatureListReceived()
-    {
-        UpdateNavigationSigns();
-    }
 }

@@ -61,10 +61,56 @@ public class SignManager : MonoBehaviour
     private string location;
     private int levelIndex; // TODO
 
+
+    [SerializeField]
+    Sprite[] typeIcons;
+    Dictionary<string, Sprite> typeIconDic = new();
+
+    private EasyVizAR.Location evLocation;
+
+    public UnityEngine.Events.UnityAction OnFeatureListReceived;
+
+    private FeatureManager featureManager;
+    private NavigationManager navigationManager;
+    List<List<Vector3>> _pointCache = new();
+
+    private void Awake()
+    {
+        InitTypeIcons();
+    }
+
     private void Start()
     {
+        featureManager = GameObject.Find("FeatureManager").GetComponent<FeatureManager>();
+        navigationManager = GameObject.Find("NavigationManager").GetComponent<NavigationManager>();
+        location = featureManager.LocationName;
+        UpdateNavigationSigns();
         RefreshView();
     }
+
+
+
+    private void InitTypeIcons()
+    {
+        for (int i = 0; i < typeIcons.Length; i++)
+        {
+            var typeIcon = typeIcons[i];
+            if (typeIcon != null)
+            {
+                // special fix for bad-person
+                if(typeIcon.name == "bad_person")
+                {
+                    typeIconDic["bad-person"] = typeIcon;
+                }
+                else
+                {
+                    typeIconDic[typeIcon.name] = typeIcon;
+                }
+            }
+        }
+    }
+
+    
 
     IEnumerator tempRefresh()
     {
@@ -164,5 +210,61 @@ public class SignManager : MonoBehaviour
     public void SetLocation(string slocation)
     {
         location = slocation;
+    }
+
+    public Sprite GetTypeIcon(string type)
+    {
+        if (typeIconDic.TryGetValue(type, out Sprite ret))
+        {
+            return ret;
+        }
+        return null;
+    }
+
+
+    private void RequestLocationName(string locationID)
+    {
+        EasyVizARServer.Instance.Get("locations/" + locationID, EasyVizARServer.JSON_TYPE, RequestLocationNameCallback);
+    }
+
+    private void RequestLocationNameCallback(string result)
+    {
+        if (result != "error")
+        {
+            evLocation = JsonUtility.FromJson<EasyVizAR.Location>(result);
+        }
+        else
+        {
+            Debug.Log("ERROR: " + result);
+        }
+    }
+
+    private void UpdateNavigationSigns()
+    {
+        if (featureManager == null)
+        {
+            Debug.LogError("SignNavigationManager:FeatureManager is null");
+            return;
+        }
+        // user current position
+        CleanList();
+        _pointCache.Clear();
+
+
+        var sourcePosition = Camera.main.transform.position;
+        var features = featureManager.feature_list.features;
+        for (int i = 0; i < features.Length; i++)
+        {
+            var feature = features[i];
+            var targetPosition =
+                new Vector3(feature.position.x, feature.position.y, feature.position.z);
+
+            if (navigationManager.GetDirection(sourcePosition, targetPosition, out Dir direction))
+            {
+                AddFeature(direction, feature, GetTypeIcon(feature.type));
+                print(direction + ":" + feature.name);
+            }
+        }
+        RefreshView();
     }
 }
