@@ -59,16 +59,18 @@ public class DockGrabCloner : MonoBehaviour
         GameObject volume_map = Instantiate(prefab, spawn_position, quaternion.identity);
 
         volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
+        volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject.transform.localPosition = new Vector3(0, 0, 0);
+        volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map").gameObject.SetActive(false);
 
-        volume_map_reference.volumetric_map_spawn_target = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/features").gameObject;
+        volume_map_reference.volumetric_map_spawn_target = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map/features").gameObject;
 
-        headset_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/headsets").gameObject;
+        //headset_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map/headsets").gameObject;
 
         //headsetloader_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject;
 
-        navimesh_reference.meshGameObject = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/WavefrontObject").gameObject;
+        navimesh_reference.meshGameObject = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map/WavefrontObject").gameObject;
 
-        navimesh_reference.UpdateNavMesh(volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/WavefrontObject").gameObject);
+        navimesh_reference.UpdateNavMesh(volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map/WavefrontObject").gameObject);
 
         //boundscheck_reference.map = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/WavefrontObject").gameObject;
 

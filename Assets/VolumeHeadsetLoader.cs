@@ -4,7 +4,7 @@ using UnityEngine;
 public class VolumeHeadsetLoader : MonoBehaviour
 {
     public GameObject _volumeHeadsetPrefab;
-    public GameObject volumetricMapParent;
+    public GameObject _headsetParent;
 
     List<EasyVizARHeadset> _activeHeadsets;
     public EasyVizARHeadsetManager headsetManager_reference; 
@@ -24,11 +24,15 @@ public class VolumeHeadsetLoader : MonoBehaviour
     public void SpawnVolumeHeadset(EasyVizARHeadset headset)
     {
 
-        GameObject headset_game_object = Instantiate(_volumeHeadsetPrefab, headset.transform.position, headset.transform.rotation, volumetricMapParent.transform);
+        GameObject headset_game_object = Instantiate(_volumeHeadsetPrefab, headset.transform.position, headset.transform.rotation, _headsetParent.transform);
         headset_game_object.transform.localPosition = headset.transform.position;
 
 
         headset_game_object.name = headset._headsetID;
+
+        EasyVizARHeadset easyvizarHeadset = headset_game_object.GetComponent<EasyVizARHeadset>();
+        easyvizarHeadset._headsetID = headset._headsetID;
+
 
         MarkerObject marker_object = headset_game_object.GetComponent<MarkerObject>();
         if (marker_object != null)
@@ -41,7 +45,9 @@ public class VolumeHeadsetLoader : MonoBehaviour
             if (icon_renderer is not null)
             {
                 Color myColor = headset._color;
-                icon_renderer.material.SetColor("_EmissionColor", myColor);
+                Debug.Log(ColorUtility.ToHtmlStringRGB(myColor));
+                easyvizarHeadset._color = myColor;
+                icon_renderer.material.color = myColor;
             }
         }
 
@@ -54,17 +60,21 @@ public class VolumeHeadsetLoader : MonoBehaviour
 
         foreach (EasyVizARHeadset headset in _activeHeadsets)
         {
-            if (spawnedHeadsets.ContainsKey(headset._headsetID))
+            if (!headset.Is_local)
             {
-                // Update position if headset already exists
-                GameObject existingHeadset = spawnedHeadsets[headset._headsetID];
-                //headsetManager_reference.MoveAndRotateIcon(existingHeadset, existingHeadset.transform);
+                if (spawnedHeadsets.ContainsKey(headset._headsetID))
+                {
+                    // Update position if headset already exists
+                    GameObject existingHeadset = spawnedHeadsets[headset._headsetID];
+                    //headsetManager_reference.MoveAndRotateIcon(existingHeadset, existingHeadset.transform);
+                }
+                else
+                {
+                    // Spawn new headset if it doesn't exist
+                    SpawnVolumeHeadset(headset);
+                }
             }
-            else
-            {
-                // Spawn new headset if it doesn't exist
-                SpawnVolumeHeadset(headset);
-            }
+
         }
 
         // Optionally, remove headsets that are no longer active

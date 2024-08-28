@@ -143,6 +143,7 @@ public class NavigationManager : MonoBehaviour
             myLineRender.positionCount = path.corners.Length;
             myLineRender.SetPositions(path.corners);
         }
+
     }
 
     /*
@@ -165,8 +166,17 @@ public class NavigationManager : MonoBehaviour
     {
         foundPath = NavMesh.CalculatePath(startPosition, endPosition, NavMesh.AllAreas, path);
         if (!foundPath)
+        {
+            Debug.Log("path not found");
             return false;
+        }
 
+        Debug.Log("Path found");
+        foreach (Vector3 coord in path.corners)
+        {
+            Debug.Log(coord);
+        }
+   
         return GiveDirectionsToUser(path.corners, locationId, deviceId, color, label);
     }
 
@@ -193,6 +203,7 @@ public class NavigationManager : MonoBehaviour
         mapPath.color = color;
         mapPath.label = label;
         mapPath.points = points;
+
 
         //Serialize the feature into JSON
         var data = JsonUtility.ToJson(mapPath);
@@ -296,14 +307,17 @@ public class NavigationManager : MonoBehaviour
 
         // This retrieves paths for the given deviceId and paths with null deviceId (intended for everyone).
         string url = $"locations/{newLocationId}/map-paths?envelope=map_paths";
+
         EasyVizARServer.Instance.Get(url, EasyVizARServer.JSON_TYPE, delegate (string result)
         {
+            Debug.Log("EasyVizARServer.Instance.Get");
             if (result != "error")
             {
                 var mapPathList = JsonUtility.FromJson<EasyVizAR.MapPathList>(result);
                 foreach (var path in mapPathList.map_paths)
                 {
                     UpdateMapPath(path);
+                   
                 }
             }
             else

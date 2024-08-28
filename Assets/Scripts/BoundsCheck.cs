@@ -10,6 +10,8 @@ public class BoundsCheck : MonoBehaviour
     Collider map_Collider;
     Collider culler_Collider;
     GameObject volumetric_map;
+    GameObject headsets;
+    GameObject features;
 
     void Start()
     {
@@ -18,6 +20,8 @@ public class BoundsCheck : MonoBehaviour
         culler_Collider = culler.GetComponent<Collider>();
         
         volumetric_map = moveable_map.transform.Find("WavefrontObject").gameObject;
+        features = moveable_map.transform.Find("features").gameObject;
+        headsets = moveable_map.transform.Find("headsets").gameObject;
 
     }
 
@@ -31,13 +35,53 @@ public class BoundsCheck : MonoBehaviour
             if (m_Collider.bounds.Contains(rend.bounds.center) || culler_Collider.bounds.Contains(rend.bounds.center)) 
             {
                 rend.enabled = true;
-                //Debug.Log("Bounds does not contain the point : " + rend.bounds.center);
             }
             else
             {
                 rend.enabled = false;
-                //Debug.Log("Bounds contain the point : " + rend.bounds.center);
             }
+        }
+
+        foreach (Transform feature in features.transform)
+        {
+            Renderer rend = feature.transform.Find("Icon Visuals").GetComponent<MeshRenderer>();
+            Renderer text_rend = feature.transform.Find("Feature_Text").GetComponent<MeshRenderer>();
+            if (rend == null || text_rend == null)
+            {
+                Debug.Log("feature renderer is null");
+            }
+            if (m_Collider.bounds.Contains(rend.bounds.center) || culler_Collider.bounds.Contains(rend.bounds.center))
+            {
+                rend.enabled = true;
+                text_rend.enabled = true;
+            }
+            else
+            {
+                rend.enabled = false;
+                text_rend.enabled = false;
+            }
+
+        }
+
+        foreach (Transform headset in headsets.transform)
+        {
+            Renderer rend = headset.transform.Find("Capsule").GetComponent<MeshRenderer>();
+            Renderer text_rend = headset.transform.Find("Feature_Text").GetComponent<MeshRenderer>();
+            if (rend == null || text_rend == null)
+            {
+                Debug.Log("feature renderer is null");
+            }
+            if (m_Collider.bounds.Contains(rend.bounds.center) || culler_Collider.bounds.Contains(rend.bounds.center))
+            {
+                rend.enabled = true;
+                text_rend.enabled = true;
+            }
+            else
+            {
+                rend.enabled = false;
+                text_rend.enabled = false;
+            }
+
         }
 
     }
