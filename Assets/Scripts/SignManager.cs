@@ -77,15 +77,16 @@ public class SignManager : MonoBehaviour
     private void Awake()
     {
         InitTypeIcons();
-    }
-
-    private void Start()
-    {
         featureManager = GameObject.Find("FeatureManager").GetComponent<FeatureManager>();
         navigationManager = GameObject.Find("NavigationManager").GetComponent<NavigationManager>();
         location = featureManager.LocationName;
         UpdateNavigationSigns();
         RefreshView();
+    }
+
+    private void Start()
+    {
+
     }
 
 
@@ -239,6 +240,7 @@ public class SignManager : MonoBehaviour
         }
     }
 
+    [ContextMenu("Update Sign")]
     private void UpdateNavigationSigns()
     {
         if (featureManager == null)
