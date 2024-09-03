@@ -33,10 +33,6 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     [SerializeField]
     GameObject _volumeHeadsetPrefab;
 
-    // Attach QRScanner GameObject so we can listen for location change events.
-    [SerializeField]
-    GameObject _qrScanner;
-
     [SerializeField]
     string _localHeadsetName;
     public string LocalHeadsetName => _localHeadsetName;
@@ -106,29 +102,23 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         //The EasyVizARHeadsetManager script componenet should be attached to the corresponding GameObject
         headsetManager = this.gameObject;
 
-        if (_qrScanner)
+        // The QRScanner will call this function once whenever a new location QR code is detected.
+        // This would be a good place to initiate creating a new check-in and loading all of the
+        // the other headsets that are already in the location.
+        QRScanner.Instance.LocationChanged += (o, ev) =>
         {
-            var scanner = _qrScanner.GetComponent<QRScanner>();
+            _locationId = ev.LocationID;
 
-            // The QRScanner will call this function once whenever a new location QR code is detected.
-            // This would be a good place to initiate creating a new check-in and loading all of the
-            // the other headsets that are already in the location.
-            scanner.LocationChanged += (o, ev) =>
+            // Update the location ID in the headset object, which will be sent with pose updates to the server.
+            if (_localHeadset is not null)
             {
-                _locationId = ev.LocationID;
+                EasyVizARHeadset headset = _localHeadset.GetComponent<EasyVizARHeadset>();
+                headset.LocationID = this.LocationID;
+            }
 
-                // Update the location ID in the headset object, which will be sent with pose updates to the server.
-                if (_localHeadset is not null)
-                {
-                    EasyVizARHeadset headset = _localHeadset.GetComponent<EasyVizARHeadset>();
-                    headset.LocationID = this.LocationID;
-                }
-
-                LocalRegistrationSetup();
-                Invoke(nameof(HideLocalVisuals), 2f);
-            };
-        }
-
+            LocalRegistrationSetup();
+            Invoke(nameof(HideLocalVisuals), 2f);
+        };
     }
 
     // Update is called once per frame

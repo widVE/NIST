@@ -34,10 +34,6 @@ public struct MeshConversionResult
 
 public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
 {
-    // Attach QRScanner GameObject so we can listen for location change events.
-    [SerializeField]
-    GameObject _qrScanner;
-
     // Attach HeadsetManager GameObject so we can listen for headset configuration change events.
     [SerializeField]
     GameObject _headsetManager;
@@ -68,14 +64,10 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
             _locationId = "628b00d4-ac6b-41bb-8e13-1d7d50eceeb9";
         }
 
-        if (_qrScanner)
+        QRScanner.Instance.LocationChanged += (o, ev) =>
         {
-            var scanner = _qrScanner.GetComponent<QRScanner>();
-            scanner.LocationChanged += (o, ev) =>
-            {
-                _locationId = ev.LocationID;
-            };
-        }
+            _locationId = ev.LocationID;
+        };
 
         if (_headsetManager)
         {

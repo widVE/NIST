@@ -50,10 +50,6 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
     public GameObject navigationManager = null;
     public GameObject map_parent;
 
-    // Attach QRScanner GameObject so we can listen for location change events.
-    [SerializeField]
-    GameObject _qrScanner = null;
-
     [SerializeField]
     float _updateInterval = 0.2f;
     public bool post_data = false;
@@ -83,26 +79,22 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
         _mainCamera = Camera.main;
 
         // Otherwise, wait for a QR code to be scanned.
-        if (_qrScanner)
+        QRScanner.Instance.LocationChanged += async (o, ev) =>
         {
-            var scanner = _qrScanner.GetComponent<QRScanner>();
-            scanner.LocationChanged += async (o, ev) =>
+            if (isConnected)
             {
-                if (isConnected)
-                {
-                    await _ws.Close();
-                    isConnected = false;
-                }
-                _locationId = ev.LocationID;
-                string scheme = ev.UseHTTPS ? "wss" : "ws";
-                _webSocketURL = string.Format("{0}://{1}/ws", scheme, ev.Server);
-                _ws = initializeWebSocket();
+                await _ws.Close();
+                isConnected = false;
+            }
+            _locationId = ev.LocationID;
+            string scheme = ev.UseHTTPS ? "wss" : "ws";
+            _webSocketURL = string.Format("{0}://{1}/ws", scheme, ev.Server);
+            _ws = initializeWebSocket();
 
-                // Connect returns a Task that only completes after the connection closes.
-                // If we 'await' it here, it might block other code that needs to respond to the LocationChanged event.
-                var _ = _ws.Connect();
-            };
-        }
+            // Connect returns a Task that only completes after the connection closes.
+            // If we 'await' it here, it might block other code that needs to respond to the LocationChanged event.
+            var _ = _ws.Connect();
+        };
     }
 
     // Update is called once per frame

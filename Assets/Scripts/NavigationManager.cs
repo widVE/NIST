@@ -6,8 +6,6 @@ using UnityEngine.AI;
 
 public class NavigationManager : MonoBehaviour
 {
-    public GameObject qrScanner;
-
     // One of these can be set in the editor to load a mesh at startup.
     // They can also be altered during runtime by calling UpdateNavMesh.
     public Mesh mesh;
@@ -119,15 +117,11 @@ public class NavigationManager : MonoBehaviour
             yield return UpdateNavMesh(meshGameObject);
 
         // Wait for a QR code to be scanned to fetch features from the correct location.
-        if (qrScanner)
+        QRScanner.Instance.LocationChanged += (o, ev) =>
         {
-            var scanner = qrScanner.GetComponent<QRScanner>();
-            scanner.LocationChanged += (o, ev) =>
-            {
-                LoadMapPaths(ev.LocationID);
-                locationId = ev.LocationID;
-            };
-        }
+            LoadMapPaths(ev.LocationID);
+            locationId = ev.LocationID;
+        };
     }
 
     // Update is called once per frame
