@@ -74,28 +74,6 @@
       "source": "local-tarball",
       "dependencies": {}
     },
-    "com.nexplayer.nxplayerfullfeatsample": {
-      "version": "file:com.nexplayer.nxplayerfullfeatsample",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {
-        "com.nexplayer.nxplayersdk": "2.3.0"
-      }
-    },
-    "com.nexplayer.nxplayersdk": {
-      "version": "file:com.nexplayer.nxplayersdk",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
-    "com.nexplayer.nxplayersimplesample": {
-      "version": "file:com.nexplayer.nxplayersimplesample",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {
-        "com.nexplayer.nxplayersdk": "2.3.0"
-      }
-    },
     "com.unity.ai.navigation": {
       "version": "1.0.0-exp.4",
       "depth": 0,
@@ -233,8 +211,8 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.xr.arsubsystems": "4.2.3",
         "com.unity.xr.management": "4.0.1",
+        "com.unity.xr.arsubsystems": "4.2.3",
         "com.unity.modules.particlesystem": "1.0.0"
       },
       "url": "https://packages.unity.com"
@@ -244,8 +222,8 @@
       "depth": 2,
       "source": "registry",
       "dependencies": {
-        "com.unity.subsystemregistration": "1.1.0",
-        "com.unity.xr.management": "4.0.1"
+        "com.unity.xr.management": "4.0.1",
+        "com.unity.subsystemregistration": "1.1.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -273,11 +251,11 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.modules.subsystems": "1.0.0",
         "com.unity.modules.vr": "1.0.0",
         "com.unity.modules.xr": "1.0.0",
-        "com.unity.xr.legacyinputhelpers": "2.1.7",
-        "com.unity.subsystemregistration": "1.0.6"
+        "com.unity.modules.subsystems": "1.0.0",
+        "com.unity.subsystemregistration": "1.0.6",
+        "com.unity.xr.legacyinputhelpers": "2.1.7"
       },
       "url": "https://packages.unity.com"
     },
@@ -295,9 +273,9 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {
+        "com.unity.inputsystem": "1.4.2",
         "com.unity.xr.management": "4.0.1",
-        "com.unity.xr.legacyinputhelpers": "2.1.2",
-        "com.unity.inputsystem": "1.4.2"
+        "com.unity.xr.legacyinputhelpers": "2.1.2"
       },
       "url": "https://packages.unity.com"
     },
