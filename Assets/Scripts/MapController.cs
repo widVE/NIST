@@ -12,6 +12,7 @@ public class MapController : MonoBehaviour
     public List<GameObject> map_lines;
     public GameObject mapCollection;
     public GameObject feature_parent;
+    public GameObject navigationPathView;
 
     public bool verbose_debug = false;
     public bool mirror_axis = false;
@@ -49,6 +50,13 @@ public class MapController : MonoBehaviour
         map_location_ID = currHeadset.GetComponent<EasyVizARHeadsetManager>().LocationID;
         GetMapImage();
         MapAspectRatioAndOrigin();
+
+        // If we have a map path child, ask the navigation manager to update its path
+        // to the latest navigation path that we have.
+        if (navigationPathView)
+        {
+            NavigationManager.Instance.UpdateNavigationPathView(navigationPathView);
+        }
     }
 
     // Update is called once per frame

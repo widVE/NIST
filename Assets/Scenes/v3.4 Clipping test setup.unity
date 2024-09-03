@@ -20248,6 +20248,7 @@ MonoBehaviour:
   - {fileID: 1659198083}
   mapCollection: {fileID: 665494468}
   feature_parent: {fileID: 1968206798}
+  navigationPathView: {fileID: 1810665669}
   verbose_debug: 1
   mirror_axis: 1
   last_clicked_target: 
@@ -30062,6 +30063,7 @@ MonoBehaviour:
   map_lines: []
   mapCollection: {fileID: 0}
   feature_parent: {fileID: 0}
+  navigationPathView: {fileID: 0}
   verbose_debug: 0
   mirror_axis: 0
   last_clicked_target: 
@@ -38408,6 +38410,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 622476188437637769, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: m_TagString
+      value: NavigationPathView
+      objectReference: {fileID: 0}
     - target: {fileID: 1415802458275241382, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: renderers.Array.data[0]
       value: 
@@ -48350,7 +48356,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1556404472619698930, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1556404472619698930, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: m_LocalScale.x

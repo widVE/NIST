@@ -10,7 +10,10 @@ public class NavigationManager : MonoBehaviour
     // They can also be altered during runtime by calling UpdateNavMesh.
     public Mesh mesh;
     public GameObject meshGameObject;
-    public GameObject mapPathGameObject;
+
+    // We will find any LineRenderers with this tag and update them whenever
+    // our navigation path changes.
+    public string navigationPathViewTag = "NavigationPathView";
 
     // A target can be set in the editor or by calling SetTarget.
     // After a target has been set, if a path can be found, it will be displayed
@@ -27,7 +30,6 @@ public class NavigationManager : MonoBehaviour
 
     private NavMeshSurface myNavMeshSurface;
     private LineRenderer myLineRender;
-    private LineRenderer mapLineRenderer;
 
     private bool foundPath = false;
     private NavMeshPath path;
@@ -35,7 +37,22 @@ public class NavigationManager : MonoBehaviour
     // Location of this device, which will be set after scanning a QR code.
     private string locationId = "";
 
+    private EasyVizAR.MapPath myNavigationPath;
+
     private Dictionary<int, GameObject> mapPathLineRenderers = new();
+    public static NavigationManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Debug.Log("Warning: multiple instances of NavigationManager created when there should only be one.");
+        }
+        else
+        {
+            Instance = this;
+        }
+    }
 
     private NavMeshBuildSource BuildSourceFromMesh(Mesh mesh)
     {
@@ -101,9 +118,6 @@ public class NavigationManager : MonoBehaviour
     {
         myNavMeshSurface = GetComponent<NavMeshSurface>();
         myLineRender = GetComponent<LineRenderer>();
-
-        if (mapPathGameObject)
-            mapLineRenderer = mapPathGameObject.GetComponent<LineRenderer>();
 
         path = new();
         navMeshData = new();
@@ -253,11 +267,13 @@ public class NavigationManager : MonoBehaviour
             // this navigation line should be higher priority than any of the other lines.
             lr.sortingOrder = -10;
 
-            // Also display our navigation path on the hand-attached map.
-            if (mapLineRenderer)
+            // Save the latest navigation path.
+            myNavigationPath = path;
+
+            // Also display our navigation path on any tagged LineRenderers such as the hand-attached map.
+            foreach (var obj in GameObject.FindGameObjectsWithTag(navigationPathViewTag))
             {
-                mapLineRenderer.positionCount = path.points.Length;
-                mapLineRenderer.SetPositions(path.points);
+                UpdateNavigationPathView(obj);
             }
         }
         else if (ColorUtility.TryParseHtmlString(path.color, out Color color))
@@ -311,7 +327,6 @@ public class NavigationManager : MonoBehaviour
                 foreach (var path in mapPathList.map_paths)
                 {
                     UpdateMapPath(path);
-                   
                 }
             }
             else
@@ -376,4 +391,23 @@ public class NavigationManager : MonoBehaviour
         }
     }
 
+    /*
+     * Use the latest navigation path that we received to update
+     * the LineRenderer in the passed game object. This can be used
+     * to draw the navigation path on one or more map surfaces.
+     */
+    public void UpdateNavigationPathView(GameObject view)
+    {
+        if (myNavigationPath == null)
+        {
+            return;
+        }
+
+        var renderer = view.GetComponent<LineRenderer>();
+        if (renderer)
+        {
+            renderer.positionCount = myNavigationPath.points.Length;
+            renderer.SetPositions(myNavigationPath.points);
+        }
+    }
 }

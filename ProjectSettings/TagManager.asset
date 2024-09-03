@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Icon
   - Headset
+  - NavigationPathView
   layers:
   - Default
   - TransparentFX
