@@ -1,0 +1,19 @@
+{
+  "name": "com.nexplayer.nxplayersdk",
+  "version": "2.3.0",
+  "displayName": "NexPlayer SDK",
+  "description": "NexPlayerTM plugin for Unity is an interactive multiscreen streaming player for Unity apps that supports both standard and 360o video playback across all Android, iOS, Windows and macOS devices, including WebGL. NexPlayer's Unity video plugin is the only player supporting Widevine DRM-protected HLS & DASH streaming on all Android & iOS devices.",
+  "unity": "2019.1",
+  "documentationUrl": "https://github.com/NexPlayer/NexPlayer_Unity_Plugin",
+  "keywords": [
+    "nexplayer",
+    "videoplayer",
+    "streaming"
+  ],
+  "author": {
+    "name": "NexPlayer",
+    "email": "info@nexplayer.com",
+    "url": "https://nexplayersdk.com/"
+  },
+  "type": "tool"
+}
