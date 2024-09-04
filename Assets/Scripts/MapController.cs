@@ -12,6 +12,7 @@ public class MapController : MonoBehaviour
     public List<GameObject> map_lines;
     public GameObject mapCollection;
     public GameObject feature_parent;
+    public GameObject navigationPathView;
 
     public bool verbose_debug = false;
     public bool mirror_axis = false;
@@ -49,6 +50,7 @@ public class MapController : MonoBehaviour
         map_location_ID = currHeadset.GetComponent<EasyVizARHeadsetManager>().LocationID;
         GetMapImage();
         MapAspectRatioAndOrigin();
+        UpdateNavigationPath();
     }
 
     // Update is called once per frame
@@ -145,6 +147,23 @@ public class MapController : MonoBehaviour
         {
             Debug.Log("ERROR: " + results);
         }
+    }
+
+    private void UpdateNavigationPath()
+    {
+        if (navigationPathView == null)
+            return;
+
+        var path = NavigationManager.Instance.GetMyNavigationPath();
+        if (path == null)
+            return;
+
+        var renderer = navigationPathView.GetComponent<LineRenderer>();
+        if (renderer == null)
+            return;
+
+        renderer.positionCount = path.points.Length;
+        renderer.SetPositions(path.points);
     }
 
     //Get list of map layers, and extract the metadata for each layer

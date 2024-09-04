@@ -10,7 +10,6 @@ public class NavigationManager : MonoBehaviour
     // They can also be altered during runtime by calling UpdateNavMesh.
     public Mesh mesh;
     public GameObject meshGameObject;
-    public GameObject mapPathGameObject;
 
     // A target can be set in the editor or by calling SetTarget.
     // After a target has been set, if a path can be found, it will be displayed
@@ -27,7 +26,6 @@ public class NavigationManager : MonoBehaviour
 
     private NavMeshSurface myNavMeshSurface;
     private LineRenderer myLineRender;
-    private LineRenderer mapLineRenderer;
 
     private bool foundPath = false;
     private NavMeshPath path;
@@ -35,7 +33,23 @@ public class NavigationManager : MonoBehaviour
     // Location of this device, which will be set after scanning a QR code.
     private string locationId = "";
 
+    private EasyVizAR.MapPath myNavigationPath = null;
+
     private Dictionary<int, GameObject> mapPathLineRenderers = new();
+
+    public static NavigationManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("Multiple instances of NavigationManager created when there should be only one.");
+        }
+        else
+        {
+            Instance = this;
+        }
+    }
 
     private NavMeshBuildSource BuildSourceFromMesh(Mesh mesh)
     {
@@ -101,9 +115,6 @@ public class NavigationManager : MonoBehaviour
     {
         myNavMeshSurface = GetComponent<NavMeshSurface>();
         myLineRender = GetComponent<LineRenderer>();
-
-        if (mapPathGameObject)
-            mapLineRenderer = mapPathGameObject.GetComponent<LineRenderer>();
 
         path = new();
         navMeshData = new();
@@ -253,12 +264,8 @@ public class NavigationManager : MonoBehaviour
             // this navigation line should be higher priority than any of the other lines.
             lr.sortingOrder = -10;
 
-            // Also display our navigation path on the hand-attached map.
-            if (mapLineRenderer)
-            {
-                mapLineRenderer.positionCount = path.points.Length;
-                mapLineRenderer.SetPositions(path.points);
-            }
+            // Save the latest navigation path for other game objects to query.
+            myNavigationPath = path;
         }
         else if (ColorUtility.TryParseHtmlString(path.color, out Color color))
         {
@@ -376,4 +383,14 @@ public class NavigationManager : MonoBehaviour
         }
     }
 
+    /*
+     * Get the latest navigation path. These are directions specifically intended to guide the local user,
+     * so it can be displayed on maps, as a world space trail, etc.
+     * 
+     * The return value may be null if no path is set.
+     */
+    public EasyVizAR.MapPath GetMyNavigationPath()
+    {
+        return myNavigationPath;
+    }
 }

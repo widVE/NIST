@@ -47,7 +47,6 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
 
     public GameObject featureManager = null;
     public GameObject headsetManager = null;
-    public GameObject navigationManager = null;
     public GameObject map_parent;
 
     [SerializeField]
@@ -187,7 +186,7 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
             await _ws.SendText("subscribe features:deleted " + event_uri);
         }
 
-        if (navigationManager)
+        if (NavigationManager.Instance)
         {
             await _ws.SendText("subscribe map-paths:created " + event_uri);
             await _ws.SendText("subscribe map-paths:updated " + event_uri);
@@ -257,19 +256,19 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
             case "map-paths:created":
                 {
                     MapPathsEvent ev = JsonUtility.FromJson<MapPathsEvent>(event_body);
-                    navigationManager.GetComponent<NavigationManager>().UpdateMapPath(ev.current);
+                    NavigationManager.Instance.UpdateMapPath(ev.current);
                     break;
                 }
             case "map-paths:updated":
                 {
                     MapPathsEvent ev = JsonUtility.FromJson<MapPathsEvent>(event_body);
-                    navigationManager.GetComponent<NavigationManager>().UpdateMapPath(ev.current);
+                    NavigationManager.Instance.UpdateMapPath(ev.current);
                     break;
                 }
             case "map-paths:deleted":
                 {
                     MapPathsEvent ev = JsonUtility.FromJson<MapPathsEvent>(event_body);
-                    navigationManager.GetComponent<NavigationManager>().DeleteMapPath(ev.previous.id);
+                    NavigationManager.Instance.DeleteMapPath(ev.previous.id);
                     break;
                 }
             default:
