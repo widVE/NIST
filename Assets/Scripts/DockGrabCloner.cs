@@ -33,7 +33,11 @@ public class DockGrabCloner : MonoBehaviour
     //Name of the culling region in the volumetric map prefab, this is the ultimate size of the object
     public string culling_box_name = "Manual Culling Box Adjustment";
 
-    //funtion, when this object is picked up it will spawn a prefab at the spawn_parent_location
+    public void Start()
+    {
+        //find the navigation manager in the scene
+        navigation_manager = GameObject.Find("NavigationManager").GetComponent<NavigationManager>();
+    }
 
     public void SpawnObject(GameObject prefab)
     {
