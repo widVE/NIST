@@ -23,16 +23,18 @@ public class BoundsCheck : MonoBehaviour
         features = moveable_map.transform.Find("features").gameObject;
         headsets = moveable_map.transform.Find("headsets").gameObject;
 
+        //call RndererBoundsCheck every 0.1 seconds
+        InvokeRepeating("RendererBoundsCheck", 0.5f, 0.1f);
     }
 
-    void Update()
+    private void RendererBoundsCheck()
     {
-        foreach(Transform child in volumetric_map.transform)
+        foreach (Transform child in volumetric_map.transform)
         {
 
             Renderer rend = child.GetComponent<Renderer>();
             //If the first GameObject's Bounds contains the Transform's position, output a message in the console
-            if (m_Collider.bounds.Contains(rend.bounds.center) || culler_Collider.bounds.Contains(rend.bounds.center)) 
+            if (m_Collider.bounds.Contains(rend.bounds.center) || culler_Collider.bounds.Contains(rend.bounds.center))
             {
                 rend.enabled = true;
             }
@@ -83,6 +85,5 @@ public class BoundsCheck : MonoBehaviour
             }
 
         }
-
     }
 }
