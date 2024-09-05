@@ -8,8 +8,8 @@ public class NavigationManager : MonoBehaviour
 {
     // One of these can be set in the editor to load a mesh at startup.
     // They can also be altered during runtime by calling UpdateNavMesh.
-    public Mesh mesh;
-    public GameObject meshGameObject;
+    public Mesh remote_mesh;
+    public GameObject local_mesh_testing;
 
     // A target can be set in the editor or by calling SetTarget.
     // After a target has been set, if a path can be found, it will be displayed
@@ -65,7 +65,7 @@ public class NavigationManager : MonoBehaviour
     // This could be called with an externally-sourced mesh to load a saved map for navigation.
     public AsyncOperation UpdateNavMesh(Mesh mesh)
     {
-        this.mesh = mesh;
+        this.remote_mesh = mesh;
 
         var source = BuildSourceFromMesh(mesh);
 
@@ -82,7 +82,7 @@ public class NavigationManager : MonoBehaviour
     // This could be called with an externally-sourced mesh to load a saved map for navigation.
     public AsyncOperation UpdateNavMesh(GameObject meshGameObject)
     {
-        this.meshGameObject = meshGameObject;
+        this.local_mesh_testing = meshGameObject;
 
         var sourceList = new List<NavMeshBuildSource>();
 
@@ -122,10 +122,10 @@ public class NavigationManager : MonoBehaviour
         NavMesh.AddNavMeshData(navMeshData);
 
         // Potentially load a built-in mesh at start-up for testing purposes.
-        if (mesh)
-            yield return UpdateNavMesh(mesh);
-        else if (meshGameObject)
-            yield return UpdateNavMesh(meshGameObject);
+        if (remote_mesh)
+            yield return UpdateNavMesh(remote_mesh);
+        else if (local_mesh_testing)
+            yield return UpdateNavMesh(local_mesh_testing);
 
         // Wait for a QR code to be scanned to fetch features from the correct location.
         QRScanner.Instance.LocationChanged += (o, ev) =>

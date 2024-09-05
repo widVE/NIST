@@ -11,7 +11,7 @@ public class DockGrabCloner : MonoBehaviour
 
     public EasyVizARHeadsetManager headset_reference;
 
-    public NavigationManager navimesh_reference;
+    public NavigationManager navigation_manager;
 
     //GameObject VolumeHeadsetLoader;
 
@@ -43,9 +43,7 @@ public class DockGrabCloner : MonoBehaviour
 
     //spawned at the location the user lets go of the docked object at, has no parent   
     public void SpawnVolumetricMap(GameObject prefab)
-    {
-        
-
+    {  
         //find the child of volumetric_map_prefab GameObject that has the name "VolumeMap"
         //this is using LINQ, which is a way to query objects in a collection. I'm not really sure how it works, but I thought it was cool
         GameObject culling_region = volumetric_map_prefab.GetComponentsInChildren<Transform>().FirstOrDefault(c => c.gameObject.name == culling_box_name)?.gameObject;
@@ -68,10 +66,13 @@ public class DockGrabCloner : MonoBehaviour
 
         //headsetloader_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject;
 
-        navimesh_reference.meshGameObject = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map/WavefrontObject").gameObject;
+        //Probably want a more general way to find this wavefront object, and particularly this is only for this version of the volume map
+        GameObject remote_map_mesh = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map/WavefrontObject").gameObject;
+                
+        //Using the reference to the navigation manager, update the nav mesh with the new remote map mesh
+        navigation_manager.UpdateNavMesh(remote_map_mesh);
 
-        navimesh_reference.UpdateNavMesh(volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map/WavefrontObject").gameObject);
-
+        //navigation_manager.local_mesh_testing = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map/WavefrontObject").gameObject;
         //boundscheck_reference.map = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/WavefrontObject").gameObject;
 
 
