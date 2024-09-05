@@ -11,7 +11,7 @@ public class DockGrabCloner : MonoBehaviour
 
     public EasyVizARHeadsetManager headset_reference;
 
-    public NavigationManager navimesh_reference;
+    public NavigationManager navigation_manager;
 
     //GameObject VolumeHeadsetLoader;
 
@@ -33,7 +33,11 @@ public class DockGrabCloner : MonoBehaviour
     //Name of the culling region in the volumetric map prefab, this is the ultimate size of the object
     public string culling_box_name = "Manual Culling Box Adjustment";
 
-    //funtion, when this object is picked up it will spawn a prefab at the spawn_parent_location
+    public void Start()
+    {
+        //find the navigation manager in the scene
+        navigation_manager = GameObject.Find("NavigationManager").GetComponent<NavigationManager>();
+    }
 
     public void SpawnObject(GameObject prefab)
     {
@@ -43,9 +47,7 @@ public class DockGrabCloner : MonoBehaviour
 
     //spawned at the location the user lets go of the docked object at, has no parent   
     public void SpawnVolumetricMap(GameObject prefab)
-    {
-        
-
+    {  
         //find the child of volumetric_map_prefab GameObject that has the name "VolumeMap"
         //this is using LINQ, which is a way to query objects in a collection. I'm not really sure how it works, but I thought it was cool
         GameObject culling_region = volumetric_map_prefab.GetComponentsInChildren<Transform>().FirstOrDefault(c => c.gameObject.name == culling_box_name)?.gameObject;
@@ -59,17 +61,22 @@ public class DockGrabCloner : MonoBehaviour
         GameObject volume_map = Instantiate(prefab, spawn_position, quaternion.identity);
 
         volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
+        volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject.transform.localPosition = new Vector3(0, 0, 0);
+        volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map").gameObject.SetActive(false);
 
-        volume_map_reference.volumetric_map_spawn_target = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/features").gameObject;
+        volume_map_reference.volumetric_map_spawn_target = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map/features").gameObject;
 
-        headset_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/headsets").gameObject;
+        //headset_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map/headsets").gameObject;
 
         //headsetloader_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject;
 
-        navimesh_reference.meshGameObject = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/WavefrontObject").gameObject;
+        //Probably want a more general way to find this wavefront object, and particularly this is only for this version of the volume map
+        GameObject remote_map_mesh = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map/WavefrontObject").gameObject;
+                
+        //Using the reference to the navigation manager, update the nav mesh with the new remote map mesh
+        navigation_manager.UpdateNavMesh(remote_map_mesh);
 
-        navimesh_reference.UpdateNavMesh(volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/WavefrontObject").gameObject);
-
+        //navigation_manager.local_mesh_testing = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map/WavefrontObject").gameObject;
         //boundscheck_reference.map = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/WavefrontObject").gameObject;
 
 

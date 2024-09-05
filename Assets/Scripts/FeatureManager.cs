@@ -101,11 +101,6 @@ public class FeatureManager : MonoBehaviour
 
     string location_id = "";
 
-
-    // Attach QRScanner GameObject so we can listen for location change events.
-    [SerializeField]
-    GameObject _qrScanner;
-
     private EasyVizAR.Location location;
     public string LocationName => location.name;
 
@@ -179,17 +174,12 @@ public class FeatureManager : MonoBehaviour
 #endif
 
         // Wait for a QR code to be scanned to fetch features from the correct location.
-        if (_qrScanner)
+        QRScanner.Instance.LocationChanged += (o, ev) =>
         {
-            var scanner = _qrScanner.GetComponent<QRScanner>();
-            scanner.LocationChanged += (o, ev) =>
-            {
-                ListFeaturesFromLocation(ev.LocationID);
-                RequestLocationName(ev.LocationID);
-                location_id = ev.LocationID;
-
-            };
-        }
+            ListFeaturesFromLocation(ev.LocationID);
+            RequestLocationName(ev.LocationID);
+            location_id = ev.LocationID;
+        };
     }
 
     // Update is called once per frame

@@ -6,13 +6,10 @@ using UnityEngine.AI;
 
 public class NavigationManager : MonoBehaviour
 {
-    public GameObject qrScanner;
-
     // One of these can be set in the editor to load a mesh at startup.
     // They can also be altered during runtime by calling UpdateNavMesh.
-    public Mesh mesh;
-    public GameObject meshGameObject;
-    public GameObject mapPathGameObject;
+    public Mesh remote_mesh;
+    public GameObject local_mesh_testing;
 
     // A target can be set in the editor or by calling SetTarget.
     // After a target has been set, if a path can be found, it will be displayed
@@ -29,7 +26,6 @@ public class NavigationManager : MonoBehaviour
 
     private NavMeshSurface myNavMeshSurface;
     private LineRenderer myLineRender;
-    private LineRenderer mapLineRenderer;
 
     private bool foundPath = false;
     private NavMeshPath path;
@@ -37,7 +33,23 @@ public class NavigationManager : MonoBehaviour
     // Location of this device, which will be set after scanning a QR code.
     private string locationId = "";
 
+    private EasyVizAR.MapPath myNavigationPath = null;
+
     private Dictionary<int, GameObject> mapPathLineRenderers = new();
+
+    public static NavigationManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("Multiple instances of NavigationManager created when there should be only one.");
+        }
+        else
+        {
+            Instance = this;
+        }
+    }
 
     private NavMeshBuildSource BuildSourceFromMesh(Mesh mesh)
     {
@@ -53,7 +65,7 @@ public class NavigationManager : MonoBehaviour
     // This could be called with an externally-sourced mesh to load a saved map for navigation.
     public AsyncOperation UpdateNavMesh(Mesh mesh)
     {
-        this.mesh = mesh;
+        this.remote_mesh = mesh;
 
         var source = BuildSourceFromMesh(mesh);
 
@@ -70,7 +82,7 @@ public class NavigationManager : MonoBehaviour
     // This could be called with an externally-sourced mesh to load a saved map for navigation.
     public AsyncOperation UpdateNavMesh(GameObject meshGameObject)
     {
-        this.meshGameObject = meshGameObject;
+        this.local_mesh_testing = meshGameObject;
 
         var sourceList = new List<NavMeshBuildSource>();
 
@@ -104,30 +116,23 @@ public class NavigationManager : MonoBehaviour
         myNavMeshSurface = GetComponent<NavMeshSurface>();
         myLineRender = GetComponent<LineRenderer>();
 
-        if (mapPathGameObject)
-            mapLineRenderer = mapPathGameObject.GetComponent<LineRenderer>();
-
         path = new();
         navMeshData = new();
 
         NavMesh.AddNavMeshData(navMeshData);
 
         // Potentially load a built-in mesh at start-up for testing purposes.
-        if (mesh)
-            yield return UpdateNavMesh(mesh);
-        else if (meshGameObject)
-            yield return UpdateNavMesh(meshGameObject);
+        if (remote_mesh)
+            yield return UpdateNavMesh(remote_mesh);
+        else if (local_mesh_testing)
+            yield return UpdateNavMesh(local_mesh_testing);
 
         // Wait for a QR code to be scanned to fetch features from the correct location.
-        if (qrScanner)
+        QRScanner.Instance.LocationChanged += (o, ev) =>
         {
-            var scanner = qrScanner.GetComponent<QRScanner>();
-            scanner.LocationChanged += (o, ev) =>
-            {
-                LoadMapPaths(ev.LocationID);
-                locationId = ev.LocationID;
-            };
-        }
+            LoadMapPaths(ev.LocationID);
+            locationId = ev.LocationID;
+        };
     }
 
     // Update is called once per frame
@@ -143,6 +148,7 @@ public class NavigationManager : MonoBehaviour
             myLineRender.positionCount = path.corners.Length;
             myLineRender.SetPositions(path.corners);
         }
+
     }
 
     /*
@@ -165,8 +171,17 @@ public class NavigationManager : MonoBehaviour
     {
         foundPath = NavMesh.CalculatePath(startPosition, endPosition, NavMesh.AllAreas, path);
         if (!foundPath)
+        {
+            Debug.Log("path not found");
             return false;
+        }
 
+        Debug.Log("Path found");
+        foreach (Vector3 coord in path.corners)
+        {
+            Debug.Log(coord);
+        }
+   
         return GiveDirectionsToUser(path.corners, locationId, deviceId, color, label);
     }
 
@@ -193,6 +208,7 @@ public class NavigationManager : MonoBehaviour
         mapPath.color = color;
         mapPath.label = label;
         mapPath.points = points;
+
 
         //Serialize the feature into JSON
         var data = JsonUtility.ToJson(mapPath);
@@ -248,12 +264,8 @@ public class NavigationManager : MonoBehaviour
             // this navigation line should be higher priority than any of the other lines.
             lr.sortingOrder = -10;
 
-            // Also display our navigation path on the hand-attached map.
-            if (mapLineRenderer)
-            {
-                mapLineRenderer.positionCount = path.points.Length;
-                mapLineRenderer.SetPositions(path.points);
-            }
+            // Save the latest navigation path for other game objects to query.
+            myNavigationPath = path;
         }
         else if (ColorUtility.TryParseHtmlString(path.color, out Color color))
         {
@@ -296,14 +308,17 @@ public class NavigationManager : MonoBehaviour
 
         // This retrieves paths for the given deviceId and paths with null deviceId (intended for everyone).
         string url = $"locations/{newLocationId}/map-paths?envelope=map_paths";
+
         EasyVizARServer.Instance.Get(url, EasyVizARServer.JSON_TYPE, delegate (string result)
         {
+            Debug.Log("EasyVizARServer.Instance.Get");
             if (result != "error")
             {
                 var mapPathList = JsonUtility.FromJson<EasyVizAR.MapPathList>(result);
                 foreach (var path in mapPathList.map_paths)
                 {
                     UpdateMapPath(path);
+                   
                 }
             }
             else
@@ -368,4 +383,14 @@ public class NavigationManager : MonoBehaviour
         }
     }
 
+    /*
+     * Get the latest navigation path. These are directions specifically intended to guide the local user,
+     * so it can be displayed on maps, as a world space trail, etc.
+     * 
+     * The return value may be null if no path is set.
+     */
+    public EasyVizAR.MapPath GetMyNavigationPath()
+    {
+        return myNavigationPath;
+    }
 }
