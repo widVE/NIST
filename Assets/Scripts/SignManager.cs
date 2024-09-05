@@ -268,5 +268,12 @@ public class SignManager : MonoBehaviour
             }
         }
         RefreshView();
+        
+    }
+     private void OnEnable()
+
+    {
+        UpdateNavigationSigns();
     }
 }
+
