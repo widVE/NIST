@@ -9126,9 +9126,9 @@ RectTransform:
   m_Father: {fileID: 2503480805270879942}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 550, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 550, y: -200}
   m_SizeDelta: {x: 1100, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &220431592997367631
@@ -10264,7 +10264,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7824111022908722930}
   - component: {fileID: 2798459963896274543}
-  - component: {fileID: 5131980134722464521}
   m_Layer: 2
   m_Name: Sign Navigation Backup
   m_TagString: Untagged
@@ -10325,19 +10324,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 227f6c289eae97b42b767c24c2669c70, type: 3}
   - {fileID: 21300000, guid: 666e34a659bfd1143808ab1642e7c3f9, type: 3}
   - {fileID: 21300000, guid: be5444a20073cd6429dcb5421f3691b7, type: 3}
---- !u!114 &5131980134722464521
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7824111022908722931}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 49c7a395233f1ad49a3d5ffaeff3fe32, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SurfaceMagnetismGameObject: {fileID: 7824111022908722931}
 --- !u!1 &7889374694825207202
 GameObject:
   m_ObjectHideFlags: 0

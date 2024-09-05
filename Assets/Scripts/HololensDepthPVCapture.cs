@@ -32,6 +32,9 @@ public class HololensDepthPVCapture : MonoBehaviour
 #endif
 	
 	[SerializeField]
+	QRScanner _qrScanner;
+	
+	[SerializeField]
 	EasyVizARHeadsetManager _manager;
 	
 	[SerializeField]
@@ -155,7 +158,7 @@ public class HololensDepthPVCapture : MonoBehaviour
 			}
 			else
 			{
-				QRScanner.Instance.QRTransformChanged += (o, ev) =>
+				_qrScanner.QRTransformChanged += (o, ev) =>
 				{
 					Matrix4x4 m = ev.NewTransform;
 					//m = m.transpose;

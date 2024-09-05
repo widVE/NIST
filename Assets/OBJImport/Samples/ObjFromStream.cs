@@ -9,7 +9,7 @@ public class ObjFromStream : MonoBehaviour {
     //awake
     void Awake () {
         //make www
-        var www = new WWW("https://easyvizar.wings.cs.wisc.edu/locations/8a58613d-f207-44dd-8f61-effaea9abde6/model");
+        var www = new WWW("https://easyvizar.wings.cs.wisc.edu/locations/70fc63b6-61ca-4a2f-8e0f-7b2c265a9c9f/model");
         while (!www.isDone)
             System.Threading.Thread.Sleep(1);
         

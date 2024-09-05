@@ -126,24 +126,10 @@ public class QRScanner : MonoBehaviour
 	public GameObject headAttachedDisplay;
 	private HeadAttachedText headAttachedText;
 
-	public static QRScanner Instance { get; private set; }
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-			Debug.Log("Warning: multiple instances of QRScanner created when there should only be one.");
-        }
-        else
-        {
-			Instance = this;
-        }
-    }
-
-    /// Initialization is just a matter of asking for permission, and then
-    /// hooking up to the `QRCodeWatcher`'s events. `QRCodeWatcher.RequestAccessAsync`
-    /// is an async call, so you could re-arrange this code to be non-blocking!
-    async void Start()
+	/// Initialization is just a matter of asking for permission, and then
+	/// hooking up to the `QRCodeWatcher`'s events. `QRCodeWatcher.RequestAccessAsync`
+	/// is an async call, so you could re-arrange this code to be non-blocking!
+	async void Start()
 	{
         _headsetManager = EasyVizARHeadsetManager.EasyVizARManager.gameObject;
 
