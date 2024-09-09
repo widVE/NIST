@@ -256,19 +256,19 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
             case "map-paths:created":
                 {
                     MapPathsEvent ev = JsonUtility.FromJson<MapPathsEvent>(event_body);
-                    NavigationManager.Instance.UpdateMapPath(ev.current);
+                    NavigationManager.Instance.UpdateMapPathLineRenderers(ev.current);
                     break;
                 }
             case "map-paths:updated":
                 {
                     MapPathsEvent ev = JsonUtility.FromJson<MapPathsEvent>(event_body);
-                    NavigationManager.Instance.UpdateMapPath(ev.current);
+                    NavigationManager.Instance.UpdateMapPathLineRenderers(ev.current);
                     break;
                 }
             case "map-paths:deleted":
                 {
                     MapPathsEvent ev = JsonUtility.FromJson<MapPathsEvent>(event_body);
-                    NavigationManager.Instance.DeleteMapPath(ev.previous.id);
+                    NavigationManager.Instance.DeletePathRenderers(ev.previous.id);
                     break;
                 }
             default:

@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public enum Dir
+public enum SignArrowDirection
 {
     top=3,
     bottom=1,
@@ -18,7 +18,7 @@ public enum Dir
 
 public class SignItemData
 {
-    public Dir dir;
+    public SignArrowDirection arrow_direction;
     public string locationName;
     public Sprite img;
 }
@@ -56,7 +56,7 @@ public class SignManager : MonoBehaviour
 
     private List<SignNavigationBoard_DirectionItem> directionItemList = new();
 
-    private Dictionary<Dir, List<FeatureWithIcon>> signData = new();
+    private Dictionary<SignArrowDirection, List<FeatureWithIcon>> signData = new();
 
     private string location;
     private int levelIndex; // TODO
@@ -64,7 +64,7 @@ public class SignManager : MonoBehaviour
 
     [SerializeField]
     Sprite[] typeIcons;
-    Dictionary<string, Sprite> typeIconDic = new();
+    Dictionary<string, Sprite> icon_type_dictionary = new();
 
     private EasyVizAR.Location evLocation;
 
@@ -101,11 +101,11 @@ public class SignManager : MonoBehaviour
                 // special fix for bad-person
                 if(typeIcon.name == "bad_person")
                 {
-                    typeIconDic["bad-person"] = typeIcon;
+                    icon_type_dictionary["bad-person"] = typeIcon;
                 }
                 else
                 {
-                    typeIconDic[typeIcon.name] = typeIcon;
+                    icon_type_dictionary[typeIcon.name] = typeIcon;
                 }
             }
         }
@@ -144,14 +144,14 @@ public class SignManager : MonoBehaviour
         levelLabel.text = levelIndex.ToString();
 
         //TryAddFeatureByDirection(Dir.top);
-        TryAddFeatureByDirection(Dir.left);
-        TryAddFeatureByDirection(Dir.right);
-        TryAddFeatureByDirection(Dir.bottom);
+        TryAddFeatureByDirection(SignArrowDirection.left);
+        TryAddFeatureByDirection(SignArrowDirection.right);
+        TryAddFeatureByDirection(SignArrowDirection.bottom);
 
         StartCoroutine(TriggerLayoutRefresh());
     }
 
-    private void TryAddFeatureByDirection(Dir direction)
+    private void TryAddFeatureByDirection(SignArrowDirection direction)
     {
         if (signData.TryGetValue(direction, out List<FeatureWithIcon> features))
         {
@@ -161,7 +161,7 @@ public class SignManager : MonoBehaviour
     }
 
 
-    private void CreateDirectionItem(Dir direction, List<FeatureWithIcon> features)
+    private void CreateDirectionItem(SignArrowDirection direction, List<FeatureWithIcon> features)
     {
         var newDirectionItem =
             Instantiate(directionItemTempalte.gameObject, diretionItemRoot)
@@ -194,7 +194,7 @@ public class SignManager : MonoBehaviour
         signData.Clear();
     }
 
-    public void AddFeature(Dir direction, Feature feature, Sprite sprite)
+    public void AddFeature(SignArrowDirection direction, Feature feature, Sprite sprite)
     {
         if (signData.TryGetValue(direction, out List<FeatureWithIcon> featureList))
         {
@@ -208,16 +208,16 @@ public class SignManager : MonoBehaviour
         }
     }
 
-    public void SetLocation(string slocation)
+    public void SetLocation(string sign_location)
     {
-        location = slocation;
+        location = sign_location;
     }
 
     public Sprite GetTypeIcon(string type)
     {
-        if (typeIconDic.TryGetValue(type, out Sprite ret))
+        if (icon_type_dictionary.TryGetValue(type, out Sprite icon_sprite))
         {
-            return ret;
+            return icon_sprite;
         }
         return null;
     }
@@ -261,7 +261,7 @@ public class SignManager : MonoBehaviour
             var targetPosition =
                 new Vector3(feature.position.x, feature.position.y, feature.position.z);
 
-            if (navigationManager.GetDirection(sourcePosition, targetPosition, out Dir direction))
+            if (navigationManager.GetDirection(sourcePosition, targetPosition, out SignArrowDirection direction))
             {
                 AddFeature(direction, feature, GetTypeIcon(feature.type));
                 print(direction + ":" + feature.name);

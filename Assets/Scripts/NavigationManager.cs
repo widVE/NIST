@@ -27,17 +27,19 @@ public class NavigationManager : MonoBehaviour
     private NavMeshSurface myNavMeshSurface;
     private LineRenderer myLineRender;
 
-    private bool foundPath = false;
-    private NavMeshPath path;
+    private bool is_path_found = false;
+    private NavMeshPath nav_mesh_path;
 
     // Location of this device, which will be set after scanning a QR code.
     private string locationId = "";
 
-    private EasyVizAR.MapPath myNavigationPath = null;
+    private EasyVizAR.MapPath easyViz_map_path = null;
 
     private Dictionary<int, GameObject> mapPathLineRenderers = new();
 
     public static NavigationManager Instance { get; private set; }
+
+    private Coroutine updatePathCoroutine;
 
     private void Awake()
     {
@@ -51,14 +53,15 @@ public class NavigationManager : MonoBehaviour
         }
     }
 
+    // Create a NavMeshBuildSource from a Mesh object.
     private NavMeshBuildSource BuildSourceFromMesh(Mesh mesh)
     {
-        var src = new NavMeshBuildSource();
-        src.transform = transform.localToWorldMatrix;
-        src.shape = NavMeshBuildSourceShape.Mesh;
-        src.size = mesh.bounds.size;
-        src.sourceObject = mesh;
-        return src;
+        var nav_mesh_source = new NavMeshBuildSource();
+        nav_mesh_source.transform = transform.localToWorldMatrix;
+        nav_mesh_source.shape = NavMeshBuildSourceShape.Mesh;
+        nav_mesh_source.size = mesh.bounds.size;
+        nav_mesh_source.sourceObject = mesh;
+        return nav_mesh_source;
     }
 
     // Update the global NavMesh from a Mesh object.
@@ -67,15 +70,15 @@ public class NavigationManager : MonoBehaviour
     {
         this.remote_mesh = mesh;
 
-        var source = BuildSourceFromMesh(mesh);
+        var nav_mesh_source = BuildSourceFromMesh(mesh);
 
-        var sourceList = new List<NavMeshBuildSource>();
-        sourceList.Add(source);
+        var nav_mesh_source_list = new List<NavMeshBuildSource>();
+        nav_mesh_source_list.Add(nav_mesh_source);
 
-        var settings = NavMesh.GetSettingsByID(0);
+        var nav_mesh_build_settings = NavMesh.GetSettingsByID(0);
         var bounds = mesh.bounds;
 
-        return NavMeshBuilder.UpdateNavMeshDataAsync(navMeshData, settings, sourceList, bounds);
+        return NavMeshBuilder.UpdateNavMeshDataAsync(navMeshData, nav_mesh_build_settings, nav_mesh_source_list, bounds);
     }
 
     // Update the global NavMesh from a GameObject containing one or more meshes.
@@ -84,22 +87,22 @@ public class NavigationManager : MonoBehaviour
     {
         this.local_mesh_testing = meshGameObject;
 
-        var sourceList = new List<NavMeshBuildSource>();
+        var nav_mesh_source_list = new List<NavMeshBuildSource>();
 
         var bounds = new Bounds();
         var components = meshGameObject.GetComponentsInChildren<MeshFilter>();
 
-        foreach (var mf in components)
+        foreach (var mesh_filter in components)
         {
-            var source = BuildSourceFromMesh(mf.sharedMesh);
-            sourceList.Add(source);
+            var nav_mesh_source = BuildSourceFromMesh(mesh_filter.sharedMesh);
+            nav_mesh_source_list.Add(nav_mesh_source);
 
-            bounds.Encapsulate(mf.sharedMesh.bounds);
+            bounds.Encapsulate(mesh_filter.sharedMesh.bounds);
         }
 
-        var settings = NavMesh.GetSettingsByID(0);
+        var nav_mesh_build_settings = NavMesh.GetSettingsByID(0);
 
-        return NavMeshBuilder.UpdateNavMeshDataAsync(navMeshData, settings, sourceList, bounds);
+        return NavMeshBuilder.UpdateNavMeshDataAsync(navMeshData, nav_mesh_build_settings, nav_mesh_source_list, bounds);
     }
 
     // Set a navigation target.
@@ -116,7 +119,7 @@ public class NavigationManager : MonoBehaviour
         myNavMeshSurface = GetComponent<NavMeshSurface>();
         myLineRender = GetComponent<LineRenderer>();
 
-        path = new();
+        nav_mesh_path = new();
         navMeshData = new();
 
         NavMesh.AddNavMeshData(navMeshData);
@@ -130,7 +133,7 @@ public class NavigationManager : MonoBehaviour
         // Wait for a QR code to be scanned to fetch features from the correct location.
         QRScanner.Instance.LocationChanged += (o, ev) =>
         {
-            LoadMapPaths(ev.LocationID);
+            LoadServerMapPaths(ev.LocationID);
             locationId = ev.LocationID;
         };
     }
@@ -138,17 +141,31 @@ public class NavigationManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // If a target has been set, try to find a path from the current position to the target.
-        // If a path can be found, it is displayed using the attached LineRenderer.
-        // This code uses the global NavMesh, so other scripts could take advantage of that, as well.
-        if (targetIsSet)
+        // Start the coroutine if it hasn't been started yet
+        if (updatePathCoroutine == null)
         {
-            var sourcePosition = Camera.main.transform.position;
-            foundPath = NavMesh.CalculatePath(sourcePosition, targetPosition, NavMesh.AllAreas, path);
-            myLineRender.positionCount = path.corners.Length;
-            myLineRender.SetPositions(path.corners);
+            updatePathCoroutine = StartCoroutine(UpdatePathCoroutine());
         }
+    }
 
+    // Move the logic of the Update function into a coroutine called UpdatePathCoroutine so that it can be called less frequently.
+    private IEnumerator UpdatePathCoroutine()
+    {
+        while (true)
+        {
+            // If a target has been set, try to find a path from the current position to the target.
+            // If a path can be found, it is displayed using the attached LineRenderer.
+            // This code uses the global NavMesh, so other scripts could take advantage of that, as well.
+            if (targetIsSet)
+            {
+                var sourcePosition = Camera.main.transform.position;
+                is_path_found = NavMesh.CalculatePath(sourcePosition, targetPosition, NavMesh.AllAreas, nav_mesh_path);
+                myLineRender.positionCount = nav_mesh_path.corners.Length;
+                myLineRender.SetPositions(nav_mesh_path.corners);
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 
     /*
@@ -169,20 +186,20 @@ public class NavigationManager : MonoBehaviour
      */
     public bool GiveDirectionsToUser(Vector3 startPosition, Vector3 endPosition, string locationId, string deviceId, string color, string label)
     {
-        foundPath = NavMesh.CalculatePath(startPosition, endPosition, NavMesh.AllAreas, path);
-        if (!foundPath)
+        is_path_found = NavMesh.CalculatePath(startPosition, endPosition, NavMesh.AllAreas, nav_mesh_path);
+        if (!is_path_found)
         {
             Debug.Log("path not found");
             return false;
         }
 
         Debug.Log("Path found");
-        foreach (Vector3 coord in path.corners)
+        foreach (Vector3 coord in nav_mesh_path.corners)
         {
             Debug.Log(coord);
         }
    
-        return GiveDirectionsToUser(path.corners, locationId, deviceId, color, label);
+        return GiveDirectionsToUser(nav_mesh_path.corners, locationId, deviceId, color, label);
     }
 
     /*
@@ -222,7 +239,7 @@ public class NavigationManager : MonoBehaviour
         return true;
     }
 
-    public void UpdateMapPath(EasyVizAR.MapPath path)
+    public void UpdateMapPathLineRenderers(EasyVizAR.MapPath path)
     {
         GameObject lineObject;
         LineRenderer lr;
@@ -265,7 +282,7 @@ public class NavigationManager : MonoBehaviour
             lr.sortingOrder = -10;
 
             // Save the latest navigation path for other game objects to query.
-            myNavigationPath = path;
+            easyViz_map_path = path;
         }
         else if (ColorUtility.TryParseHtmlString(path.color, out Color color))
         {
@@ -288,7 +305,7 @@ public class NavigationManager : MonoBehaviour
         lr.SetPositions(path.points);
     }
 
-    public void DeleteMapPath(int mapPathId)
+    public void DeletePathRenderers(int mapPathId)
     {
         if (mapPathLineRenderers.ContainsKey(mapPathId))
         {
@@ -297,7 +314,7 @@ public class NavigationManager : MonoBehaviour
         }
     }
 
-    private void LoadMapPaths(string newLocationId)
+    private void LoadServerMapPaths(string newLocationId)
     {
         // Remove any existing map paths assuming we are changing location
         foreach (var path in mapPathLineRenderers.Values)
@@ -317,8 +334,7 @@ public class NavigationManager : MonoBehaviour
                 var mapPathList = JsonUtility.FromJson<EasyVizAR.MapPathList>(result);
                 foreach (var path in mapPathList.map_paths)
                 {
-                    UpdateMapPath(path);
-                   
+                    UpdateMapPathLineRenderers(path);                   
                 }
             }
             else
@@ -328,9 +344,9 @@ public class NavigationManager : MonoBehaviour
         });
     }
 
-    internal bool GetDirection(Vector3 sourcePosition, Vector3 targetPosition, out Dir direction)
+    internal bool GetDirection(Vector3 sourcePosition, Vector3 targetPosition, out SignArrowDirection direction)
     {
-        direction = Dir.bottom;
+        direction = SignArrowDirection.bottom;
 
         NavMeshPath path = new();
         if (NavMesh.CalculatePath(sourcePosition, targetPosition, NavMesh.AllAreas, path))
@@ -350,7 +366,7 @@ public class NavigationManager : MonoBehaviour
         return false;
     }
 
-    private Dir GetDirection(Vector3 direction)
+    private SignArrowDirection GetDirection(Vector3 direction)
     {
         if (Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
         {
@@ -358,27 +374,27 @@ public class NavigationManager : MonoBehaviour
             {
                 if (direction.x > 0)
                 {
-                    return Dir.right;
+                    return SignArrowDirection.right;
                 }
                 else
                 {
-                    return Dir.left;
+                    return SignArrowDirection.left;
                 }
             }
             else
             {
-                return Dir.bottom;
+                return SignArrowDirection.bottom;
             }
         }
         else
         {
             if (direction.x > 0)
             {
-                return Dir.right;
+                return SignArrowDirection.right;
             }
             else
             {
-                return Dir.left;
+                return SignArrowDirection.left;
             }
         }
     }
@@ -391,6 +407,6 @@ public class NavigationManager : MonoBehaviour
      */
     public EasyVizAR.MapPath GetMyNavigationPath()
     {
-        return myNavigationPath;
+        return easyViz_map_path;
     }
 }

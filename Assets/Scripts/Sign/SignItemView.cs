@@ -14,7 +14,7 @@ namespace Sign
 
         public void SetData(SignItemData data)
         {
-            dirImage.transform.localRotation = Quaternion.Euler(0, 0, (int)data.dir * 90);
+            dirImage.transform.localRotation = Quaternion.Euler(0, 0, (int)data.arrow_direction * 90);
             LocationNameTextMeshPro.text = data.locationName;
             signImage.sprite = data.img;
         }

@@ -23,7 +23,7 @@ public class SignNavigationBoard_DirectionItem : MonoBehaviour
         new Vector3(0,0,270) 
     };
 
-    internal void UpdateFeatureData(Dir direction, List<FeatureWithIcon> features)
+    internal void UpdateFeatureData(SignArrowDirection direction, List<FeatureWithIcon> features)
     {
         CleanItemList();
 
