@@ -5,6 +5,7 @@ using UnityEngine;
 using TMPro;
 using System;
 using UnityEngine.InputSystem;
+using VInspector;
 //using System.Diagnostics;
 //using Color = UnityEngine.Color;
 
@@ -13,27 +14,34 @@ public class FeatureManager : MonoBehaviour
 {
 
     public EasyVizARHeadsetManager manager;
-    // key as id, value as the GameObject (the marker placed)
-    public Dictionary<int, EasyVizAR.Feature> feature_dictionary = new Dictionary<int, EasyVizAR.Feature>(); // TODO: can delete this later after more integration
-
-    // Each GameObject now contains a field call obj_feature (in the script MarkerObject.cs) so that feature is now one of the fields of the GameObject 
-    //public Dictionary<int, GameObject> feature_gameobj_dictionary = new Dictionary<int, GameObject>(); // a seperate dictionary for keeping track of Gameobject in the scene
-    public bool mirror_map_axis = false;
-
+    
+    //For listing features
+    // key as id, value as the GameObject (the marker placed). The dictonary is used for the websocket events, so it is the most up to date list of features.
+    //public Dictionary<int, EasyVizAR.Feature> feature_dictionary = new Dictionary<int, EasyVizAR.Feature>(); // TODO: can delete this later after more integration
+    public SerializedDictionary<int, EasyVizAR.Feature> feature_dictionary = new SerializedDictionary<int, EasyVizAR.Feature>();
+    public VISerializedDictionaryDrawer feature_dictionary_drawer = new VISerializedDictionaryDrawer();
+    //The feature list is NOT UPDATED when a feature is added or removed. It is only updated when the ListFeatures function is called. The dictonary is used for the websocket events.
     public EasyVizAR.FeatureList feature_list = new EasyVizAR.FeatureList();
+    
     public EasyVizAR.Feature featureHolder = null;
     public GameObject markerHolder = null;
     public int featureID = 32; // also a temporary holder
+    
     //for updates 
     public string color = "";
     public string name = "";
     public EasyVizAR.Position new_position;
+    
     // For displaying map 
     public GameObject palm_map_spawn_target;
     public GameObject floating_map_spawn_target;
     public GameObject volumetric_map_spawn_target; //added a target to spawn the volumetric map markers
     public GameObject PalmMap;
     public Dictionary<string, GameObject> map_icon_dictionary = new Dictionary<string, GameObject>(); // contains all possible marker objects
+    // Each GameObject now contains a field call obj_feature (in the script MarkerObject.cs) so that feature is now one of the fields of the GameObject 
+    //public Dictionary<int, GameObject> feature_gameobj_dictionary = new Dictionary<int, GameObject>(); // a seperate dictionary for keeping track of Gameobject in the scene
+    public bool mirror_map_axis = false;
+
     //map icon
     public GameObject map_ambulance_icon;
     public GameObject map_audio_icon;
