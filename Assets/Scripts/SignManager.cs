@@ -79,6 +79,7 @@ public class SignManager : MonoBehaviour
     private void Awake()
     {
         InitTypeIcons();
+        if (navigation_root = null) navigation_root = this.transform;
         featureManager = GameObject.Find("FeatureManager").GetComponent<FeatureManager>();
         navigationManager = GameObject.Find("NavigationManager").GetComponent<NavigationManager>();
         location = featureManager.LocationName;
@@ -88,7 +89,6 @@ public class SignManager : MonoBehaviour
 
     private void Start()
     {
-        if (navigation_root = null) navigation_root = this.transform;
     }
 
     private void InitTypeIcons()
