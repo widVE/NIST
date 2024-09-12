@@ -61,7 +61,7 @@ public class SignManager : MonoBehaviour
     private string location;
     private int levelIndex; // TODO
 
-    public Transform sign_navigation_start_locaiton;
+    public Transform navigation_root;
 
 
     [SerializeField]
@@ -88,7 +88,7 @@ public class SignManager : MonoBehaviour
 
     private void Start()
     {
-        if (sign_navigation_start_locaiton = null) sign_navigation_start_locaiton = this.transform;
+        if (navigation_root = null) navigation_root = this.transform;
     }
 
     private void InitTypeIcons()
@@ -260,7 +260,7 @@ public class SignManager : MonoBehaviour
             var targetPosition =
                 new Vector3(feature.position.x, feature.position.y, feature.position.z);
 
-            if (navigationManager.GetDirection(sign_navigation_start_locaiton.position, targetPosition, out SignArrowDirection direction))
+            if (navigationManager.GetDirection(navigation_root.position, targetPosition, out SignArrowDirection direction))
             {
                 AddFeature(direction, feature, GetTypeIcon(feature.type));
                 print(direction + ":" + feature.name);
