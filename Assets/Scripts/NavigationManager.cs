@@ -4,6 +4,7 @@ using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 
+
 public class NavigationManager : MonoBehaviour
 {
     // One of these can be set in the editor to load a mesh at startup.
@@ -64,6 +65,16 @@ public class NavigationManager : MonoBehaviour
         return nav_mesh_source;
     }
 
+    private NavMeshBuildSource BuildSourceFromMesh(Mesh mesh, Transform tf)
+    {
+        var nav_mesh_source = new NavMeshBuildSource();
+        nav_mesh_source.transform = tf.localToWorldMatrix;
+        nav_mesh_source.shape = NavMeshBuildSourceShape.Mesh;
+        nav_mesh_source.size = mesh.bounds.size;
+        nav_mesh_source.sourceObject = mesh;
+        return nav_mesh_source;
+    }
+
     // Update the global NavMesh from a Mesh object.
     // This could be called with an externally-sourced mesh to load a saved map for navigation.
     public AsyncOperation UpdateNavMesh(Mesh mesh)
@@ -94,7 +105,7 @@ public class NavigationManager : MonoBehaviour
 
         foreach (var mesh_filter in components)
         {
-            var nav_mesh_source = BuildSourceFromMesh(mesh_filter.sharedMesh);
+            var nav_mesh_source = BuildSourceFromMesh(mesh_filter.sharedMesh, meshGameObject.transform);
             nav_mesh_source_list.Add(nav_mesh_source);
 
             bounds.Encapsulate(mesh_filter.sharedMesh.bounds);
