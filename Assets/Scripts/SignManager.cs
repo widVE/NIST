@@ -61,6 +61,8 @@ public class SignManager : MonoBehaviour
     private string location;
     private int levelIndex; // TODO
 
+    public Transform sign_navigation_start_locaiton;
+
 
     [SerializeField]
     Sprite[] typeIcons;
@@ -86,10 +88,8 @@ public class SignManager : MonoBehaviour
 
     private void Start()
     {
-
+        if (sign_navigation_start_locaiton = null) sign_navigation_start_locaiton = this.transform;
     }
-
-
 
     private void InitTypeIcons()
     {
@@ -110,9 +110,7 @@ public class SignManager : MonoBehaviour
             }
         }
     }
-
-    
-
+        
     IEnumerator tempRefresh()
     {
         yield return new WaitForSeconds(20);
@@ -253,7 +251,8 @@ public class SignManager : MonoBehaviour
         _pointCache.Clear();
 
 
-        var sourcePosition = Camera.main.transform.position;
+        
+
         var features = featureManager.feature_list.features;
         for (int i = 0; i < features.Length; i++)
         {
@@ -261,7 +260,7 @@ public class SignManager : MonoBehaviour
             var targetPosition =
                 new Vector3(feature.position.x, feature.position.y, feature.position.z);
 
-            if (navigationManager.GetDirection(sourcePosition, targetPosition, out SignArrowDirection direction))
+            if (navigationManager.GetDirection(sign_position, targetPosition, out SignArrowDirection direction))
             {
                 AddFeature(direction, feature, GetTypeIcon(feature.type));
                 print(direction + ":" + feature.name);
