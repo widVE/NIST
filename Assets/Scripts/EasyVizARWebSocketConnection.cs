@@ -27,6 +27,13 @@ public class MapPathsEvent
     public EasyVizAR.MapPath current;
 }
 
+[System.Serializable]
+public class SurfacesEvent
+{
+    public EasyVizAR.Surface previous;
+    public EasyVizAR.Surface current;
+}
+
 public class EasyVizARWebSocketConnection : MonoBehaviour
 {
     [SerializeField]
@@ -193,6 +200,13 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
             await _ws.SendText("subscribe map-paths:deleted " + event_uri);
         }
 
+        if (LocationModelLoader.Instance)
+        {
+            await _ws.SendText("subscribe surfaces:created " + event_uri);
+            await _ws.SendText("subscribe surfaces:updated " + event_uri);
+            await _ws.SendText("subscribe surfaces:deleted " + event_uri);
+        }
+
         isConnected = true;
     }
 
@@ -269,6 +283,24 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
                 {
                     MapPathsEvent ev = JsonUtility.FromJson<MapPathsEvent>(event_body);
                     NavigationManager.Instance.DeletePathRenderers(ev.previous.id);
+                    break;
+                }
+            case "surfaces:created":
+                {
+                    var ev = JsonUtility.FromJson<SurfacesEvent>(event_body);
+                    LocationModelLoader.Instance.UpdateSurface(ev.current);
+                    break;
+                }
+            case "surfaces:updated":
+                {
+                    var ev = JsonUtility.FromJson<SurfacesEvent>(event_body);
+                    LocationModelLoader.Instance.UpdateSurface(ev.current);
+                    break;
+                }
+            case "surfaces:deleted":
+                {
+                    var ev = JsonUtility.FromJson<SurfacesEvent>(event_body);
+                    LocationModelLoader.Instance.DeleteSurface(ev.previous.id);
                     break;
                 }
             default:

@@ -302,6 +302,13 @@ namespace EasyVizAR
 		public string model_url;
 		public HeadsetConfiguration headset_configuration;
     }
+
+	[System.Serializable]
+	public class Surface
+    {
+		public string id;
+		public string uploadedBy;
+    }
 }
 
 public class EasyVizARServer : SingletonWIDVE<EasyVizARServer>
