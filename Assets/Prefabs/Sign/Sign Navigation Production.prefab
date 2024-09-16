@@ -2909,7 +2909,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1721148167141709174}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 16.73469}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.0012015302, y: 0.01183432, z: 0.14204547}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2920,7 +2920,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0.7326495, y: -0.33439982}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1100, y: 1260}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &8128853702538032725
@@ -6552,6 +6552,37 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &4807992338754979936
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7519668097098514554}
+  m_Layer: 0
+  m_Name: Sign Navigaiton Offset
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7519668097098514554
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4807992338754979936}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0.15}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7824111022908722930}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4912996406436320876
 GameObject:
   m_ObjectHideFlags: 0
@@ -8296,8 +8327,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6540369042079481151}
-  m_LocalRotation: {x: -0, y: -0.38268343, z: -0, w: 0.92387956}
-  m_LocalPosition: {x: 0.2983991, y: -0.144, z: -1.2826917}
+  m_LocalRotation: {x: -0, y: 0.3826835, z: -0, w: -0.9238795}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -9693,7 +9724,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7824111020964976409}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.0683, y: 0.113164544, z: 0.060496032}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.83227205, y: 0.0845, z: 0.00704}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -9715,7 +9746,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1.3104779, y: 2.165151, z: 0}
-  m_Center: {x: 0.7808874, y: 5.9644933, z: 4.572024}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &7824111020964976402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10266,7 +10297,7 @@ GameObject:
   - component: {fileID: 2798459963896274543}
   - component: {fileID: 5131980134722464521}
   m_Layer: 2
-  m_Name: Sign Navigation Backup
+  m_Name: Sign Navigation Production
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10280,12 +10311,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7824111022908722931}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.696, y: 0.144, z: 1.118}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7824111020964976408}
   - {fileID: 7845825940667355350}
+  - {fileID: 7519668097098514554}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10306,6 +10338,7 @@ MonoBehaviour:
   levelLabel: {fileID: 4831000821038325946}
   directionItemTempalte: {fileID: 3622825606814112609}
   diretionItemRoot: {fileID: 8278631500646599868}
+  navigation_root: {fileID: 7519668097098514554}
   typeIcons:
   - {fileID: 21300000, guid: e1f33da63fe9f5540aaae54884377bc9, type: 3}
   - {fileID: 21300000, guid: 1e402150a09dba7448ae3030682e96c9, type: 3}
