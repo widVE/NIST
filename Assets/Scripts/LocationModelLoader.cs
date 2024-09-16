@@ -120,7 +120,11 @@ public class LocationModelLoader : ObjectImporter
             model = obj;
             modelIsReady = true;
 
-            NavigationManager.Instance.UpdateNavMesh(model);
+            NavigationManager.Instance.InitializeNavMesh(model);
+        }
+        else
+        {
+            NavigationManager.Instance.UpdateNavMesh(obj);
         }
     }
 }

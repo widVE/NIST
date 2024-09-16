@@ -5,11 +5,19 @@ using UnityEngine;
 using UnityEngine.AI;
 
 
+class MeshData
+{
+    public GameObject mesh;
+    public int sourceIndex;
+    public NavMeshBuildSource navMeshBuildSource;
+    public Bounds bounds;
+}
+
+
 public class NavigationManager : MonoBehaviour
 {
     // One of these can be set in the editor to load a mesh at startup.
     // They can also be altered during runtime by calling UpdateNavMesh.
-    public Mesh remote_mesh;
     public GameObject local_mesh_testing;
 
     // A target can be set in the editor or by calling SetTarget.
@@ -36,7 +44,10 @@ public class NavigationManager : MonoBehaviour
 
     private EasyVizAR.MapPath easyViz_map_path = null;
 
-    private Dictionary<int, GameObject> mapPathLineRenderers = new();
+    // All navmesh data, keyed by surface ID
+    private Dictionary<string, MeshData> navMeshSources = new();
+
+    public Dictionary<int, GameObject> mapPathLineRenderers = new();
 
     public static NavigationManager Instance { get; private set; }
 
@@ -74,45 +85,47 @@ public class NavigationManager : MonoBehaviour
         nav_mesh_source.sourceObject = mesh;
         return nav_mesh_source;
     }
-
-    // Update the global NavMesh from a Mesh object.
-    // This could be called with an externally-sourced mesh to load a saved map for navigation.
-    public AsyncOperation UpdateNavMesh(Mesh mesh)
-    {
-        this.remote_mesh = mesh;
-
-        var nav_mesh_source = BuildSourceFromMesh(mesh);
-
-        var nav_mesh_source_list = new List<NavMeshBuildSource>();
-        nav_mesh_source_list.Add(nav_mesh_source);
-
-        var nav_mesh_build_settings = NavMesh.GetSettingsByID(0);
-        var bounds = mesh.bounds;
-
-        return NavMeshBuilder.UpdateNavMeshDataAsync(navMeshData, nav_mesh_build_settings, nav_mesh_source_list, bounds);
-    }
-
-    // Update the global NavMesh from a GameObject containing one or more meshes.
-    // This could be called with an externally-sourced mesh to load a saved map for navigation.
-    public AsyncOperation UpdateNavMesh(GameObject meshGameObject)
+    public AsyncOperation InitializeNavMesh(GameObject meshGameObject)
     {
         this.local_mesh_testing = meshGameObject;
 
-        var nav_mesh_source_list = new List<NavMeshBuildSource>();
+        navMeshSources = new();
+        return UpdateNavMesh(meshGameObject);
+    }
 
-        var bounds = new Bounds();
+    public AsyncOperation UpdateNavMesh(GameObject meshGameObject)
+    {
         var components = meshGameObject.GetComponentsInChildren<MeshFilter>();
 
         foreach (var mesh_filter in components)
         {
             var nav_mesh_source = BuildSourceFromMesh(mesh_filter.sharedMesh, meshGameObject.transform);
-            nav_mesh_source_list.Add(nav_mesh_source);
 
-            bounds.Encapsulate(mesh_filter.sharedMesh.bounds);
+            var meshData = new MeshData()
+            {
+                mesh = mesh_filter.transform.gameObject,
+                sourceIndex = navMeshSources.Count,
+                navMeshBuildSource = nav_mesh_source,
+                bounds = mesh_filter.sharedMesh.bounds,
+            };
+            navMeshSources[mesh_filter.name] = meshData;
+        }
+
+        return RebuildNavMesh();
+    }
+
+    private AsyncOperation RebuildNavMesh()
+    {
+        var nav_mesh_source_list = new List<NavMeshBuildSource>();
+        var bounds = new Bounds();
+
+        foreach (var meshData in navMeshSources.Values)
+        {
+            nav_mesh_source_list.Add(meshData.navMeshBuildSource);
+            bounds.Encapsulate(meshData.bounds);
         }
 
         var nav_mesh_build_settings = NavMesh.GetSettingsByID(0);
-
         return NavMeshBuilder.UpdateNavMeshDataAsync(navMeshData, nav_mesh_build_settings, nav_mesh_source_list, bounds);
     }
 
@@ -136,9 +149,7 @@ public class NavigationManager : MonoBehaviour
         NavMesh.AddNavMeshData(navMeshData);
 
         // Potentially load a built-in mesh at start-up for testing purposes.
-        if (remote_mesh)
-            yield return UpdateNavMesh(remote_mesh);
-        else if (local_mesh_testing)
+        if (local_mesh_testing)
             yield return UpdateNavMesh(local_mesh_testing);
 
         // Wait for a QR code to be scanned to fetch features from the correct location.
