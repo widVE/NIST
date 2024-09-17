@@ -99,6 +99,12 @@ public class NavigationManager : MonoBehaviour
 
         foreach (var mesh_filter in components)
         {
+            // Our models may have needed rotation or other transformations after loading.
+            // We will get the mesh bounds from the Renderer, which returns the bounds in
+            // world space, rather than from the MeshFilter, which returns them in local
+            // space.
+            var renderer = mesh_filter.gameObject.GetComponent<Renderer>();
+
             var nav_mesh_source = BuildSourceFromMesh(mesh_filter.sharedMesh, meshGameObject.transform);
 
             var meshData = new MeshData()
@@ -106,7 +112,7 @@ public class NavigationManager : MonoBehaviour
                 mesh = mesh_filter.transform.gameObject,
                 sourceIndex = navMeshSources.Count,
                 navMeshBuildSource = nav_mesh_source,
-                bounds = mesh_filter.sharedMesh.bounds,
+                bounds = renderer.bounds,
             };
             navMeshSources[mesh_filter.name] = meshData;
         }

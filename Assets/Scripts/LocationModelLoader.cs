@@ -11,10 +11,14 @@ public class LocationModelLoader : ObjectImporter
     [Tooltip("Load the model from server after a location QR code has been scanned.")]
     public bool loadOnLocationChange = true;
 
+    private string locationId = "unknown";
     private GameObject model;
     private bool modelIsReady = false;
 
     private string urlBase = "";
+
+    // Store reference to newest GameObject for each surface, keyed on surface ID.
+    private Dictionary<string, GameObject> surfaces = new();
 
     private ImportOptions importOptions = new ImportOptions() 
     { 
@@ -53,6 +57,7 @@ public class LocationModelLoader : ObjectImporter
             if (loadOnLocationChange)
             {
                 modelIsReady = false;
+                locationId = ev.LocationID;
 
                 var scheme = "http://";
                 if (ev.UseHTTPS)
@@ -63,7 +68,7 @@ public class LocationModelLoader : ObjectImporter
                 string url = $"{urlBase}/model#model.obj";
                 Debug.Log("Loading model from: " + url);
 
-                ImportModelAsync("model", url, transform, importOptions);
+                ImportModelAsync(locationId, url, transform, importOptions);
             }
         };
     }
@@ -77,26 +82,19 @@ public class LocationModelLoader : ObjectImporter
     {
         if (modelIsReady)
         {
-            // If there is an existing surface with the same ID, delete it first.
-            // The result of importing the surface will be a new game object with the same name.
-            var oldSurface = model.transform.Find(surface.id);
-            if (oldSurface)
-                Destroy(oldSurface.gameObject);
-
             string url = $"{urlBase}/surfaces/{surface.id}/surface.obj";
             Debug.Log("Loading model from: " + url);
 
-            ImportModelAsync(surface.id, url, model.transform, importOptions);
+            ImportModelAsync(surface.id, url, transform, importOptions);
         }
     }
 
     public void DeleteSurface(string surface_id)
     {
-        if (modelIsReady)
+        if (surfaces.ContainsKey(surface_id))
         {
-            var oldSurface = model.transform.Find(surface_id);
-            if (oldSurface)
-                Destroy(oldSurface.gameObject);
+            Destroy(surfaces[surface_id]);
+            surfaces.Remove(surface_id);
         }
     }
 
@@ -114,6 +112,22 @@ public class LocationModelLoader : ObjectImporter
     protected override void OnImported(GameObject obj, string absolutePath)
     {
         base.OnImported(obj, absolutePath);
+
+        // Iterate over the components of the object and save a reference to each.
+        // For location models, this iterates the individual surfaces, which each have their own surface ID.
+        foreach (Transform tf in obj.transform)
+        {
+            if (surfaces.ContainsKey(tf.name))
+            {
+                Debug.Log("Destroy object " + tf.name);
+                Destroy(surfaces[tf.name]);
+            }
+            surfaces[tf.name] = tf.gameObject;
+        }
+
+        // Also create a reference to the parent object. This ensures that for individually loaded
+        // surfaces, we store a reference to the top-level game object, rather than its child.
+        surfaces[obj.name] = obj;
 
         if (!modelIsReady)
         {
