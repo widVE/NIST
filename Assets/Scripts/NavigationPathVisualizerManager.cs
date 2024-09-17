@@ -113,8 +113,6 @@ public class NavigationPathVisualizerManager : MonoBehaviour
         {
             line_renderer.SetPosition(i, path.points[i]);
         }
-
-
     }
 
     //Enable or disable the visibility of the LineRenderer path based on the is_visible and path_id parameters
