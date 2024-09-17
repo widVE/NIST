@@ -83,6 +83,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.VCRTForwarders.14
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexPlayer.Editor", "NexPlayer.Editor.csproj", "{C516F94F-2994-18B1-DED2-43C55ED4B4A5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{3B0A90C7-CAF2-68E9-AEC9-F77D00C769FC}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.XR.CoreUtils.Editor", "Unity.XR.CoreUtils.Editor.csproj", "{A781D172-2A6F-288D-E94A-E712D5852EC9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexPlayer.FullSample.Editor", "NexPlayer.FullSample.Editor.csproj", "{B20B6531-CBA9-1A9B-8D02-ECAB8D70A917}"
@@ -311,6 +313,10 @@ Global
 		{C516F94F-2994-18B1-DED2-43C55ED4B4A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C516F94F-2994-18B1-DED2-43C55ED4B4A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C516F94F-2994-18B1-DED2-43C55ED4B4A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B0A90C7-CAF2-68E9-AEC9-F77D00C769FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B0A90C7-CAF2-68E9-AEC9-F77D00C769FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B0A90C7-CAF2-68E9-AEC9-F77D00C769FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B0A90C7-CAF2-68E9-AEC9-F77D00C769FC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A781D172-2A6F-288D-E94A-E712D5852EC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A781D172-2A6F-288D-E94A-E712D5852EC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A781D172-2A6F-288D-E94A-E712D5852EC9}.Release|Any CPU.ActiveCfg = Release|Any CPU

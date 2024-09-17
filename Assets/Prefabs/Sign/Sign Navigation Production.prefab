@@ -6562,7 +6562,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7519668097098514554}
   m_Layer: 0
-  m_Name: Sign Navigaiton Offset
+  m_Name: Sign Navigation Offset
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6581,7 +6581,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7824111022908722930}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4912996406436320876
 GameObject:
@@ -7350,6 +7350,75 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &5453315805632992324
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 729380503704920013}
+  - component: {fileID: 1957837554592825829}
+  m_Layer: 0
+  m_Name: Sign Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &729380503704920013
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5453315805632992324}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.039154623, y: 0.36581114, z: -0.0039776866}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7824111022908722930}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1957837554592825829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5453315805632992324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b279c1b9679e4aa488c9896cd0d5c7cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  layout: {fileID: 5429537151169675162}
+  locationLabel: {fileID: 8860258605126553708}
+  levelLabel: {fileID: 4831000821038325946}
+  directionItemTempalte: {fileID: 3622825606814112609}
+  diretionItemRoot: {fileID: 8278631500646599868}
+  navigation_root: {fileID: 7519668097098514554}
+  typeIcons:
+  - {fileID: 21300000, guid: e1f33da63fe9f5540aaae54884377bc9, type: 3}
+  - {fileID: 21300000, guid: 1e402150a09dba7448ae3030682e96c9, type: 3}
+  - {fileID: 21300000, guid: 3e371472bee95714e835bc6bca58f61a, type: 3}
+  - {fileID: 21300000, guid: 07f0e68561fe9904185add00080b323e, type: 3}
+  - {fileID: 21300000, guid: f4365289cbbf8a4428f390e1b5e3d3ee, type: 3}
+  - {fileID: 21300000, guid: 8099bbe3de0c9f64fa8bc09449a40b6d, type: 3}
+  - {fileID: 21300000, guid: 8c2ee91f81c76dd4281d529afa3e5a4b, type: 3}
+  - {fileID: 21300000, guid: 448448ebc5cdd7b4aa144325aef81180, type: 3}
+  - {fileID: 21300000, guid: cb043536c9ef12048bd01cb3d229f65a, type: 3}
+  - {fileID: 21300000, guid: 2f6a7ac716ddd2249b191468f8db8d93, type: 3}
+  - {fileID: 21300000, guid: d9dc60f7642e2b44ba616b450972aa56, type: 3}
+  - {fileID: 21300000, guid: 6d87639cbc6a72646a739916d36fce18, type: 3}
+  - {fileID: 21300000, guid: 57af60e834e1ba142b6b6d4404231c99, type: 3}
+  - {fileID: 21300000, guid: 3d899717e7d6d43448fe67a5e1d4b866, type: 3}
+  - {fileID: 21300000, guid: b10d6060cc1172541911d7c6ff5c5adf, type: 3}
+  - {fileID: 21300000, guid: 227f6c289eae97b42b767c24c2669c70, type: 3}
+  - {fileID: 21300000, guid: 666e34a659bfd1143808ab1642e7c3f9, type: 3}
+  - {fileID: 21300000, guid: be5444a20073cd6429dcb5421f3691b7, type: 3}
 --- !u!1 &5496471187321819690
 GameObject:
   m_ObjectHideFlags: 0
@@ -8335,7 +8404,7 @@ Transform:
   - {fileID: 8679820314785196475}
   - {fileID: 6151974301294972656}
   m_Father: {fileID: 7824111022908722930}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4128848325479525822
 MonoBehaviour:
@@ -9157,9 +9226,9 @@ RectTransform:
   m_Father: {fileID: 2503480805270879942}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 550, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 550, y: -200}
   m_SizeDelta: {x: 1100, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &220431592997367631
@@ -9732,7 +9801,7 @@ Transform:
   - {fileID: 3161459071817283605}
   - {fileID: 8762839282795073409}
   m_Father: {fileID: 7824111022908722930}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &7824111020964976405
 BoxCollider:
@@ -9903,7 +9972,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2798459963896274543}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SignManager, Assembly-CSharp
         m_MethodName: RefreshView
         m_Mode: 1
@@ -9930,7 +9999,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2798459963896274543}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SignManager, Assembly-CSharp
         m_MethodName: RefreshView
         m_Mode: 1
@@ -10294,7 +10363,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7824111022908722930}
-  - component: {fileID: 2798459963896274543}
   - component: {fileID: 5131980134722464521}
   m_Layer: 2
   m_Name: Sign Navigation Production
@@ -10315,49 +10383,13 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 729380503704920013}
   - {fileID: 7824111020964976408}
   - {fileID: 7845825940667355350}
   - {fileID: 7519668097098514554}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2798459963896274543
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7824111022908722931}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b279c1b9679e4aa488c9896cd0d5c7cd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  layout: {fileID: 5429537151169675162}
-  locationLabel: {fileID: 8860258605126553708}
-  levelLabel: {fileID: 4831000821038325946}
-  directionItemTempalte: {fileID: 3622825606814112609}
-  diretionItemRoot: {fileID: 8278631500646599868}
-  navigation_root: {fileID: 7519668097098514554}
-  typeIcons:
-  - {fileID: 21300000, guid: e1f33da63fe9f5540aaae54884377bc9, type: 3}
-  - {fileID: 21300000, guid: 1e402150a09dba7448ae3030682e96c9, type: 3}
-  - {fileID: 21300000, guid: 3e371472bee95714e835bc6bca58f61a, type: 3}
-  - {fileID: 21300000, guid: 07f0e68561fe9904185add00080b323e, type: 3}
-  - {fileID: 21300000, guid: f4365289cbbf8a4428f390e1b5e3d3ee, type: 3}
-  - {fileID: 21300000, guid: 8099bbe3de0c9f64fa8bc09449a40b6d, type: 3}
-  - {fileID: 21300000, guid: 8c2ee91f81c76dd4281d529afa3e5a4b, type: 3}
-  - {fileID: 21300000, guid: 448448ebc5cdd7b4aa144325aef81180, type: 3}
-  - {fileID: 21300000, guid: cb043536c9ef12048bd01cb3d229f65a, type: 3}
-  - {fileID: 21300000, guid: 2f6a7ac716ddd2249b191468f8db8d93, type: 3}
-  - {fileID: 21300000, guid: d9dc60f7642e2b44ba616b450972aa56, type: 3}
-  - {fileID: 21300000, guid: 6d87639cbc6a72646a739916d36fce18, type: 3}
-  - {fileID: 21300000, guid: 57af60e834e1ba142b6b6d4404231c99, type: 3}
-  - {fileID: 21300000, guid: 3d899717e7d6d43448fe67a5e1d4b866, type: 3}
-  - {fileID: 21300000, guid: b10d6060cc1172541911d7c6ff5c5adf, type: 3}
-  - {fileID: 21300000, guid: 227f6c289eae97b42b767c24c2669c70, type: 3}
-  - {fileID: 21300000, guid: 666e34a659bfd1143808ab1642e7c3f9, type: 3}
-  - {fileID: 21300000, guid: be5444a20073cd6429dcb5421f3691b7, type: 3}
 --- !u!114 &5131980134722464521
 MonoBehaviour:
   m_ObjectHideFlags: 0
