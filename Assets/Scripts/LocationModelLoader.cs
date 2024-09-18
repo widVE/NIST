@@ -1,18 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 
 using AsImpL;
 
+public class ModelImportedEventArgs
+{
+    public GameObject model;
+}
+
 public class LocationModelLoader : ObjectImporter
 {
     [Tooltip("Load the model from server after a location QR code has been scanned.")]
     public bool loadOnLocationChange = true;
 
-    private string locationId = "unknown";
+    public event EventHandler<ModelImportedEventArgs> ModelImported;
+
     private GameObject model;
+    private string locationId = "unknown";
     private bool modelIsReady = false;
 
     private string urlBase = "";
@@ -25,7 +33,7 @@ public class LocationModelLoader : ObjectImporter
         zUp = false,
 
         // Pass our layer ID to the loaded model.
-        inheritLayer = true,
+        //inheritLayer = true,
 
         // AsImpL seems to load the models rotated by 180 degrees. I think this fixes it.
         localEulerAngles = new Vector3(0, 180, 0),
@@ -47,6 +55,9 @@ public class LocationModelLoader : ObjectImporter
         {
             Instance = this;
         }
+
+        model = new GameObject("model");
+        model.transform.parent = this.transform;
     }
 
     void Start()
@@ -58,6 +69,7 @@ public class LocationModelLoader : ObjectImporter
             {
                 modelIsReady = false;
                 locationId = ev.LocationID;
+                model.name = ev.LocationID;
 
                 var scheme = "http://";
                 if (ev.UseHTTPS)
@@ -68,7 +80,7 @@ public class LocationModelLoader : ObjectImporter
                 string url = $"{urlBase}/model#model.obj";
                 Debug.Log("Loading model from: " + url);
 
-                ImportModelAsync(locationId, url, transform, importOptions);
+                ImportModelAsync("main", url, model.transform, importOptions);
             }
         };
     }
@@ -85,7 +97,7 @@ public class LocationModelLoader : ObjectImporter
             string url = $"{urlBase}/surfaces/{surface.id}/surface.obj";
             Debug.Log("Loading model from: " + url);
 
-            ImportModelAsync(surface.id, url, transform, importOptions);
+            ImportModelAsync(surface.id, url, model.transform, importOptions);
         }
     }
 
@@ -100,18 +112,15 @@ public class LocationModelLoader : ObjectImporter
 
     protected override void OnModelCreated(GameObject obj, string absolutePath)
     {
-        // We want to have the game object inherit our layer before it starts loading
-        // data rather than after, which is how AsImpL does it. In that way, if our
-        // layer is set to one that is not rendered, the partially loaded object will
-        // never be visible.
-        obj.layer = this.gameObject.layer;
-
         base.OnModelCreated(obj, absolutePath);
     }
 
     protected override void OnImported(GameObject obj, string absolutePath)
     {
         base.OnImported(obj, absolutePath);
+
+        // Disable rendering once the object has been loaded.
+        obj.SetActive(false);
 
         // Iterate over the components of the object and save a reference to each.
         // For location models, this iterates the individual surfaces, which each have their own surface ID.
@@ -131,14 +140,19 @@ public class LocationModelLoader : ObjectImporter
 
         if (!modelIsReady)
         {
-            model = obj;
             modelIsReady = true;
-
-            NavigationManager.Instance.InitializeNavMesh(model);
+            NavigationManager.Instance.InitializeNavMesh(obj);
         }
         else
         {
             NavigationManager.Instance.UpdateNavMesh(obj);
         }
+
+        var eventArgs = new ModelImportedEventArgs()
+        {
+            model = obj,
+        };
+        ModelImported?.Invoke(this, eventArgs);
     }
+
 }
