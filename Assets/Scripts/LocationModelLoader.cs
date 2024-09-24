@@ -112,6 +112,10 @@ public class LocationModelLoader : ObjectImporter
 
     protected override void OnModelCreated(GameObject obj, string absolutePath)
     {
+        // Make the object disappear while loading.
+        // We could use obj.SetActive(false), but that causes a bug in the loader code.
+        obj.transform.localScale = new Vector3(0, 0, 0);
+
         base.OnModelCreated(obj, absolutePath);
     }
 
@@ -121,6 +125,9 @@ public class LocationModelLoader : ObjectImporter
 
         // Disable rendering once the object has been loaded.
         obj.SetActive(false);
+
+        // Restore the object scale before using it for the NavMesh.
+        obj.transform.localScale = new Vector3(1, 1, 1);
 
         // Iterate over the components of the object and save a reference to each.
         // For location models, this iterates the individual surfaces, which each have their own surface ID.
