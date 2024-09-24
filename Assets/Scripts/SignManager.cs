@@ -78,6 +78,8 @@ public class SignManager : MonoBehaviour
 
     private void Awake()
     {
+        if (navigation_root == null) navigation_root = this.transform;
+
         InitTypeIcons();        
         featureManager = GameObject.Find("FeatureManager").GetComponent<FeatureManager>();
         navigationManager = GameObject.Find("NavigationManager").GetComponent<NavigationManager>();
@@ -88,7 +90,7 @@ public class SignManager : MonoBehaviour
 
     private void Start()
     {
-        if (navigation_root = null) navigation_root = this.transform;
+        if (navigation_root == null) navigation_root = this.transform;
     }
 
     private void InitTypeIcons()
@@ -246,6 +248,12 @@ public class SignManager : MonoBehaviour
             Debug.LogError("SignNavigationManager:FeatureManager is null");
             return;
         }
+        if (navigation_root == null)
+        {
+            Debug.LogError("SignNavigationManager:Nav_Root is null");
+            navigation_root = this.transform;
+        }
+
         // user current position
         CleanList();
         _pointCache.Clear();
