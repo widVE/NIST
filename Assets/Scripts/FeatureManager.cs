@@ -19,7 +19,11 @@ public class FeatureManager : MonoBehaviour
     // key as id, value as the GameObject (the marker placed). The dictonary is used for the websocket events, so it is the most up to date list of features.
     //public Dictionary<int, EasyVizAR.Feature> feature_dictionary = new Dictionary<int, EasyVizAR.Feature>(); // TODO: can delete this later after more integration
     public SerializedDictionary<int, EasyVizAR.Feature> feature_dictionary = new SerializedDictionary<int, EasyVizAR.Feature>();
-    public VInspector.VISerializedDictionaryDrawer feature_dictionary_drawer = new VInspector.VISerializedDictionaryDrawer();
+
+    //Causing compiler errors idk why D: when deployed onto hmd
+    //public VInspector.VISerializedDictionaryDrawer feature_dictionary_drawer = new VInspector.VISerializedDictionaryDrawer();
+
+
     //The feature list is NOT UPDATED when a feature is added or removed. It is only updated when the ListFeatures function is called. The dictonary is used for the websocket events.
     public EasyVizAR.FeatureList feature_list = new EasyVizAR.FeatureList();
     
