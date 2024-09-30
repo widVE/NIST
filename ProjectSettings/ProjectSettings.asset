@@ -976,9 +976,9 @@ PlayerSettings:
   metroPackageVersion: 1.0.0.0
   metroCertificatePath: Assets/WSATestCertificate.pfx
   metroCertificatePassword: 
-  metroCertificateSubject: DefaultCompany
-  metroCertificateIssuer: DefaultCompany
-  metroCertificateNotAfter: 80a4fc9d8010db01
+  metroCertificateSubject: UW-Madison
+  metroCertificateIssuer: UW-Madison
+  metroCertificateNotAfter: 802cf0695c32dc01
   metroApplicationDescription: Template_3D
   wsaImages: {}
   metroTileShortName: NIST AR December 2023

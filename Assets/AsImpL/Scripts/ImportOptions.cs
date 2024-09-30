@@ -63,5 +63,8 @@ namespace AsImpL
 
         [Tooltip("Scaling of the object\n([1,1,1] = no rescaling)")]
         public Vector3 localScale = Vector3.one;
+
+        [Tooltip("Shader to use with models that do not contain material information")]
+        public string defaultShaderName = "VertexLit";
     }
 }

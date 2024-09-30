@@ -363,6 +363,11 @@ public class EasyVizARHeadset : MonoBehaviour
 
 
         h.name = _headsetName;
+#if UNITY_EDITOR
+		h.type = "editor";
+#else
+		h.type = "headset";
+#endif
         h.location_id = _locationID;
 
         EasyVizARServer.Instance.Post("headsets", EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), CreateRegisterCallback);
@@ -420,6 +425,11 @@ public class EasyVizARHeadset : MonoBehaviour
 
 		
 		h.name = _headsetName;
+#if UNITY_EDITOR
+		h.type = "editor";
+#else
+		h.type = "headset";
+#endif
 		h.location_id = _locationID;
 		
 		EasyVizARServer.Instance.Post("headsets", EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), CreateCallback);

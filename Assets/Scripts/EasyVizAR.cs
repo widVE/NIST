@@ -51,6 +51,7 @@ namespace EasyVizAR
 		public string location_id;
 		public string mapId;
 		public string name;
+		public string type;
 		public NavigationTarget navigation_target;
 		public Orientation orientation;
 		public Position position;
@@ -76,6 +77,7 @@ namespace EasyVizAR
 		public string location_id;
 		public string mapId;
 		public string name;
+		public string type;
 		public NavigationTarget navigation_target;
 		public Orientation orientation;
 		public Position position;

@@ -96,6 +96,10 @@ namespace AsImpL
             if (materialData == null || materialData.Count == 0)
             {
                 string shaderName = "VertexLit";
+                if (buildOptions != null)
+                {
+                    shaderName = buildOptions.defaultShaderName;
+                }
                 if (hasColors)
                 {
                     shaderName = "Unlit/Simple Vertex Colors Shader";

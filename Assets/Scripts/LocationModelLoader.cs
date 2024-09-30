@@ -41,6 +41,9 @@ public class LocationModelLoader : ObjectImporter
         // We would like to set this to make the model invisible while loading,
         // but that seems to cause an error in AsImpL.
         //hideWhileLoading = true,
+
+        // Rainbow shader
+        defaultShaderName = "Graph/Point Surface",
     };
 
     public static LocationModelLoader Instance { get; private set; }
