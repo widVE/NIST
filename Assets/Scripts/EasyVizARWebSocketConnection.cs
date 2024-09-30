@@ -6,33 +6,6 @@ using UnityEngine;
 using NativeWebSocket;
 using System.Diagnostics;
 
-[System.Serializable]
-public class FeaturesEvent
-{
-    public EasyVizAR.Feature previous;
-    public EasyVizAR.Feature current;
-}
-
-[System.Serializable]
-public class HeadsetsEvent
-{
-    public EasyVizAR.Headset previous;
-    public EasyVizAR.Headset current;
-}
-
-[System.Serializable]
-public class MapPathsEvent
-{
-    public EasyVizAR.MapPath previous;
-    public EasyVizAR.MapPath current;
-}
-
-[System.Serializable]
-public class SurfacesEvent
-{
-    public EasyVizAR.Surface previous;
-    public EasyVizAR.Surface current;
-}
 
 public class EasyVizARWebSocketConnection : MonoBehaviour
 {
@@ -147,10 +120,12 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
             { "X-Ignore", "ignore" }
         };
 
-        // Request "json-with-header" subprotocol from the server. This results in received messages
+        // Request "json-with-header-v2" subprotocol from the server. This results in received messages
         // having a useful header before the JSON body so that we know how to deserialize and
         // route the message.
-        string subprotocol = "json-with-header";
+        //
+        // v2 simplified the message format for improved performance.
+        string subprotocol = "json-with-header-v2";
 
         var ws = new WebSocket(_webSocketURL, subprotocol, headers);
 
@@ -232,75 +207,75 @@ public class EasyVizARWebSocketConnection : MonoBehaviour
         {
             case "location-headsets:created":
                 {
-                    HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
-                    headsetManager.GetComponent<EasyVizARHeadsetManager>().CreateRemoteHeadset(ev.current);
+                    var obj = JsonUtility.FromJson<EasyVizAR.Headset>(event_body);
+                    headsetManager.GetComponent<EasyVizARHeadsetManager>().CreateRemoteHeadset(obj);
                     break;
                 }
             case "location-headsets:updated":
                 {
-                    HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
-                    headsetManager.GetComponent<EasyVizARHeadsetManager>().UpdateRemoteHeadset(ev.previous.id, ev.current);
+                    var obj = JsonUtility.FromJson<EasyVizAR.Headset>(event_body);
+                    headsetManager.GetComponent<EasyVizARHeadsetManager>().UpdateRemoteHeadset(obj.id, obj);
                     break;
                 }
             case "location-headsets:deleted":
                 {
-                    HeadsetsEvent ev = JsonUtility.FromJson<HeadsetsEvent>(event_body);
-                    headsetManager.GetComponent<EasyVizARHeadsetManager>().DeleteRemoteHeadset(ev.previous.id);
+                    var obj = JsonUtility.FromJson<EasyVizAR.Headset>(event_body);
+                    headsetManager.GetComponent<EasyVizARHeadsetManager>().DeleteRemoteHeadset(obj.id);
                     //Destroy(map_parent.transform.Find(ev.previous.name).gameObject);
                     break;
                 }
             case "features:created":
                 {
-                    FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(event_body);
-                    featureManager.GetComponent<FeatureManager>().AddFeatureFromServer(ev.current);
+                    var obj = JsonUtility.FromJson<EasyVizAR.Feature>(event_body);
+                    featureManager.GetComponent<FeatureManager>().AddFeatureFromServer(obj);
                     break;
                 }
             case "features:updated":
                 {
-                    FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(event_body);
-                    featureManager.GetComponent<FeatureManager>().UpdateFeatureFromServer(ev.current);
+                    var obj = JsonUtility.FromJson<EasyVizAR.Feature>(event_body);
+                    featureManager.GetComponent<FeatureManager>().UpdateFeatureFromServer(obj);
                     break;
                 }
             case "features:deleted":
                 {
-                    FeaturesEvent ev = JsonUtility.FromJson<FeaturesEvent>(event_body);
-                    featureManager.GetComponent<FeatureManager>().DeleteFeatureFromServer(ev.previous.id);
+                    var obj = JsonUtility.FromJson<EasyVizAR.Feature>(event_body);
+                    featureManager.GetComponent<FeatureManager>().DeleteFeatureFromServer(obj.id);
                     break;
                 }
             case "map-paths:created":
                 {
-                    MapPathsEvent ev = JsonUtility.FromJson<MapPathsEvent>(event_body);
-                    NavigationManager.Instance.UpdateMapPathLineRenderers(ev.current);
+                    var obj = JsonUtility.FromJson<EasyVizAR.MapPath>(event_body);
+                    NavigationManager.Instance.UpdateMapPathLineRenderers(obj);
                     break;
                 }
             case "map-paths:updated":
                 {
-                    MapPathsEvent ev = JsonUtility.FromJson<MapPathsEvent>(event_body);
-                    NavigationManager.Instance.UpdateMapPathLineRenderers(ev.current);
+                    var obj = JsonUtility.FromJson<EasyVizAR.MapPath>(event_body);
+                    NavigationManager.Instance.UpdateMapPathLineRenderers(obj);
                     break;
                 }
             case "map-paths:deleted":
                 {
-                    MapPathsEvent ev = JsonUtility.FromJson<MapPathsEvent>(event_body);
-                    NavigationManager.Instance.DeletePathRenderers(ev.previous.id);
+                    var obj = JsonUtility.FromJson<EasyVizAR.MapPath>(event_body);
+                    NavigationManager.Instance.DeletePathRenderers(obj.id);
                     break;
                 }
             case "surfaces:created":
                 {
-                    var ev = JsonUtility.FromJson<SurfacesEvent>(event_body);
-                    LocationModelLoader.Instance.UpdateSurface(ev.current);
+                    var obj = JsonUtility.FromJson<EasyVizAR.Surface>(event_body);
+                    LocationModelLoader.Instance.UpdateSurface(obj);
                     break;
                 }
             case "surfaces:updated":
                 {
-                    var ev = JsonUtility.FromJson<SurfacesEvent>(event_body);
-                    LocationModelLoader.Instance.UpdateSurface(ev.current);
+                    var obj = JsonUtility.FromJson<EasyVizAR.Surface>(event_body);
+                    LocationModelLoader.Instance.UpdateSurface(obj);
                     break;
                 }
             case "surfaces:deleted":
                 {
-                    var ev = JsonUtility.FromJson<SurfacesEvent>(event_body);
-                    LocationModelLoader.Instance.DeleteSurface(ev.previous.id);
+                    var obj = JsonUtility.FromJson<EasyVizAR.Surface>(event_body);
+                    LocationModelLoader.Instance.DeleteSurface(obj.id);
                     break;
                 }
             default:
