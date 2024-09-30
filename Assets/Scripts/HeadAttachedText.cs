@@ -17,6 +17,21 @@ public class HeadAttachedText : MonoBehaviour
 
     private Queue<HeadAttachedMessage> messageQueue = new();
     private TMPro.TMP_Text textObject;
+
+    public static HeadAttachedText Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Debug.Log("Warning: multiple instances of HeadAttachedText created when there should only be one.");
+        }
+        else
+        {
+            Instance = this;
+        }
+    }
+
     void Start()
     {
         textObject = GetComponent<TMPro.TMP_Text>();

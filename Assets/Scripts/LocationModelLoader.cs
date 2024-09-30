@@ -148,10 +148,12 @@ public class LocationModelLoader : ObjectImporter
         // surfaces, we store a reference to the top-level game object, rather than its child.
         surfaces[obj.name] = obj;
 
-        if (!modelIsReady)
+        if (obj.name == "main")
         {
             modelIsReady = true;
             NavigationManager.Instance.InitializeNavMesh(obj);
+
+            HeadAttachedText.Instance.EnqueueMessage("Finished loading navigation map", 2.0f);
         }
         else
         {
