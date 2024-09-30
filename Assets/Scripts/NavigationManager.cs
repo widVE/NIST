@@ -381,6 +381,7 @@ public class NavigationManager : MonoBehaviour
         {
             if (path != null && path.corners.Length > 0)
             {
+                //error here, the first corner will not exist in a null array, or with no path
                 var firstCorner = path.corners[1];
                 Vector3 directionToTarget = firstCorner - sourcePosition;
                 Vector3 normalizedDirection = directionToTarget.normalized;
