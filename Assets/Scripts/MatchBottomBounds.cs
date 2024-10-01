@@ -26,16 +26,26 @@ public class MatchBottomBounds : MonoBehaviour
 
         foreach (GameObject floored_object in objects_to_match)
         {
-            //get the bounds of the source object
-            Bounds source_bounds = lower_bounds_source.GetComponent<Renderer>().bounds;
+            //get the renderer component of the source object
+            Renderer source_renderer = lower_bounds_source.GetComponent<Renderer>();
+            Bounds source_bounds;
 
-            //get the bounds of the object to match
-            Bounds object_bounds = floored_object.GetComponent<Renderer>().bounds;
+            //get the renderer component of the object to match
+            Renderer object_renderer = floored_object.GetComponent<Renderer>();
+            Bounds object_bounds;
 
-            //check if object_bounds is null, check if source_bounds is null
-            if (object_bounds == null || source_bounds == null)
+            //check if object_renderer and source_renderer are not null
+            if (object_renderer != null && source_renderer != null)
             {
-                Debug.LogWarning("Bounds are null");
+                //get the bounds of the source object
+                source_bounds = source_renderer.bounds;
+
+                //get the bounds of the object to match
+                object_bounds = object_renderer.bounds;
+            }
+            else
+            {
+                Debug.LogWarning("Renderer is null");
                 return;
             }
 
