@@ -120,6 +120,28 @@ public class NavigationManager : MonoBehaviour
         return RebuildNavMesh();
     }
 
+    public AsyncOperation UpdateNavMesh(MeshFilter meshFilter)
+    {
+        // Our models may have needed rotation or other transformations after loading.
+        // We will get the mesh bounds from the Renderer, which returns the bounds in
+        // world space, rather than from the MeshFilter, which returns them in local
+        // space.
+        var renderer = meshFilter.gameObject.GetComponent<Renderer>();
+
+        var nav_mesh_source = BuildSourceFromMesh(meshFilter.sharedMesh, meshFilter.gameObject.transform);
+
+        var meshData = new MeshData()
+        {
+            mesh = meshFilter.gameObject,
+            sourceIndex = navMeshSources.Count,
+            navMeshBuildSource = nav_mesh_source,
+            bounds = renderer.bounds,
+        };
+        navMeshSources[meshFilter.gameObject.name] = meshData;
+
+        return RebuildNavMesh();
+    }
+
     private AsyncOperation RebuildNavMesh()
     {
         var nav_mesh_source_list = new List<NavMeshBuildSource>();
