@@ -74,7 +74,7 @@ public class DockGrabCloner : MonoBehaviour
         GameObject remote_map_mesh = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map/WavefrontObject").gameObject;
                 
         //Using the reference to the navigation manager, update the nav mesh with the new remote map mesh
-        navigation_manager.UpdateNavMesh(remote_map_mesh);
+        //navigation_manager.UpdateNavMesh(remote_map_mesh);
 
         //navigation_manager.local_mesh_testing = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map/WavefrontObject").gameObject;
         //boundscheck_reference.map = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/WavefrontObject").gameObject;

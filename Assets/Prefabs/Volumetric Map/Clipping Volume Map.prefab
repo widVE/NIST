@@ -1335,7 +1335,6 @@ GameObject:
   - component: {fileID: 1477525487928821631}
   - component: {fileID: 1477525487928821630}
   - component: {fileID: 2317057510497868884}
-  - component: {fileID: 8260540303665855295}
   - component: {fileID: 1640645750212004366}
   - component: {fileID: 1557076056160291013}
   m_Layer: 0
@@ -1397,19 +1396,6 @@ MonoBehaviour:
   - {fileID: 1956283533853967267}
   - {fileID: 2062445990451654474}
   matched: 0
---- !u!114 &8260540303665855295
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1477525487928821629}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: daba88a30f38f3f4d8df0d146acfcd08, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spawn_parent: {fileID: 2062445990451654474}
 --- !u!114 &1640645750212004366
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1681,7 +1667,7 @@ Transform:
   m_GameObject: {fileID: 1956283533853967267}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 4702042332979524344}
@@ -1777,7 +1763,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9206695162986507559}
-  - component: {fileID: 5732158895504438989}
+  - component: {fileID: 2350510895373451426}
+  - component: {fileID: 4204339215287153197}
   m_Layer: 0
   m_Name: Server Map
   m_TagString: Untagged
@@ -1802,7 +1789,19 @@ Transform:
   m_Father: {fileID: 4702042332979524344}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &5732158895504438989
+--- !u!114 &2350510895373451426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2062445990451654474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0431de403f80894b8be5d5f992be925, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!23 &4204339215287153197
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
