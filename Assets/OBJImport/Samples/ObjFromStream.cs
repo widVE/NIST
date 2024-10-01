@@ -8,11 +8,16 @@ public class ObjFromStream : MonoBehaviour {
     public GameObject spawn_parent;
     //awake
     void Awake () {
+       
+    }
+
+    void GetModel()
+    {
         //make www
         var www = new WWW("https://easyvizar.wings.cs.wisc.edu/locations/8a58613d-f207-44dd-8f61-effaea9abde6/model");
         while (!www.isDone)
             System.Threading.Thread.Sleep(1);
-        
+
         //create stream and load
         var textStream = new MemoryStream(Encoding.UTF8.GetBytes(www.text));
 
