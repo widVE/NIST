@@ -13,7 +13,7 @@ public class MatchBottomBounds : MonoBehaviour
     //Boolean to keep track of if the object has been matched
     public bool matched = false;
 
-    public void Awake()
+    public void Start()
     {
         MatchBottomRenderBounds();
     }
@@ -23,7 +23,6 @@ public class MatchBottomBounds : MonoBehaviour
     {
         Debug.Log("Matching: ");
 
-
         foreach (GameObject floored_object in objects_to_match)
         {
             //get the renderer component of the source object
@@ -31,17 +30,19 @@ public class MatchBottomBounds : MonoBehaviour
             Bounds source_bounds;
 
             //get the renderer component of the object to match
-            Renderer object_renderer = floored_object.GetComponent<Renderer>();
-            Bounds object_bounds;
+            //Renderer object_renderer = floored_object.GetComponent<Renderer>();
+            Bounds object_bounds = new Bounds();
+
+            foreach (var object_renderer in floored_object.GetComponentsInChildren<Renderer>())
+            {
+                object_bounds.Encapsulate(object_renderer.bounds);
+            }
 
             //check if object_renderer and source_renderer are not null
-            if (object_renderer != null && source_renderer != null)
+            if (source_renderer != null)
             {
                 //get the bounds of the source object
                 source_bounds = source_renderer.bounds;
-
-                //get the bounds of the object to match
-                object_bounds = object_renderer.bounds;
             }
             else
             {
