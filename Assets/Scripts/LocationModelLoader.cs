@@ -17,6 +17,9 @@ public class LocationModelLoader : ObjectImporter
     [Tooltip("Load the model from server after a location QR code has been scanned.")]
     public bool loadOnLocationChange = true;
 
+    [Tooltip("Load updated surfaces from the server. This seems to have a performance penalty.")]
+    public bool loadUpdatedSurfaces = false;
+
     public event EventHandler<ModelImportedEventArgs> ModelImported;
 
     private GameObject model;
@@ -95,7 +98,7 @@ public class LocationModelLoader : ObjectImporter
 
     public void UpdateSurface(EasyVizAR.Surface surface)
     {
-        if (modelIsReady)
+        if (loadUpdatedSurfaces && modelIsReady)
         {
             string url = $"{urlBase}/surfaces/{surface.id}/surface.obj";
             Debug.Log("Loading model from: " + url);

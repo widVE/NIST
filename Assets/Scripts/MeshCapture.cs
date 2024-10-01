@@ -46,7 +46,16 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
     [Tooltip("Game object that determines the world coordinate system, ie. the one that changes when QR code is scanned.")]
     GameObject coordinateSystemSource;
 
+    [SerializeField]
+    [Tooltip("Update NavMesh using observed spatial awareness meshes.")]
+    bool updateNavMesh = false;
+
+    [SerializeField]
+    [Tooltip("Upload virtual mesh observer surfaces to server. This should be disabled except for testing.")]
+    bool uploadVirtualMeshes = false;
+
     private string _locationId = null;
+    private bool meshObserverIsVirtual = true;
 
     // We might not need this reference to the mesh observer depending on whether
     // we use the observer to iterate through its meshes or if we go through the
@@ -94,6 +103,7 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
             if (provider.Name == "Spatial Object Mesh Observer")
             {
                 meshObserver = provider;
+                meshObserverIsVirtual = true;
                 break;
             }
 #endif
@@ -102,6 +112,7 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
             if (provider.Name == "OpenXR Spatial Mesh Observer")
             {
                 meshObserver = provider;
+                meshObserverIsVirtual = false;
             }
         }
 
@@ -168,8 +179,15 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
 
     async void EnqueueMeshUpdate(SpatialAwarenessMeshObject meshObject)
     {
+        // Use our observed spatial meshes to update the local NavMesh.
+        if (updateNavMesh)
+        {
+            await NavigationManager.Instance.UpdateNavMesh(meshObject.Filter);
+        }
+
         // It is not useful to send meshes if the location is unknown.
-        if (_locationId is null)
+        // Also, we generally want to avoid uploading fake meshes unless enabled for testing.
+        if (_locationId is null || (meshObserverIsVirtual && !uploadVirtualMeshes))
         {
             return;
         }

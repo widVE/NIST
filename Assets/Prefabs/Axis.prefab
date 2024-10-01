@@ -773,6 +773,7 @@ Transform:
   - {fileID: 4833661384060812}
   - {fileID: 6780504855033854074}
   - {fileID: 4366126804156264204}
+  - {fileID: 1698834942601225703}
   - {fileID: 7904445622301405717}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -1003,6 +1004,54 @@ MonoBehaviour:
   importAssets: 0
   importAssetPath: _ImportedOBJ
   loadOnLocationChange: 1
+--- !u!1 &6396635237086011973
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1698834942601225703}
+  - component: {fileID: 6213941870113131453}
+  m_Layer: 0
+  m_Name: MeshCapture
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1698834942601225703
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6396635237086011973}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4001612315231318}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6213941870113131453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6396635237086011973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff38da39be66d094fbc7ff31ceebd34c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _headsetManager: {fileID: 0}
+  debug: 0
+  coordinateSystemSource: {fileID: 0}
+  updateNavMesh: 1
 --- !u!1 &6669233561075065781
 GameObject:
   m_ObjectHideFlags: 0
@@ -1033,7 +1082,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4001612315231318}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1997486766897108148
 MonoBehaviour:
