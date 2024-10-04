@@ -9860,7 +9860,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1539913615}
-  m_RootOrder: 12
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &404529391
 MonoBehaviour:
@@ -17243,7 +17243,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1539913615}
-  m_RootOrder: 14
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -21437,7 +21437,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1539913615}
-  m_RootOrder: 11
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &925204596
 MonoBehaviour:
@@ -34325,6 +34325,42 @@ PrefabInstance:
     - target: {fileID: 4366126804156264204, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
       propertyPath: m_RootOrder
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4710973340172725786, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
+      propertyPath: m_Parameters.widthMultiplier
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 4710973340172725786, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4710973340172725786, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[1].time
+      value: 0.10354046
+      objectReference: {fileID: 0}
+    - target: {fileID: 4710973340172725786, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[1].value
+      value: 0.11585438
+      objectReference: {fileID: 0}
+    - target: {fileID: 4710973340172725786, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[1].inSlope
+      value: -0.087752834
+      objectReference: {fileID: 0}
+    - target: {fileID: 4710973340172725786, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[1].inWeight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4710973340172725786, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[1].outSlope
+      value: -0.087752834
+      objectReference: {fileID: 0}
+    - target: {fileID: 4710973340172725786, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[1].outWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 4710973340172725786, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[1].tangentMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6213941870113131453, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
       propertyPath: _headsetManager

@@ -7,6 +7,7 @@ public class VolumeHeadsetManager : MonoBehaviour
     public NavigationManager local_nav_reference = null;
     public EasyVizARHeadset headset_reference = null;
     public EasyVizARHeadsetManager headsetManager_reference = null;
+	public PathPreview pathPreview = null;
     Vector3 old_position;
 
 
@@ -68,5 +69,20 @@ public class VolumeHeadsetManager : MonoBehaviour
     {
         old_position = this.transform.parent.GetComponent<Transform>().localPosition;
     }
-}
 
+	public void StartPathPreview(GameObject cursor)
+	{
+		if (pathPreview)
+		{
+			pathPreview.StartPreview(cursor);
+		}
+	}
+
+	public void StopPathPreview()
+	{
+		if (pathPreview)
+		{
+			pathPreview.StopPreview();
+		}
+	}
+}

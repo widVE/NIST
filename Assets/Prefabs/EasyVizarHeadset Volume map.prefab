@@ -55,6 +55,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: EasyVizarHeadset Volume map
       objectReference: {fileID: 0}
+    - target: {fileID: 2949428818045588792, guid: 53b7274ec7bf90643b352bf1c7589e26, type: 3}
+      propertyPath: m_Parameters.widthMultiplier
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2949428818045588792, guid: 53b7274ec7bf90643b352bf1c7589e26, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].time
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2949428818045588792, guid: 53b7274ec7bf90643b352bf1c7589e26, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].value
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 2955154939740706361, guid: 53b7274ec7bf90643b352bf1c7589e26, type: 3}
       propertyPath: m_RootOrder
       value: 4
@@ -62,6 +74,10 @@ PrefabInstance:
     - target: {fileID: 4821545658032759295, guid: 53b7274ec7bf90643b352bf1c7589e26, type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7447912172159357445, guid: 53b7274ec7bf90643b352bf1c7589e26, type: 3}
+      propertyPath: m_RootOrder
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8231832368714168251, guid: 53b7274ec7bf90643b352bf1c7589e26, type: 3}
       propertyPath: m_IsActive
@@ -190,6 +206,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 2744191230848508655}
+        m_TargetAssemblyTypeName: VolumeHeadsetManager, Assembly-CSharp
+        m_MethodName: StartPathPreview
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 2161221711680702053}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onManipulationEnded:
     m_PersistentCalls:
       m_Calls:
@@ -232,6 +260,18 @@ MonoBehaviour:
       - m_Target: {fileID: 2744191230848508655}
         m_TargetAssemblyTypeName: VolumeHeadsetManager, Assembly-CSharp
         m_MethodName: NavigationTrigger
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2744191230848508655}
+        m_TargetAssemblyTypeName: VolumeHeadsetManager, Assembly-CSharp
+        m_MethodName: StopPathPreview
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

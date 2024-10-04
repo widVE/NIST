@@ -63,6 +63,7 @@ MonoBehaviour:
   local_headset_id: 
   feature_parent: {fileID: 0}
   navigation_line: {fileID: 0}
+  pathPreview: {fileID: 0}
 --- !u!114 &6077780464579907565
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -126,6 +127,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   local_nav_reference: {fileID: 0}
+  headset_reference: {fileID: 0}
+  headsetManager_reference: {fileID: 0}
 --- !u!1 &6732124109696385241
 GameObject:
   m_ObjectHideFlags: 0

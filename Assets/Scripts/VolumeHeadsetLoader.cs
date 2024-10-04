@@ -5,6 +5,7 @@ public class VolumeHeadsetLoader : MonoBehaviour
 {
     public GameObject _volumeHeadsetPrefab;
     public GameObject _headsetParent;
+    public PathPreview _pathPreview;
 
     List<EasyVizARHeadset> _activeHeadsets;
     public EasyVizARHeadsetManager headsetManager_reference; 
@@ -32,6 +33,9 @@ public class VolumeHeadsetLoader : MonoBehaviour
 
         EasyVizARHeadset easyvizarHeadset = headset_game_object.GetComponent<EasyVizARHeadset>();
         easyvizarHeadset._headsetID = headset._headsetID;
+
+		var manager = easyvizarHeadset.transform.GetComponentInChildren<VolumeHeadsetManager>();
+		manager.pathPreview = _pathPreview;
 
 
         MarkerObject marker_object = headset_game_object.GetComponent<MarkerObject>();
