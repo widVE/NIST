@@ -17,6 +17,9 @@ using System.IO;
 using UnityEngine;
 using System;
 using Dummiesman;
+using System.Collections;
+using System.Threading.Tasks;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -108,9 +111,9 @@ namespace Dummiesman
 
             //lists for face data
             //prevents excess GC
-            List<int> vertexIndices = new List<int>();
-            List<int> normalIndices = new List<int>();
-            List<int> uvIndices = new List<int>();
+            List<int> vertexIndices = new List<int>(4);
+            List<int> normalIndices = new List<int>(4);
+            List<int> uvIndices = new List<int>(4);
 
             //helper func
             Action<string> setCurrentObjectFunc = (string objectName) =>
@@ -197,7 +200,7 @@ namespace Dummiesman
                 if (buffer.Is("f"))
                 {
                     //loop through indices
-                    while (true)
+                    while (!buffer.endReached)
                     {
 						bool newLinePassed;
 						buffer.SkipWhitespaces(out newLinePassed);
@@ -328,6 +331,217 @@ namespace Dummiesman
         public GameObject Load(string path)
         {
             return Load(path, null);
+        }
+
+        public IEnumerator LoadAsync(Stream input, string name, Transform parent, bool startActive)
+        {
+            var reader = new StreamReader(input);
+            //var reader = new StringReader(inputReader.ReadToEnd());
+
+            Dictionary<string, OBJObjectBuilder> builderDict = new Dictionary<string, OBJObjectBuilder>();
+            OBJObjectBuilder currentBuilder = null;
+            string currentMaterial = "default";
+
+            //lists for face data
+            //prevents excess GC
+            List<int> vertexIndices = new List<int>(4);
+            List<int> normalIndices = new List<int>(4);
+            List<int> uvIndices = new List<int>(4);
+
+            //helper func
+            Action<string> setCurrentObjectFunc = (string objectName) =>
+            {
+                if (!builderDict.TryGetValue(objectName, out currentBuilder))
+                {
+                    currentBuilder = new OBJObjectBuilder(objectName, this);
+                    builderDict[objectName] = currentBuilder;
+                }
+            };
+
+            //create default object
+            setCurrentObjectFunc.Invoke("default");
+
+            //var buffer = new DoubleBuffer(reader, 256 * 1024);
+            var buffer = new CharWordReader(reader, 4 * 1024);
+
+            //do the reading
+            var task = Task.Run(() =>
+            {
+                while (true)
+                {
+                    buffer.SkipWhitespaces();
+
+                    if (buffer.endReached == true)
+                    {
+                        break;
+                    }
+
+                    buffer.ReadUntilWhiteSpace();
+
+                    //comment or blank
+                    if (buffer.Is("#"))
+                    {
+                        buffer.SkipUntilNewLine();
+                        continue;
+                    }
+
+                    if (Materials == null && buffer.Is("mtllib"))
+                    {
+                        buffer.SkipWhitespaces();
+                        buffer.ReadUntilNewLine();
+                        string mtlLibPath = buffer.GetString();
+                        LoadMaterialLibrary(mtlLibPath);
+                        continue;
+                    }
+
+                    if (buffer.Is("v"))
+                    {
+                        Vertices.Add(buffer.ReadVector());
+                        continue;
+                    }
+
+                    //normal
+                    if (buffer.Is("vn"))
+                    {
+                        Normals.Add(buffer.ReadVector());
+                        continue;
+                    }
+
+                    //uv
+                    if (buffer.Is("vt"))
+                    {
+                        UVs.Add(buffer.ReadVector());
+                        continue;
+                    }
+
+                    //new material
+                    if (buffer.Is("usemtl"))
+                    {
+                        buffer.SkipWhitespaces();
+                        buffer.ReadUntilNewLine();
+                        string materialName = buffer.GetString();
+                        currentMaterial = materialName;
+
+                        if (SplitMode == SplitMode.Material)
+                        {
+                            setCurrentObjectFunc.Invoke(materialName);
+                        }
+                        continue;
+                    }
+
+                    //new object
+                    if ((buffer.Is("o") || buffer.Is("g")) && SplitMode == SplitMode.Object)
+                    {
+                        //yield return null;
+                        buffer.ReadUntilNewLine();
+                        string objectName = buffer.GetString(1);
+                        setCurrentObjectFunc.Invoke(objectName);
+                        continue;
+                    }
+
+                    //face data (the fun part)
+                    if (buffer.Is("f"))
+                    {
+                        //loop through indices
+                        while (!buffer.endReached)
+                        {
+                            bool newLinePassed;
+                            buffer.SkipWhitespaces(out newLinePassed);
+                            if (newLinePassed == true)
+                            {
+                                break;
+                            }
+
+                            int vertexIndex = int.MinValue;
+                            int normalIndex = int.MinValue;
+                            int uvIndex = int.MinValue;
+
+                            vertexIndex = buffer.ReadInt();
+                            if (buffer.currentChar == '/')
+                            {
+                                buffer.MoveNext();
+                                if (buffer.currentChar != '/')
+                                {
+                                    uvIndex = buffer.ReadInt();
+                                }
+                                if (buffer.currentChar == '/')
+                                {
+                                    buffer.MoveNext();
+                                    normalIndex = buffer.ReadInt();
+                                }
+                            }
+
+                            //"postprocess" indices
+                            if (vertexIndex > int.MinValue)
+                            {
+                                if (vertexIndex < 0)
+                                    vertexIndex = Vertices.Count - vertexIndex;
+                                vertexIndex--;
+                            }
+                            if (normalIndex > int.MinValue)
+                            {
+                                if (normalIndex < 0)
+                                    normalIndex = Normals.Count - normalIndex;
+                                normalIndex--;
+                            }
+                            if (uvIndex > int.MinValue)
+                            {
+                                if (uvIndex < 0)
+                                    uvIndex = UVs.Count - uvIndex;
+                                uvIndex--;
+                            }
+
+                            //set array values
+                            vertexIndices.Add(vertexIndex);
+                            normalIndices.Add(normalIndex);
+                            uvIndices.Add(uvIndex);
+                        }
+
+                        //push to builder
+                        currentBuilder.PushFace(currentMaterial, vertexIndices, normalIndices, uvIndices);
+
+                        //clear lists
+                        vertexIndices.Clear();
+                        normalIndices.Clear();
+                        uvIndices.Clear();
+
+                        continue;
+                    }
+
+                    buffer.SkipUntilNewLine();
+                }
+            });
+            yield return new WaitUntil(() => task.IsCompleted);
+
+            //finally, put it all together
+            GameObject obj = new GameObject(_objInfo != null ? Path.GetFileNameWithoutExtension(_objInfo.Name) : "WavefrontObject");
+            obj.SetActive(startActive);
+            obj.transform.localScale = new Vector3(-1f, 1f, 1f);
+
+            foreach (var builder in builderDict)
+            {
+                yield return null;
+
+                //empty object
+                if (builder.Value.PushedFaceCount == 0)
+                    continue;
+
+                var builtObj = builder.Value.Build();
+                builtObj.transform.SetParent(obj.transform, false);
+            }
+
+            obj.name = name;
+            obj.transform.parent = parent;
+            //return obj;
+        }
+
+        public void SetDefaultMaterial(Material material)
+        {
+            if (Materials == null)
+            {
+                Materials = new();
+            }
+            Materials["default"] = material;
         }
     }
 }

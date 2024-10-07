@@ -70,7 +70,6 @@ public class OBJObjectBuilder {
 		var mr = go.AddComponent<MeshRenderer>();
 		int submesh = 0;
 
-
 		//locate the material for each submesh
 		Material[] materialArray = new Material[_materialIndices.Count];
 		foreach (var kvp in _materialIndices) {

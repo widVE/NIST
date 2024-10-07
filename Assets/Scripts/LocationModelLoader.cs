@@ -6,6 +6,10 @@ using UnityEngine;
 using UnityEngine.AI;
 
 using AsImpL;
+using Dummiesman;
+using System.IO;
+using System.Text;
+using UnityEngine.Networking;
 
 public class ModelImportedEventArgs
 {
@@ -30,6 +34,10 @@ public class LocationModelLoader : ObjectImporter
 
     // Store reference to newest GameObject for each surface, keyed on surface ID.
     private Dictionary<string, GameObject> surfaces = new();
+
+    public Shader defaultShader;
+
+    private OBJLoader loader;
 
     private ImportOptions importOptions = new ImportOptions() 
     { 
@@ -64,6 +72,14 @@ public class LocationModelLoader : ObjectImporter
 
         model = new GameObject("model");
         model.transform.parent = this.transform;
+
+        if (defaultShader == null)
+        {
+            defaultShader = Shader.Find("Graph/Point Surface");
+        }
+
+        loader = new OBJLoader();
+        loader.SetDefaultMaterial(new Material(defaultShader));
     }
 
     void Start()
@@ -86,9 +102,20 @@ public class LocationModelLoader : ObjectImporter
                 string url = $"{urlBase}/model#model.obj";
                 Debug.Log("Loading model from: " + url);
 
-                ImportModelAsync("main", url, model.transform, importOptions);
+                //ImportModelAsync("main", url, model.transform, importOptions);
+                StartCoroutine(LoadModel(url));
             }
         };
+    }
+
+    private IEnumerator LoadModel(string url)
+    {
+        UnityWebRequest www = new UnityWebRequest(url);
+        www.downloadHandler = new DownloadHandlerBuffer();
+        yield return www.SendWebRequest();
+
+        var stream = new MemoryStream(www.downloadHandler.data);
+        yield return loader.LoadAsync(stream, "main", model.transform, false);
     }
 
     public GameObject GetModel()

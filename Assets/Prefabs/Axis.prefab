@@ -1004,6 +1004,7 @@ MonoBehaviour:
   importAssetPath: _ImportedOBJ
   loadOnLocationChange: 1
   loadUpdatedSurfaces: 0
+  defaultShader: {fileID: 4800000, guid: 465e84f7c06b44e05a7ae6f3dccab691, type: 3}
 --- !u!1 &6396635237086011973
 GameObject:
   m_ObjectHideFlags: 0
