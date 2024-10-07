@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.IO;
 using System.Globalization;
 
@@ -262,105 +263,110 @@ namespace AsImpL
             objLoadingProgress.message = "Parsing geometry data...";
             // store separators, used multiple times
             char[] separators = new char[] { ' ', '\t' };
-            for (int i = 0; i < lines.Length; i++)
-            {
-                // update progress only sometimes
-                if (i % 7000 == 0)
+
+            // Move this compute-heavy work to a worker thread
+			var task = Task.Run(() => {
+                for (int i = 0; i < lines.Length; i++)
                 {
-                    objLoadingProgress.percentage = LOAD_PHASE_PERC * i / lines.Length;
-                    yield return null;
-                }
+                    // update progress only sometimes
+                    if (i % 7000 == 0)
+                    {
+                        objLoadingProgress.percentage = LOAD_PHASE_PERC * i / lines.Length;
+                    }
 
-                string line = lines[i].Trim();
+                    string line = lines[i].Trim();
 
-                if (line.Length > 0 && line[0] == '#')
-                { // comment line
-                    continue;
-                }
-                string[] p = line.Split(separators, StringSplitOptions.RemoveEmptyEntries);
-                if (p.Length == 0)
-                { // empty line
-                    continue;
-                }
+                    if (line.Length > 0 && line[0] == '#')
+                    { // comment line
+                        continue;
+                    }
+                    string[] p = line.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+                    if (p.Length == 0)
+                    { // empty line
+                        continue;
+                    }
 
-                string parameters = null;
-                if (line.Length > p[0].Length)
-                {
-                    parameters = line.Substring(p[0].Length + 1).Trim();
-                }
+                    string parameters = null;
+                    if (line.Length > p[0].Length)
+                    {
+                        parameters = line.Substring(p[0].Length + 1).Trim();
+                    }
 
-                switch (p[0])
-                {
-                    case "o":
-                        dataSet.AddObject(parameters);
-                        isFirstInGroup = true;
-                        break;
-                    case "g":
-                        isFirstInGroup = true;
-                        dataSet.AddGroup(parameters);
-                        break;
-                    case "v":
-                        dataSet.AddVertex(ConvertVec3(ParseFloat(p[1]), ParseFloat(p[2]), ParseFloat(p[3])));
-                        if (p.Length >= 7)
-                        {
-                            // 7 for "v x y z r g b"
-                            // 8 for "v x y z r g b w"
-                            // w is the weight required for rational curves and surfaces. It is
-                            // not required for non - rational curves and surfaces.If you do not
-                            // specify a value for w, the default is 1.0. [http://paulbourke.net/dataformats/obj/]
-                            dataSet.AddColor(new Color(ParseFloat(p[4]), ParseFloat(p[5]), ParseFloat(p[6]), 1f));
-                        }
-                        break;
-                    case "vt":
-                        dataSet.AddUV(new Vector2(ParseFloat(p[1]), ParseFloat(p[2])));
-                        break;
-                    case "vn":
-                        dataSet.AddNormal(ConvertVec3(ParseFloat(p[1]), ParseFloat(p[2]), ParseFloat(p[3])));
-                        break;
-                    case "f":
-                        {
-                            int numVerts = p.Length - 1;
-                            DataSet.FaceIndices[] face = new DataSet.FaceIndices[numVerts];
-                            if (isFirstInGroup)
+                    switch (p[0])
+                    {
+                        case "o":
+                            dataSet.AddObject(parameters);
+                            isFirstInGroup = true;
+                            break;
+                        case "g":
+                            isFirstInGroup = true;
+                            dataSet.AddGroup(parameters);
+                            break;
+                        case "v":
+                            dataSet.AddVertex(ConvertVec3(ParseFloat(p[1]), ParseFloat(p[2]), ParseFloat(p[3])));
+                            if (p.Length >= 7)
                             {
-                                isFirstInGroup = false;
-                                string[] c = p[1].Trim().Split("/".ToCharArray());
-                                isFaceIndexPlus = (int.Parse(c[0]) >= 0);
+                                // 7 for "v x y z r g b"
+                                // 8 for "v x y z r g b w"
+                                // w is the weight required for rational curves and surfaces. It is
+                                // not required for non - rational curves and surfaces.If you do not
+                                // specify a value for w, the default is 1.0. [http://paulbourke.net/dataformats/obj/]
+                                dataSet.AddColor(new Color(ParseFloat(p[4]), ParseFloat(p[5]), ParseFloat(p[6]), 1f));
                             }
-                            GetFaceIndicesByOneFaceLine(face, p, isFaceIndexPlus);
-                            if (numVerts == 3)
+                            break;
+                        case "vt":
+                            dataSet.AddUV(new Vector2(ParseFloat(p[1]), ParseFloat(p[2])));
+                            break;
+                        case "vn":
+                            dataSet.AddNormal(ConvertVec3(ParseFloat(p[1]), ParseFloat(p[2]), ParseFloat(p[3])));
+                            break;
+                        case "f":
                             {
-                                dataSet.AddFaceIndices(face[0]);
-                                dataSet.AddFaceIndices(face[2]);
-                                dataSet.AddFaceIndices(face[1]);
+                                int numVerts = p.Length - 1;
+                                DataSet.FaceIndices[] face = new DataSet.FaceIndices[numVerts];
+                                if (isFirstInGroup)
+                                {
+                                    isFirstInGroup = false;
+                                    string[] c = p[1].Trim().Split("/".ToCharArray());
+                                    isFaceIndexPlus = (int.Parse(c[0]) >= 0);
+                                }
+                                GetFaceIndicesByOneFaceLine(face, p, isFaceIndexPlus);
+                                if (numVerts == 3)
+                                {
+                                    dataSet.AddFaceIndices(face[0]);
+                                    dataSet.AddFaceIndices(face[2]);
+                                    dataSet.AddFaceIndices(face[1]);
+                                }
+                                else
+                                {
+                                    // Triangulate the polygon
+                                    // TODO: Texturing and lighting work better with a triangulation that maximizes triangles areas.
+                                    // TODO: the following true must be replaced to a proper option (disabled by default) as soon as a proper triangulation method is implemented.
+                                    Triangulator.Triangulate(dataSet, face);
+                                    // TODO: Maybe triangulation could be done in ObjectImporter instead.
+                                }
                             }
-                            else
+                            break;
+                        case "mtllib":
+                            if (!string.IsNullOrEmpty(parameters))
                             {
-                                // Triangulate the polygon
-                                // TODO: Texturing and lighting work better with a triangulation that maximizes triangles areas.
-                                // TODO: the following true must be replaced to a proper option (disabled by default) as soon as a proper triangulation method is implemented.
-                                Triangulator.Triangulate(dataSet, face);
-                                // TODO: Maybe triangulation could be done in ObjectImporter instead.
+                                mtlLib = parameters;
                             }
-                        }
-                        break;
-                    case "mtllib":
-                        if (!string.IsNullOrEmpty(parameters))
-                        {
-                            mtlLib = parameters;
-                        }
-                        break;
-                    case "usemtl":
-                        if (!string.IsNullOrEmpty(parameters))
-                        {
-                            dataSet.AddMaterialName(DataSet.FixMaterialName(parameters));
-                        }
-                        break;
-                    default:
-                        Debug.LogWarning("OBJ element not supported: " + p[0]);
-                        break;
+                            break;
+                        case "usemtl":
+                            if (!string.IsNullOrEmpty(parameters))
+                            {
+                                dataSet.AddMaterialName(DataSet.FixMaterialName(parameters));
+                            }
+                            break;
+                        default:
+                            Debug.LogWarning("OBJ element not supported: " + p[0]);
+                            break;
+                    }
                 }
-            }
+			});
+			yield return new WaitUntil(() => task.IsCompleted);
+			
             objLoadingProgress.percentage = LOAD_PHASE_PERC;
             //dataSet.PrintSummary();
         }
