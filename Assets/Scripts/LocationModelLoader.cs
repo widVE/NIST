@@ -115,7 +115,16 @@ public class LocationModelLoader : ObjectImporter
         yield return www.SendWebRequest();
 
         var stream = new MemoryStream(www.downloadHandler.data);
-        yield return loader.LoadAsync(stream, "main", model.transform, false);
+        yield return loader.LoadAsync(stream, false, (loadedObject) =>
+        {
+            loadedObject.name = "main";
+            loadedObject.transform.parent = model.transform;
+
+            modelIsReady = true;
+            NavigationManager.Instance.InitializeNavMesh(loadedObject);
+
+            HeadAttachedText.Instance.EnqueueMessage("Finished loading navigation map", 2.0f);
+        });
     }
 
     public GameObject GetModel()

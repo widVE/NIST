@@ -333,7 +333,7 @@ namespace Dummiesman
             return Load(path, null);
         }
 
-        public IEnumerator LoadAsync(Stream input, string name, Transform parent, bool startActive)
+        public IEnumerator LoadAsync(Stream input, bool startActive, System.Action<GameObject> callbackOnLoaded)
         {
             var reader = new StreamReader(input);
             //var reader = new StringReader(inputReader.ReadToEnd());
@@ -530,9 +530,7 @@ namespace Dummiesman
                 builtObj.transform.SetParent(obj.transform, false);
             }
 
-            obj.name = name;
-            obj.transform.parent = parent;
-            //return obj;
+            callbackOnLoaded(obj);
         }
 
         public void SetDefaultMaterial(Material material)
