@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4720080652705160657}
   - component: {fileID: 5684703719639699586}
+  - component: {fileID: 4984683371140054315}
   m_Layer: 0
   m_Name: Navigation Path Visualizer
   m_TagString: Untagged
@@ -131,3 +132,23 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
+--- !u!114 &4984683371140054315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2749928375326212319}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62993a03297c19d45ab0bf3988c92f15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  navigation_paths:
+    serializedKvps: []
+    dividerPos: 0.33
+  map_path_visualizer: {fileID: 0}
+  path_visualizers:
+    serializedKvps: []
+    dividerPos: 0.33
+  navigation_root: {fileID: 0}
