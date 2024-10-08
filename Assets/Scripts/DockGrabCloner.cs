@@ -60,7 +60,9 @@ public class DockGrabCloner : MonoBehaviour
         
         GameObject volume_map = Instantiate(prefab, spawn_position, quaternion.identity);
 
-        volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
+        //Modifying the scale is inadventently modifying other values, so we don't want that here for now
+        //volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
+        
         volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject.transform.localPosition = new Vector3(0, 0, 0);
         volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map").gameObject.SetActive(false);
 

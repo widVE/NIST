@@ -95,19 +95,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 921069525072559227, guid: 53b7274ec7bf90643b352bf1c7589e26, type: 3}
   m_PrefabInstance: {fileID: 1240311137253472798}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &6198916149854943285
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2161221711680702053}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-6879018561170715169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -150,7 +137,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hostTransform: {fileID: 2161221711680702052}
   manipulationType: 3
-  twoHandedManipulationType: 7
+  twoHandedManipulationType: 3
   allowFarManipulation: 1
   useForcesForNearManipulation: 0
   oneHandRotationModeNear: 0
@@ -335,7 +322,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 2161221711680702053}
-  boundsOverride: {fileID: 6198916149854943285}
+  boundsOverride: {fileID: 0}
   boundsCalculationMethod: 0
   activation: 1
   flattenAxis: 0
@@ -421,6 +408,20 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   elasticsManager: {fileID: 0}
+--- !u!136 &4242290540009840648
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2161221711680702053}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &2744191230848508655 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3973066622457059569, guid: 53b7274ec7bf90643b352bf1c7589e26, type: 3}

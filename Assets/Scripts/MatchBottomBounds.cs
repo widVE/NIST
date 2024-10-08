@@ -57,7 +57,8 @@ public class MatchBottomBounds : MonoBehaviour
             Debug.Log("Difference: " + difference);
 
             //move the object to match to match the source object
-            floored_object.transform.position = new Vector3(floored_object.transform.position.x, floored_object.transform.position.y + difference, floored_object.transform.position.z);
+            Vector3 new_position = new Vector3(floored_object.transform.position.x, floored_object.transform.position.y + difference, floored_object.transform.position.z);
+            floored_object.transform.position = new_position;
         }
     }
 
