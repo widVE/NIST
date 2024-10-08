@@ -47,7 +47,7 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
     GameObject coordinateSystemSource;
 
     [SerializeField]
-    [Tooltip("Update NavMesh using observed spatial awareness meshes.")]
+    [Tooltip("Update NavMesh using observed spatial awareness meshes. This seems to have a performance penalty.")]
     bool updateNavMesh = false;
 
     [SerializeField]

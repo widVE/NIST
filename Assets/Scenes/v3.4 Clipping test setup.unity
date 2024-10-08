@@ -1461,7 +1461,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1539913615}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &49547810
 MonoBehaviour:
@@ -1503,7 +1503,7 @@ MonoBehaviour:
   swapForeground: 0
   shouldWaitForResult: 0
   multiScaleMask: {fileID: 2100000, guid: 7355b87662b03c0419f6402b2766d12c, type: 2}
-  lineRendererMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  lineRendererMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 3}
   contourWidth: 0.02
   blurAcceptanceThreshold: 0.0005
 --- !u!64 &49547811
@@ -9860,7 +9860,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1539913615}
-  m_RootOrder: 12
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &404529391
 MonoBehaviour:
@@ -17243,7 +17243,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1539913615}
-  m_RootOrder: 13
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -18881,7 +18881,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1539913615}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -21437,7 +21437,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1539913615}
-  m_RootOrder: 11
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &925204596
 MonoBehaviour:

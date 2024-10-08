@@ -1000,10 +1000,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9ae7a10b2643704bb9428cb495b3438, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  importAssets: 0
-  importAssetPath: _ImportedOBJ
   loadOnLocationChange: 1
-  loadUpdatedSurfaces: 0
+  loadUpdatedSurfaces: 1
   defaultShader: {fileID: 4800000, guid: 465e84f7c06b44e05a7ae6f3dccab691, type: 3}
 --- !u!1 &6396635237086011973
 GameObject:
@@ -1052,5 +1050,5 @@ MonoBehaviour:
   _headsetManager: {fileID: 0}
   debug: 0
   coordinateSystemSource: {fileID: 0}
-  updateNavMesh: 1
+  updateNavMesh: 0
   uploadVirtualMeshes: 0

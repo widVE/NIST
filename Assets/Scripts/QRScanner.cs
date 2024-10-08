@@ -469,6 +469,11 @@ public class QRScanner : MonoBehaviour
         }
     }
 
+	public string GetLocationId()
+    {
+		return _currentLocationID;
+    }
+
 	public event EventHandler<LocationChangedEventArgs> LocationChanged;
 	
 	public event EventHandler<QRTransformChangedEventArgs> QRTransformChanged;

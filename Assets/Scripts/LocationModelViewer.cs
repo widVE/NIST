@@ -21,11 +21,19 @@ using UnityEngine;
  */
 public class LocationModelViewer : MonoBehaviour
 {
+    private GameObject modelParent = null;
+
     // Store reference to newest GameObject for each surface, keyed on surface ID.
     private Dictionary<string, GameObject> surfaces = new();
 
     void Start()
     {
+        modelParent = new GameObject();
+        modelParent.name = "model";
+        modelParent.transform.parent = transform;
+        modelParent.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+        modelParent.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+
         var model = LocationModelLoader.Instance.GetModel();
         CloneModelComponents(model);
 
@@ -37,27 +45,19 @@ public class LocationModelViewer : MonoBehaviour
 
     private void CloneModelComponents(GameObject model)
     {
-        var clone = Instantiate(model, this.transform);
-
         // Iterate over the components of the object and save a reference to each.
         // For location models, this iterates the individual surfaces, which each have their own surface ID.
-        foreach (Transform tf in clone.transform)
+        foreach (Transform tf in model.transform)
         {
+            var clone = Instantiate(tf.gameObject, modelParent.transform);
+            clone.name = tf.name;
+
             if (surfaces.ContainsKey(tf.name))
             {
-                Debug.Log("Destroy object " + tf.name);
                 Destroy(surfaces[tf.name]);
             }
-            surfaces[tf.name] = tf.gameObject;
-            tf.gameObject.SetActive(true);
+            surfaces[tf.name] = clone;
         }
-
-        // Also create a reference to the parent object. This ensures that for individually loaded
-        // surfaces, we store a reference to the top-level game object, rather than its child.
-        surfaces[model.name] = clone;
-
-        clone.name = model.name;
-        clone.SetActive(true);
     }
 
     // Update is called once per frame
