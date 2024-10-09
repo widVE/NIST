@@ -811,20 +811,25 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         //the key to parsing the array - the text we add here has to match the name of the variable in the array wrapper class (headsets).
         EasyVizAR.HeadsetList headset_list = JsonUtility.FromJson<EasyVizAR.HeadsetList>(result_data);
 
-        // why are we pre-incrementing i???
-        //Only one local headset and we know the ID. Find and spawn local, otherwise remote
-        for (int i = 0; i < headset_list.headsets.Length; ++i)
-        {
-            if (headset_list.headsets[i].id == _local_headset_ID)
-            {
-                Debug.Log("Found Local " + headset_list.headsets[i].id);
+        StartCoroutine(CreateHeadsetsCoroutine(headset_list));
+    }
 
-                CreateLocalHeadset(headset_list.headsets[i]);
+    private IEnumerator CreateHeadsetsCoroutine(EasyVizAR.HeadsetList headsetList)
+    {
+        foreach (var headset in headsetList.headsets)
+        {
+            // Each create call does some pretty heavy object instantiations.
+            // This helps spread out the work across multiple frames to maintain UI responsiveness.
+            yield return null;
+
+            if (headset.id == _local_headset_ID)
+            {
+                Debug.Log("Found Local " + headset.id);
+                CreateLocalHeadset(headset);
             }
             else
             {
-                Debug.Log("No Local " + headset_list.headsets[i].id);
-                CreateRemoteHeadset(headset_list.headsets[i]);
+                CreateRemoteHeadset(headset);
             }
         }
     }

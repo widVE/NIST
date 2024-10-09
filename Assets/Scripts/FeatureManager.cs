@@ -306,13 +306,13 @@ public class FeatureManager : MonoBehaviour
     [ContextMenu("ListFeatures")]
     public void ListFeatures()
     {
-        EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
+        EasyVizARServer.Instance.Get("locations/" + manager.LocationID + "/features?envelope=features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
         //Debug.Log("ListFeatures Called");
     }
 
     public void ListFeaturesFromLocation(string locationID)
     {
-        EasyVizARServer.Instance.Get("locations/" + locationID + "/features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
+        EasyVizARServer.Instance.Get("locations/" + locationID + "/features?envelope=features", EasyVizARServer.JSON_TYPE, ListFeatureCallBack);
     }
 
     void ListFeatureCallBack(string result)
@@ -326,16 +326,9 @@ public class FeatureManager : MonoBehaviour
             }
 
 
-            this.feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList>("{\"features\":" + result + "}");
+            this.feature_list = JsonUtility.FromJson<EasyVizAR.FeatureList>(result);
 
-            //Debug.Log("feature_list length: " + feature_list.features.Length);
-
-            foreach (EasyVizAR.Feature feature in feature_list.features)
-            {
-                // This will add the feature if it is new or update an existing one.
-                //if (!feature_dictionary.ContainsValue(feature))
-                UpdateFeatureFromServer(feature);
-            }
+            StartCoroutine(UpdateFeaturesCoroutine(feature_list));
 
             //disabling the Update()
             isChanged = false;
@@ -344,6 +337,19 @@ public class FeatureManager : MonoBehaviour
         else
         {
             Debug.Log("ERROR: " + result);
+        }
+    }
+
+    private IEnumerator UpdateFeaturesCoroutine(EasyVizAR.FeatureList featureList)
+    {
+        foreach (var feature in featureList.features)
+        {
+            // Each create call does some pretty heavy object instantiations.
+            // This helps spread out the work across multiple frames to maintain UI responsiveness.
+            yield return null;
+
+            // This will add the feature if it is new or update an existing one.
+            UpdateFeatureFromServer(feature);
         }
     }
 
