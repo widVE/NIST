@@ -26,6 +26,9 @@ public class LocationModelLoader : MonoBehaviour
     [Tooltip("Shader to use for rendering the loaded model.")]
     public Shader defaultShader;
 
+    [Tooltip("Display model in editor play mode.")]
+    public bool displayModelInEditor = true;
+
     public event EventHandler<ModelImportedEventArgs> ModelImported;
 
     private GameObject model;
@@ -103,8 +106,14 @@ public class LocationModelLoader : MonoBehaviour
 
     private IEnumerator LoadLocationModel(string locationId)
     {
+#if UNITY_EDITOR
+        bool startActive = displayModelInEditor;
+#else
+        bool startActive = false;
+#endif
+
         string url = $"{urlBase}/locations/{locationId}/model#model.obj";
-        yield return LoadModel(url, false, (loadedObject) =>
+        yield return LoadModel(url, startActive, (loadedObject) =>
         {
             loadedObject.name = locationId;
             loadedObject.transform.parent = transform;
