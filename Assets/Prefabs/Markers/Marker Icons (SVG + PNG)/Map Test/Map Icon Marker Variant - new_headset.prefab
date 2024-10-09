@@ -449,7 +449,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   feature_ID: -1
+  feature_type: 
+  feature_name: 
+  world_position: {x: 0, y: 0, z: 0}
   manager_script: {fileID: 0}
+  displayDistanceInFeet: 1
 --- !u!114 &24541908684011364
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -881,7 +885,6 @@ GameObject:
   - component: {fileID: 7833678100284879075}
   - component: {fileID: 4716764437113378491}
   - component: {fileID: 89999884880821511}
-  - component: {fileID: 3611350869130563013}
   m_Layer: 0
   m_Name: Icon Visuals
   m_TagString: Untagged
@@ -969,26 +972,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.1, y: 0.1, z: 0.1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3611350869130563013
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2764787049799016336}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aef6f8418d9752647bf69e6ab7f32414, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  source_transform: {fileID: 0}
-  find_main_camera: 1
-  copy_x_rotation: 0
-  copy_y_rotation: 1
-  copy_z_rotation: 0
-  verbose: 0
-  rotation_source_name: Main Camera
-  headset_manager_name: EasyVizARHeadsetManager
 --- !u!1 &4402188086708784334
 GameObject:
   m_ObjectHideFlags: 0
@@ -1439,7 +1422,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   feature_ID: -1
+  feature_type: 
+  feature_name: 
+  world_position: {x: 0, y: 0, z: 0}
   manager_script: {fileID: 0}
+  displayDistanceInFeet: 1
 --- !u!114 &4763739793472463593
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1672,33 +1659,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3790148274104345818, guid: 926fb805b03eb2040a9c62b0166977e5, type: 3}
   m_PrefabInstance: {fileID: 1060793965728349495}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &7905472845623964649 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7137453166730415838, guid: 926fb805b03eb2040a9c62b0166977e5, type: 3}
-  m_PrefabInstance: {fileID: 1060793965728349495}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &5797926360966592641
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7905472845623964649}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14cf7a2f492699c4594cd73beb00fc8d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  main_camera: {fileID: 0}
-  camera_position: {x: 0, y: 0, z: 0}
-  feature: {fileID: 5318789042369293505, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
-  feature_map: {fileID: 141735801408490096}
-  icon_visuals: {fileID: 0}
-  is_feet: 1
-  parent: {fileID: 0}
-  old_position: {x: 0, y: 0, z: 0}
-  new_position: {x: 0, y: 0, z: 0}
-  distance: 0
 --- !u!1001 &4196259259429944380
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1825,33 +1785,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3790148274104345818, guid: 926fb805b03eb2040a9c62b0166977e5, type: 3}
   m_PrefabInstance: {fileID: 4196259259429944380}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &6426997611206013666 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7137453166730415838, guid: 926fb805b03eb2040a9c62b0166977e5, type: 3}
-  m_PrefabInstance: {fileID: 4196259259429944380}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1602536662998140870
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6426997611206013666}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14cf7a2f492699c4594cd73beb00fc8d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  main_camera: {fileID: 0}
-  camera_position: {x: 0, y: 0, z: 0}
-  feature: {fileID: 740466347194095177, guid: 769f7f842e5ca21458fc6a42c5ae732c, type: 3}
-  feature_map: {fileID: 4402188086708784334}
-  icon_visuals: {fileID: 0}
-  is_feet: 1
-  parent: {fileID: 0}
-  old_position: {x: 0, y: 0, z: 0}
-  new_position: {x: 0, y: 0, z: 0}
-  distance: 0
 --- !u!1001 &6321304013590900570
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -543,7 +543,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   feature_ID: -1
+  feature_type: 
+  feature_name: 
+  world_position: {x: 0, y: 0, z: 0}
   manager_script: {fileID: 0}
+  displayDistanceInFeet: 1
 --- !u!114 &3952929929657778918
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1105,7 +1109,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   feature_ID: -1
+  feature_type: 
+  feature_name: 
+  world_position: {x: 0, y: 0, z: 0}
   manager_script: {fileID: 0}
+  displayDistanceInFeet: 1
 --- !u!114 &8399394131258562411
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1710,33 +1718,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 926fb805b03eb2040a9c62b0166977e5, type: 3}
---- !u!1 &3312077083037225709 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7137453166730415838, guid: 926fb805b03eb2040a9c62b0166977e5, type: 3}
-  m_PrefabInstance: {fileID: 5691300169896778803}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &7132239816822482889
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3312077083037225709}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14cf7a2f492699c4594cd73beb00fc8d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  main_camera: {fileID: 0}
-  camera_position: {x: 0, y: 0, z: 0}
-  feature: {fileID: 5318789042369293505, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
-  feature_map: {fileID: 5318789042369293505}
-  icon_visuals: {fileID: 0}
-  is_feet: 1
-  parent: {fileID: 0}
-  old_position: {x: 0, y: 0, z: 0}
-  new_position: {x: 0, y: 0, z: 0}
-  distance: 0
 --- !u!224 &8818822813719591145 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3790148274104345818, guid: 926fb805b03eb2040a9c62b0166977e5, type: 3}
@@ -1859,33 +1840,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 926fb805b03eb2040a9c62b0166977e5, type: 3}
---- !u!1 &1833657064476054502 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7137453166730415838, guid: 926fb805b03eb2040a9c62b0166977e5, type: 3}
-  m_PrefabInstance: {fileID: 8826816350615706936}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &2644118241158092942
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1833657064476054502}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14cf7a2f492699c4594cd73beb00fc8d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  main_camera: {fileID: 0}
-  camera_position: {x: 0, y: 0, z: 0}
-  feature: {fileID: 5318789042369293505, guid: 5d89309e5ae48624a9a2f561e4247465, type: 3}
-  feature_map: {fileID: 8444283645387745919}
-  icon_visuals: {fileID: 0}
-  is_feet: 1
-  parent: {fileID: 0}
-  old_position: {x: 0, y: 0, z: 0}
-  new_position: {x: 0, y: 0, z: 0}
-  distance: 0
 --- !u!224 &5685347519559875042 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3790148274104345818, guid: 926fb805b03eb2040a9c62b0166977e5, type: 3}

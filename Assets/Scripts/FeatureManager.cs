@@ -688,7 +688,7 @@ public class FeatureManager : MonoBehaviour
         DeleteFeatureFromServer(feature.id);
         AddFeatureFromServer(feature);
 
-        UnityEngine.Debug.Log("Update is called when feature changed from server");
+        //UnityEngine.Debug.Log("Update is called when feature changed from server");
 
         // Add the name of the feature to DistanceFeatureText.cs 
         //spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("Feature_Text").GetComponent<DistanceFeatureText>().feature_name = feature.name;
