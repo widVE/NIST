@@ -45,6 +45,7 @@ public class LocationModelLoader : MonoBehaviour
     private Dictionary<string, GameObject> surfaces = new();
 
     private OBJLoader loader;
+    private Material defaultMaterial;
 
     // Queue of updated surface IDs to load
     private UniqueQueue<string> updateQueue = new();
@@ -66,9 +67,10 @@ public class LocationModelLoader : MonoBehaviour
         {
             defaultShader = Shader.Find("Graph/Point Surface");
         }
+        defaultMaterial = new Material(defaultShader);
 
         loader = new OBJLoader();
-        loader.SetDefaultMaterial(new Material(defaultShader));
+        loader.SetDefaultMaterial(defaultMaterial);
     }
 
     void Start()
@@ -237,6 +239,36 @@ public class LocationModelLoader : MonoBehaviour
         {
             Destroy(surfaces[surface_id]);
             surfaces.Remove(surface_id);
+        }
+    }
+
+    public void UpdateLocalMesh(string surfaceId, MeshFilter filter)
+    {
+        if (modelIsReady)
+        {
+            if (surfaces.ContainsKey(surfaceId) && surfaces[surfaceId] != null)
+            {
+                Destroy(surfaces[surfaceId]);
+            }
+
+            var obj = new GameObject(surfaceId);
+            obj.transform.parent = model.transform;
+
+            var newFilter = obj.AddComponent<MeshFilter>();
+            newFilter.sharedMesh = filter.sharedMesh;
+
+            var renderer = obj.AddComponent<MeshRenderer>();
+            renderer.material = defaultMaterial;
+
+            surfaces[surfaceId] = obj;
+
+            var eventArgs = new ModelImportedEventArgs()
+            {
+                locationId = locationId,
+                surfaceId = surfaceId,
+                model = obj,
+            };
+            ModelImported?.Invoke(this, eventArgs);
         }
     }
 }

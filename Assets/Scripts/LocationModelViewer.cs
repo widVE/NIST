@@ -45,18 +45,27 @@ public class LocationModelViewer : MonoBehaviour
 
     private void CloneModelComponents(GameObject model)
     {
-        // Iterate over the components of the object and save a reference to each.
-        // For location models, this iterates the individual surfaces, which each have their own surface ID.
-        foreach (Transform tf in model.transform)
+        // Two cases: we are passed a GameObject that contains the MeshFilter directly,
+        // or we are passed a GameObject which is a container for other GameObjects.
+        if (model.GetComponent<MeshFilter>() != null)
         {
-            var clone = Instantiate(tf.gameObject, modelParent.transform);
-            clone.name = tf.name;
+            var clone = Instantiate(model, modelParent.transform);
+            clone.name = model.name;
 
-            if (surfaces.ContainsKey(tf.name))
+            if (surfaces.ContainsKey(model.name))
             {
-                Destroy(surfaces[tf.name]);
+                Destroy(surfaces[model.name]);
             }
-            surfaces[tf.name] = clone;
+            surfaces[model.name] = clone;
+        }
+        else
+        {
+            // Iterate over the components of the object and save a reference to each.
+            // For location models, this iterates the individual surfaces, which each have their own surface ID.
+            foreach (Transform tf in model.transform)
+            {
+                CloneModelComponents(tf.gameObject);
+            }
         }
     }
 

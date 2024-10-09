@@ -178,7 +178,7 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
     }
 
     async void EnqueueMeshUpdate(SpatialAwarenessMeshObject meshObject)
-    {
+    {   
         // Use our observed spatial meshes to update the local NavMesh.
         if (updateNavMesh)
         {
@@ -209,6 +209,11 @@ public class MeshCapture : MonoBehaviour, SpatialAwarenessHandler
             // but perhaps not a good reason to discard the surface data.
             result.SurfaceId = "s" + meshObject.Id.ToString();
         }
+
+        // Pass the mesh over to the LocationModelLoader, so it can be shared with any consumers,
+        // e.g. the volumetric map display. Since the mesh is already loaded as a Unity object,
+        // this should be much faster than bouncing the mesh through the server and reloading.
+        LocationModelLoader.Instance.UpdateLocalMesh(result.SurfaceId, meshObject.Filter);
 
         // AcquireReadOnlyMeshData is supposed to give us a thread-safe data structure.
         // The using block makes sure it is properly cleaned up when we are done.
