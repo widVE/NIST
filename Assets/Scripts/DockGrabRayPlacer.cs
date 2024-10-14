@@ -29,7 +29,7 @@ public class DockGrabRayPlacer : MonoBehaviour
     //spawned at the location the user lets go of the docked object at, has no parent   
     public void SpawnPrefab(GameObject prefab)
     {    
-        wall_map = Instantiate(prefab);
+        wall_map = Instantiate(prefab, spawn_parent_location.transform.position, spawn_parent_location.transform.rotation);
         //set wall_Map's parent to null
         wall_map.transform.SetParent(null);
         this.transform.SetParent(null);

@@ -73,7 +73,6 @@ public class SignManager : MonoBehaviour
     public UnityEngine.Events.UnityAction OnFeatureListReceived;
 
     private FeatureManager featureManager;
-    private NavigationManager navigationManager;
     List<List<Vector3>> _pointCache = new();
 
     private void Awake()
@@ -82,7 +81,6 @@ public class SignManager : MonoBehaviour
 
         InitTypeIcons();        
         featureManager = GameObject.Find("FeatureManager").GetComponent<FeatureManager>();
-        navigationManager = GameObject.Find("NavigationManager").GetComponent<NavigationManager>();
         location = featureManager.LocationName;
         UpdateNavigationSigns();
         RefreshView();
@@ -117,7 +115,7 @@ public class SignManager : MonoBehaviour
     {
         yield return new WaitForSeconds(20);
         OnManipulate();
-        print("Refresh Done");
+        Debug.Log("Refresh Done");
     }
 
     IEnumerator TriggerLayoutRefresh()
@@ -268,10 +266,10 @@ public class SignManager : MonoBehaviour
             var targetPosition =
                 new Vector3(feature.position.x, feature.position.y, feature.position.z);
 
-            if (navigationManager.GetDirection(navigation_root.position, targetPosition, out SignArrowDirection direction))
+            if (NavigationManager.Instance.GetDirection(navigation_root.position, targetPosition, out SignArrowDirection direction))
             {
                 AddFeature(direction, feature, GetTypeIcon(feature.type));
-                print(direction + ":" + feature.name);
+                Debug.Log(direction + ":" + feature.name);
             }
         }
         RefreshView();

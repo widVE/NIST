@@ -29,6 +29,15 @@ public class LocationModelLoader : MonoBehaviour
     [Tooltip("Display model in editor play mode.")]
     public bool displayModelInEditor = true;
 
+    [Tooltip("Minimum time (seconds) between updating navigation mesh. There is a performance impact to running this too often.")]
+    public float updateNavMeshInterval = 60.0f;
+
+    [Tooltip("Minimum number of newly added surfaces before considering updating NavMesh.")]
+    public int newSurfaceThreshold = 8;
+
+    [Tooltip("Minimum number of surface updates (new or updated) before considering updating NavMesh.")]
+    public int updatedSurfaceThreshold = 30;
+
     public event EventHandler<ModelImportedEventArgs> ModelImported;
 
     private GameObject model;
@@ -168,8 +177,6 @@ public class LocationModelLoader : MonoBehaviour
             loadedObject.name = surfaceId;
             loadedObject.transform.parent = surfaces[locationId].transform;
 
-            //NavigationManager.Instance.UpdateNavMesh(loadedObject);
-
             var eventArgs = new ModelImportedEventArgs()
             {
                 locationId = locationId,
@@ -218,6 +225,25 @@ public class LocationModelLoader : MonoBehaviour
         }
     }
 
+    private IEnumerator UpdateNavMesh()
+    {
+        var loopDelay = new WaitForSeconds(updateNavMeshInterval);
+
+        while (true)
+        {
+            if (newSurfaces >= newSurfaceThreshold || updatedSurfaces >= updatedSurfaceThreshold)
+            {
+                // Call InitializeNavMesh instead of UpdateNavMesh because we are completely recomputing it and not just sending the changes.
+                NavigationManager.Instance.InitializeNavMesh(model);
+
+                newSurfaces = 0;
+                updatedSurfaces = 0;
+            }
+
+            yield return loopDelay;
+        }
+    }
+
     public GameObject GetModel()
     {
         return model;
@@ -250,6 +276,11 @@ public class LocationModelLoader : MonoBehaviour
             {
                 Destroy(surfaces[surfaceId]);
             }
+            else
+            {
+                newSurfaces++;
+            }
+            updatedSurfaces++;
 
             var obj = new GameObject(surfaceId);
             obj.transform.parent = model.transform;
