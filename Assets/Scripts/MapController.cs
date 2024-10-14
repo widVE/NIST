@@ -164,6 +164,16 @@ public class MapController : MonoBehaviour
 
         renderer.positionCount = path.points.Length;
         renderer.SetPositions(path.points);
+
+        // Find the minimum Y value among the path points,
+        // and set the line renderer height such that the path lies above the map surface.
+        float minY = 0.0f;
+        foreach (var point in path.points)
+        {
+            if (point.y < minY)
+                minY = point.y;
+        }
+        navigationPathView.transform.localPosition = new Vector3(0.0f, -minY, 0.0f);
     }
 
     //Get list of map layers, and extract the metadata for each layer

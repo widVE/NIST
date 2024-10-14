@@ -284,6 +284,11 @@ public class NavigationManager : MonoBehaviour
         EasyVizARServer.Instance.Put(url, EasyVizARServer.JSON_TYPE, data, delegate (string result)
         {
             // callback for server request
+            if (result != "error")
+            {
+                var resultingPath = JsonUtility.FromJson<EasyVizAR.MapPath>(result);
+                NavigationManager.Instance.UpdateMapPathLineRenderers(resultingPath);
+            } 
         });
 
         return true;

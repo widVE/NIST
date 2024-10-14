@@ -103,7 +103,7 @@ public class Navigation : MonoBehaviour
             var foundPath = UnityEngine.AI.NavMesh.CalculatePath(start, destination_position, UnityEngine.AI.NavMesh.AllAreas, nmPath);
             if (foundPath)
             {
-                NavigationManager.GiveDirectionsToUser(nmPath.corners, location_id, local_headset_id, "#0000ff", "Directions");
+                NavigationManager.GiveDirectionsToUser(nmPath.corners, location_id, local_headset_id, "#0000ff", "Directions to map marker");
             }
             else
             {
