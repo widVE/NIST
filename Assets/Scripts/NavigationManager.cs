@@ -399,22 +399,36 @@ public class NavigationManager : MonoBehaviour
         });
     }
 
-    internal bool GetDirection(Vector3 sourcePosition, Vector3 targetPosition, out SignArrowDirection direction)
+    internal bool GetDirection(Transform sourceTransform, Vector3 targetPosition, out SignArrowDirection direction)
     {
         direction = SignArrowDirection.bottom;
 
         NavMeshPath path = new();
-        if (NavMesh.CalculatePath(sourcePosition, targetPosition, NavMesh.AllAreas, path))
+        if (NavMesh.CalculatePath(sourceTransform.position, targetPosition, NavMesh.AllAreas, path))
         {
-            if (path != null && path.corners.Length >= 2)
+            if (path.corners.Length >= 2)
             {
-                var firstCorner = path.corners[1];
-                Vector3 directionToTarget = firstCorner - sourcePosition;
-                Vector3 normalizedDirection = directionToTarget.normalized;
-                direction = GetDirection(normalizedDirection);
+                // The first point tends to be the projection of the starting point onto the floor.
+                var firstStep = path.corners[0];
+                var nextStep = path.corners[1];
 
-                //Debug_DisplayPath(path.corners);
+                // We could just look at the immediate next point in the path returned by CalculatePath
+                // to determine the next step direction for the sign. However, there could be
+                // some noise due to the rough geometry of the navigation mesh. My idea was to
+                // look a little bit further out, e.g. one meter, to determine the direction.
+                for (int i = 2; i < path.corners.Length; i++)
+                {
+                    var point = path.corners[i];
+                    if (Vector3.Distance(firstStep, point) < 1.0f)
+                        nextStep = point;
+                    else
+                        break;
+                }
 
+                // Get the vector to the path vertex in the local coordinate system of the sign.
+                // This fixes the sign orientation problem.
+                var directionToPoint = sourceTransform.worldToLocalMatrix * nextStep;
+                direction = GetDirection(directionToPoint);
                 return true;
             }
         }
@@ -423,90 +437,33 @@ public class NavigationManager : MonoBehaviour
 
     private SignArrowDirection GetDirection(Vector3 direction)
     {
+        /*
+         * \  a  /
+         *  \ | /
+         *   \|/
+         * d-----c
+         *   /|\
+         *  / | \
+         * /  b  \
+         * 
+         * a: |z| > |x| and z > 0 -> up arrow
+         * b: |z| > |x| and z < 0 -> down arrow
+         * c: |z| < |x| and x > 0 -> right arrow
+         * d: |z| < |x| and x < 0 -> left arrow
+         */
         if (Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
         {
             if (direction.z > 0)
-            {
-                if (direction.x > 0)
-                {
-                    return SignArrowDirection.right;
-                }
-                else
-                {
-                    return SignArrowDirection.left;
-                }
-            }
+                return SignArrowDirection.top;
             else
-            {
                 return SignArrowDirection.bottom;
-            }
         }
         else
         {
             if (direction.x > 0)
-            {
                 return SignArrowDirection.right;
-            }
             else
-            {
                 return SignArrowDirection.left;
-            }
-        }
-    }
-
-    internal bool GetDirectionDegrees(Vector3 sourcePosition, Vector3 targetPosition, Quaternion sign_rotation, out SignArrowDirection direction)
-    {
-        direction = SignArrowDirection.bottom;
-
-        NavMeshPath path = new();
-        if (NavMesh.CalculatePath(sourcePosition, targetPosition, NavMesh.AllAreas, path))
-        {
-            if (path != null && path.corners.Length > 0)
-            {
-                var firstCorner = path.corners[1];
-                Vector3 directionToTarget = firstCorner - sourcePosition;
-                Vector3 normalizedDirection = directionToTarget.normalized;
-                direction = GetDirectionDegrees(normalizedDirection, sign_rotation);
-
-                //Debug_DisplayPath(path.corners);
-
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    private SignArrowDirection GetDirectionDegrees(Vector3 direction, Quaternion sign_rotation)
-    {
-        //I think this works. It's flipped the x and z values axis so it's as if we were looking at it from below, but since the arctan measures from the z axis to the x axis it still sweeps in the same direction and we don't need to worry about offsetting the angle by 90 degrees if we used the z up and x right axis. Still not totally sure, but I think it checks out
-        float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-
-        //this might be a addition or subtraction, not sure, we're trying zero out the sign rotation so we can get the angle in the world space, so think it's subtraction
-        angle -= sign_rotation.eulerAngles.y;
-
-        float right_start = 1f;
-        float right_end = 120f;
-        float bottom_start = 120f;
-        float bottom_end = 240f;
-        float left_start = 240f;
-        float left_end = 359f;
-
-        if (angle >= right_start && angle < right_end)
-        {
-            return SignArrowDirection.right;
-        }
-        else if (angle >= bottom_start && angle < bottom_end)
-        {
-            return SignArrowDirection.bottom;
-        }
-        else if (angle >= left_start || angle < left_end)
-        {
-            return SignArrowDirection.left;
-        }
-        else
-        {
-            return SignArrowDirection.top;
         }
     }
 
