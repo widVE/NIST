@@ -23,6 +23,8 @@ public class MapController : MonoBehaviour
     private EasyVizAR.MapLayerInfoList map_layer_info_list;
     private Dictionary<int,Texture2D> map_layer_images = new Dictionary<int, Texture2D>();
 
+    private EasyVizAR.MapPath currentNavigationPath = null;
+
     public Texture2D[] map_layer_images_array = new Texture2D[10];
     public int texture_index = 0;
 
@@ -35,6 +37,8 @@ public class MapController : MonoBehaviour
     {
         Easy_Viz_Manager = EasyVizARHeadsetManager.EasyVizARManager.gameObject;
         //map_location_ID = currHeadset.GetComponent<EasyVizARHeadsetManager>().LocationID;
+
+        StartCoroutine(UpdateNavigationPathLoop());
     }
 
     private void Awake()
@@ -50,7 +54,7 @@ public class MapController : MonoBehaviour
         map_location_ID = currHeadset.GetComponent<EasyVizARHeadsetManager>().LocationID;
         GetMapImage();
         MapAspectRatioAndOrigin();
-        UpdateNavigationPath();
+        //UpdateNavigationPath();
     }
 
     // Update is called once per frame
@@ -154,26 +158,40 @@ public class MapController : MonoBehaviour
         if (navigationPathView == null)
             return;
 
-        var path = NavigationManager.Instance.GetMyNavigationPath();
-        if (path == null)
-            return;
-
         var renderer = navigationPathView.GetComponent<LineRenderer>();
         if (renderer == null)
             return;
 
-        renderer.positionCount = path.points.Length;
-        renderer.SetPositions(path.points);
-
-        // Find the minimum Y value among the path points,
-        // and set the line renderer height such that the path lies above the map surface.
-        float minY = 0.0f;
-        foreach (var point in path.points)
+        currentNavigationPath = NavigationManager.Instance.GetMyNavigationPath();
+        if (currentNavigationPath == null)
         {
-            if (point.y < minY)
-                minY = point.y;
+            renderer.positionCount = 0;
         }
-        navigationPathView.transform.localPosition = new Vector3(0.0f, -minY, 0.0f);
+        else
+        {
+            renderer.positionCount = currentNavigationPath.points.Length;
+            renderer.SetPositions(currentNavigationPath.points);
+
+            // Find the minimum Y value among the path points,
+            // and set the line renderer height such that the path lies above the map surface.
+            float minY = 0.0f;
+            foreach (var point in currentNavigationPath.points)
+            {
+                if (point.y < minY)
+                    minY = point.y;
+            }
+            navigationPathView.transform.localPosition = new Vector3(0.0f, -minY, 0.0f);
+        }
+    }
+
+    private IEnumerator UpdateNavigationPathLoop()
+    {
+        while (true)
+        {
+            // Wait for a change to the navigation path, then update the line renderer on the map.
+            yield return new WaitUntil(() => { return NavigationManager.Instance.GetMyNavigationPath() != currentNavigationPath; });
+            UpdateNavigationPath();
+        }
     }
 
     //Get list of map layers, and extract the metadata for each layer
