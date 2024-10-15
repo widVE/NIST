@@ -7,14 +7,7 @@ public class VolumeHeadsetLoader : MonoBehaviour
     public GameObject _headsetParent;
     public PathPreview _pathPreview;
 
-    List<EasyVizARHeadset> _activeHeadsets;
-    public EasyVizARHeadsetManager headsetManager_reference; 
     private Dictionary<string, GameObject> spawnedHeadsets = new Dictionary<string, GameObject>();
-
-    private void Awake()
-    {
-        headsetManager_reference = GameObject.Find("MixedRealityPlayspace/AR Managment Axis/EasyVizARHeadsetManager").GetComponent<EasyVizARHeadsetManager>();
-    }
 
     void Start()
     {
@@ -60,9 +53,9 @@ public class VolumeHeadsetLoader : MonoBehaviour
 
     public void UpdateHeadsets()
     {
-        _activeHeadsets = headsetManager_reference._activeHeadsets;
+        var _activeHeadsets = EasyVizARHeadsetManager.EasyVizARManager._activeHeadsets;
 
-        foreach (EasyVizARHeadset headset in _activeHeadsets)
+        foreach (EasyVizARHeadset headset in _activeHeadsets.Values)
         {
             if (!headset.Is_local)
             {
@@ -85,7 +78,7 @@ public class VolumeHeadsetLoader : MonoBehaviour
         List<string> inactiveHeadsets = new List<string>();
         foreach (string headsetID in spawnedHeadsets.Keys)
         {
-            bool isActive = _activeHeadsets.Exists(h => h._headsetID == headsetID);
+            bool isActive = _activeHeadsets.ContainsKey(headsetID);
             if (!isActive)
             {
                 inactiveHeadsets.Add(headsetID);

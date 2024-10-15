@@ -46,7 +46,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     [SerializeField]
     public string _local_headset_ID = "";
 
-    public List<EasyVizARHeadset> _activeHeadsets = new List<EasyVizARHeadset>();
+    public Dictionary<string, EasyVizARHeadset> _activeHeadsets = new();
 
     // TODO we should be able to clear and load the headset list any time a new QR code is scanned, not just the first time
     private bool _headsetsCreated = false;
@@ -310,7 +310,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     public void ToggleBreadcrumbs()
     {
         //For every headset in the active list set the line renderer to the opposite state
-        foreach (EasyVizARHeadset headset_user in _activeHeadsets)
+        foreach (EasyVizARHeadset headset_user in _activeHeadsets.Values)
         {
             //Turns out it's not the line renderer that needs to be disabled to hide the line, it's the entire object
             //holding the lines
@@ -352,7 +352,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
         //For every headset in the active list get it's position and line renderer
         //update the vertical componenet based on the offset relative to the headset position.
-        foreach (EasyVizARHeadset headset_user in _activeHeadsets)
+        foreach (EasyVizARHeadset headset_user in _activeHeadsets.Values)
         {
             //I'm not super sure I'm getting the correct component here. The line renderer is a bit confusing
             //as to how offsets of the parent of the line rendere itself work
@@ -400,7 +400,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
         //For every headset in the active list get it's position and line renderer
         //update the vertical componenet based on the offset relative to the headset position.
-        foreach (EasyVizARHeadset headset_user in _activeHeadsets)
+        foreach (EasyVizARHeadset headset_user in _activeHeadsets.Values)
         {
             //I'm not super sure I'm getting the correct component here. The line renderer is a bit confusing
             //as to how offsets of the parent of the line rendere itself work
@@ -475,7 +475,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         float scaled_slider_value_zero_offset_vertical = slider_value_zero_offset_vertical * scale_factor;
         float scaled_slider_value_zero_offset_horizontal = slider_value_zero_offset_horizontal * scale_factor;
 
-        foreach (EasyVizARHeadset headset_user in _activeHeadsets)
+        foreach (EasyVizARHeadset headset_user in _activeHeadsets.Values)
         {
             //I'm not super sure I'm getting the correct component here. The line renderer is a bit confusing
             //as to how offsets of the parent of the line rendere itself work
@@ -607,7 +607,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         if (headset_class_data != null)
         {
             headset_class_data.AssignValuesFromJson(remote_headset);
-            _activeHeadsets.Add(headset_class_data);
+            _activeHeadsets[headset_class_data._headsetID] = headset_class_data;
         }
     }
 
@@ -627,7 +627,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             //This has to be initialized before the JSON values are assigned 
             headset_class_data.Initialize(remote_headset, map_parent, headsetManager, feature_parent);
 
-            _activeHeadsets.Add(headset_class_data);
+            _activeHeadsets[headset_class_data._headsetID] = headset_class_data;
 
             MarkerObject marker_object = headset_game_object.GetComponent<MarkerObject>();
             if (marker_object is not null)
@@ -681,7 +681,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             //This has to be initialized before the JSON values are assigned 
             headset_class_data.Initialize(remote_headset, volumetricMapParent, headsetManager, feature_parent);
 
-            _activeHeadsets.Add(headset_class_data);
+            _activeHeadsets[headset_class_data._headsetID] = headset_class_data;
 
             MarkerObject marker_object = headset_game_object.GetComponent<MarkerObject>();
             if (marker_object is not null)
@@ -728,13 +728,20 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
     public void UpdateRemoteHeadset(string previous_id, EasyVizAR.Headset remoteHeadset)
     {
-        EasyVizARHeadset matched_headset = _activeHeadsets.Find(find_headset => find_headset._headsetID == previous_id);
+        EasyVizARHeadset matched_headset;
+        _activeHeadsets.TryGetValue(previous_id, out matched_headset);
 
         if (matched_headset == null)
         {
             CreateRemoteHeadset(remoteHeadset);
         }
-        else if (matched_headset.Is_local) return;
+        else if (matched_headset.Is_local)
+        {
+            // We might want some of the updates from the server,
+            // e.g. if the headset icon color or name changed.
+            // However, calling AssignValuesFromJson seems to break something.
+            return;
+        }
         else
         {
             matched_headset.AssignValuesFromJson(remoteHeadset);
@@ -763,36 +770,30 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
     public void DeleteRemoteHeadset(string id)
     {
-        //foreach (var headset in _activeHeadsets)
-        for (int i = 0; i < _activeHeadsets.Count; i++)
+        if (_activeHeadsets.ContainsKey(id))
         {
-            // Definitely should be matching on ID rather than name.--> changed 
-            if (_activeHeadsets[i]._headsetID == id)
+            var headset = _activeHeadsets[id];
+
+            Transform current_headset = headsetManager.transform.Find(id);
+            if (current_headset)
             {
-                //Destroy(_activeHeadsets[i].gameObject); //this wasn't working for some unkn
-                Transform current_headset = headsetManager.transform.Find(_activeHeadsets[i]._headsetID);
-
-                if (current_headset)
-                {
-                    Destroy(current_headset.gameObject);
-                }
-
-                _activeHeadsets.RemoveAt(i);
-                // TODO: if this works, delete the DeleteIcon() from MapIconSpawn.cs
-
-                if (map_parent != null)
-                {
-                    //Debug.Log("the delete name: " + name);
-                    Transform delete_headset = map_parent.transform.Find(_activeHeadsets[i]._headsetID);
-                    if (delete_headset)
-                    {
-                        Debug.Log("Found and Destroyed the headset");
-                        Destroy(delete_headset.gameObject);
-                    }
-                }
-
-                break;
+                Destroy(current_headset.gameObject);
             }
+
+            // TODO: if this works, delete the DeleteIcon() from MapIconSpawn.cs
+
+            if (map_parent != null)
+            {
+                //Debug.Log("the delete name: " + name);
+                Transform delete_headset = map_parent.transform.Find(id);
+                if (delete_headset)
+                {
+                    Debug.Log("Found and Destroyed the headset");
+                    Destroy(delete_headset.gameObject);
+                }
+            }
+
+            _activeHeadsets.Remove(id);
         }
     }
 
@@ -871,8 +872,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                 headset_game_object.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
             }
 
-
-            _activeHeadsets.Add(headset_class_data);
+            _activeHeadsets[headset_class_data._headsetID] = headset_class_data;
         }
         else
         {
@@ -909,7 +909,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                 headset_game_object.transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = _localMaterial;
             }
 
-            _activeHeadsets.Add(headset_class_data);
+            _activeHeadsets[headset_class_data._headsetID] = headset_class_data;
 
             if (map_parent is not null)
             {
@@ -996,5 +996,11 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         EasyVizARServer.Instance.Get("headsets?envelope=headsets&location_id=" + _locationId, EasyVizARServer.JSON_TYPE, CreateHeadsetsCallback);
     }
 
-
+    public EasyVizARHeadset GetLocalHeadsetData()
+    {
+        if (_activeHeadsets.ContainsKey(_local_headset_ID))
+            return _activeHeadsets[_local_headset_ID];
+        else
+            return null;
+    }
 }

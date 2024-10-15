@@ -234,7 +234,7 @@ public class NavigationManager : MonoBehaviour
      * label: Label text for the path. It is recommended to generate meaningful text like "Directions for <headset name>"
      *        or "Directions to <waypoint name>". This text will appear on the dashboard and may be displayed in the headset.
      */
-    public bool GiveDirectionsToUser(Vector3 startPosition, Vector3 endPosition, string locationId, string deviceId, string color, string label)
+    public bool GiveDirectionsToUser(Vector3 startPosition, Vector3 endPosition, string locationId, string deviceId, Color color, string label)
     {
         is_path_found = NavMesh.CalculatePath(startPosition, endPosition, NavMesh.AllAreas, nav_mesh_path);
         if (!is_path_found)
@@ -266,13 +266,13 @@ public class NavigationManager : MonoBehaviour
      * label: Label text for the path. It is recommended to generate meaningful text like "Directions for <headset name>"
      *        or "Directions to <waypoint name>". This text will appear on the dashboard and may be displayed in the headset.
      */
-    public static bool GiveDirectionsToUser(Vector3[] points, string locationId, string deviceId, string color, string label)
+    public static bool GiveDirectionsToUser(Vector3[] points, string locationId, string deviceId, Color color, string label)
     {
         EasyVizAR.NewMapPath mapPath = new();
         mapPath.location_id = locationId;
         mapPath.mobile_device_id = deviceId;
         mapPath.type = "navigation";
-        mapPath.color = color;
+        mapPath.color = "#" + ColorUtility.ToHtmlStringRGB(color);
         mapPath.label = label;
         mapPath.points = points;
 

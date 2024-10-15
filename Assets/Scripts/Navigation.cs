@@ -100,10 +100,18 @@ public class Navigation : MonoBehaviour
             user_target_position.y = destination_position.y;
             user_target_position.z = destination_position.z;
 
+            // Try to match patch color to the assigned headset color
+            Color pathColor;
+            var localHeadset = EasyVizARHeadsetManager.EasyVizARManager.GetLocalHeadsetData();
+            if (localHeadset)
+                pathColor = localHeadset._color;
+            else
+                pathColor = Color.magenta;
+
             var foundPath = UnityEngine.AI.NavMesh.CalculatePath(start, destination_position, UnityEngine.AI.NavMesh.AllAreas, nmPath);
             if (foundPath)
             {
-                NavigationManager.GiveDirectionsToUser(nmPath.corners, location_id, local_headset_id, "#0000ff", "Directions to map marker");
+                NavigationManager.GiveDirectionsToUser(nmPath.corners, location_id, local_headset_id, pathColor, "Directions to map marker");
             }
             else
             {
