@@ -61,8 +61,8 @@ public class Navigation : MonoBehaviour
             UnityEngine.Debug.Log("Navigation: cannot find the icon parent");
         }
         // initializing the line render
-        world_line = GameObject.Find("Main Camera").GetComponent<LineRenderer>();
-        map_line = GameObject.Find("Map Path View").GetComponent<LineRenderer>();
+        world_line = GameObject.Find("Main Camera")?.GetComponent<LineRenderer>();
+        map_line = GameObject.Find("Map Path View")?.GetComponent<LineRenderer>();
 
         if (world_line != null) UnityEngine.Debug.Log("found line renderer!"); 
         

@@ -18,6 +18,9 @@ public class MapController : MonoBehaviour
     public bool mirror_axis = false;
     public string last_clicked_target = "";
 
+    [Tooltip("Map features further away than the culling distance will be hidden or docked on the edge of the map.")]
+    public float featureCullingDistance = 10.0f;
+
     private GameObject Easy_Viz_Manager;
 
     private EasyVizAR.MapLayerInfoList map_layer_info_list;
@@ -55,6 +58,7 @@ public class MapController : MonoBehaviour
 
         // Start this coroutine every time the map is enabled because it automatically stops when the map is hidden.
         StartCoroutine(UpdateNavigationPathLoop());
+        StartCoroutine(UpdateIconCullingLoop());
     }
 
     // Update is called once per frame
@@ -194,6 +198,70 @@ public class MapController : MonoBehaviour
         }
     }
 
+    private IEnumerator UpdateIconCullingLoop()
+    {
+        while (true)
+        {
+            yield return null;
+
+            foreach (Transform feature in iconParent.transform)
+            {
+                yield return null;
+
+                var lineRenderer = feature.GetComponent<LineRenderer>();
+                if (lineRenderer)
+                {
+                    bool active = false;
+
+                    // There is no obvious best way to cull a line renderer.
+                    // We can check the points and decide whether to render the whole path or not.
+                    for (int i = 0; i < lineRenderer.positionCount; i++)
+                    {
+                        var point = lineRenderer.GetPosition(i);
+                        var distance = Vector3.Distance(Camera.main.transform.position, point);
+                        if (distance < featureCullingDistance)
+                        {
+                            active = true;
+                            break;
+                        }
+                    }
+
+                    feature.gameObject.SetActive(active);
+
+                    continue;
+                }
+
+                var markerObject = feature.GetComponent<MarkerObject>();
+                if (markerObject && markerObject.feature_type != "headset")
+                {
+                    var distance = Vector3.Distance(Camera.main.transform.position, markerObject.world_position);
+
+                    if (distance > featureCullingDistance)
+                    {
+                        // Push features outside the culling distance into the margin of the map.
+                        var direction = markerObject.world_position - Camera.main.transform.position;
+                        var position = 1.2f * featureCullingDistance * direction.normalized + Camera.main.transform.position;
+                        feature.localPosition = position;
+                    }
+                    else
+                    {
+                        // Otherwise, leave the feature where it should be.
+                        feature.localPosition = markerObject.world_position;
+                    }
+
+                    continue;
+                }
+
+                // Anything that is not a line renderer or feature marker, e.g. other user headsets, here.
+                {
+                    var distance = Vector3.Distance(Camera.main.transform.position, feature.localPosition);
+                    feature.gameObject.SetActive(distance < 10);
+                    continue;
+                }
+            }
+        }
+    }
+    
     //Get list of map layers, and extract the metadata for each layer
     [ContextMenu("Map Layer Loop Test")]
     void ImageLoopTest()
@@ -270,6 +338,4 @@ public class MapController : MonoBehaviour
     {
         throw new NotImplementedException();
     }
-
-
 }

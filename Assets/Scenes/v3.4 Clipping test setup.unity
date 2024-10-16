@@ -20400,6 +20400,7 @@ MonoBehaviour:
   verbose_debug: 1
   mirror_axis: 1
   last_clicked_target: 
+  featureCullingDistance: 10
   map_layer_images_array:
   - {fileID: 0}
   - {fileID: 0}
@@ -30225,6 +30226,7 @@ MonoBehaviour:
   verbose_debug: 0
   mirror_axis: 0
   last_clicked_target: 
+  featureCullingDistance: 10
   map_layer_images_array:
   - {fileID: 0}
   - {fileID: 0}
@@ -38587,6 +38589,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1415802458275241382, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: renderers.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1415802458275241382, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: renderers.Array.data[0]
       value: 
       objectReference: {fileID: 1659198086}
@@ -38594,6 +38600,10 @@ PrefabInstance:
       propertyPath: renderers.Array.data[1]
       value: 
       objectReference: {fileID: 1141096525}
+    - target: {fileID: 1415802458275241382, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: renderers.Array.data[2]
+      value: 
+      objectReference: {fileID: 1810665670}
     - target: {fileID: 1492607365016697350, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
@@ -39032,6 +39042,11 @@ GameObject:
 --- !u!1 &1810665669 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 622476188437637769, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+  m_PrefabInstance: {fileID: 1810665664}
+  m_PrefabAsset: {fileID: 0}
+--- !u!120 &1810665670 stripped
+LineRenderer:
+  m_CorrespondingSourceObject: {fileID: 6963556928545528350, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
   m_PrefabInstance: {fileID: 1810665664}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1813667874
