@@ -37,8 +37,6 @@ public class MapController : MonoBehaviour
     {
         Easy_Viz_Manager = EasyVizARHeadsetManager.EasyVizARManager.gameObject;
         //map_location_ID = currHeadset.GetComponent<EasyVizARHeadsetManager>().LocationID;
-
-        StartCoroutine(UpdateNavigationPathLoop());
     }
 
     private void Awake()
@@ -54,7 +52,9 @@ public class MapController : MonoBehaviour
         map_location_ID = currHeadset.GetComponent<EasyVizARHeadsetManager>().LocationID;
         GetMapImage();
         MapAspectRatioAndOrigin();
-        //UpdateNavigationPath();
+
+        // Start this coroutine every time the map is enabled because it automatically stops when the map is hidden.
+        StartCoroutine(UpdateNavigationPathLoop());
     }
 
     // Update is called once per frame
