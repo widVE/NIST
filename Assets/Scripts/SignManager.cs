@@ -141,7 +141,7 @@ public class SignManager : MonoBehaviour
         locationLabel.text = location;
         levelLabel.text = levelIndex.ToString();
 
-        //TryAddFeatureByDirection(Dir.top);
+        TryAddFeatureByDirection(SignArrowDirection.top);
         TryAddFeatureByDirection(SignArrowDirection.left);
         TryAddFeatureByDirection(SignArrowDirection.right);
         TryAddFeatureByDirection(SignArrowDirection.bottom);

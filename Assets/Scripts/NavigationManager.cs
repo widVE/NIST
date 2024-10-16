@@ -427,7 +427,7 @@ public class NavigationManager : MonoBehaviour
 
                 // Get the vector to the path vertex in the local coordinate system of the sign.
                 // This fixes the sign orientation problem.
-                var directionToPoint = sourceTransform.worldToLocalMatrix * nextStep;
+                var directionToPoint = sourceTransform.InverseTransformVector(nextStep - firstStep);
                 direction = GetDirection(directionToPoint);
                 return true;
             }
