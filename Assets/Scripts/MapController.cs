@@ -57,7 +57,8 @@ public class MapController : MonoBehaviour
         MapAspectRatioAndOrigin();
 
         // Start this coroutine every time the map is enabled because it automatically stops when the map is hidden.
-        StartCoroutine(UpdateNavigationPathLoop());
+        // The map path is now updated by the UpdateIconCullingLoop coroutine, so we only need the one coroutine.
+        //StartCoroutine(UpdateNavigationPathLoop());
         StartCoroutine(UpdateIconCullingLoop());
     }
 
@@ -173,18 +174,64 @@ public class MapController : MonoBehaviour
         }
         else
         {
-            renderer.positionCount = currentNavigationPath.points.Length;
-            renderer.SetPositions(currentNavigationPath.points);
-
-            // Find the minimum Y value among the path points,
-            // and set the line renderer height such that the path lies above the map surface.
-            float minY = 0.0f;
-            foreach (var point in currentNavigationPath.points)
+            bool[] include = new bool[currentNavigationPath.points.Length];
+            int includeCount = 0;
+            for (int i = 0; i < include.Length; i++)
             {
-                if (point.y < minY)
-                    minY = point.y;
+                var point = currentNavigationPath.points[i];
+                var distance = Vector3.Distance(Camera.main.transform.position, point);
+                if (distance < featureCullingDistance)
+                {
+                    include[i] = true;
+                    includeCount++;
+                }
             }
-            navigationPathView.transform.localPosition = new Vector3(0.0f, -minY, 0.0f);
+
+            // This step finds places where the path transitions between visible and non-visible,
+            // then marks an extra point as visible. The result is that the closest point which
+            // should be culled is still rendered, giving the user a visual indication that the
+            // the path continues beyond what is currently shown.
+            for (int i = 1; i < include.Length; i++)
+            {
+                if (include[i] && !include[i-1])
+                {
+                    include[i - 1] = true;
+                    includeCount++;
+                }
+            }
+            for (int i = include.Length-2; i > 0; i--)
+            {
+                if (include[i] && !include[i+1])
+                {
+                    include[i + 1] = true;
+                    includeCount++;
+                }
+            }
+
+            renderer.positionCount = includeCount;
+            if (includeCount > 0)
+            {
+                float minY = 0.0f;
+                int j = 0;
+
+                for (int i = 0; i < include.Length && j < includeCount; i++)
+                {
+                    if (include[i])
+                    {
+                        var point = currentNavigationPath.points[i];
+
+                        if (point.y < minY)
+                            minY = point.y;
+
+                        renderer.SetPosition(j, point);
+                        j++;
+                    }
+                }
+
+                // Find the minimum Y value among the path points,
+                // and set the line renderer height such that the path lies above the map surface.
+                navigationPathView.transform.localPosition = new Vector3(0.0f, -minY, 0.0f);
+            }
         }
     }
 
@@ -204,6 +251,8 @@ public class MapController : MonoBehaviour
         {
             yield return null;
 
+            UpdateNavigationPath();
+
             foreach (Transform feature in iconParent.transform)
             {
                 yield return null;
@@ -211,23 +260,7 @@ public class MapController : MonoBehaviour
                 var lineRenderer = feature.GetComponent<LineRenderer>();
                 if (lineRenderer)
                 {
-                    bool active = false;
-
-                    // There is no obvious best way to cull a line renderer.
-                    // We can check the points and decide whether to render the whole path or not.
-                    for (int i = 0; i < lineRenderer.positionCount; i++)
-                    {
-                        var point = lineRenderer.GetPosition(i);
-                        var distance = Vector3.Distance(Camera.main.transform.position, point);
-                        if (distance < featureCullingDistance)
-                        {
-                            active = true;
-                            break;
-                        }
-                    }
-
-                    feature.gameObject.SetActive(active);
-
+                    // The map path line renderer is updated by the call to UpdateNavigationPath, so we can skip it here.
                     continue;
                 }
 
