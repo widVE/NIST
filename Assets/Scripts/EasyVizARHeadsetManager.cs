@@ -47,6 +47,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     public string _local_headset_ID = "";
 
     public Dictionary<string, EasyVizARHeadset> _activeHeadsets = new();
+    private EasyVizAR.Headset _localHeadsetData = null;
 
     // TODO we should be able to clear and load the headset list any time a new QR code is scanned, not just the first time
     private bool _headsetsCreated = false;
@@ -175,6 +176,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             if (h.id == _local_headset_ID)
             {
                 if (verbose_debug_log) Debug.Log("Registraiton ID is on server");
+
+                _localHeadsetData = h;
 
                 // Tell the server the headset is moving to a new location (create a check-in or aka device tracking session).
                 // We do not need to do this when we register a new headset because we pass the location ID during registration,
@@ -817,21 +820,32 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
     private IEnumerator CreateHeadsetsCoroutine(EasyVizAR.HeadsetList headsetList)
     {
+        bool found_local = false;
+
         foreach (var headset in headsetList.headsets)
         {
-            // Each create call does some pretty heavy object instantiations.
-            // This helps spread out the work across multiple frames to maintain UI responsiveness.
-            yield return null;
-
             if (headset.id == _local_headset_ID)
             {
                 Debug.Log("Found Local " + headset.id);
                 CreateLocalHeadset(headset);
+                found_local = true;
             }
             else
             {
                 CreateRemoteHeadset(headset);
             }
+
+            // Each create call does some pretty heavy object instantiations.
+            // This helps spread out the work across multiple frames to maintain UI responsiveness.
+            yield return null;
+        }
+
+        // When moving to a different location from the headset's previous check in,
+        // it is possible that the local headset is not yet present
+        // in the list of headsets at that location.
+        if (!found_local && _localHeadsetData != null)
+        {
+            CreateLocalHeadset(_localHeadsetData);
         }
     }
 
