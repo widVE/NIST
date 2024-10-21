@@ -101,9 +101,9 @@ MonoBehaviour:
   onManipulationStarted:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: DockGrabCloner, Assembly-CSharp
-        m_MethodName: SpawnObject
+      - m_Target: {fileID: 5463296847387414751}
+        m_TargetAssemblyTypeName: DockGrabRayPlacer, Assembly-CSharp
+        m_MethodName: SpawnDockedObject
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 9178323556240901071}
@@ -113,23 +113,47 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onManipulationEnded:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: DockGrabCloner, Assembly-CSharp
-        m_MethodName: SpawnVolumetricMap
+      - m_Target: {fileID: 5463296847387414751}
+        m_TargetAssemblyTypeName: DockGrabRayPlacer, Assembly-CSharp
+        m_MethodName: HierarchyBreakout
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 5463296847387414751}
+        m_TargetAssemblyTypeName: DockGrabRayPlacer, Assembly-CSharp
+        m_MethodName: SpawnPrefab
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 1477525487126966760, guid: f092c3d5b805f314f8fa72f551450e8b, type: 3}
+          m_ObjectArgument: {fileID: 641596521692892201, guid: b1bc097573b8f404b98a967dfb6872e9, type: 3}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: DockGrabCloner, Assembly-CSharp
+  onManipulationEnded:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5463296847387414751}
+        m_TargetAssemblyTypeName: DockGrabRayPlacer, Assembly-CSharp
+        m_MethodName: StopWallfindingInChildren
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 5463296847387414751}
+        m_TargetAssemblyTypeName: DockGrabRayPlacer, Assembly-CSharp
         m_MethodName: DestroyObject
         m_Mode: 1
         m_Arguments:
@@ -173,8 +197,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawn_parent_location: {fileID: 0}
-  docked_object_prefab: {fileID: 0}
-  wall_finder_prefab: {fileID: 0}
+  docked_object_prefab: {fileID: 9178323556240901071}
+  wall_finder_prefab: {fileID: 641596521692892201, guid: 2dc8e38d3b8cdad45abfcab307e96c39, type: 3}
 --- !u!64 &1174607744732693159
 MeshCollider:
   m_ObjectHideFlags: 0

@@ -45,6 +45,13 @@ public class DockGrabCloner : MonoBehaviour
         docked_object.transform.SetParent(spawn_parent_location.transform);
     }
 
+    //If the docked object is still a child of the hand its docked to it must be detached otherwise if the dock hand goes out of tracking range the object will malfunciton
+    public void HierarchyBreakout()
+    {
+        //detach the docked object from the parent
+        this.transform.parent = null;
+    }
+
     //spawned at the location the user lets go of the docked object at, has no parent   
     public void SpawnVolumetricMap(GameObject prefab)
     {  

@@ -7,11 +7,12 @@ public class ActivateOnManipulation : MonoBehaviour
 
     public GameObject activated_sign;
     public GameObject preveiw_sign;
+    public float time_to_activate = 2f;
 
     public void Awake()
     {
         //invoke toggleactivea fter a 1 second delay
-        Invoke("ToggleActive", 5f);
+        Invoke("ToggleActive", time_to_activate);
     }
 
     public void ToggleActive()
