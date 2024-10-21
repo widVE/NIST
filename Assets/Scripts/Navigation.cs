@@ -58,13 +58,16 @@ public class Navigation : MonoBehaviour
 
         if (!markerSpawnParent)
         {
-            UnityEngine.Debug.Log("Navigation: cannot find the icon parent");
+            UnityEngine.Debug.LogWarning("Navigation: cannot find the icon parent");
         }
         // initializing the line render
         world_line = GameObject.Find("Main Camera")?.GetComponent<LineRenderer>();
         map_line = GameObject.Find("Map Path View")?.GetComponent<LineRenderer>();
 
-        if (world_line != null) UnityEngine.Debug.Log("found line renderer!"); 
+        if (world_line == null) 
+        {
+            UnityEngine.Debug.LogWarning("Navigation: cannot find the line renderer");
+        }
         
         world_line.positionCount = 0; // this is hard coded for now.
         waypoints = new Transform[2];

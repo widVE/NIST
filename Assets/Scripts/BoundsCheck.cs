@@ -5,23 +5,16 @@ using UnityEngine;
 public class BoundsCheck : MonoBehaviour
 {
     public GameObject culler;
-    public GameObject moveable_map;
-    Collider culling_box_collider;
-    Collider map_Collider;
-    Collider culler_Collider;
-    GameObject volumetric_map;
-    GameObject headsets;
-    GameObject features;
+    public GameObject volumetric_map;
+    Renderer culler_renderer;
+
+    bool map_shrunk = false;
+
 
     void Start()
     {
-        //Fetch the Collider from the GameObject this script is attached to
-        culling_box_collider = GetComponent<Collider>();
-        culler_Collider = culler.GetComponent<Collider>();
-        
-        volumetric_map = moveable_map;
-        features = moveable_map.transform.Find("features").gameObject;
-        headsets = moveable_map.transform.Find("headsets").gameObject;
+        //Fetch the Collider from the GameObject that does the culling
+        culler_renderer = culler.GetComponent<Renderer>();
 
         //call RndererBoundsCheck every 0.1 seconds
         InvokeRepeating("RendererBoundsCheck", 0.5f, 0.1f);
@@ -29,77 +22,54 @@ public class BoundsCheck : MonoBehaviour
 
     private void RendererBoundsCheck()
     {
+        //This operates on all the renderers in the volumetric map hierarchy, not just the 3d map segments, so this includes the markers and headsets too
         Renderer[] volumetric_map_renderers = volumetric_map.GetComponentsInChildren<Renderer>();
 
         foreach (Renderer map_visuals_renderer in volumetric_map_renderers)
         {
             //If the first GameObject's Bounds contains the Transform's position, output a message in the console
-            if (culler_Collider.bounds.Contains(map_visuals_renderer.bounds.center))
+            if (culler_renderer.bounds.Contains(map_visuals_renderer.bounds.center))
             {
                 map_visuals_renderer.enabled = true;
             }
-            else
+            else 
             {
                 map_visuals_renderer.enabled = false;
             }
         }
-
-
-        //foreach (Transform child in volumetric_map.transform)
-        //{
-
-        //    Renderer rend = child.GetComponent<Renderer>();
-        //    //If the first GameObject's Bounds contains the Transform's position, output a message in the console
-        //    if (culling_box_collider.bounds.Contains(rend.bounds.center) || culler_Collider.bounds.Contains(rend.bounds.center))
-        //    {
-        //        rend.enabled = true;
-        //    }
-        //    else
-        //    {
-        //        rend.enabled = false;
-        //    }
-        //}
-
-        //foreach (Transform feature in features.transform)
-        //{
-        //    Renderer rend = feature.transform.Find("Icon Visuals").GetComponent<MeshRenderer>();
-        //    Renderer text_rend = feature.transform.Find("Feature_Text").GetComponent<MeshRenderer>();
-        //    if (rend == null || text_rend == null)
-        //    {
-        //        Debug.Log("feature renderer is null");
-        //    }
-        //    if (culling_box_collider.bounds.Contains(rend.bounds.center) || culler_Collider.bounds.Contains(rend.bounds.center))
-        //    {
-        //        rend.enabled = true;
-        //        text_rend.enabled = true;
-        //    }
-        //    else
-        //    {
-        //        rend.enabled = false;
-        //        text_rend.enabled = false;
-        //    }
-
-        //}
-
-        //foreach (Transform headset in headsets.transform)
-        //{
-        //    Renderer rend = headset.transform.Find("Capsule").GetComponent<MeshRenderer>();
-        //    Renderer text_rend = headset.transform.Find("Feature_Text").GetComponent<MeshRenderer>();
-        //    if (rend == null || text_rend == null)
-        //    {
-        //        Debug.Log("feature renderer is null");
-        //    }
-        //    if (culling_box_collider.bounds.Contains(rend.bounds.center) || culler_Collider.bounds.Contains(rend.bounds.center))
-        //    {
-        //        rend.enabled = true;
-        //        text_rend.enabled = true;
-        //    }
-        //    else
-        //    {
-        //        rend.enabled = false;
-        //        text_rend.enabled = false;
-        //    }
-
-        //}
     }
+
+    // This function will autofit the local scale of the volumetric map to be encompassed by the culler renderer
+    public void AutofitVolumetricMap()
+    {
+        // Get the bounds of the culler renderer
+        Bounds culler_bounds = culler_renderer.bounds;
+
+        // Get the bounds of the volumetric map
+        Renderer[] volumetric_map_renderers = volumetric_map.GetComponentsInChildren<Renderer>();
+
+        //set the object_bounds to the first renderer's bounds and grow the bounds to encapsulate all the renderers
+        Bounds map_visual_bounds = volumetric_map_renderers[0].bounds;
+
+        foreach (Renderer object_renderer in volumetric_map_renderers)
+        {
+            map_visual_bounds.Encapsulate(object_renderer.bounds);
+        }
+
+        // Calculate the scale factor for each axis!!! DON"T APPLY THIS TO ALL THE AXIS, Only use the smallest scale factor and uniformlay scale the map, otherwise each axis will be scaled differently
+        float scaleX = culler_bounds.size.x / map_visual_bounds.size.x;
+        float scaleY = culler_bounds.size.y / map_visual_bounds.size.y;
+        float scaleZ = culler_bounds.size.z / map_visual_bounds.size.z;
+
+        // Apply the scale factor of the smallest factor uniformaly to the volumetric map only if the map has not been shrunk already
+        if (!map_shrunk)
+        {
+            float scale_factor = Mathf.Min(scaleX, scaleY, scaleZ);
+            volumetric_map.transform.localScale = new Vector3(scale_factor, scale_factor, scale_factor);
+            map_shrunk = true;
+        }
+        
+    }
+
+
 }
