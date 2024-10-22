@@ -16,6 +16,9 @@ class MeshData
 
 public class NavigationManager : MonoBehaviour
 {
+    [Tooltip("Show paths intended for other users. This potentially clutters the view.")]
+    public bool showOtherUsersPaths = false;
+
     // One of these can be set in the editor to load a mesh at startup.
     // They can also be altered during runtime by calling UpdateNavMesh.
     public GameObject local_mesh_testing;
@@ -325,7 +328,6 @@ public class NavigationManager : MonoBehaviour
         }
 
         EasyVizARServer.Instance.TryGetHeadsetID(out string myDeviceId);
-
         if (path.type == "navigation" && path.mobile_device_id == myDeviceId)
         {
             // If this is a navigation path intended for me, then show the nice color gradient.
@@ -356,6 +358,10 @@ public class NavigationManager : MonoBehaviour
             lr.sortingOrder = -1000;
         }
 
+        // Disable lines intended for other uses unless that feature is enabled.
+        // A null value for path.mobile_device_id means the path is intended for everyone.
+        bool active = (path.mobile_device_id == "" || path.mobile_device_id == myDeviceId || showOtherUsersPaths);
+        lr.gameObject.SetActive(active);
         lr.positionCount = path.points.Length;
         lr.SetPositions(path.points);
     }
