@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.XR.CoreUtils;
 using UnityEngine;
 
 public class BoundsCheck : MonoBehaviour
@@ -28,7 +29,7 @@ public class BoundsCheck : MonoBehaviour
         foreach (Renderer map_visuals_renderer in volumetric_map_renderers)
         {
             //If the first GameObject's Bounds contains the Transform's position, output a message in the console
-            if (culler_renderer.bounds.Contains(map_visuals_renderer.bounds.center))
+            if (culler_renderer.bounds.ContainsCompletely(map_visuals_renderer.bounds))
             {
                 map_visuals_renderer.enabled = true;
             }
