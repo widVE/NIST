@@ -14,7 +14,7 @@ PlayerSettings:
   accelerometerFrequency: 60
   companyName: UW-Madison
   productName: EasyVizAR
-  defaultCursor: {fileID: 0}
+  defaultCursor: {fileID: 2800000, guid: 80029825b1d5883488d98f7f6acb7fb0, type: 3}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
   m_ShowUnitySplashScreen: 1
@@ -249,8 +249,6 @@ PlayerSettings:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: 8880289550110572756, guid: 83d1380544b4b094d815fc57648a9999, type: 2}
-  - {fileID: -7989831385245197106, guid: 5f5776f591d9edd4c8c0ffc2a876792f, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -699,7 +697,9 @@ PlayerSettings:
     Android: 1
     iPhone: 1
     tvOS: 1
-  m_BuildTargetGroupLightmapEncodingQuality: []
+  m_BuildTargetGroupLightmapEncodingQuality:
+  - m_BuildTarget: Windows Store Apps
+    m_EncodingQuality: 2
   m_BuildTargetGroupLightmapSettings: []
   m_BuildTargetNormalMapEncoding: []
   m_BuildTargetDefaultTextureCompressionFormat: []
@@ -978,13 +978,25 @@ PlayerSettings:
   metroCertificatePassword: 
   metroCertificateSubject: UW-Madison
   metroCertificateIssuer: UW-Madison
-  metroCertificateNotAfter: 802cf0695c32dc01
+  metroCertificateNotAfter: 0069ebdf6645dc01
   metroApplicationDescription: Template_3D
-  wsaImages: {}
-  metroTileShortName: NIST AR December 2023
+  wsaImages:
+    65636: Assets/Images/NIST Logo Launch 50x50.png
+    65936: Assets/Images/NIST Logo Launch 200x200.png
+    131272: Assets/Images/NIST Logo Launch 1240x600.png
+    2031640: Assets/Images/NIST Logo Launch 24x24.png
+    2031716: Assets/Images/NIST Logo Launch 44x44.png
+    2031816: Assets/Images/NIST Logo Launch 88x88.png
+    2097252: Assets/Images/NIST Logo Launch 71x71.png
+    2097352: Assets/Images/NIST Logo Launch 142x142.png
+    2162788: Assets/Images/NIST Logo Launch 150x150.png
+    2162888: Assets/Images/NIST Logo Launch 300x300.png
+    2228324: Assets/Images/NIST Logo Launch 310x310.png
+    2293960: Assets/Images/NIST Logo Launch 620x300.png
+  metroTileShortName: EasyVizAR
   metroTileShowName: 0
-  metroMediumTileShowName: 0
-  metroLargeTileShowName: 0
+  metroMediumTileShowName: 1
+  metroLargeTileShowName: 1
   metroWideTileShowName: 0
   metroSupportStreamingInstall: 0
   metroLastRequiredScene: 0
