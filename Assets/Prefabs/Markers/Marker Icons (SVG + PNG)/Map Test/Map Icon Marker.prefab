@@ -1452,7 +1452,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2070291447063185073, guid: b20573eb9bf8a914882fa4a571d2e8dc, type: 3}
       propertyPath: enforceFrontPush
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2070291447063185073, guid: b20573eb9bf8a914882fa4a571d2e8dc, type: 3}
       propertyPath: TouchBegin.m_PersistentCalls.m_Calls.Array.size
