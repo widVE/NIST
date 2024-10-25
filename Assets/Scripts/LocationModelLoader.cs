@@ -285,6 +285,9 @@ public class LocationModelLoader : MonoBehaviour
             var obj = new GameObject(surfaceId);
             obj.transform.parent = model.transform;
 
+            // Flip locally generated surfaces to be consistent with all of the surfaces loaded from remote OBJ file(s).
+            obj.transform.localScale = new Vector3(-1.0f, 1.0f, 1.0f);
+
             var newFilter = obj.AddComponent<MeshFilter>();
             newFilter.sharedMesh = filter.sharedMesh;
 

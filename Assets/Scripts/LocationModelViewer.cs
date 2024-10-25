@@ -21,6 +21,9 @@ using UnityEngine;
  */
 public class LocationModelViewer : MonoBehaviour
 {
+    [Tooltip("Invert the X axis of loaded models. Generally, this will be expected for OBJ files.")]
+    public bool invertXAxis = true;
+
     private GameObject modelParent = null;
 
     // Store reference to newest GameObject for each surface, keyed on surface ID.
@@ -32,7 +35,7 @@ public class LocationModelViewer : MonoBehaviour
         modelParent.name = "model";
         modelParent.transform.parent = transform;
         modelParent.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
-        modelParent.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+        modelParent.transform.localScale = new Vector3(invertXAxis ? -1.0f : 1.0f, 1.0f, 1.0f);
 
         var model = LocationModelLoader.Instance.GetModel();
         CloneModelComponents(model);
