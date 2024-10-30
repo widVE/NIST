@@ -1684,32 +1684,40 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1508432857404783680, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
-      propertyPath: onManipulationStarted.m_PersistentCalls.m_Calls.Array.size
-      value: 2
+      propertyPath: onManipulationEnded.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1508432857404783680, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
-      propertyPath: onManipulationStarted.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
-      value: 1
+      propertyPath: onManipulationEnded.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1508432857404783680, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
       propertyPath: onManipulationStarted.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
       objectReference: {fileID: 841914341}
     - target: {fileID: 1508432857404783680, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
-      propertyPath: onManipulationStarted.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
-      value: 2
+      propertyPath: onManipulationEnded.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: DestroyObject
       objectReference: {fileID: 0}
     - target: {fileID: 1508432857404783680, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
-      propertyPath: onManipulationStarted.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
-      value: HierarchyBreakout
+      propertyPath: onManipulationEnded.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: SpawnVolumetricMap
       objectReference: {fileID: 0}
     - target: {fileID: 1508432857404783680, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
-      propertyPath: onManipulationStarted.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
-      value: DockGrabCloner, Assembly-CSharp
+      propertyPath: onManipulationEnded.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 1508432857404783680, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
-      propertyPath: onManipulationStarted.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      propertyPath: onManipulationEnded.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgument
+      value: 
+      objectReference: {fileID: 1477525487126966760, guid: f092c3d5b805f314f8fa72f551450e8b, type: 3}
+    - target: {fileID: 1508432857404783680, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
+      propertyPath: onManipulationEnded.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 1508432857404783680, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
+      propertyPath: onManipulationEnded.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 1508432857404783686, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
       propertyPath: headset_reference
@@ -1873,6 +1881,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8544219536940641527, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9031315204444651033, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

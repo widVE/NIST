@@ -5208,10 +5208,6 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7640376648336076714, guid: 9f2a499e3c1d3be48a80500ae6f5a8e0, type: 3}
-      propertyPath: onManipulationStarted.m_PersistentCalls.m_Calls.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7640376648336076714, guid: 9f2a499e3c1d3be48a80500ae6f5a8e0, type: 3}
       propertyPath: onManipulationEnded.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
       value: 2
       objectReference: {fileID: 0}
@@ -5235,6 +5231,10 @@ PrefabInstance:
       propertyPath: onManipulationStarted.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1508432857404783686}
+    - target: {fileID: 7640376648336076714, guid: 9f2a499e3c1d3be48a80500ae6f5a8e0, type: 3}
+      propertyPath: onManipulationStarted.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7640376648336076714, guid: 9f2a499e3c1d3be48a80500ae6f5a8e0, type: 3}
       propertyPath: onManipulationEnded.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2

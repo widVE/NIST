@@ -97,7 +97,8 @@ public class DockGrabCloner : MonoBehaviour
     // Destroy this object
     public void DestroyObject()
     {
-        Destroy(this.gameObject);
+        GameObject docked_object = this.gameObject;
+        Destroy(docked_object);
     }
 
 
