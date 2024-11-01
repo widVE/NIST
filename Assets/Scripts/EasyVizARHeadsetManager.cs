@@ -845,6 +845,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         // in the list of headsets at that location.
         if (!found_local && _localHeadsetData != null)
         {
+            // Make sure we pass along the correct location ID which we just received from the QR Scanner.
+            _localHeadsetData.location_id = _locationId;
             CreateLocalHeadset(_localHeadsetData);
         }
     }
