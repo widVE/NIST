@@ -33,9 +33,16 @@ public class BoundsCheck : MonoBehaviour
             {
                 map_visuals_renderer.enabled = true;
             }
-            else 
+            else
             {
-                map_visuals_renderer.enabled = false;
+                if (map_visuals_renderer is LineRenderer)
+                {
+                    map_visuals_renderer.enabled = true;
+                }
+                else
+                {
+                    map_visuals_renderer.enabled = false;
+                }
             }
         }
     }
