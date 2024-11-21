@@ -274,7 +274,7 @@ public class EasyVizARHeadset : MonoBehaviour
         
 		if (cur_headset)
         {
-			cur_headset.Find("Capsule").GetComponent<Renderer>().material.color = newColor;
+			cur_headset.Find("Visual").GetComponent<Renderer>().material.color = newColor;
         }
         else
 		{

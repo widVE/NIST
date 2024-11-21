@@ -30,10 +30,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1284782531699778849}
+  - {fileID: 2955154939740706361}
   - {fileID: 502451607366571222}
   - {fileID: 7113539944382149637}
-  - {fileID: 2955154939740706361}
+  - {fileID: 1284782531699778849}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -63,7 +63,6 @@ MonoBehaviour:
   local_headset_id: 
   feature_parent: {fileID: 0}
   navigation_line: {fileID: 0}
-  pathPreview: {fileID: 0}
 --- !u!114 &6077780464579907565
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,7 +111,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 921069525072559226}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3973066622457059569
 MonoBehaviour:
@@ -129,6 +128,7 @@ MonoBehaviour:
   local_nav_reference: {fileID: 0}
   headset_reference: {fileID: 0}
   headsetManager_reference: {fileID: 0}
+  pathPreview: {fileID: 0}
 --- !u!1 &6732124109696385241
 GameObject:
   m_ObjectHideFlags: 0
@@ -313,7 +313,7 @@ GameObject:
   - component: {fileID: 6623056935919291814}
   - component: {fileID: 4821545658032759295}
   m_Layer: 0
-  m_Name: Capsule
+  m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -414,7 +414,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 921069525072559226}
-  m_RootOrder: 0
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &7223075261371352222
 LineRenderer:

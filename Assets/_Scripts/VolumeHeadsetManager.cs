@@ -4,26 +4,30 @@ using UnityEngine;
 
 public class VolumeHeadsetManager : MonoBehaviour
 {
-    public NavigationManager local_nav_reference = null;
+    public NavigationManager local_navigation_manager = null;
     public EasyVizARHeadset headset_reference = null;
     public EasyVizARHeadsetManager headsetManager_reference = null;
 	public PathPreview pathPreview = null;
-    Vector3 old_position;
+    
+    Vector3 user_start_position;
 
+    public GameObject ghost_user;
+    public Material ghost_material;
 
     private void Awake()
     {
+        headsetManager_reference = EasyVizARHeadsetManager.EasyVizARManager;
+        headset_reference = this.transform.parent.GetComponent<EasyVizARHeadset>();
+
         // Find the NavigationManager in the scene and assign it to our var
-        GameObject navigationManagerObject = GameObject.Find("MixedRealityPlayspace/AR Managment Axis/NavigationManager");
-        GameObject locationIDObject = GameObject.Find("MixedRealityPlayspace/AR Managment Axis/EasyVizARHeadsetManager");
-        if (navigationManagerObject != null)
+        GameObject navigation_manager_game_object = GameObject.Find("NavigationManager");
+        
+        if (navigation_manager_game_object != null)
         {
-            local_nav_reference = navigationManagerObject.GetComponent<NavigationManager>();
-            headset_reference = this.transform.parent.GetComponent<EasyVizARHeadset>();
-            headsetManager_reference = locationIDObject.GetComponent<EasyVizARHeadsetManager>();
+            local_navigation_manager = navigation_manager_game_object.GetComponent<NavigationManager>();
         }
 
-        if (local_nav_reference != null)
+        if (local_navigation_manager != null)
         {
             Debug.Log("NavigationManager successfully found and assigned.");
         }
@@ -33,20 +37,14 @@ public class VolumeHeadsetManager : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        // Any additional logic that needs to be done in Start
-    }
-
     public void NavigationTrigger()
     {
-        if (local_nav_reference != null)
+        if (local_navigation_manager != null)
         {
             //Debug.Log(this.transform.parent.GetComponent<Transform>().localPosition);
-            local_nav_reference.GiveDirectionsToUser(this.transform.parent.GetComponent<Transform>().localPosition, old_position, headsetManager_reference.LocationID, headset_reference._headsetID, headset_reference._color, headset_reference.Name);
+            local_navigation_manager.GiveDirectionsToUser(this.transform.parent.GetComponent<Transform>().localPosition, user_start_position, headsetManager_reference.LocationID, headset_reference._headsetID, headset_reference._color, headset_reference.Name);
             Debug.Log("new position " + this.transform.parent.GetComponent<Transform>().localPosition);
-            Debug.Log("old position " + old_position);
+            Debug.Log("old position " + user_start_position);
             Debug.Log("location id " + headsetManager_reference.LocationID);
             Debug.Log("headset id " + headset_reference._headsetID);
             Debug.Log("color " + "#" + ColorUtility.ToHtmlStringRGB(headset_reference._color));
@@ -59,15 +57,9 @@ public class VolumeHeadsetManager : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        // Any update logic
-    }
-
     public void StorePosition()
     {
-        old_position = this.transform.parent.GetComponent<Transform>().localPosition;
+        user_start_position = this.transform.parent.GetComponent<Transform>().localPosition;
     }
 
 	public void StartPathPreview(GameObject cursor)
@@ -85,4 +77,29 @@ public class VolumeHeadsetManager : MonoBehaviour
 			pathPreview.StopPreview();
 		}
 	}
+    
+    // Reset the ghost user to the origin, intended to be called when the user starts interacting with the avatar so that it will be back at the same location as the user avatar
+    public void GhostReset()
+    {
+        ghost_user.transform.localPosition = new Vector3(0, 0, 0);
+        ghost_user.transform.localRotation = new Quaternion(0, 0, 0, 0);
+    }
+
+    public void GhostActiveToggle()
+    {
+        if (ghost_user.activeSelf)
+        {
+            ghost_user.SetActive(false);
+        }
+        else
+        {
+            ghost_user.SetActive(true);
+        }
+    }
+
+    //same as last function but takes a bool argument instead
+    public void GhostActiveToggle(bool active)
+    {
+        ghost_user.SetActive(active);
+    }
 }
