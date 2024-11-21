@@ -35,7 +35,7 @@ public class BoundsCheck : MonoBehaviour
             }
             else
             {
-                if (map_visuals_renderer is LineRenderer)
+                if (map_visuals_renderer is LineRenderer || map_visuals_renderer is ParticleSystemRenderer)
                 {
                     map_visuals_renderer.enabled = true;
                 }
