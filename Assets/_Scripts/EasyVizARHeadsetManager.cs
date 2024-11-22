@@ -151,7 +151,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         {   
             if(headset.name == _local_headset_ID)
             {
-                Transform match_ID = headset.Find("Capsule");
+                Transform match_ID = headset.Find("Visual");
                 GameObject capsule_visual = match_ID.gameObject;
                 capsule_visual.SetActive(false);
             }

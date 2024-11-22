@@ -1311,6 +1311,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   updateInterval: 0.1
+  isDrawing: 0
+  cursor: {fileID: 0}
+  startPosition: {x: 0, y: 0, z: 0}
+  user_avatar: {fileID: 0}
 --- !u!1 &3902594589738515875
 GameObject:
   m_ObjectHideFlags: 0
@@ -2028,7 +2032,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 4a2c57e397a68e54cb733d25b3407528, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2123,6 +2127,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   updateInterval: 0.1
+  isDrawing: 0
+  cursor: {fileID: 0}
+  startPosition: {x: 0, y: 0, z: 0}
+  user_avatar: {fileID: 0}
 --- !u!1 &6830670921788510250
 GameObject:
   m_ObjectHideFlags: 0

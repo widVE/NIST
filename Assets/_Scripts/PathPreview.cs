@@ -12,10 +12,12 @@ public class PathPreview : MonoBehaviour
 
     private LineRenderer lineRenderer;
 
-    private bool isDrawing = false;
-    private GameObject cursor = null;
-    private Vector3 startPosition = new();
-    private NavMeshPath navMeshPath;
+
+    [SerializeField] private bool isDrawing = false;
+    [SerializeField] private GameObject cursor = null;
+    [SerializeField] private Vector3 startPosition = new();
+    [SerializeField] private NavMeshPath navMeshPath;
+    [SerializeField] private GameObject user_avatar;
 
     private void Awake()
     {
@@ -27,11 +29,17 @@ public class PathPreview : MonoBehaviour
         lineRenderer = GetComponent<LineRenderer>();
     }
 
-    public void StartPreview(GameObject cursor)
+    public void SetUser(GameObject user)
+    { 
+        user_avatar = user;
+    }
+
+    public void StartPreview(GameObject cursor, GameObject user)
     {
         isDrawing = true;
         this.cursor = cursor;
-        startPosition = cursor.transform.localPosition;
+        user_avatar = user;
+        startPosition = user_avatar.transform.localPosition;
         StartCoroutine(UpdatePathCoroutine());
     }
 

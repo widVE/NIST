@@ -7,8 +7,10 @@ public class VolumeHeadsetManager : MonoBehaviour
     public NavigationManager local_navigation_manager = null;
     public EasyVizARHeadset headset_reference = null;
     public EasyVizARHeadsetManager headsetManager_reference = null;
-	public PathPreview pathPreview = null;
-    
+    public PathPreview pathPreview = null;
+
+    public GameObject prefab_root;
+
     Vector3 user_start_position;
 
     public GameObject ghost_user;
@@ -21,7 +23,7 @@ public class VolumeHeadsetManager : MonoBehaviour
 
         // Find the NavigationManager in the scene and assign it to our var
         GameObject navigation_manager_game_object = GameObject.Find("NavigationManager");
-        
+
         if (navigation_manager_game_object != null)
         {
             local_navigation_manager = navigation_manager_game_object.GetComponent<NavigationManager>();
@@ -59,25 +61,32 @@ public class VolumeHeadsetManager : MonoBehaviour
 
     public void StorePosition()
     {
-        user_start_position = this.transform.parent.GetComponent<Transform>().localPosition;
+        try
+        {
+            user_start_position = prefab_root.transform.localPosition;
+        }
+        catch (System.NullReferenceException ex)
+        {
+            Debug.LogError("Null reference exception: " + ex.Message);
+        }
     }
 
-	public void StartPathPreview(GameObject cursor)
-	{
-		if (pathPreview)
-		{
-			pathPreview.StartPreview(cursor);
-		}
-	}
+    public void StartPathPreview(GameObject cursor)
+    {
+        if (pathPreview)
+        {
+            pathPreview.StartPreview(cursor, prefab_root);
+        }
+    }
 
-	public void StopPathPreview()
-	{
-		if (pathPreview)
-		{
-			pathPreview.StopPreview();
-		}
-	}
-    
+    public void StopPathPreview()
+    {
+        if (pathPreview)
+        {
+            pathPreview.StopPreview();
+        }
+    }
+
     // Reset the ghost user to the origin, intended to be called when the user starts interacting with the avatar so that it will be back at the same location as the user avatar
     public void GhostReset()
     {
