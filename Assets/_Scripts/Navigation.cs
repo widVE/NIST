@@ -17,7 +17,7 @@ public class NavigationTargetUpdate
 
 public class Navigation : MonoBehaviour
 {
-    GameObject markerSpawnParent = null;
+    GameObject marker_spawn_parent = null;
     Collider collider;
     LineRenderer world_line;
     LineRenderer map_line;
@@ -46,17 +46,15 @@ public class Navigation : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        markerSpawnParent = this.transform.parent.gameObject.GetComponent<MapIconSpawn>().feature_parent;
-        
         //IDK if this is a safe assumption -B
         map_parent = this.transform.parent.gameObject;
         last_target = map_parent.GetComponent<MapIconSpawn>().last_clicked_target;
 
         EasyVizARServer.Instance.TryGetHeadsetID(out local_headset_id);
 
-        //markerSpawnParent = GameObject.Find("Marker Spawn Parent");
+        if(marker_spawn_parent == null) marker_spawn_parent = GameObject.Find("Marker Spawn Parent");
 
-        if (!markerSpawnParent)
+        if (!marker_spawn_parent)
         {
             UnityEngine.Debug.LogWarning("Navigation: cannot find the icon parent");
         }
@@ -79,7 +77,7 @@ public class Navigation : MonoBehaviour
         //UnityEngine.Debug.Log("the type of icon: " + this.transform.Find("type").GetChild(0).name);
         if (this.transform.Find("type").GetChild(0).name != "Headset")
         {
-            feature = markerSpawnParent.transform.Find(this.name);
+            feature = marker_spawn_parent.transform.Find(this.name);
             // Testing Querying path
             //FindPath();
         }
