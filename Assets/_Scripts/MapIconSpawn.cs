@@ -2,14 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using VInspector.Libs;
+using Unity.Sentis.Layers;
 
+//This class really seems to be more about getting the aspect ratio of the map visualizaiton correct than anything to do with spawning icons. -b 12-24
 public class MapIconSpawn : MonoBehaviour
 {
-    public GameObject currHeadset;
+    public EasyVizARHeadsetManager headset_manager;
     public GameObject iconParent;
-    public List <GameObject> map_objects;
+    public List<GameObject> map_objects;
+    public List<GameObject> map_lines;
     public GameObject mapCollection;
-    public GameObject feature_parent;
 
     public bool verbose_debug = false;
     public bool mirror_axis = false;
@@ -18,8 +21,16 @@ public class MapIconSpawn : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-         DisplayPNGMap();
+        headset_manager = EasyVizARHeadsetManager.EasyVizARManager;
 
+        foreach (GameObject wall_lines in map_lines)
+        {
+            headset_manager.map_line_objects.Add(wall_lines);
+        }
+
+        headset_manager.DisplayHandMap();
+
+        DisplayPNGMap();
     }
 
     // Update is called once per frame
@@ -32,7 +43,7 @@ public class MapIconSpawn : MonoBehaviour
     [ContextMenu("DisplayPNGMap")]
     public void DisplayPNGMap()
     {
-        EasyVizARServer.Instance.Get("locations/" + currHeadset.GetComponent<EasyVizARHeadsetManager>().LocationID + "/layers/1/", EasyVizARServer.JSON_TYPE, DisplayPNGMapCallback);
+        EasyVizARServer.Instance.Get("locations/" + headset_manager.LocationID + "/layers/1/", EasyVizARServer.JSON_TYPE, DisplayPNGMapCallback);
         //Debug.Log("Got into DisplayPNGMap()");
     }
 

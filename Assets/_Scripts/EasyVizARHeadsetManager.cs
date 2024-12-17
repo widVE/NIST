@@ -62,7 +62,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     bool _makeUniqueLocalHeadset = false;
 
     [SerializeField]
-    List<GameObject> _mapObjects = new List<GameObject>();
+    public List<GameObject> map_line_objects = new List<GameObject>();
 
     // I had to add these to get the slider to work. I wanted to pass the slider value as an argument
     // to this script, but I couldn't figure out how to reference that value in the event handler. This
@@ -293,12 +293,13 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     public void DisplayMapCallback(Texture resultTexture)
     {
         //Debug.Log("In map callback");
-        foreach (var map_layout in _mapObjects)
+        foreach (var map_layout in map_line_objects)
         {
-            //map_layout.GetComponent<Renderer>().material.mainTexture = resultTexture;
+            map_layout.GetComponent<Renderer>().material.mainTexture = resultTexture;
         }
     }
 
+    [ContextMenu("DisplayHandMap")]
     public void DisplayHandMap()
     {
         EasyVizARServer.Instance.Texture("locations/" + _locationId + "/layers/1/image", "image/png", "1200", DisplayMapCallback);

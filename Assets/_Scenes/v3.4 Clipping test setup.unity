@@ -34769,7 +34769,7 @@ PrefabInstance:
       objectReference: {fileID: 1426975337}
     - target: {fileID: 3728181045455103163, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3728181045455103163, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: currHeadset
@@ -34791,6 +34791,10 @@ PrefabInstance:
       propertyPath: feature_parent
       value: 
       objectReference: {fileID: 1968206798}
+    - target: {fileID: 3728181045455103163, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: headset_manager
+      value: 
+      objectReference: {fileID: 561901448}
     - target: {fileID: 3728181045455103163, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: map_objects.Array.size
       value: 2

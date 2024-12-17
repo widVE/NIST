@@ -1233,14 +1233,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6335ff8fed030474a850e0152c887657, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currHeadset: {fileID: 0}
+  headset_manager: {fileID: 0}
   iconParent: {fileID: 5658436111747294205}
   map_objects:
   - {fileID: 7386973344879076844}
+  map_lines:
+  - {fileID: 2950660246284776047}
+  - {fileID: 2950660246297115734}
+  - {fileID: 2950660244890200069}
+  - {fileID: 152121081174364061}
   mapCollection: {fileID: 7617688847364070910}
-  feature_parent: {fileID: 0}
   verbose_debug: 0
-  mirror_axis: 0
+  mirror_axis: 1
   last_clicked_target: 
 --- !u!1 &5863585123098965857
 GameObject:
