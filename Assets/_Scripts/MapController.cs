@@ -12,7 +12,7 @@ public class MapController : MonoBehaviour
     public List<GameObject> map_lines;
     public GameObject mapCollection;
     public GameObject feature_parent;
-    public GameObject navigationPathView;
+    public GameObject navigation_path_view;
 
     public bool verbose_debug = false;
     public bool mirror_axis = false;
@@ -160,10 +160,10 @@ public class MapController : MonoBehaviour
 
     private void UpdateNavigationPath()
     {
-        if (navigationPathView == null)
+        if (navigation_path_view == null)
             return;
 
-        var renderer = navigationPathView.GetComponent<LineRenderer>();
+        var renderer = navigation_path_view.GetComponent<LineRenderer>();
         if (renderer == null)
             return;
 
@@ -230,7 +230,7 @@ public class MapController : MonoBehaviour
 
                 // Find the minimum Y value among the path points,
                 // and set the line renderer height such that the path lies above the map surface.
-                navigationPathView.transform.localPosition = new Vector3(0.0f, -minY, 0.0f);
+                navigation_path_view.transform.localPosition = new Vector3(0.0f, -minY, 0.0f);
             }
         }
     }
