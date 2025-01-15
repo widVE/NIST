@@ -34,6 +34,7 @@ public class OBJObjectBuilder {
 	private List<Vector3> _vertices = new List<Vector3>();
 	private List<Vector3> _normals = new List<Vector3>();
 	private List<Vector2> _uvs = new List<Vector2>();
+	private List<Color> _colors = new List<Color>();
 
 	//this will be set if the model has no normals or missing normal info
 	private bool recalculateNormals = false;
@@ -103,6 +104,7 @@ public class OBJObjectBuilder {
 		msh.SetVertices(_vertices);
 		msh.SetNormals(_normals);
 		msh.SetUVs(0, _uvs);
+		msh.SetColors(_colors);
 
 		//set faces
 		foreach (var kvp in _materialIndices) {
@@ -166,6 +168,7 @@ public class OBJObjectBuilder {
 				_vertices.Add((vertexIndex >= 0 && vertexIndex < _loader.Vertices.Count) ? _loader.Vertices[vertexIndex] : Vector3.zero);
 				_normals.Add((normalIndex >= 0 && normalIndex < _loader.Normals.Count) ? _loader.Normals[normalIndex] : Vector3.zero);
 				_uvs.Add((uvIndex >= 0 && uvIndex < _loader.UVs.Count) ? _loader.UVs[uvIndex] : Vector2.zero);
+				_colors.Add((vertexIndex >= 0 && vertexIndex < _loader.Colors.Count) ? _loader.Colors[vertexIndex] : Color.magenta);
 
 				//mark recalc flag
 				if (normalIndex < 0)

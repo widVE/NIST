@@ -18297,7 +18297,7 @@ MonoBehaviour:
   - {fileID: 1659198083}
   mapCollection: {fileID: 665494468}
   feature_parent: {fileID: 1968206798}
-  navigationPathView: {fileID: 1810665669}
+  navigation_path_view: {fileID: 0}
   verbose_debug: 1
   mirror_axis: 1
   last_clicked_target: 
@@ -26494,7 +26494,7 @@ MonoBehaviour:
   map_lines: []
   mapCollection: {fileID: 0}
   feature_parent: {fileID: 0}
-  navigationPathView: {fileID: 0}
+  navigation_path_view: {fileID: 0}
   verbose_debug: 0
   mirror_axis: 0
   last_clicked_target: 
@@ -30594,6 +30594,10 @@ PrefabInstance:
       propertyPath: mapPathGameObject
       value: 
       objectReference: {fileID: 1810665669}
+    - target: {fileID: 3977768454651093499, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
+      propertyPath: vertexColorShader
+      value: 
+      objectReference: {fileID: 4800000, guid: cd47b1036a3d1944fac0fa71d36e069e, type: 3}
     - target: {fileID: 4366126804156264204, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
       propertyPath: m_RootOrder
       value: 7

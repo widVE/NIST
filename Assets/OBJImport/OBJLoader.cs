@@ -44,6 +44,7 @@ namespace Dummiesman
         internal List<Vector3> Vertices = new List<Vector3>();
         internal List<Vector3> Normals = new List<Vector3>();
         internal List<Vector2> UVs = new List<Vector2>();
+        internal List<Color> Colors = new List<Color>();
 
         //materials, accessed by objobjectbuilder
         internal Dictionary<string, Material> Materials;
@@ -107,6 +108,8 @@ namespace Dummiesman
 
             Dictionary<string, OBJObjectBuilder> builderDict = new Dictionary<string, OBJObjectBuilder>();
             OBJObjectBuilder currentBuilder = null;
+
+            string lastSetMaterial = "default";
             string currentMaterial = "default";
 
             //lists for face data
@@ -158,8 +161,26 @@ namespace Dummiesman
 				}
 				
 				if (buffer.Is("v")) {
-					Vertices.Add(buffer.ReadVector());
-					continue;
+                    var values = buffer.ReadFloatArray();
+
+                    if (values.Length >= 3)
+                    {
+                        var vector = new Vector3(values[0], values[1], values[2]);
+                        Vertices.Add(vector);
+                    }
+
+                    if (values.Length >= 6)
+                    {
+                        var color = new Color(values[3], values[4], values[5]);
+                        Colors.Add(color);
+                        currentMaterial = "vertexColor";
+                    }
+                    else
+                    {
+                        Colors.Add(Color.magenta);
+                    }
+
+                    continue;
 				}
 
 				//normal
@@ -180,6 +201,7 @@ namespace Dummiesman
 					buffer.ReadUntilNewLine();
 					string materialName = buffer.GetString();
                     currentMaterial = materialName;
+                    lastSetMaterial = materialName;
 
                     if(SplitMode == SplitMode.Material)
                     {
@@ -193,6 +215,7 @@ namespace Dummiesman
                     buffer.ReadUntilNewLine();
                     string objectName = buffer.GetString(1);
                     setCurrentObjectFunc.Invoke(objectName);
+                    currentMaterial = lastSetMaterial;
                     continue;
                 }
 
@@ -340,6 +363,8 @@ namespace Dummiesman
 
             Dictionary<string, OBJObjectBuilder> builderDict = new Dictionary<string, OBJObjectBuilder>();
             OBJObjectBuilder currentBuilder = null;
+
+            string lastSetMaterial = "default";
             string currentMaterial = "default";
 
             //lists for face data
@@ -396,7 +421,25 @@ namespace Dummiesman
 
                     if (buffer.Is("v"))
                     {
-                        Vertices.Add(buffer.ReadVector());
+                        var values = buffer.ReadFloatArray();
+
+                        if (values.Length >= 3)
+                        {
+                            var vector = new Vector3(values[0], values[1], values[2]);
+                            Vertices.Add(vector);
+                        }
+
+                        if (values.Length >= 6)
+                        {
+                            var color = new Color(values[3], values[4], values[5]);
+                            Colors.Add(color);
+                            currentMaterial = "vertexColor";
+                        }
+                        else
+                        {
+                            Colors.Add(Color.magenta);
+                        }
+
                         continue;
                     }
 
@@ -421,6 +464,7 @@ namespace Dummiesman
                         buffer.ReadUntilNewLine();
                         string materialName = buffer.GetString();
                         currentMaterial = materialName;
+                        lastSetMaterial = materialName;
 
                         if (SplitMode == SplitMode.Material)
                         {
@@ -436,6 +480,7 @@ namespace Dummiesman
                         buffer.ReadUntilNewLine();
                         string objectName = buffer.GetString(1);
                         setCurrentObjectFunc.Invoke(objectName);
+                        currentMaterial = lastSetMaterial;
                         continue;
                     }
 
@@ -540,6 +585,15 @@ namespace Dummiesman
                 Materials = new();
             }
             Materials["default"] = material;
+        }
+
+        public void SetVertexColorMaterial(Material material)
+        {
+            if (Materials == null)
+            {
+                Materials = new();
+            }
+            Materials["vertexColor"] = material;
         }
     }
 }

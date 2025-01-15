@@ -823,6 +823,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d9485676ecf0cb43990e23920e91df8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  showOtherUsersPaths: 0
   local_mesh_testing: {fileID: 0}
   targetIsSet: 0
   targetPosition: {x: 1, y: 1, z: 1}
@@ -1003,6 +1004,11 @@ MonoBehaviour:
   loadOnLocationChange: 1
   loadUpdatedSurfaces: 1
   defaultShader: {fileID: 4800000, guid: 465e84f7c06b44e05a7ae6f3dccab691, type: 3}
+  vertexColorShader: {fileID: 4800000, guid: cd47b1036a3d1944fac0fa71d36e069e, type: 3}
+  displayModelInEditor: 1
+  updateNavMeshInterval: 60
+  newSurfaceThreshold: 8
+  updatedSurfaceThreshold: 30
 --- !u!1 &6396635237086011973
 GameObject:
   m_ObjectHideFlags: 0

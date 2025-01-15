@@ -103,6 +103,22 @@ namespace Dummiesman {
 			return new Vector3(x, y, z);
 		}
 
+		public float[] ReadFloatArray()
+        {
+			List<float> values = new List<float>();
+            while (true)
+            {
+				this.SkipWhitespaces(out var newLinePassed);
+				if (newLinePassed)
+					break;
+
+				float x = this.ReadFloat();
+				values.Add(x);
+            }
+
+			return values.ToArray();
+        }
+
 		public int ReadInt() {
 			int result = 0;
 			bool isNegative = this.currentChar == '-';

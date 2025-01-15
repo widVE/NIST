@@ -26,6 +26,9 @@ public class LocationModelLoader : MonoBehaviour
     [Tooltip("Shader to use for rendering the loaded model.")]
     public Shader defaultShader;
 
+    [Tooltip("Shader to use for models with vertex shading.")]
+    public Shader vertexColorShader;
+
     [Tooltip("Display model in editor play mode.")]
     public bool displayModelInEditor = true;
 
@@ -55,6 +58,7 @@ public class LocationModelLoader : MonoBehaviour
 
     private OBJLoader loader;
     private Material defaultMaterial;
+    private Material vertexColorMaterial;
 
     // Queue of updated surface IDs to load
     private UniqueQueue<string> updateQueue = new();
@@ -78,8 +82,15 @@ public class LocationModelLoader : MonoBehaviour
         }
         defaultMaterial = new Material(defaultShader);
 
+        if (vertexColorShader == null)
+        {
+            vertexColorShader = Shader.Find("Custom/Vertex Color Shader");
+        }
+        vertexColorMaterial = new Material(vertexColorShader);
+
         loader = new OBJLoader();
         loader.SetDefaultMaterial(defaultMaterial);
+        loader.SetVertexColorMaterial(vertexColorMaterial);
     }
 
     void Start()
@@ -123,7 +134,7 @@ public class LocationModelLoader : MonoBehaviour
         bool startActive = false;
 #endif
 
-        string url = $"{urlBase}/locations/{locationId}/model#model.obj";
+        string url = $"{urlBase}/locations/{locationId}/model?colored#model.obj";
         yield return LoadModel(url, startActive, (loadedObject) =>
         {
             loadedObject.name = locationId;
