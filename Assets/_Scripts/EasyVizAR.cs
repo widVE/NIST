@@ -24,6 +24,16 @@ namespace EasyVizAR
 		public float x;
 		public float y;
 		public float z;
+
+		public Orientation() { }
+
+		public Orientation(Quaternion q)
+        {
+			w = q.w;
+			x = q.x;
+			y = q.y;
+			z = q.z;
+        }
 	}
 
 	[System.Serializable]
@@ -32,6 +42,15 @@ namespace EasyVizAR
 		public float x;
 		public float y;
 		public float z;
+
+		public Position() { }
+
+		public Position(Vector3 p)
+		{
+			x = p.x;
+			y = p.y;
+			z = p.z;
+		}
 	}
 
 	[System.Serializable]
@@ -40,6 +59,15 @@ namespace EasyVizAR
 		public float x;
 		public float y;
 		public float z;
+
+		public Scale() { }
+
+		public Scale(Vector3 p)
+		{
+			x = p.x;
+			y = p.y;
+			z = p.z;
+		}
 	}
 
 	[System.Serializable]

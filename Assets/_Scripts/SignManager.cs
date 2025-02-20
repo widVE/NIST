@@ -279,6 +279,9 @@ public class SignManager : MonoBehaviour
 
     {
         UpdateNavigationSigns();
+
+        // Notify the server that a new sign was created.
+        featureManager.CreateNewFeature("wall-sign", this.gameObject, replaceLocal: false);
     }
 }
 
