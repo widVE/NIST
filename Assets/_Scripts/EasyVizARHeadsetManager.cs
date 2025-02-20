@@ -83,7 +83,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
     public event EventHandler<HeadsetConfigurationChangedEvent> HeadsetConfigurationChanged;
 
-    public GameObject head_tracked_marker_menu = null;
+    public GameObject head_tracked_marker_menu;
 
     private void Awake()
     {
@@ -222,6 +222,9 @@ public class EasyVizARHeadsetManager : MonoBehaviour
                     change.Configuration = JsonUtility.FromJson<EasyVizAR.HeadsetConfiguration>(result);
 
                     HeadsetConfigurationChanged(this, change);
+
+                    //Using a direct reference to the headset manager to set the active state of the hand menu instead of the events because there's only one head tracked marker menu
+                    HeadsetMarkerMenuActiveState(change.Configuration.enable_marker_placement);
                 }
 			}
 		});
@@ -232,7 +235,12 @@ public class EasyVizARHeadsetManager : MonoBehaviour
     {
         if (head_tracked_marker_menu == null)
         {
+            //this only works if the object is active in the scene, but we want it disabled by default
             head_tracked_marker_menu = GameObject.Find("Marker Spawn Follow Menu");
+            //i changed it to only disabling the child content and not the parent object
+
+            //Debug.LogError("HeadsetManager: HeadsetMarkerMenuActiveState() could not find the hand menu");
+
         }
 
         if (head_tracked_marker_menu != null)
@@ -241,7 +249,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("HeadsetManager: HeadsetMarkerMenuActiveState() could not find the hand menu");
+            Debug.LogError("HeadsetManager: HeadsetMarkerMenuActiveState() could not find the hand menu");
         }
     }    
 
