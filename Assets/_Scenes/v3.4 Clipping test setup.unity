@@ -30596,7 +30596,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1698834942601225703, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
       propertyPath: m_RootOrder
-      value: 13
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3531411487165434132, guid: d3f436728a834c94eb3d882d0dabd410, type: 3}
       propertyPath: qrScanner
@@ -43807,6 +43807,10 @@ PrefabInstance:
       propertyPath: _visualizePreviousLocal
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
+      propertyPath: head_tracked_marker_menu
+      value: 
+      objectReference: {fileID: 935252631}
     - target: {fileID: 1556404472619698931, guid: d775c2b53b39d1b4597cdd145147e109, type: 3}
       propertyPath: horizontal_offset_slider
       value: 

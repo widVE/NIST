@@ -37,4 +37,9 @@ public class HandMenu : MonoBehaviour
             UnityEngine.Debug.Log("Hand Menu is now ON");
         }
     }
+
+    public void HandMenuActiveState(bool active_state)
+    {
+        hand_menu.SetActive(active_state);
+    }
 }

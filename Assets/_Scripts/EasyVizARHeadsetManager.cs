@@ -83,6 +83,8 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
     public event EventHandler<HeadsetConfigurationChangedEvent> HeadsetConfigurationChanged;
 
+    public GameObject head_tracked_marker_menu = null;
+
     private void Awake()
     {
         // If there is an instance, and it's not me, delete myself.
@@ -207,6 +209,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
 	void LoadHeadsetConfiguration(String headset_id)
 	{
+
         EasyVizARServer.Instance.Get($"/headsets/{headset_id}/configuration", EasyVizARServer.JSON_TYPE, delegate (string result)
 		{
 			if (result != "error") {
@@ -223,6 +226,24 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 			}
 		});
 	}
+
+    //Allows us to set the active state of the hand menu from the headset manager
+    public void HeadsetMarkerMenuActiveState(bool menu_active_state)
+    {
+        if (head_tracked_marker_menu == null)
+        {
+            head_tracked_marker_menu = GameObject.Find("Marker Spawn Follow Menu");
+        }
+
+        if (head_tracked_marker_menu != null)
+        {
+            head_tracked_marker_menu.GetComponent<HandMenu>().HandMenuActiveState(menu_active_state);
+        }
+        else
+        {
+            Debug.Log("HeadsetManager: HeadsetMarkerMenuActiveState() could not find the hand menu");
+        }
+    }    
 
     [ContextMenu("CreateAllHeadsets")]
     public void LocalRegistrationSetup()
