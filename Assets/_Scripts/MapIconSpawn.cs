@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using VInspector.Libs;
+//using VInspector.Libs;
 using Unity.Sentis.Layers;
 
 //This class really seems to be more about getting the aspect ratio of the map visualizaiton correct than anything to do with spawning icons. -b 12-24

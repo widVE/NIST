@@ -12437,7 +12437,7 @@ GameObject:
   m_Component:
   - component: {fileID: 543288651}
   m_Layer: 0
-  m_Name: MenuContent (1)
+  m_Name: Marker Content
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12451,7 +12451,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 543288650}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.1493, y: 0, z: -0.107}
+  m_LocalPosition: {x: -0.14930001, y: 0, z: -0.10699999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -12461,7 +12461,7 @@ Transform:
   - {fileID: 1161810665}
   - {fileID: 704749621}
   m_Father: {fileID: 4316553457461979239}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &545259742
 PrefabInstance:
@@ -12669,6 +12669,10 @@ PrefabInstance:
     - target: {fileID: 1297437505137613530, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
       propertyPath: m_Name
       value: FeatureManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 1297437505137613530, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4692823068669223862, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
       propertyPath: m_RootOrder
@@ -17092,12 +17096,24 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 935252634}
+    m_TransformParent: {fileID: 4316553457461979239}
     m_Modifications:
+    - target: {fileID: 1530229247293458911, guid: 67957c16514f80e4c95c394447944a28, type: 3}
+      propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1530229247293458911, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
-      objectReference: {fileID: 1157355507}
+      objectReference: {fileID: 935252633}
+    - target: {fileID: 1530229247293458911, guid: 67957c16514f80e4c95c394447944a28, type: 3}
+      propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
+      value: ToggleHandMenu
+      objectReference: {fileID: 0}
+    - target: {fileID: 1530229247293458911, guid: 67957c16514f80e4c95c394447944a28, type: 3}
+      propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
+      value: HandMenu, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 1662177744093422013, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: m_text
       value: Quit Application
@@ -17108,10 +17124,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1704944278096700531, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: m_Name
-      value: Spawn Marker 1
+      value: Panel Activation Toggle
       objectReference: {fileID: 0}
     - target: {fileID: 1704944278096700531, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4199423998610104309, guid: 67957c16514f80e4c95c394447944a28, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4199423998610104309, guid: 67957c16514f80e4c95c394447944a28, type: 3}
@@ -17124,15 +17144,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5854300274069653270, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 5854300274069653270, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.036
+      value: 0.0001
       objectReference: {fileID: 0}
     - target: {fileID: 5854300274069653270, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1
+      value: -0.08499998
       objectReference: {fileID: 0}
     - target: {fileID: 5854300274069653270, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: m_LocalRotation.w
@@ -17160,6 +17180,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5854300274069653270, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7808211266439356155, guid: 67957c16514f80e4c95c394447944a28, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8093590129798258414, guid: 67957c16514f80e4c95c394447944a28, type: 3}
@@ -19411,7 +19435,7 @@ GameObject:
   - component: {fileID: 935252632}
   - component: {fileID: 935252636}
   m_Layer: 0
-  m_Name: SummonMenu
+  m_Name: Marker Spawn Follow Menu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19487,7 +19511,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b107f93296ee794682b0e64ed11ccba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hand_menu: {fileID: 683731866758900730}
+  hand_menu: {fileID: 543288650}
 --- !u!4 &935252634
 Transform:
   m_ObjectHideFlags: 0
@@ -19500,7 +19524,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 778114911}
   - {fileID: 4316553457461979239}
   - {fileID: 1368765919}
   m_Father: {fileID: 0}
@@ -22917,17 +22940,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1157355507 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1508432858393532781, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
-  m_PrefabInstance: {fileID: 79204527}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 049c882cddb65644db05fd32c5d4e50e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1161810664
 GameObject:
   m_ObjectHideFlags: 0
@@ -26819,7 +26831,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 935252634}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1375559501 stripped
 GameObject:
@@ -32329,19 +32341,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1715387986}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1720341444
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 683731866758900730}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b107f93296ee794682b0e64ed11ccba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hand_menu: {fileID: 683731866758900730}
 --- !u!114 &1720341445
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32393,7 +32392,7 @@ MonoBehaviour:
     m_ActionName: Map/Toggle[/Keyboard/l]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1720341444}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: HandMenu, Assembly-CSharp
         m_MethodName: SummonMenu
         m_Mode: 1
@@ -42401,7 +42400,7 @@ Transform:
   - {fileID: 1146507809}
   - {fileID: 1714216559}
   m_Father: {fileID: 4316553457461979239}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &494488124362632548
 MonoBehaviour:
@@ -43309,7 +43308,6 @@ GameObject:
   - component: {fileID: 683731866758900731}
   - component: {fileID: 1126424197009348710}
   - component: {fileID: 1126424197009348715}
-  - component: {fileID: 1720341444}
   - component: {fileID: 1720341445}
   - component: {fileID: 7809135867685137721}
   - component: {fileID: 7809135867685137722}
@@ -43355,46 +43353,10 @@ MonoBehaviour:
       m_Calls: []
   onFirstHandDetected:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 494488124128638185}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-      - m_Target: {fileID: 1272156377}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onLastHandLost:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1272156377}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
+      m_Calls: []
   facingCameraTrackingThreshold: 50
   requireFlatHand: 1
   flatHandThreshold: 45
@@ -47020,10 +46982,11 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 778114911}
   - {fileID: 543288651}
   - {fileID: 494488124128638186}
   m_Father: {fileID: 935252634}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4474003572216973430
 Transform:

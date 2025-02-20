@@ -6,7 +6,7 @@ using UnityEngine;
 public class HandMenu : MonoBehaviour
 {
 
-    bool menu_enable;
+    //bool menu_enable;
     public GameObject hand_menu;
     // Start is called before the first frame update
     void Start()
@@ -22,22 +22,19 @@ public class HandMenu : MonoBehaviour
         
     }
 
-    public void SummonMenu()
+    //This function will check if the hand_menu is active or not, and then toggle it, it will also output the state to the debug console in unity
+    [ContextMenu("ToggleHandMenu")]
+    public void ToggleHandMenu()
     {
-        UnityEngine.Debug.Log("Got to SummonMenu()");
-
-        if (!menu_enable)
+        if (hand_menu.activeSelf)
         {
-            UnityEngine.Debug.Log("set the menu active");
-            hand_menu.SetActive(true);
-            menu_enable = true;
+            hand_menu.SetActive(false);
+            UnityEngine.Debug.Log("Hand Menu is now OFF");
         }
         else
         {
-            UnityEngine.Debug.Log("set the menu inactive");
-            hand_menu.SetActive(false);
-            menu_enable = false;
+            hand_menu.SetActive(true);
+            UnityEngine.Debug.Log("Hand Menu is now ON");
         }
-
     }
 }
