@@ -75,6 +75,11 @@ public class DockGrabCloner : MonoBehaviour
 
         volume_map_reference.volumetric_map_spawn_target = volume_map.transform.Find("Map Components/3D Models Clipped/Maps/Moveable Map/Server Map/features").gameObject;
 
+        // Notify the server that a volumetric map has been created.
+        // TODO: This should probably happen after the user has positioned and sized the model.
+        FeatureManager.Instance.CreateNewFeature("3d-map", volume_map, replaceLocal: false);
+
+
         //headset_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map/Server Map/headsets").gameObject;
 
         //headsetloader_reference.volumetricMapParent = volume_map.transform.Find("Map Components/3D Models Clipped (1)/Maps/Moveable Map").gameObject;

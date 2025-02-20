@@ -116,7 +116,19 @@ public class FeatureManager : MonoBehaviour
     private EasyVizAR.Location location;
     public string LocationName => location.name;
 
-    // Start is called before the first frame update
+    public static FeatureManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Debug.Log("Warning: multiple instances of FeatureManager created when there should only be one.");
+        }
+        else
+        {
+            Instance = this;
+        }
+    }
 
     void Start()
     {
@@ -210,25 +222,18 @@ public class FeatureManager : MonoBehaviour
     }
 
     // POST 
-    public void CreateNewFeature(string feature_type, GameObject marker) //TODO: change the feature_type from int to string
+    public void CreateNewFeature(string feature_type, GameObject marker, bool replaceLocal = true) //TODO: change the feature_type from int to string
     {
         EasyVizAR.Feature feature_to_post = new EasyVizAR.Feature();
 
         feature_to_post.createdBy = manager.LocationID;
         feature_to_post.createdBy = manager.LocationID;
 
-        EasyVizAR.Position position = new EasyVizAR.Position();
-        position.x = (float)marker.transform.position.x;
-        position.y = (float)marker.transform.position.y;
-        position.z = (float)marker.transform.position.z;
-        feature_to_post.position = position;
+        feature_to_post.position = new EasyVizAR.Position(marker.transform.position);
+        feature_to_post.orientation = new EasyVizAR.Orientation(marker.transform.rotation);
+        feature_to_post.scale = new EasyVizAR.Scale(marker.transform.localScale);
         feature_to_post.name = feature_type;
-        // feature_to_post.type = feature_type.ToLower();
         feature_to_post.type = feature_type;
-
-        EasyVizAR.FeatureDisplayStyle style = new EasyVizAR.FeatureDisplayStyle();
-        style.placement = "point";
-        feature_to_post.style = style;
 
         //Serialize the feature into JSON
         var data = JsonUtility.ToJson(feature_to_post);
@@ -236,7 +241,10 @@ public class FeatureManager : MonoBehaviour
         EasyVizARServer.Instance.Post("locations/" + manager.LocationID + "/features", EasyVizARServer.JSON_TYPE, data, delegate (string result)
         {
             // Pass the relevant marker GameObject to the callback so that it can be updated.
-            PostFeature(result, marker);
+            if (replaceLocal)
+            {
+                PostFeature(result, marker);
+            }
         });
 
         featureHolder = feature_to_post;
@@ -396,21 +404,12 @@ public class FeatureManager : MonoBehaviour
             //Find the feature in the scene to get the game object's position
             Transform feature_object_transform = spawn_parent.transform.Find(string.Format("feature-{0}", id));
 
-            EasyVizAR.Position position = new EasyVizAR.Position();
-
-            position.x = feature_object_transform.position.x;
-            position.y = feature_object_transform.position.y;
-            position.z = feature_object_transform.position.z;
-
-            feature_to_patch.position = position;
-
-
-            // TODO: might want to modify the style?
-            //feature_to_patch.style.placement = "point";
+            feature_to_patch.position = new EasyVizAR.Position(feature_object_transform.position);
+            feature_to_patch.orientation = new EasyVizAR.Orientation(feature_object_transform.rotation);
+            feature_to_patch.scale = new EasyVizAR.Scale(feature_object_transform.localScale);
 
             //Serialize the feature into JSON
             var data = JsonUtility.ToJson(feature_to_patch);
-
 
             // updates the dictionary
             featureHolder = feature_to_patch;
