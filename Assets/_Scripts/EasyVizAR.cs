@@ -35,6 +35,14 @@ namespace EasyVizAR
 	}
 
 	[System.Serializable]
+	public class Scale
+	{
+		public float x;
+		public float y;
+		public float z;
+	}
+
+	[System.Serializable]
 	public class NavigationTarget
 	{
 		public string type;         // One of (none|point|feature|headset)
@@ -230,6 +238,8 @@ namespace EasyVizAR
 		public string name;
 		//Are we using the predefined Vect3f or using our custom class
 		public Position position;
+		public Orientation orientation;
+		public Scale scale;
 		public FeatureDisplayStyle style;
 		public string type;
 		public float updated;
@@ -292,6 +302,7 @@ namespace EasyVizAR
 		public float photo_detection_threshold;
 		public float photo_target_interval;
 		public bool enable_gesture_recognition;
+		public bool enable_marker_placement;
     }
 
 	[System.Serializable]
