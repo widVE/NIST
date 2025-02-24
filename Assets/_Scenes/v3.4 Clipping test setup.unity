@@ -12479,185 +12479,37 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 561901448}
     - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: door_icon
-      value: 
-      objectReference: {fileID: 5768835465149159710, guid: 276038058a482d5449f1b915684023e4, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: exit_icon
-      value: 
-      objectReference: {fileID: 3140010996445233141, guid: 80a6333689031964a91df9a68115a482, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: featureID
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: fire_icon
-      value: 
-      objectReference: {fileID: 2005560289462229204, guid: be371bfdb7e83e84987073c32254b484, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: user_icon
-      value: 
-      objectReference: {fileID: 345927283592416211, guid: 243609eb198ce2241b9e19f980dbe7d4, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
       propertyPath: _qrScanner
       value: 
       objectReference: {fileID: 291935030}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: audio_icon
-      value: 
-      objectReference: {fileID: 3287684663553396786, guid: 2442bb792e63b4b4086871ef8747d8b6, type: 3}
     - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
       propertyPath: spawn_root
       value: 
       objectReference: {fileID: 1208393620}
     - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: danger_icon
-      value: 
-      objectReference: {fileID: 4815252816942109241, guid: 1852a5944cf310340baa2cdc649aa6c9, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: injury_icon
-      value: 
-      objectReference: {fileID: 202343477376530035, guid: fb08555b69fc7d845a7a8abeb3070f83, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: object_icon
-      value: 
-      objectReference: {fileID: 1416711397748327800, guid: 2828d449951ac8c4a9b1b72a71ebca16, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: person_icon
-      value: 
-      objectReference: {fileID: 4262304109175930143, guid: e3905b9128050d743b5c2739af4f9595, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: stairs_icon
-      value: 
-      objectReference: {fileID: 2788638943498824565, guid: 4aa41690d1cbbb74c995d283a1b9d7cc, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
       propertyPath: curr_headset
       value: 
       objectReference: {fileID: 1517424691}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: headset_icon
-      value: 
-      objectReference: {fileID: 740466347194095177, guid: 769f7f842e5ca21458fc6a42c5ae732c, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: message_icon
-      value: 
-      objectReference: {fileID: 7075250966255036755, guid: d97dc6b4415b21d46a8667f88b9a4df5, type: 3}
     - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
       propertyPath: spawn_parent
       value: 
       objectReference: {fileID: 1968206798}
     - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: warning_icon
-      value: 
-      objectReference: {fileID: 5065242801546265607, guid: 413996b3d03ac3c4e8b1b84f725dd034, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
       propertyPath: distance_text
       value: 
       objectReference: {fileID: 415639110}
     - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: elevator_icon
+      propertyPath: wall_map_icon
       value: 
-      objectReference: {fileID: 4413004795778641156, guid: ee11c636ad58b8245a97fcbb09699bf0, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_door_icon
-      value: 
-      objectReference: {fileID: 2069925151985208245, guid: fcb4f40d1397af84fb17c92fc7f51175, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_exit_icon
-      value: 
-      objectReference: {fileID: 4252723170412605694, guid: 1f6d11e0e84f1fb4d902fd794a6f7eae, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_fire_icon
-      value: 
-      objectReference: {fileID: 5035943243370458903, guid: f2440b4ec2d22a24fafed66410029289, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_user_icon
-      value: 
-      objectReference: {fileID: 7768351483811375682, guid: e3c7207a7f381ba4cb586ef01b2ae0c0, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: ambulance_icon
-      value: 
-      objectReference: {fileID: 9199646796446568662, guid: 219510e2126b2f44cbcc6b9119597ec0, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: biohazard_icon
-      value: 
-      objectReference: {fileID: 8472836948503744904, guid: 5ead7e8dd87c9674e85d0767e91ca3df, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_audio_icon
-      value: 
-      objectReference: {fileID: 1842730812392890949, guid: 007f6ed56c35b18429f1a59159f5b338, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: radiation_icon
-      value: 
-      objectReference: {fileID: 8943490349098414105, guid: 136a5275b9dec8a4cac29fef910bd3df, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: bad_person_icon
-      value: 
-      objectReference: {fileID: 3830154839079465287, guid: 15387a4909e7cd4459e56b35fff6ec8a, type: 3}
+      objectReference: {fileID: 7824111022908722931, guid: 4d5ab6293def13541b7987d702880471, type: 3}
     - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
       propertyPath: distance_parent
       value: 
       objectReference: {fileID: 1661586568}
     - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_danger_icon
+      propertyPath: ceiling_map_icon
       value: 
-      objectReference: {fileID: 8008323707865364207, guid: 0499aebbed8cf224985a42ac87bbaf9d, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_injury_icon
-      value: 
-      objectReference: {fileID: 2004794065475310447, guid: 0acf7b3895827f442bb669f1d9bd9f19, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_object_icon
-      value: 
-      objectReference: {fileID: 6875439886385581506, guid: 6b140dfc0095d114b85769204dbbfc09, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_person_icon
-      value: 
-      objectReference: {fileID: 3853431206861463370, guid: 52942bd3952bbb446b88b6ed3fbe7d99, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_stairs_icon
-      value: 
-      objectReference: {fileID: 848803944910143869, guid: 9655769b4642b974eb77ad4d47b2be60, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_headset_icon
-      value: 
-      objectReference: {fileID: 4402188086708784334, guid: b234550f30f629c41ba6c5c3b64682a6, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_message_icon
-      value: 
-      objectReference: {fileID: 288360056468445405, guid: ff93914915aabee42b48e3aaa39ca108, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_warning_icon
-      value: 
-      objectReference: {fileID: 2430657643644576839, guid: 34552eacdb62c7445b8531a16e496022, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: extinguisher_icon
-      value: 
-      objectReference: {fileID: 4331337373351478003, guid: c416e020249acc443a8242e08be7c901, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_elevator_icon
-      value: 
-      objectReference: {fileID: 5702560553518286225, guid: fe45e9a9ef012c243b4d2deb95ce3fb0, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_ambulance_icon
-      value: 
-      objectReference: {fileID: 290209382182822209, guid: 2e0cbd28fded53e4580ae7524b008bd3, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_biohazard_icon
-      value: 
-      objectReference: {fileID: 1981342878318901796, guid: 972690c0f7861754e9f4c3dd8db275d0, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_radiation_icon
-      value: 
-      objectReference: {fileID: 9092256845123000539, guid: c246fefea99c3ce43bb921421b44cd1e, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_bad_person_icon
-      value: 
-      objectReference: {fileID: 6538244069947008119, guid: a226e2832cf4e8743979c6853e9d9586, type: 3}
-    - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
-      propertyPath: map_extinguisher_icon
-      value: 
-      objectReference: {fileID: 3800510486315543192, guid: 63e4cb30289512045b15c961cfc1ce43, type: 3}
+      objectReference: {fileID: 7824111022908722931, guid: 4d5ab6293def13541b7987d702880471, type: 3}
     - target: {fileID: -3539079313938338415, guid: e7d7b5bf36f021740ae0cc546a83ec8b, type: 3}
       propertyPath: palm_map_spawn_target
       value: 

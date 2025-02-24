@@ -29,13 +29,15 @@ public class LocationModelViewer : MonoBehaviour
     // Store reference to newest GameObject for each surface, keyed on surface ID.
     private Dictionary<string, GameObject> surfaces = new();
 
-    void Start()
+    IEnumerator Start()
     {
         modelParent = new GameObject();
         modelParent.name = "model";
         modelParent.transform.parent = transform;
         modelParent.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
         modelParent.transform.localScale = new Vector3(invertXAxis ? -1.0f : 1.0f, 1.0f, 1.0f);
+
+        yield return new WaitUntil(() => LocationModelLoader.Instance.GetModel() != null);
 
         var model = LocationModelLoader.Instance.GetModel();
         CloneModelComponents(model);

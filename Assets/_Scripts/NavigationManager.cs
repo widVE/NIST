@@ -54,6 +54,8 @@ public class NavigationManager : MonoBehaviour
 
     public static NavigationManager Instance { get; private set; }
 
+    private AsyncOperation firstNavMeshBuildOperation = null;
+
     private Coroutine updatePathCoroutine;
 
     private void Awake()
@@ -157,7 +159,12 @@ public class NavigationManager : MonoBehaviour
         }
 
         var nav_mesh_build_settings = NavMesh.GetSettingsByID(0);
-        return NavMeshBuilder.UpdateNavMeshDataAsync(navMeshData, nav_mesh_build_settings, nav_mesh_source_list, bounds);
+
+        var asyncOp = NavMeshBuilder.UpdateNavMeshDataAsync(navMeshData, nav_mesh_build_settings, nav_mesh_source_list, bounds);
+        if (firstNavMeshBuildOperation == null)
+            firstNavMeshBuildOperation = asyncOp;
+
+        return asyncOp;
     }
 
     // Set a navigation target.
@@ -295,6 +302,14 @@ public class NavigationManager : MonoBehaviour
         });
 
         return true;
+    }
+
+    public bool IsReady()
+    {
+        if (firstNavMeshBuildOperation == null)
+            return false;
+
+        return firstNavMeshBuildOperation.isDone;
     }
 
     public void UpdateMapPathLineRenderers(EasyVizAR.MapPath path)

@@ -63,7 +63,6 @@ public class SignManager : MonoBehaviour
 
     public Transform navigation_root;
 
-
     [SerializeField]
     Sprite[] typeIcons;
     Dictionary<string, Sprite> icon_type_dictionary = new();
@@ -72,23 +71,36 @@ public class SignManager : MonoBehaviour
 
     public UnityEngine.Events.UnityAction OnFeatureListReceived;
 
-    private FeatureManager featureManager;
     List<List<Vector3>> _pointCache = new();
 
     private void Awake()
     {
         if (navigation_root == null) navigation_root = this.transform;
 
-        InitTypeIcons();        
-        featureManager = GameObject.Find("FeatureManager").GetComponent<FeatureManager>();
-        location = featureManager.LocationName;
-        UpdateNavigationSigns();
-        RefreshView();
+        InitTypeIcons();
     }
 
-    private void Start()
+    private IEnumerator Start()
     {
         if (navigation_root == null) navigation_root = this.transform;
+
+        location = FeatureManager.Instance.LocationName;
+        locationLabel.text = FeatureManager.Instance.LocationName;
+
+        // Wait for navigation mesh to be ready, then populate the sign.
+        yield return new WaitUntil(() => NavigationManager.Instance.IsReady());
+
+        UpdateNavigationSigns();
+        RefreshView();
+
+        // This sign was either created locally through the hand menu
+        // or from an external source through the FeatureManager.
+        // If it was locally created, send a message to the server to create a new feature for it.
+        var parent = transform.parent?.gameObject;
+        if (parent == null || parent.name == "Sign Navigation Production")
+        {
+            FeatureManager.Instance.CreateNewFeature("wall-sign", this.gameObject, replaceLocal: false);
+        }
     }
 
     private void InitTypeIcons()
@@ -241,11 +253,6 @@ public class SignManager : MonoBehaviour
     [ContextMenu("Update Sign")]
     private void UpdateNavigationSigns()
     {
-        if (featureManager == null)
-        {
-            Debug.LogError("SignNavigationManager:FeatureManager is null");
-            return;
-        }
         if (navigation_root == null)
         {
             Debug.LogError("SignNavigationManager:Nav_Root is null");
@@ -259,7 +266,7 @@ public class SignManager : MonoBehaviour
 
         
 
-        var features = featureManager.feature_list.features;
+        var features = FeatureManager.Instance.feature_list.features;
         for (int i = 0; i < features.Length; i++)
         {
             var feature = features[i];
@@ -274,14 +281,6 @@ public class SignManager : MonoBehaviour
         }
         RefreshView();
         
-    }
-     private void OnEnable()
-
-    {
-        UpdateNavigationSigns();
-
-        // Notify the server that a new sign was created.
-        featureManager.CreateNewFeature("wall-sign", this.gameObject, replaceLocal: false);
     }
 }
 

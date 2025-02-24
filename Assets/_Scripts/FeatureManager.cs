@@ -77,10 +77,12 @@ public class FeatureManager : MonoBehaviour
     public bool isChanged = true;
     public int curr_list_size = 0;
     // Feature objects
+    public GameObject _3d_map_icon;
     public GameObject ambulance_icon;
     public GameObject audio_icon;
     public GameObject bad_person_icon;
     public GameObject biohazard_icon;
+    public GameObject ceiling_sign_icon;
     public GameObject door_icon;
     public GameObject elevator_icon;
     public GameObject exit_icon;
@@ -94,6 +96,7 @@ public class FeatureManager : MonoBehaviour
     public GameObject radiation_icon;
     public GameObject stairs_icon;
     public GameObject user_icon;
+    public GameObject wall_sign_icon;
     public GameObject warning_icon;
     //added for input
     public GameObject danger_icon;
@@ -138,10 +141,12 @@ public class FeatureManager : MonoBehaviour
 
         //Added from SpawnListIndex
         //populating the feature types dictionary 
+        //feature_type_dictionary.Add("3d-map", _3d_map_icon);
         feature_type_dictionary.Add("ambulance", ambulance_icon);
         feature_type_dictionary.Add("audio", audio_icon);
         feature_type_dictionary.Add("bad-person", bad_person_icon);
         feature_type_dictionary.Add("biohazard", biohazard_icon);
+        feature_type_dictionary.Add("ceiling-sign", ceiling_sign_icon);
         feature_type_dictionary.Add("door", door_icon);
         feature_type_dictionary.Add("elevator", elevator_icon);
         feature_type_dictionary.Add("exit", exit_icon);
@@ -155,6 +160,7 @@ public class FeatureManager : MonoBehaviour
         feature_type_dictionary.Add("radiation", radiation_icon);
         feature_type_dictionary.Add("stairs", stairs_icon);
         feature_type_dictionary.Add("user", user_icon);
+        feature_type_dictionary.Add("wall-sign", wall_sign_icon);
         feature_type_dictionary.Add("warning", warning_icon);
         // added for input 
         feature_type_dictionary.Add("danger", danger_icon);
@@ -546,18 +552,15 @@ public class FeatureManager : MonoBehaviour
         feature_dictionary.Add(feature.id, feature);
 
         GameObject world_feature_to_spawn;
-        GameObject map_icon_to_spawn;
 
         if (feature_type_dictionary.ContainsKey(feature.type))
         {
             world_feature_to_spawn = feature_type_dictionary[feature.type];
-            map_icon_to_spawn = map_icon_dictionary[feature.type];
         }
         else
         {
             Debug.Log("Feature type dictionary does not contain " + feature.type);
             world_feature_to_spawn = warning_icon;
-            map_icon_to_spawn = warning_icon;
         }
 
         Vector3 world_position = Vector3.zero;
@@ -565,76 +568,90 @@ public class FeatureManager : MonoBehaviour
         world_position.y = feature.position.y;
         world_position.z = feature.position.z;
 
-        //This is where the world markers happen I think.
-        GameObject world_marker = Instantiate(world_feature_to_spawn, world_position, spawn_root.transform.rotation, spawn_parent.transform);
-        world_marker.name = string.Format("feature-{0}", feature.id);
-        world_marker.transform.Find("ID").GetChild(0).name = feature.id.ToString(); // this helps keeping track of feature id
-
-        //I'm trying to add in the marker icon spawning to the floating map. I think this is where it happens!
-        GameObject palm_map_marker = Instantiate(map_icon_to_spawn, palm_map_spawn_target.transform, false);
-        MarkerObject palm_marker_object = palm_map_marker.GetComponent<MarkerObject>();
-        if (palm_marker_object is not null)
+        Quaternion orientation = spawn_root.transform.rotation;
+        if (feature.type == "wall-sign")
         {
-            palm_marker_object.feature_ID = feature.id;
-            palm_marker_object.feature_type = feature.type;
-            palm_marker_object.feature_name = feature.name;
-            palm_marker_object.world_position = world_position;
-            palm_marker_object.manager_script = this;
+            orientation = new Quaternion(feature.orientation.x, feature.orientation.y, feature.orientation.z, feature.orientation.w);
         }
 
-        Vector3 map_coordinate_position = Vector3.zero;
-        map_coordinate_position.x = world_position.x;
-        map_coordinate_position.y = world_position.y;
+        Color myColor = Color.magenta;
+        ColorUtility.TryParseHtmlString(feature.color, out myColor);
 
-        float y_offset = (feature.id / 1000f);
-        if (mirror_map_axis) y_offset *= -1;
+        //This is where the world markers happen I think.
+        GameObject world_marker = Instantiate(world_feature_to_spawn, world_position, orientation, spawn_parent.transform);
+        world_marker.name = string.Format("feature-{0}", feature.id);
 
-        //WARNING: When we mirror the map to have it look like what it is on the server we need to negat the z values of the position of the icons because of the coordinate space inversion
-        if (mirror_map_axis) map_coordinate_position.z = -1 * world_position.z;
-        else map_coordinate_position.z = world_position.z;
+        var idElement = world_marker.transform.Find("ID");
+        if (idElement)
+            idElement.GetChild(0).name = feature.id.ToString(); // this helps keeping track of feature id
 
-        palm_map_marker.transform.localPosition = new Vector3(map_coordinate_position.x, y_offset, map_coordinate_position.z);
-        palm_map_marker.name = string.Format("feature-{0}", feature.id);
+        var iconVisuals = world_marker.transform.Find("Icon Visuals");
+        if (iconVisuals)
+            iconVisuals.GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
 
-        //Adding the rotation to the map marker, we want it specifically for the headsets, but the other icons might look weird
-        /*        Vector3 map_rotation = Vector3.zero;
-                map_rotation.x = feature.position.x;
-                map_rotation.y = feature.position.y;
-                map_rotation.z = feature.position.z;
-        */
+        // Add the name of the feature to DistanceFeatureText.cs 
+        var typeElement = world_marker.transform.Find("type");
+        if (typeElement)
+            typeElement.GetChild(0).name = feature.name;
 
-        GameObject floating_map_marker = Instantiate(map_icon_to_spawn, floating_map_spawn_target.transform, false);
-        floating_map_marker.transform.localPosition = new Vector3(world_position.x, y_offset, map_coordinate_position.z);
-        floating_map_marker.name = string.Format("feature-{0}", feature.id);
-        MarkerObject float_marker_object = floating_map_marker.GetComponent<MarkerObject>();
-        if (float_marker_object is not null)
+        if (map_icon_dictionary.TryGetValue(feature.type, out GameObject map_icon_to_spawn))
         {
-            float_marker_object.feature_ID = feature.id;
-            float_marker_object.feature_type = feature.type;
-            float_marker_object.feature_name = feature.name;
-            float_marker_object.world_position = world_position;
-            float_marker_object.manager_script = this;
+            //I'm trying to add in the marker icon spawning to the floating map. I think this is where it happens!
+            GameObject palm_map_marker = Instantiate(map_icon_to_spawn, palm_map_spawn_target.transform, false);
+            palm_map_marker.transform.Find("Icon Visuals").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+
+            MarkerObject palm_marker_object = palm_map_marker.GetComponent<MarkerObject>();
+            if (palm_marker_object is not null)
+            {
+                palm_marker_object.feature_ID = feature.id;
+                palm_marker_object.feature_type = feature.type;
+                palm_marker_object.feature_name = feature.name;
+                palm_marker_object.world_position = world_position;
+                palm_marker_object.manager_script = this;
+            }
+
+            Vector3 map_coordinate_position = Vector3.zero;
+            map_coordinate_position.x = world_position.x;
+            map_coordinate_position.y = world_position.y;
+
+            float y_offset = (feature.id / 1000f);
+            if (mirror_map_axis) y_offset *= -1;
+
+            //WARNING: When we mirror the map to have it look like what it is on the server we need to negat the z values of the position of the icons because of the coordinate space inversion
+            if (mirror_map_axis) map_coordinate_position.z = -1 * world_position.z;
+            else map_coordinate_position.z = world_position.z;
+
+            palm_map_marker.transform.localPosition = new Vector3(map_coordinate_position.x, y_offset, map_coordinate_position.z);
+            palm_map_marker.name = string.Format("feature-{0}", feature.id);
+
+            //Adding the rotation to the map marker, we want it specifically for the headsets, but the other icons might look weird
+            /*        Vector3 map_rotation = Vector3.zero;
+                    map_rotation.x = feature.position.x;
+                    map_rotation.y = feature.position.y;
+                    map_rotation.z = feature.position.z;
+            */
+
+            GameObject floating_map_marker = Instantiate(map_icon_to_spawn, floating_map_spawn_target.transform, false);
+            floating_map_marker.transform.localPosition = new Vector3(world_position.x, y_offset, map_coordinate_position.z);
+            floating_map_marker.name = string.Format("feature-{0}", feature.id);
+            floating_map_marker.transform.Find("Icon Visuals").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+            MarkerObject float_marker_object = floating_map_marker.GetComponent<MarkerObject>();
+            if (float_marker_object is not null)
+            {
+                float_marker_object.feature_ID = feature.id;
+                float_marker_object.feature_type = feature.type;
+                float_marker_object.feature_name = feature.name;
+                float_marker_object.world_position = world_position;
+                float_marker_object.manager_script = this;
+            }
         }
 
         //GameObject mapMarker = Instantiate(world_feature_to_spawn, mapParent.transform, false);
-
-        // Add the name of the feature to DistanceFeatureText.cs 
-        world_marker.transform.Find("type").GetChild(0).name = feature.name;
         //UnityEngine.Debug.Log("the feature name is in feature manager: " + spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("type").GetChild(0).name);
 
         if(volumetric_map_spawn_target != null)
         {
             SpawnVolumeMapMarker(world_feature_to_spawn, feature);
-
-        }
-
-        Color myColor;
-        if (ColorUtility.TryParseHtmlString(feature.color, out myColor))
-        {
-            world_marker.transform.Find("Icon Visuals").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
-            //marker.transform.Find("Icon Visuals").GetComponent<Renderer>().material.color = myColor;
-            palm_map_marker.transform.Find("Icon Visuals").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
-            floating_map_marker.transform.Find("Icon Visuals").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
         }
 
         MarkerObject new_marker_object = world_marker.GetComponent<MarkerObject>();

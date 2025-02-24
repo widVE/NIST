@@ -46,6 +46,7 @@ public class LocationModelLoader : MonoBehaviour
     private GameObject model;
     private string locationId = "unknown";
     private bool modelIsReady = false;
+    public bool navMeshIsReady = false;
 
     private string urlBase = "";
 
