@@ -11,8 +11,6 @@ public class DockGrabCloner : MonoBehaviour
 
     public EasyVizARHeadsetManager headset_reference;
 
-    public NavigationManager navigation_manager;
-
     //GameObject VolumeHeadsetLoader;
 
     //public VolumeHeadsetLoader headsetloader_reference;
@@ -35,8 +33,7 @@ public class DockGrabCloner : MonoBehaviour
 
     public void Start()
     {
-        //find the navigation manager in the scene
-        navigation_manager = GameObject.Find("NavigationManager").GetComponent<NavigationManager>();
+
     }
 
     public void SpawnObject(GameObject prefab)

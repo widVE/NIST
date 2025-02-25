@@ -141,7 +141,7 @@ public class FeatureManager : MonoBehaviour
 
         //Added from SpawnListIndex
         //populating the feature types dictionary 
-        //feature_type_dictionary.Add("3d-map", _3d_map_icon);
+        feature_type_dictionary.Add("3d-map", _3d_map_icon);
         feature_type_dictionary.Add("ambulance", ambulance_icon);
         feature_type_dictionary.Add("audio", audio_icon);
         feature_type_dictionary.Add("bad-person", bad_person_icon);
@@ -649,7 +649,7 @@ public class FeatureManager : MonoBehaviour
         //GameObject mapMarker = Instantiate(world_feature_to_spawn, mapParent.transform, false);
         //UnityEngine.Debug.Log("the feature name is in feature manager: " + spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("type").GetChild(0).name);
 
-        if(volumetric_map_spawn_target != null)
+        if(volumetric_map_spawn_target != null && feature.type != "3d-map")
         {
             SpawnVolumeMapMarker(world_feature_to_spawn, feature);
         }

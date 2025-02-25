@@ -22,6 +22,10 @@ public class VolumeFeatureLoader : MonoBehaviour
     {
         foreach (EasyVizAR.Feature feature in feature_list.features)
         {
+            // Do not spawn a 3D map inside a 3D map. It is not as fun as it sounds.
+            if (feature.type == "3d-map")
+                continue;
+
             // This will add the feature if it is new or update an existing one.
             //if (!feature_dictionary.ContainsValue(feature))
             featureManager_reference.UpdateFeatureFromServer(feature);
