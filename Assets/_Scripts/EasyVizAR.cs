@@ -34,6 +34,11 @@ namespace EasyVizAR
 			y = q.y;
 			z = q.z;
         }
+
+		public Quaternion toQuaternion()
+		{
+			return new Quaternion(x, y, z, w);
+		}
 	}
 
 	[System.Serializable]
@@ -51,6 +56,11 @@ namespace EasyVizAR
 			y = p.y;
 			z = p.z;
 		}
+
+		public Vector3 toVector3()
+        {
+			return new Vector3(x, y, z);
+        }
 	}
 
 	[System.Serializable]
@@ -67,6 +77,11 @@ namespace EasyVizAR
 			x = p.x;
 			y = p.y;
 			z = p.z;
+		}
+
+		public Vector3 toVector3()
+		{
+			return new Vector3(x, y, z);
 		}
 	}
 
@@ -175,6 +190,16 @@ namespace EasyVizAR
 	}
 
 	[System.Serializable]
+	public class PhotoFile
+	{
+		public string content_type;
+		public int height;
+		public string name;
+		public string purpose;
+		public int width;
+	}
+
+	[System.Serializable]
 	public class PhotoInfo
 	{
 		public int id;
@@ -188,7 +213,21 @@ namespace EasyVizAR
 		public float created;
 		public float updated;
 
+		public Position camera_position;
+		public Orientation camera_orientation;
+
 		public PhotoAnnotation[] annotations;
+		public PhotoFile[] files;
+
+		public PhotoFile GetFileByPurpose(string purpose)
+        {
+			foreach (var file in files)
+            {
+				if (file.purpose == purpose)
+					return file;
+            }
+			return null;
+        }
 	}
 
 	[System.Serializable]

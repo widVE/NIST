@@ -214,6 +214,33 @@ public class ObjectDetector : MonoBehaviour
 		return DateTimeOffset.Now.ToUnixTimeMilliseconds();
 	}
 
+
+	public IEnumerator LoadExampleDetectionMask()
+    {
+		// Only for testing, load one of the example object detection masks.
+		if (currentLocationId == "acf9cc39-a7a8-4ea4-bc10-8959cae35582")
+        {
+			string url = EasyVizARServer.Instance.GetBaseURL() + $"/photos/8577?inflate_vectors=TRUE&wait=5";
+
+			UnityWebRequest www = new UnityWebRequest(url, "GET");
+
+			www.SetRequestHeader("Authorization", EasyVizARServer.Instance.GetAuthorizationHeader());
+			www.downloadHandler = new DownloadHandlerBuffer();
+
+			yield return www.SendWebRequest();
+
+			string detectionResult = "";
+
+			if (www.result == UnityWebRequest.Result.Success)
+			{
+				Debug.Log(www.downloadHandler.text);
+				var photo = JsonUtility.FromJson<EasyVizAR.PhotoInfo>(www.downloadHandler.text);
+
+				ShowDetectionResultMask(photo);
+			}
+		}
+	}
+
     void Start()
 	{
 		Application.targetFrameRate = 60;
@@ -259,6 +286,7 @@ public class ObjectDetector : MonoBehaviour
 					case "continuous":
 						detectionMode = DetectionMode.Blur;
 						transmitMode = TransmitMode.Continuous;
+						shouldWaitForResult = true;
 						break;
 					default:
 						detectionMode = DetectionMode.Off;
@@ -280,6 +308,7 @@ public class ObjectDetector : MonoBehaviour
 		if (running)
         {
 			Debug.Log("Initializing ObjectDetector");
+			StartCoroutine(LoadExampleDetectionMask());
 			initializeEngine();
 			initializeCamera();
 			StartCoroutine(CaptureLoop());
@@ -1281,6 +1310,8 @@ public class ObjectDetector : MonoBehaviour
                     }
 					existingContours = newContours;
                 }
+
+				ShowDetectionResultMask(photo);
 			}
 		}
 
@@ -1288,6 +1319,30 @@ public class ObjectDetector : MonoBehaviour
 			headAttachedText.EnqueueMessage(detectionResult, 5.0f);
 
 		www.Dispose();
+	}
+
+	void ShowDetectionResultMask(EasyVizAR.PhotoInfo photo)
+    {
+		// Experimental: get the object detection mask from the server and render it on a quad,
+		// which should be located where the camera image plane would be.
+		var mask = photo.GetFileByPurpose("mask");
+		var quad = transform.Find("Object Detection Result");
+		if (mask != null && quad != null)
+		{
+			EasyVizARServer.Instance.Texture($"photos/{photo.id}/{mask.name}", mask.content_type, mask.width.ToString(), delegate (Texture image) {
+				quad.transform.position = photo.camera_position.toVector3();
+				quad.transform.rotation = photo.camera_orientation.toQuaternion();
+				
+				// TODO: we will need some adjustment based on camera focal length, sensor size, etc.
+				quad.transform.position += quad.transform.forward;
+
+				float quadWidth = (float)mask.width / (float)mask.height;
+				quad.transform.localScale = new Vector3(quadWidth, 1, 1);
+
+				var renderer = quad.GetComponent<Renderer>();
+				renderer.material.mainTexture = image;
+			});
+		}
 	}
 
 	IEnumerator sendPatches(List<IMultipartFormSection> patches)
