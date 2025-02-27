@@ -273,6 +273,9 @@ public class SignManager : MonoBehaviour
             var targetPosition =
                 new Vector3(feature.position.x, feature.position.y, feature.position.z);
 
+            if (!feature.ShouldDisplayOnSigns())
+                continue;
+
             if (NavigationManager.Instance.GetDirection(navigation_root, targetPosition, out SignArrowDirection direction))
             {
                 AddFeature(direction, feature, GetTypeIcon(feature.type));

@@ -21,7 +21,7 @@ public class BillboardingFeatureMarker : MonoBehaviour
 
             // Skip objects that are not ordinary feature markers, which all have a MarkerObject attached.
             // These may be special objects (wall signs or 3D maps) that have a fixed orientation.
-            if (!markerObject)
+            if (!markerObject || !markerObject.enableBillboardBehavior)
                 continue;
 
             child.transform.LookAt(cam.transform);

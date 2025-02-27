@@ -568,18 +568,22 @@ public class FeatureManager : MonoBehaviour
         world_position.y = feature.position.y;
         world_position.z = feature.position.z;
 
-        Quaternion orientation = spawn_root.transform.rotation;
-        if (feature.type == "wall-sign")
-        {
-            orientation = new Quaternion(feature.orientation.x, feature.orientation.y, feature.orientation.z, feature.orientation.w);
-        }
+        var orientation = new Quaternion(feature.orientation.x, feature.orientation.y, feature.orientation.z, feature.orientation.w);
 
         Color myColor = Color.magenta;
         ColorUtility.TryParseHtmlString(feature.color, out myColor);
 
         //This is where the world markers happen I think.
         GameObject world_marker = Instantiate(world_feature_to_spawn, world_position, orientation, spawn_parent.transform);
+
         world_marker.name = string.Format("feature-{0}", feature.id);
+        world_marker.transform.localScale = new Vector3(feature.scale.x, feature.scale.y, feature.scale.z);
+
+        // Add the name of the feature to DistanceFeatureText.cs
+        // TODO: This GameObject only seems to exist in order to store information in its name.
+        var typeElement = world_marker.transform.Find("type");
+        if (typeElement)
+            typeElement.GetChild(0).name = feature.name;
 
         var idElement = world_marker.transform.Find("ID");
         if (idElement)
@@ -589,12 +593,22 @@ public class FeatureManager : MonoBehaviour
         if (iconVisuals)
             iconVisuals.GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
 
-        // Add the name of the feature to DistanceFeatureText.cs 
-        var typeElement = world_marker.transform.Find("type");
-        if (typeElement)
-            typeElement.GetChild(0).name = feature.name;
+        MarkerObject new_marker_object = world_marker.GetComponent<MarkerObject>();
+        if (new_marker_object is not null)
+        {
+            new_marker_object.feature_ID = feature.id;
+            new_marker_object.feature_type = feature.type;
+            new_marker_object.feature_name = feature.name;
+            new_marker_object.world_position = world_position;
+            new_marker_object.manager_script = this;
+        }
+        else
+        {
+            Debug.Log("Warning: MarkerObject component is missing");
+            return;
+        }
 
-        if (map_icon_dictionary.TryGetValue(feature.type, out GameObject map_icon_to_spawn))
+        if (new_marker_object.displayOn2DMaps && map_icon_dictionary.TryGetValue(feature.type, out GameObject map_icon_to_spawn))
         {
             //I'm trying to add in the marker icon spawning to the floating map. I think this is where it happens!
             GameObject palm_map_marker = Instantiate(map_icon_to_spawn, palm_map_spawn_target.transform, false);
@@ -649,23 +663,9 @@ public class FeatureManager : MonoBehaviour
         //GameObject mapMarker = Instantiate(world_feature_to_spawn, mapParent.transform, false);
         //UnityEngine.Debug.Log("the feature name is in feature manager: " + spawn_parent.transform.Find(string.Format("feature-{0}", feature.id)).Find("type").GetChild(0).name);
 
-        if(volumetric_map_spawn_target != null && feature.type != "3d-map")
+        if(volumetric_map_spawn_target != null && new_marker_object.displayOn3DMaps)
         {
             SpawnVolumeMapMarker(world_feature_to_spawn, feature);
-        }
-
-        MarkerObject new_marker_object = world_marker.GetComponent<MarkerObject>();
-        if (new_marker_object is not null)
-        {
-            new_marker_object.feature_ID = feature.id;
-            new_marker_object.feature_type = feature.type;
-            new_marker_object.feature_name = feature.name;
-            new_marker_object.world_position = world_position;
-            new_marker_object.manager_script = this;
-        }
-        else
-        {
-            Debug.Log("Warning: MarkerObject component is missing");
         }
     }
 
@@ -679,12 +679,12 @@ public class FeatureManager : MonoBehaviour
         float y_offset = (feature.id / 1000f);
 
         GameObject volumetric_map_marker = Instantiate(feature_to_spawn, volumetric_map_spawn_target.transform, false);
+
         volumetric_map_marker.name = string.Format("feature-{0}", feature.id);
         volumetric_map_marker.transform.localPosition = new Vector3(world_position.x, world_position.y, world_position.z);
+        volumetric_map_marker.transform.localRotation = new Quaternion(feature.orientation.x, feature.orientation.y, feature.orientation.z, feature.orientation.w);
 
         MarkerObject volumetric_marker_object = volumetric_map_marker.GetComponent<MarkerObject>();
-
-
 
         if (volumetric_marker_object is not null)
         {
@@ -694,12 +694,12 @@ public class FeatureManager : MonoBehaviour
             volumetric_marker_object.world_position = world_position;
             volumetric_marker_object.manager_script = this;
         }
-        Color myColor;
-            if (ColorUtility.TryParseHtmlString(feature.color, out myColor))
-            {
-                volumetric_map_marker.transform.Find("Icon Visuals").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
-            }
 
+        Color myColor;
+        if (ColorUtility.TryParseHtmlString(feature.color, out myColor))
+        {
+            volumetric_map_marker.transform.Find("Icon Visuals").GetComponent<Renderer>().material.SetColor("_EmissionColor", myColor);
+        }
     }
     
 

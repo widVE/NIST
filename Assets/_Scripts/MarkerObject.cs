@@ -14,6 +14,15 @@ public class MarkerObject : MonoBehaviour
 
     public bool displayDistanceInFeet = true;
 
+    // Whether the marker should always rotate to face the camera.
+    // This will be disabled on features which have a specified orientation.
+    public bool enableBillboardBehavior = true;
+
+    // Whether the marker should be shown on signs and maps.
+    public bool displayOnSigns = true;
+    public bool displayOn2DMaps = true;
+    public bool displayOn3DMaps = true;
+
     private TMPro.TextMeshPro feature_tmp = null;
     private string previous_label = "";
 

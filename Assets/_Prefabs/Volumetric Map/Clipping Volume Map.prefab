@@ -287,6 +287,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1477525487126966761}
+  - component: {fileID: 6653352427547095679}
   m_Layer: 0
   m_Name: Clipping Volume Map
   m_TagString: Untagged
@@ -313,6 +314,28 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6653352427547095679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1477525487126966760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01df08ac3a635e14da5c4ae345fc8eae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  feature_ID: -1
+  feature_type: 3d-map
+  feature_name: 
+  world_position: {x: 0, y: 0, z: 0}
+  manager_script: {fileID: 0}
+  displayDistanceInFeet: 1
+  enableBillboardBehavior: 0
+  displayOnSigns: 0
+  displayOn2DMaps: 1
+  displayOn3DMaps: 0
 --- !u!1 &1477525487256237627
 GameObject:
   m_ObjectHideFlags: 0

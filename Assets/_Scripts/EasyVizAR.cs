@@ -271,6 +271,19 @@ namespace EasyVizAR
 		public FeatureDisplayStyle style;
 		public string type;
 		public float updated;
+
+		public bool ShouldDisplayOnSigns()
+        {
+			switch (type)
+            {
+				case "3d-map":
+				case "ceiling-sign":
+				case "wall-sign":
+					return false;
+				default:
+					return true;
+            }
+        }
 	}
 
 	[System.Serializable]
