@@ -17,7 +17,9 @@ public class MapIconSpawn : MonoBehaviour
     public bool verbose_debug = false;
     public bool mirror_axis = false;
     public string last_clicked_target = "";
-    
+
+    public float icon_z_offset = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -70,7 +72,7 @@ public class MapIconSpawn : MonoBehaviour
             //loat icon_origin_y = (0 - mapTop) / mapHeight;
 
             //Debug.Log("origin x and y: " + icon_origin_x + ", " + icon_origin_y);
-            float icon_z_offset = -0.12f;
+            
 
             iconParent.transform.localPosition = new Vector3(icon_origin_x, icon_origin_y, icon_z_offset); // the scale may need to be adjusted
         }
