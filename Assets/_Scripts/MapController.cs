@@ -282,13 +282,18 @@ public class MapController : MonoBehaviour
                         feature.localPosition = markerObject.world_position;
                     }
 
+                    // Set the Y position to zero so that the feature is always on the map surface, as there are many different height values the objects could have
+                    feature.localPosition = new Vector3(feature.localPosition.x, 0.0f, feature.localPosition.z);
+
                     continue;
                 }
+
 
                 // Anything that is not a line renderer or feature marker, e.g. other user headsets, here.
                 {
                     var distance = Vector3.Distance(Camera.main.transform.position, feature.localPosition);
                     feature.gameObject.SetActive(distance < 10);
+                    feature.localPosition = new Vector3(feature.localPosition.x, 0.0f, feature.localPosition.z);
                     continue;
                 }
             }

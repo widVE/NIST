@@ -34598,6 +34598,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 83224249177950545, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1373874847806095558, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1415802458275241382, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: renderers.Array.size
       value: 2
@@ -34809,6 +34817,10 @@ PrefabInstance:
     - target: {fileID: 3728181045455103163, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: mirror_axis
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3728181045455103163, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: icon_z_offset
+      value: -0.13
       objectReference: {fileID: 0}
     - target: {fileID: 3728181045455103163, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: mapCollection
