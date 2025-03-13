@@ -18339,52 +18339,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1492607365016697351, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
   m_PrefabInstance: {fileID: 1810665664}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &873797680
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 873797678}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d609aa16ccf078e4fa2d88cc2e151678, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currHeadset: {fileID: 1361342022}
-  iconParent: {fileID: 335883421}
-  map_scale:
-  - {fileID: 1810665668}
-  - {fileID: 1208726034}
-  map_lines:
-  - {fileID: 1810665666}
-  - {fileID: 1810665667}
-  - {fileID: 1810665665}
-  - {fileID: 792694391}
-  - {fileID: 812520005}
-  - {fileID: 445203804}
-  - {fileID: 1659198083}
-  mapCollection: {fileID: 665494468}
-  feature_parent: {fileID: 1968206798}
-  navigation_path_view: {fileID: 0}
-  verbose_debug: 1
-  mirror_axis: 1
-  last_clicked_target: 
-  featureCullingDistance: 10
-  map_layer_images_array:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  texture_index: 0
-  map_location_ID: 
-  map_resolution: 1200
 --- !u!1 &875509811
 GameObject:
   m_ObjectHideFlags: 0
@@ -34748,6 +34702,30 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2768527011371345343, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: currHeadset
+      value: 
+      objectReference: {fileID: 1361342022}
+    - target: {fileID: 2768527011371345343, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: feature_parent
+      value: 
+      objectReference: {fileID: 1968206798}
+    - target: {fileID: 2768527011371345343, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: map_lines.Array.data[3]
+      value: 
+      objectReference: {fileID: 792694391}
+    - target: {fileID: 2768527011371345343, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: map_lines.Array.data[4]
+      value: 
+      objectReference: {fileID: 812520005}
+    - target: {fileID: 2768527011371345343, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: map_lines.Array.data[5]
+      value: 
+      objectReference: {fileID: 445203804}
+    - target: {fileID: 2768527011371345343, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
+      propertyPath: map_scale.Array.data[1]
+      value: 
+      objectReference: {fileID: 1208726034}
     - target: {fileID: 3056279785162570344, guid: 4e4fb2a797f348d4bb2cd6a8f418ab98, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 

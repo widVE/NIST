@@ -138,6 +138,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1492607365016697350}
+  - component: {fileID: 2768527011371345343}
   m_Layer: 0
   m_Name: Visuals
   m_TagString: Untagged
@@ -161,6 +162,52 @@ Transform:
   m_Father: {fileID: 1492607365964717175}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2768527011371345343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1492607365016697351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d609aa16ccf078e4fa2d88cc2e151678, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currHeadset: {fileID: 0}
+  iconParent: {fileID: 6272236855978299130}
+  map_scale:
+  - {fileID: 9155385415246039275}
+  - {fileID: 0}
+  map_lines:
+  - {fileID: 3566677482485063528}
+  - {fileID: 3566677482455454033}
+  - {fileID: 3566677481325823234}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 1986591873497342618}
+  mapCollection: {fileID: 8087000642588291321}
+  feature_parent: {fileID: 0}
+  navigation_path_view: {fileID: 622476188437637769}
+  verbose_debug: 1
+  mirror_axis: 1
+  last_clicked_target: 
+  featureCullingDistance: 10
+  map_layer_images_array:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  texture_index: 0
+  map_location_ID: 
+  map_resolution: 1200
 --- !u!1 &1492607365964717172
 GameObject:
   m_ObjectHideFlags: 0
@@ -1618,11 +1665,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6335ff8fed030474a850e0152c887657, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currHeadset: {fileID: 0}
+  headset_manager: {fileID: 0}
   iconParent: {fileID: 6272236855978299130}
   map_objects: []
+  map_lines: []
   mapCollection: {fileID: 0}
-  feature_parent: {fileID: 0}
   verbose_debug: 0
   mirror_axis: 0
   last_clicked_target: 
