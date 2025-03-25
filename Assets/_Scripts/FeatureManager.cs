@@ -708,7 +708,11 @@ public class FeatureManager : MonoBehaviour
         // It is easiest to delete and recreate the feature, because
         // its display settings such as the feature type may have changed.
         DeleteFeatureFromServer(feature.id);
-        AddFeatureFromServer(feature);
+
+        if (feature.enabled)
+        {
+            AddFeatureFromServer(feature);
+        }
 
         //UnityEngine.Debug.Log("Update is called when feature changed from server");
 

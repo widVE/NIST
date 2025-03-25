@@ -303,7 +303,7 @@ namespace EasyVizAR
 		public string createdBy;
 		public int id;
 		public string name;
-		//Are we using the predefined Vect3f or using our custom class
+		public bool enabled;
 		public Position position;
 		public Orientation orientation;
 		public Scale scale;
@@ -313,6 +313,9 @@ namespace EasyVizAR
 
 		public bool ShouldDisplayOnSigns()
         {
+			if (!enabled)
+				return false;
+
 			switch (type)
             {
 				case "3d-map":
