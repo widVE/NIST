@@ -21657,7 +21657,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6554539914717491207, guid: f5376bfd1500f2545b425907c57306d3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.0760341
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6554539914717491207, guid: f5376bfd1500f2545b425907c57306d3, type: 3}
       propertyPath: m_LocalPosition.y
@@ -21665,7 +21665,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6554539914717491207, guid: f5376bfd1500f2545b425907c57306d3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.04506
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6554539914717491207, guid: f5376bfd1500f2545b425907c57306d3, type: 3}
       propertyPath: m_LocalRotation.w
@@ -21701,7 +21701,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6554539914717654055, guid: f5376bfd1500f2545b425907c57306d3, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8117296625534600493, guid: f5376bfd1500f2545b425907c57306d3, type: 3}
       propertyPath: m_Mesh
@@ -21709,6 +21709,26 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f5376bfd1500f2545b425907c57306d3, type: 3}
+--- !u!1 &1042135111 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6554539914717654055, guid: f5376bfd1500f2545b425907c57306d3, type: 3}
+  m_PrefabInstance: {fileID: 1042135110}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1042135112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1042135111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5147ddc28cc651c418d9e93e1d2fd4b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  floor_visuals: {fileID: 810742208285373253, guid: 209a51fec13040147a54595d5ea88a33, type: 3}
+  raycast_origin: {fileID: 1042135111}
+  default_height: 1
 --- !u!1 &1043725241
 GameObject:
   m_ObjectHideFlags: 0
