@@ -50,7 +50,8 @@ public class NavigationManager : MonoBehaviour
     // All navmesh data, keyed by surface ID
     private Dictionary<string, MeshData> navMeshSources = new();
 
-    public Dictionary<int, GameObject> mapPathLineRenderers = new();
+    private Dictionary<int, EasyVizAR.MapPath> mapPaths = new();
+    private Dictionary<int, GameObject> mapPathLineRenderers = new();
 
     public static NavigationManager Instance { get; private set; }
 
@@ -317,6 +318,8 @@ public class NavigationManager : MonoBehaviour
         GameObject lineObject;
         LineRenderer lr;
 
+        mapPaths[path.id] = path;
+
         if (mapPathLineRenderers.ContainsKey(path.id))
         {
             // Reuse existing LineRenderer
@@ -388,6 +391,9 @@ public class NavigationManager : MonoBehaviour
             Destroy(mapPathLineRenderers[mapPathId]);
             mapPathLineRenderers.Remove(mapPathId);
         }
+
+        if (mapPaths.ContainsKey(mapPathId))
+            mapPaths.Remove(mapPathId);
     }
 
     private void LoadServerMapPaths(string newLocationId)
@@ -486,6 +492,11 @@ public class NavigationManager : MonoBehaviour
             else
                 return SignArrowDirection.left;
         }
+    }
+
+    public Dictionary<int, EasyVizAR.MapPath> GetMapPaths()
+    {
+        return mapPaths;
     }
 
     /*

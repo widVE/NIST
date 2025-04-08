@@ -19,7 +19,15 @@ public class EasyVizARHeadset : MonoBehaviour
 		get { return _headsetName;}
 		set { _headsetName = value; }
 	}
-	
+
+	[SerializeField]
+	string _deviceType;
+	public string Type
+	{
+		get { return _deviceType; }
+		set { _deviceType = value; }
+	}
+
 	public bool verbose_debug = false;
 
 	[SerializeField]
@@ -265,6 +273,7 @@ public class EasyVizARHeadset : MonoBehaviour
         _headsetID = json_headset_data.id;
         _locationID = json_headset_data.location_id;
         _headsetName = json_headset_data.name;
+		_deviceType = json_headset_data.type;
 
         transform.rotation = new Quaternion(json_headset_data.orientation.x, json_headset_data.orientation.y, json_headset_data.orientation.z, json_headset_data.orientation.w);
 
@@ -385,7 +394,8 @@ public class EasyVizARHeadset : MonoBehaviour
 
             _headsetID = h.id;
             _headsetName = h.name;
-            _locationID = h.location_id;
+			_deviceType = h.type;
+			_locationID = h.location_id;
 
             Color newColor;
             if (ColorUtility.TryParseHtmlString(h.color, out newColor))
@@ -453,6 +463,7 @@ public class EasyVizARHeadset : MonoBehaviour
 			
 			_headsetID = h.id;
 			_headsetName = h.name;
+			_deviceType = h.type;
 			_locationID = h.location_id;
 
 			Color newColor;
@@ -495,6 +506,7 @@ public class EasyVizARHeadset : MonoBehaviour
 			// sending a check-in.
 			_headsetID = h.id;
 			_headsetName = h.name;
+			_deviceType = h.type;
 
 			Color newColor;
 			if (ColorUtility.TryParseHtmlString(h.color, out newColor))
@@ -537,7 +549,6 @@ public class EasyVizARHeadset : MonoBehaviour
 		h.orientation.z = (float)transform.rotation[2];
 		h.orientation.w = (float)transform.rotation[3];
         JsonUtility.ToJson(h);
-
 
         EasyVizARServer.Instance.Patch("headsets/"+_headsetID, EasyVizARServer.JSON_TYPE, JsonUtility.ToJson(h), PostPositionCallback);
 	}
