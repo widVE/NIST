@@ -1707,7 +1707,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 479149334253652542, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1182254146109036902, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
       propertyPath: additionalOffset.y
@@ -21701,7 +21701,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6554539914717654055, guid: f5376bfd1500f2545b425907c57306d3, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8117296625534600493, guid: f5376bfd1500f2545b425907c57306d3, type: 3}
       propertyPath: m_Mesh
