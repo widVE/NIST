@@ -1709,10 +1709,6 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1182254146109036902, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
-      propertyPath: additionalOffset.y
-      value: 0.05
-      objectReference: {fileID: 0}
     - target: {fileID: 1508432857380576171, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
       propertyPath: additionalOffset.y
       value: -0.05
@@ -1788,6 +1784,14 @@ PrefabInstance:
     - target: {fileID: 1508432858992311340, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
       propertyPath: additionalOffset.y
       value: -0.08
+      objectReference: {fileID: 0}
+    - target: {fileID: 2755237748822721455, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2958442839536106857, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3118799842959421880, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
       propertyPath: transformOverride

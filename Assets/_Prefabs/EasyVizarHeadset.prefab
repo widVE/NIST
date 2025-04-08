@@ -35,6 +35,8 @@ Transform:
   - {fileID: 6659330067893740698}
   - {fileID: 7113539944382149637}
   - {fileID: 1284782531699778849}
+  - {fileID: 7771607433526815799}
+  - {fileID: 8773466182433962802}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -86,6 +88,54 @@ MonoBehaviour:
   displayOnSigns: 1
   displayOn2DMaps: 1
   displayOn3DMaps: 1
+--- !u!1 &3245649981914596056
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7771607433526815799}
+  - component: {fileID: 5833731844362866224}
+  m_Layer: 0
+  m_Name: Drone Visuals
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7771607433526815799
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3245649981914596056}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 921069525072559226}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5833731844362866224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3245649981914596056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5147ddc28cc651c418d9e93e1d2fd4b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  floor_visuals:
+  - {fileID: 810742208285373253, guid: 209a51fec13040147a54595d5ea88a33, type: 3}
+  raycast_origin: {fileID: 921069525072559227}
+  default_height: 1
 --- !u!1 &4897793136792290897
 GameObject:
   m_ObjectHideFlags: 0
@@ -137,6 +187,54 @@ MonoBehaviour:
   prefab_root: {fileID: 0}
   ghost_user: {fileID: 0}
   ghost_material: {fileID: 0}
+--- !u!1 &6239778863689123917
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8773466182433962802}
+  - component: {fileID: 63819722007140226}
+  m_Layer: 0
+  m_Name: Robot Visuals
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8773466182433962802
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6239778863689123917}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 921069525072559226}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &63819722007140226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6239778863689123917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5147ddc28cc651c418d9e93e1d2fd4b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  floor_visuals:
+  - {fileID: 810742208285373253, guid: 209a51fec13040147a54595d5ea88a33, type: 3}
+  raycast_origin: {fileID: 921069525072559227}
+  default_height: 1
 --- !u!1 &6732124109696385241
 GameObject:
   m_ObjectHideFlags: 0

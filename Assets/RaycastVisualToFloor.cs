@@ -4,16 +4,32 @@ using UnityEngine;
 
 public class RaycastVisualToFloor : MonoBehaviour
 {
-    [SerializeField] private GameObject floor_visuals;
+    [SerializeField] private List<GameObject> floor_visuals;
     [SerializeField] private GameObject raycast_origin;
     [SerializeField] private float default_height = 1f;
 
     private GameObject floor_visuals_instance;
 
+    private int visuals_index = 0;
+
     private void Start()
     {
         raycast_origin = this.gameObject;
-        floor_visuals_instance = Instantiate(floor_visuals, raycast_origin.transform.position, Quaternion.identity);
+        floor_visuals_instance = Instantiate(floor_visuals[visuals_index], raycast_origin.transform.position, Quaternion.identity);
+    }
+
+    public void CycleVisuals()
+    {
+        visuals_index++;
+
+        if (visuals_index >= floor_visuals.Count)
+        {
+            visuals_index = 0;
+        }
+
+        Destroy(floor_visuals_instance);
+
+        floor_visuals_instance = Instantiate(floor_visuals[visuals_index], raycast_origin.transform.position, Quaternion.identity);
     }
 
     void Update()
