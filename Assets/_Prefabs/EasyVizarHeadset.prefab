@@ -37,6 +37,7 @@ Transform:
   - {fileID: 1284782531699778849}
   - {fileID: 7771607433526815799}
   - {fileID: 8773466182433962802}
+  - {fileID: 4667799778082290949}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -54,9 +55,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _updateFrequency: 0.5
   _headsetName: Editor_Test
+  _deviceType: 
   verbose_debug: 0
   _is_local: 0
   _showPositionChanges: 0
+  headset_visuals: {fileID: 8231832368714168251}
+  robot_visuals: {fileID: 6239778863689123917}
+  drone_visuals: {fileID: 3245649981914596056}
+  editor_visuals: {fileID: 7317916595389313377}
   _realTimeChanges: 1
   _postPositionChanges: 1
   _headsetID: 
@@ -133,7 +139,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   floor_visuals:
+  - {fileID: 810742208285373253, guid: de0b0201c06d33246b8a9fa1ce059d99, type: 3}
   - {fileID: 810742208285373253, guid: 209a51fec13040147a54595d5ea88a33, type: 3}
+  - {fileID: 5363672353714284926, guid: 24665aa16d8c1c64aa06f00e2a98d766, type: 3}
   raycast_origin: {fileID: 921069525072559227}
   default_height: 1
 --- !u!1 &4897793136792290897
@@ -232,7 +240,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   floor_visuals:
+  - {fileID: 810742208285373253, guid: de0b0201c06d33246b8a9fa1ce059d99, type: 3}
   - {fileID: 810742208285373253, guid: 209a51fec13040147a54595d5ea88a33, type: 3}
+  - {fileID: 5363672353714284926, guid: 24665aa16d8c1c64aa06f00e2a98d766, type: 3}
   raycast_origin: {fileID: 921069525072559227}
   default_height: 1
 --- !u!1 &6732124109696385241
@@ -407,6 +417,56 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 6904258856975439090}
   m_maskType: 0
+--- !u!1 &7317916595389313377
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4667799778082290949}
+  - component: {fileID: 5843234918635692745}
+  m_Layer: 0
+  m_Name: Editor Visuals
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &4667799778082290949
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7317916595389313377}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 921069525072559226}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5843234918635692745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7317916595389313377}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5147ddc28cc651c418d9e93e1d2fd4b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  floor_visuals:
+  - {fileID: 810742208285373253, guid: de0b0201c06d33246b8a9fa1ce059d99, type: 3}
+  - {fileID: 810742208285373253, guid: 209a51fec13040147a54595d5ea88a33, type: 3}
+  - {fileID: 5363672353714284926, guid: 24665aa16d8c1c64aa06f00e2a98d766, type: 3}
+  raycast_origin: {fileID: 921069525072559227}
+  default_height: 1
 --- !u!1 &8231832368714168251
 GameObject:
   m_ObjectHideFlags: 0

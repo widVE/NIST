@@ -41,8 +41,20 @@ public class EasyVizARHeadset : MonoBehaviour
 	[SerializeField]
 	bool _showPositionChanges = false;
 	public bool ShowPositionChanges => _showPositionChanges;
-	
+
 	[SerializeField]
+	GameObject headset_visuals;
+
+	[SerializeField]
+	GameObject robot_visuals;
+
+	[SerializeField]
+	GameObject drone_visuals;
+
+	[SerializeField]
+	GameObject editor_visuals;
+
+    [SerializeField]
 	public bool _realTimeChanges = true;
     //public bool RealTimeChanges
     //{
@@ -127,7 +139,43 @@ public class EasyVizARHeadset : MonoBehaviour
 
         //if (_is_local) StartCoroutine(PositionPostingUpdate(_updateFrequency));
         if(_postPositionChanges && _is_local) StartCoroutine(PositionPostingUpdate(_updateFrequency));
+
+        StartCoroutine(DeviceVisualsChecker());
     }
+
+    //co-routine to check the value of the device type every second and change the visuals accordingly
+    IEnumerator DeviceVisualsChecker()
+    {
+        while (true)
+        {
+            if (string.Equals(_deviceType, "robot", StringComparison.OrdinalIgnoreCase))
+            {
+                headset_visuals.SetActive(false);
+                robot_visuals.SetActive(true);
+                drone_visuals.SetActive(false);
+            }
+            else if (string.Equals(_deviceType, "drone", StringComparison.OrdinalIgnoreCase))
+            {
+                headset_visuals.SetActive(false);
+                robot_visuals.SetActive(false);
+                drone_visuals.SetActive(true);
+            }
+			else if (string.Equals(_deviceType, "editor", StringComparison.OrdinalIgnoreCase))
+            {
+                headset_visuals.SetActive(true);
+                robot_visuals.SetActive(false);
+                drone_visuals.SetActive(false);
+            }
+            else
+            {
+                headset_visuals.SetActive(true);
+                robot_visuals.SetActive(false);
+                drone_visuals.SetActive(false);
+            }
+            yield return new WaitForSeconds(1f);
+        }
+    }
+
 
     public void Initialize(Headset headset_class_data)
     {

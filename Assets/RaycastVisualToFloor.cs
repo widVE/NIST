@@ -18,6 +18,11 @@ public class RaycastVisualToFloor : MonoBehaviour
         floor_visuals_instance = Instantiate(floor_visuals[visuals_index], raycast_origin.transform.position, Quaternion.identity);
     }
 
+    private void OnDestroy()
+    {
+        Destroy(floor_visuals_instance);
+    }
+
     public void CycleVisuals()
     {
         visuals_index++;
@@ -35,6 +40,7 @@ public class RaycastVisualToFloor : MonoBehaviour
     void Update()
     {
         RaycastHit hit;
+
         if (Physics.Raycast(raycast_origin.transform.position, Vector3.down, out hit))
         {
             floor_visuals_instance.transform.position = new Vector3(raycast_origin.transform.position.x, hit.point.y, raycast_origin.transform.position.z);
