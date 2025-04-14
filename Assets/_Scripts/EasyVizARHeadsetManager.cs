@@ -340,6 +340,7 @@ public class EasyVizARHeadsetManager : MonoBehaviour
 
 
 
+
     public void ToggleBreadcrumbs()
     {
         //For every headset in the active list set the line renderer to the opposite state
@@ -537,6 +538,31 @@ public class EasyVizARHeadsetManager : MonoBehaviour
             }
         }
     }
+
+    //Cycle robot visuals. Iterate through all the active headsets and if their _deviceType is robot cycle the visuals
+    public void CycleRobotVisuals()
+    {
+        foreach (EasyVizARHeadset headset_user in _activeHeadsets.Values)
+        {
+            if (headset_user.Type == "robot")
+            {
+                headset_user.CycleVisuals();
+            }
+        }
+    }
+
+    //Cycle drone visuals. Iterate through all the active headsets and if their Type is drone cycle the visuals
+    public void CycleDroneVisuals()
+    {
+        foreach (EasyVizARHeadset headset_user in _activeHeadsets.Values)
+        {
+            if (headset_user.Type == "drone")
+            {
+                headset_user.CycleVisuals();
+            }
+        }
+    }
+
 
     void CreateLocalHeadset()
     {

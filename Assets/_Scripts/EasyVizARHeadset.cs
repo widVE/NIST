@@ -176,6 +176,34 @@ public class EasyVizARHeadset : MonoBehaviour
         }
     }
 
+    //Find the Drone Visuals and Robot Visuals game objects, get the RaycastVisualToFloor component and call the CycleVisuals() on it
+    public void CycleVisuals()
+    {
+        if (string.Equals(_deviceType, "robot", StringComparison.OrdinalIgnoreCase))
+        {
+            GameObject robot_visual = GameObject.Find("Robot Visuals");
+            if (robot_visual)
+            {
+                RaycastVisualToFloor rvtf = robot_visual.GetComponent<RaycastVisualToFloor>();
+                if (rvtf)
+                {
+                    rvtf.CycleVisuals();
+                }
+            }
+        }
+        else if (string.Equals(_deviceType, "drone", StringComparison.OrdinalIgnoreCase))
+        {
+            GameObject drone_visual = GameObject.Find("Drone Visuals");
+            if (drone_visual)
+            {
+                RaycastVisualToFloor rvtf = drone_visual.GetComponent<RaycastVisualToFloor>();
+                if (rvtf)
+                {
+                    rvtf.CycleVisuals();
+                }
+            }
+        }
+    }
 
     public void Initialize(Headset headset_class_data)
     {

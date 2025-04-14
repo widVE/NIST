@@ -1817,6 +1817,50 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4719661011325910146, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 561901448}
+    - target: {fileID: 4719661011325910146, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: CycleDroneVisuals
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719661011325910146, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: EasyVizARHeadsetManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719661011325910146, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 5642316111373189700, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5642316111373189700, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5642316111373189700, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 561901448}
+    - target: {fileID: 5642316111373189700, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5642316111373189700, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: CycleRobotVisuals
+      objectReference: {fileID: 0}
+    - target: {fileID: 5642316111373189700, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: EasyVizARHeadsetManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 5642316111373189700, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 6232975782971491064, guid: 4b0c43520ded00e4499fa5534f17a89e, type: 3}
       propertyPath: m_LocalScale.x
       value: 1

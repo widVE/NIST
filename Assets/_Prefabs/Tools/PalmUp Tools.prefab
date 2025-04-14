@@ -4180,6 +4180,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 8544219537636739718}
     m_Modifications:
     - target: {fileID: 1530229247293458911, guid: 67957c16514f80e4c95c394447944a28, type: 3}
+      propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1530229247293458911, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
       objectReference: {fileID: 1508432858393532781}
@@ -4252,16 +4256,24 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8093590129798258414, guid: 67957c16514f80e4c95c394447944a28, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8093590129798258414, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1886674847565634602}
+      objectReference: {fileID: 0}
     - target: {fileID: 8093590129798258414, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: QuitApplication
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8093590129798258414, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: ApplicationQuitter, Assembly-CSharp
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8093590129798258414, guid: 67957c16514f80e4c95c394447944a28, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1662177744093422012, guid: 67957c16514f80e4c95c394447944a28, type: 3}
@@ -4295,6 +4307,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8544219537636739718}
     m_Modifications:
+    - target: {fileID: 1530229247293458911, guid: 67957c16514f80e4c95c394447944a28, type: 3}
+      propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1530229247293458911, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
@@ -4365,6 +4381,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5854300274069653270, guid: 67957c16514f80e4c95c394447944a28, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8093590129798258414, guid: 67957c16514f80e4c95c394447944a28, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8093590129798258414, guid: 67957c16514f80e4c95c394447944a28, type: 3}
