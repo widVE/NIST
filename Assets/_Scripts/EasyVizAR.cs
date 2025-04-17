@@ -303,7 +303,7 @@ namespace EasyVizAR
 		public string createdBy;
 		public int id;
 		public string name;
-		public bool enabled;
+		public bool enabled = true;
 		public Position position;
 		public Orientation orientation;
 		public Scale scale;
