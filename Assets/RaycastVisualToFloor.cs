@@ -8,6 +8,13 @@ public class RaycastVisualToFloor : MonoBehaviour
     [SerializeField] private GameObject raycast_origin;
     [SerializeField] private float default_height = 1f;
 
+    [SerializeField] private bool drone_mode = false;
+    public bool DroneMode
+    {
+        get => drone_mode;
+        set => drone_mode = value;
+    }
+
     private GameObject floor_visuals_instance;
 
     private int visuals_index = 0;
@@ -41,7 +48,11 @@ public class RaycastVisualToFloor : MonoBehaviour
     {
         RaycastHit hit;
 
-        if (Physics.Raycast(raycast_origin.transform.position, Vector3.down, out hit))
+        if (drone_mode)
+        {  
+            floor_visuals_instance.transform.position = new Vector3(raycast_origin.transform.position.x, raycast_origin.transform.position.y, raycast_origin.transform.position.z);
+        }
+        else if (Physics.Raycast(raycast_origin.transform.position, Vector3.down, out hit))
         {
             floor_visuals_instance.transform.position = new Vector3(raycast_origin.transform.position.x, hit.point.y, raycast_origin.transform.position.z);
             Debug.Log("Hit at " + hit.point.y);

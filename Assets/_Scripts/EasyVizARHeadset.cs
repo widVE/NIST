@@ -187,6 +187,7 @@ public class EasyVizARHeadset : MonoBehaviour
                 RaycastVisualToFloor rvtf = robot_visual.GetComponent<RaycastVisualToFloor>();
                 if (rvtf)
                 {
+                    rvtf.DroneMode = false;
                     rvtf.CycleVisuals();
                 }
             }
@@ -199,6 +200,7 @@ public class EasyVizARHeadset : MonoBehaviour
                 RaycastVisualToFloor rvtf = drone_visual.GetComponent<RaycastVisualToFloor>();
                 if (rvtf)
                 {
+					rvtf.DroneMode = true;
                     rvtf.CycleVisuals();
                 }
             }
