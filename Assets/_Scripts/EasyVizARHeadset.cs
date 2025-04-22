@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 using UnityEngine;
+using VInspector.Libs;
 
 public class EasyVizARHeadset : MonoBehaviour
 {
@@ -159,6 +160,17 @@ public class EasyVizARHeadset : MonoBehaviour
                 headset_visuals.SetActive(false);
                 robot_visuals.SetActive(false);
                 drone_visuals.SetActive(true);
+
+                GameObject drone_visual = this.transform.Find("Drone Visuals")?.gameObject;
+                if (drone_visual)
+                {
+                    RaycastVisualToFloor rvtf = drone_visual.GetComponent<RaycastVisualToFloor>();
+                    if (rvtf)
+                    {
+                        rvtf.DroneMode = true;
+                    }
+                }
+
             }
 			else if (string.Equals(_deviceType, "editor", StringComparison.OrdinalIgnoreCase))
             {
@@ -187,7 +199,6 @@ public class EasyVizARHeadset : MonoBehaviour
                 RaycastVisualToFloor rvtf = robot_visual.GetComponent<RaycastVisualToFloor>();
                 if (rvtf)
                 {
-                    rvtf.DroneMode = false;
                     rvtf.CycleVisuals();
                 }
             }
@@ -200,7 +211,6 @@ public class EasyVizARHeadset : MonoBehaviour
                 RaycastVisualToFloor rvtf = drone_visual.GetComponent<RaycastVisualToFloor>();
                 if (rvtf)
                 {
-					rvtf.DroneMode = true;
                     rvtf.CycleVisuals();
                 }
             }
