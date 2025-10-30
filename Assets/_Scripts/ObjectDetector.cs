@@ -60,11 +60,18 @@ public class ImageProcessingResult
 	public float max_score;
 	public string max_label;
 
+	public long preprocessing_time_ms;
 	public long execution_time_ms;
+	public long postprocessing_time_ms;
 	public long encode_time_ms;
+	public long last_layer_time_ms;
+	public long nms_layer_time_ms;
 
 	public int binary_size;
 	public float average_quality;
+
+	public string detection_mode;
+	public string transmit_mode;
 }
 
 [System.Serializable]
@@ -72,6 +79,12 @@ public class NewPhotoResult
 {
 	public int id;
 	public string filename;
+}
+
+[System.Serializable]
+public class ImageList
+{
+	public string[] images;
 }
 
 public enum DetectionMode
@@ -131,9 +144,16 @@ public class ObjectDetector : MonoBehaviour
 
 	public bool drawBoundingBoxes = false;
 
+	// Whether the game object should be active before scanning QR code
+	// Set to true for experiments
+	public bool defaultActive = false;
+
+	// For experiments, load test images from a server
+	public bool loadTestImages = false;
+
 	// For experiments, send to an alternate server
 	public bool sendToExperimentServer = false;
-	public string experimentServerURL = "http://easyvizar.wings.cs.wisc.edu:5001";
+	public string experimentServerURL = "http://localhost:5000";
 
 	// If performing ROI encoding, also send the original image (primarily for experiments).
 	public bool sendOriginalWithPatches = false;
@@ -209,6 +229,9 @@ public class ObjectDetector : MonoBehaviour
 
 	private List<GameObject> existingContours = new();
 
+	private Queue<string> testImageQueue = null;
+	private List<string> modelLayerNames = null;
+
 	public long GetTimestamp()
     {
 		return DateTimeOffset.Now.ToUnixTimeMilliseconds();
@@ -248,7 +271,7 @@ public class ObjectDetector : MonoBehaviour
 		experiment_start_time = GetTimestamp();
 
 		// Disable the game object until enabled by configuration loader below.
-		gameObject.SetActive(false);
+		gameObject.SetActive(defaultActive);
 
 		if (headAttachedDisplay)
 			headAttachedText = headAttachedDisplay.GetComponent<HeadAttachedText>();
@@ -305,6 +328,11 @@ public class ObjectDetector : MonoBehaviour
 
     private void OnEnable()
     {
+		if (loadTestImages)
+		{
+			StartCoroutine(RunTest());
+		}
+
 		if (running)
         {
 			Debug.Log("Initializing ObjectDetector");
@@ -433,6 +461,12 @@ public class ObjectDetector : MonoBehaviour
 		// haven't figured out how to parse this JSON string, hence I just use a constant array of class names
 		//var names = model.Metadata["names"];
 
+		modelLayerNames = new();
+		foreach (var layer in model.layers)
+		{
+			modelLayerNames.Add(layer.name);
+		}
+
 		engine = WorkerFactory.CreateWorker(BackendType.GPUCompute, model);
 	}
 
@@ -506,8 +540,6 @@ public class ObjectDetector : MonoBehaviour
 		positionAtCapture = Camera.main.transform.position;
 		rotationAtCapture = Camera.main.transform.rotation;
 
-		startExecution();
-
 		long executionTime = 0;
 
 		var stopwatch = new System.Diagnostics.Stopwatch();
@@ -561,6 +593,9 @@ public class ObjectDetector : MonoBehaviour
 
 	private IEnumerator finishExecution(ImageProcessingResult report)
     {
+		var stopwatch = new System.Diagnostics.Stopwatch();
+		stopwatch.Start();
+
 		Texture2D texture = new Texture2D(outputTexture.width, outputTexture.height, TextureFormat.RGBA32, false);
 		RenderTexture.active = outputTexture;
 
@@ -587,10 +622,15 @@ public class ObjectDetector : MonoBehaviour
 		else
 			dresult = new DetectionResult();
 
+		report.postprocessing_time_ms = stopwatch.ElapsedMilliseconds;
+
 		report.max_label = dresult.max_label;
 		report.max_score = dresult.max_score;
 		report.num_detected = dresult.num_detected;
 		report.num_persons = dresult.num_persons;
+
+		report.detection_mode = detectionMode.ToString();
+		report.transmit_mode = transmitMode.ToString();
 
 		texture.Apply();
 		RenderTexture.active = null;
@@ -870,6 +910,10 @@ public class ObjectDetector : MonoBehaviour
 
 	private bool shouldSendFrame(DetectionResult dresult)
     {
+		// Always send results for an experiment
+		if (loadTestImages)
+			return true;
+
 		if (detectionMode == DetectionMode.Blur)
 		{
 			var variance = engine.PeekOutput("variance") as TensorFloat;
@@ -1373,5 +1417,99 @@ public class ObjectDetector : MonoBehaviour
 		}
 
 		www.Dispose();
+	}
+
+	IEnumerator ProcessTestImageQueue()
+    {
+		while (testImageQueue.Count > 0)
+        {
+			var url = testImageQueue.Dequeue();
+			Debug.Log(url);
+
+			var report = new ImageProcessingResult();
+			var stopwatch = new System.Diagnostics.Stopwatch();
+			var layerTimer = new System.Diagnostics.Stopwatch();
+
+			UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
+			yield return www.SendWebRequest();
+
+			if (www.result == UnityWebRequest.Result.Success)
+            {
+				stopwatch.Start();
+				Texture tex = DownloadHandlerTexture.GetContent(www);
+				inputTensor = TextureConverter.ToTensor(tex, -1, -1, 3);
+				Graphics.Blit(tex, outputTexture);
+				report.preprocessing_time_ms = stopwatch.ElapsedMilliseconds;
+
+				stopwatch.Restart();
+				executionSchedule = engine.StartManualSchedule(inputTensor);
+
+				var layerEnumerator = modelLayerNames.GetEnumerator();
+				bool hasMoreWork = true;
+				while (hasMoreWork)
+				{
+					layerEnumerator.MoveNext();
+
+					layerTimer.Restart();
+					hasMoreWork = executionSchedule.MoveNext();
+					
+					report.last_layer_time_ms = layerTimer.ElapsedMilliseconds;
+					if (layerEnumerator.Current == "selected_indices")
+						report.nms_layer_time_ms = layerTimer.ElapsedMilliseconds;
+				}
+				report.execution_time_ms = stopwatch.ElapsedMilliseconds;
+
+				report.device = SystemInfo.deviceName;
+				report.model = modelName;
+				report.experiment_start = experiment_start_time;
+				report.number = counter;
+
+				counter++;
+
+				yield return finishExecution(report);
+
+				inputTensor.Dispose();
+				inputTensor = null;
+			}
+			else
+            {
+				Debug.Log(www.error);
+            }
+		}
+    }
+
+	IEnumerator RunTest()
+	{
+		experiment_start_time = GetTimestamp();
+		counter = 0;
+
+		initializeEngine();
+		outputTexture = new RenderTexture(modelInputWidth, modelInputHeight, 0, RenderTextureFormat.ARGBFloat);
+
+		yield return sendStartUpReport();
+
+		string url = experimentServerURL + "/images";
+
+		UnityWebRequest www = new UnityWebRequest(url, "GET");
+		www.downloadHandler = new DownloadHandlerBuffer();
+		yield return www.SendWebRequest();
+
+		if (www.result == UnityWebRequest.Result.Success)
+		{
+			var imageList = JsonUtility.FromJson<ImageList>(www.downloadHandler.text);
+			testImageQueue = new Queue<string>();
+			foreach (var filename in imageList.images)
+			{
+				testImageQueue.Enqueue(experimentServerURL + $"/images/{filename}");
+			}
+		}
+
+		yield return ProcessTestImageQueue();
+
+		outputTexture.Release();
+		outputTexture = null;
+
+		engine.Dispose();
+		engine = null;
 	}
 }

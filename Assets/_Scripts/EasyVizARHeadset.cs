@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 using UnityEngine;
-using VInspector.Libs;
 
 public class EasyVizARHeadset : MonoBehaviour
 {
